@@ -1,0 +1,62 @@
+{
+    "scene":[
+        {
+            "id": 1,
+            "target": true,
+            "position": {
+                "ang_unit": "arcsec",
+                "xoff": 0.0,
+                "yoff": 0.0
+            },
+            "spectrum": {
+                "normalization": {
+                     "type": "none"},
+                "sed": {
+                    "sed_type": "input",
+                    "spectrum": []
+                        },
+                "lines": []
+                    }
+                }
+            ],
+    "background": "medium",
+    "calculation":{
+        "effects": {
+                "background": true,
+                "ipc": true,
+                "saturation": true
+                },
+        "noise": {
+                "crs": true,
+                "darkcurrent": true,
+                "ffnoise": false,
+                "readnoise": true,
+                "rn_correlation": true
+           }
+    },
+    "configuration": {
+    "instrument": {
+           "instrument": "miri",
+           "mode": "lrsslitless",
+           "filter": null,
+           "aperture": "imager",
+           "disperser": "p750l"
+           },
+    "detector": {
+              "subarray": "slitlessprism",
+              "readmode": "fast",
+              "ngroup": 10,
+              "nint": 1,
+              "nexp": 10
+         }
+    },
+    "strategy": {
+            "method": "specapphot",
+            "background_subtraction":true,
+            "aperture_size": 0.42,
+            "sky_annulus": [0.5,1.5],
+            "target_xy": [0.0, 0.0],
+            "reference_wavelength": null,
+            "units":"arcsec"
+       }
+}
