@@ -1,0 +1,38 @@
+
+{% block css %}
+<link rel="stylesheet" href="http://cdn.pydata.org/bokeh/release/bokeh-0.11.1.min.css" type="text/css"/>
+{% end %}
+
+{% block body %}
+<h1 class="page-header">Login for Pre-Approved Beta Testers-ONLY</h1>
+<p>PandExo is not yet released to the public. If you are not a pre approved beta tester, please check back with us later when the site is available to the public</p>
+<form enctype="multipart/form-data" class="form-horizontal" action="/login" method="post" id="calculation-form">
+
+    <div class="form-group">
+        <label class="col-md-3 control-label" for="calcName">Username</label>
+
+        <div class="col-md-9">
+            <input type="text" class="form-control" id="username" name="username">
+            <p class="help-block">Provide a username</p>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-3 control-label" for="password">Password</label>
+
+        <div class="col-md-9">
+            <input type="password" class="form-control" id="password" name="password">
+            <p class="help-block">Provide a password</p>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-sm-offset-3 col-sm-9">
+            <button type="submit" class="btn btn-success">Submit</button>
+            {% module xsrf_form_html() %}
+        </div>
+    </div>
+</form>
+{% end %}
+
+{% block js %}        
+<script src="{{ static_url('js/starter.form.js') }}"></script>
+{% end %}

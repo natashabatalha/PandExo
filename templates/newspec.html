@@ -1,0 +1,325 @@
+{% extends "base.html" %}
+
+{% block css %}
+<link rel="stylesheet" href="http://cdn.pydata.org/bokeh/release/bokeh-0.11.1.min.css" type="text/css"/>
+{% end %}
+
+{% block body %}
+<h1 class="page-header">New Transmission Spectra</h1>
+<p> Enter up to 10 molecules. To specify background gas enter 'bkg' (no quotes). For H2/He background, write 'bkg' in both H2 and He boxes. Then specify H2/He fraction below. The sum of the mixing ratio of all molecules should NOT exceed 1. Please credit PandExo & Line et al. 2012.</p>
+<form enctype="multipart/form-data" class="form-horizontal" action="/calculation/newspec" method="post" id="calculation-form">
+
+    <div class="form-group">
+        <label class="col-md-3 control-label" for="calcName">Name</label>
+
+        <div class="col-md-9">
+            <input type="text" class="form-control" id="calcName" name="calcName" value="My New Calculation">
+            <p class="help-block">Provide a name for this planet</p>
+        </div>
+    </div>
+    
+    <div class="form-group">
+        <label class="col-md-3 control-label" for="mol1">Molecule # 1</label>
+        <div class="col-md-3">
+            <select id="mol1" name="mol1" class="form-control">
+                <option value=""></option>
+                <option value="C2H2">C2H2</option>
+                <option value="CH4">CH4</option>
+                <option value="CO">CO</option>
+                <option value="CO2">CO2</option>
+                <option value="FeH">FeH</option> 
+                <option value="H2">H2</option> 
+                <option value="He">He</option> 
+                <option value="H2O">H2O</option> 
+                <option value="H2S">H2S</option> 
+                <option value="HCN">HCN</option>
+                <option value="NH3">NH3</option>
+                <option value="VO">VO</option>                
+            </select>
+        </div>
+        <div class="col-md-3">
+            <input type="text" class="form-control" id="mol1_vmr" name="mol1_vmr" >
+            <p class="help-block">Provide Mixing Ratio or write 'bkg' for background gas</p>
+        </div>
+    </div>  
+
+    <div class="form-group">
+        <label class="col-md-3 control-label" for="mol2">Molecule # 2</label>
+        <div class="col-md-3">
+            <select id="mol2" name="mol2" class="form-control">
+                <option value=""></option>
+                <option value="C2H2">C2H2</option>
+                <option value="CH4">CH4</option>
+                <option value="CO">CO</option>
+                <option value="CO2">CO2</option>
+                <option value="FeH">FeH</option> 
+                <option value="H2">H2</option> 
+                <option value="He">He</option> 
+                <option value="H2O">H2O</option> 
+                <option value="H2S">H2S</option> 
+                <option value="HCN">HCN</option>
+                <option value="NH3">NH3</option>
+                <option value="VO">VO</option>                
+            </select>
+        </div>
+        <div class="col-md-3">
+            <input type="text" class="form-control" id="mol2_vmr" name="mol2_vmr" >
+        </div>
+    </div>  
+    
+    <div class="form-group">
+        <label class="col-md-3 control-label" for="mol3">Molecule # 3</label>
+        <div class="col-md-3">
+            <select id="mol3" name="mol3" class="form-control">
+                <option value=""></option>
+                <option value="C2H2">C2H2</option>
+                <option value="CH4">CH4</option>
+                <option value="CO">CO</option>
+                <option value="CO2">CO2</option>
+                <option value="FeH">FeH</option> 
+                <option value="H2">H2</option> 
+                <option value="He">He</option> 
+                <option value="H2O">H2O</option> 
+                <option value="H2S">H2S</option> 
+                <option value="HCN">HCN</option>
+                <option value="NH3">NH3</option>
+                <option value="VO">VO</option>                
+            </select>
+        </div>
+        <div class="col-md-3">
+            <input type="text" class="form-control" id="mol3_vmr" name="mol3_vmr" >
+        </div>
+    </div>  
+    
+    <div class="form-group">
+        <label class="col-md-3 control-label" for="mol4">Molecule # 4</label>
+        <div class="col-md-3">
+            <select id="mol4" name="mol4" class="form-control">
+                <option value=""></option>
+                <option value="C2H2">C2H2</option>
+                <option value="CH4">CH4</option>
+                <option value="CO">CO</option>
+                <option value="CO2">CO2</option>
+                <option value="FeH">FeH</option> 
+                <option value="H2">H2</option> 
+                <option value="He">He</option> 
+                <option value="H2O">H2O</option> 
+                <option value="H2S">H2S</option> 
+                <option value="HCN">HCN</option>
+                <option value="NH3">NH3</option>
+                <option value="VO">VO</option>                
+            </select>
+        </div>
+        <div class="col-md-3">
+            <input type="text" class="form-control" id="mol4_vmr" name="mol4_vmr" >
+        </div>
+    </div>  
+    <div class="form-group">
+        <label class="col-md-3 control-label" for="mol5">Molecule # 5</label>
+        <div class="col-md-3">
+            <select id="mol5" name="mol5" class="form-control">
+                <option value=""></option>
+                <option value="C2H2">C2H2</option>
+                <option value="CH4">CH4</option>
+                <option value="CO">CO</option>
+                <option value="CO2">CO2</option>
+                <option value="FeH">FeH</option> 
+                <option value="H2">H2</option> 
+                <option value="He">He</option> 
+                <option value="H2O">H2O</option> 
+                <option value="H2S">H2S</option> 
+                <option value="HCN">HCN</option>
+                <option value="NH3">NH3</option>
+                <option value="VO">VO</option>                
+            </select>
+        </div>
+        <div class="col-md-3">
+            <input type="text" class="form-control" id="mol5_vmr" name="mol5_vmr" >
+        </div>
+    </div>  
+    <div class="form-group">
+        <label class="col-md-3 control-label" for="mol6">Molecule # 6</label>
+        <div class="col-md-3">
+            <select id="mol1" name="mol6" class="form-control">
+                <option value=""></option>
+                <option value="C2H2">C2H2</option>
+                <option value="CH4">CH4</option>
+                <option value="CO">CO</option>
+                <option value="CO2">CO2</option>
+                <option value="FeH">FeH</option> 
+                <option value="H2">H2</option> 
+                <option value="He">He</option> 
+                <option value="H2O">H2O</option> 
+                <option value="H2S">H2S</option> 
+                <option value="HCN">HCN</option>
+                <option value="NH3">NH3</option>
+                <option value="VO">VO</option>                
+            </select>
+        </div>
+        <div class="col-md-3">
+            <input type="text" class="form-control" id="mol6_vmr" name="mol6_vmr" >
+        </div>
+    </div>  
+    <div class="form-group">
+        <label class="col-md-3 control-label" for="mol7">Molecule # 7</label>
+        <div class="col-md-3">
+            <select id="mol7" name="mol7" class="form-control">
+                <option value=""></option>
+                <option value="C2H2">C2H2</option>
+                <option value="CH4">CH4</option>
+                <option value="CO">CO</option>
+                <option value="CO2">CO2</option>
+                <option value="FeH">FeH</option> 
+                <option value="H2">H2</option> 
+                <option value="He">He</option> 
+                <option value="H2O">H2O</option> 
+                <option value="H2S">H2S</option> 
+                <option value="HCN">HCN</option>
+                <option value="NH3">NH3</option>
+                <option value="VO">VO</option>                
+            </select>
+        </div>
+        <div class="col-md-3">
+            <input type="text" class="form-control" id="mol7_vmr" name="mol7_vmr" >
+        </div>
+    </div>  
+    <div class="form-group">
+        <label class="col-md-3 control-label" for="mol8">Molecule # 8</label>
+        <div class="col-md-3">
+            <select id="mol8" name="mol8" class="form-control">
+                <option value=""></option>
+                <option value="C2H2">C2H2</option>
+                <option value="CH4">CH4</option>
+                <option value="CO">CO</option>
+                <option value="CO2">CO2</option>
+                <option value="FeH">FeH</option> 
+                <option value="H2">H2</option> 
+                <option value="He">He</option> 
+                <option value="H2O">H2O</option> 
+                <option value="H2S">H2S</option> 
+                <option value="HCN">HCN</option>
+                <option value="NH3">NH3</option>
+                <option value="VO">VO</option>                
+            </select>
+        </div>
+        <div class="col-md-3">
+            <input type="text" class="form-control" id="mol8_vmr" name="mol8_vmr" >
+        </div>
+    </div>  
+    <div class="form-group">
+        <label class="col-md-3 control-label" for="mol9">Molecule # 9</label>
+        <div class="col-md-3">
+            <select id="mol9" name="mol9" class="form-control">
+                <option value=""></option>
+                <option value="C2H2">C2H2</option>
+                <option value="CH4">CH4</option>
+                <option value="CO">CO</option>
+                <option value="CO2">CO2</option>
+                <option value="FeH">FeH</option> 
+                <option value="H2">H2</option> 
+                <option value="He">He</option> 
+                <option value="H2O">H2O</option> 
+                <option value="H2S">H2S</option> 
+                <option value="HCN">HCN</option>
+                <option value="NH3">NH3</option>
+                <option value="VO">VO</option>                
+            </select>
+        </div>
+        <div class="col-md-3">
+            <input type="text" class="form-control" id="mol9_vmr" name="mol9_vmr" >
+        </div>
+    </div>  
+    <div class="form-group">
+        <label class="col-md-3 control-label" for="mol10">Molecule # 10</label>
+        <div class="col-md-3">
+            <select id="mol10" name="mol10" class="form-control">
+                <option value=""></option>
+                <option value="C2H2">C2H2</option>
+                <option value="CH4">CH4</option>
+                <option value="CO">CO</option>
+                <option value="CO2">CO2</option>
+                <option value="FeH">FeH</option> 
+                <option value="H2">H2</option> 
+                <option value="He">He</option> 
+                <option value="H2O">H2O</option> 
+                <option value="H2S">H2S</option> 
+                <option value="HCN">HCN</option>
+                <option value="NH3">NH3</option>
+                <option value="VO">VO</option>                
+            </select>
+        </div>
+        <div class="col-md-3">
+            <input type="text" class="form-control" id="mol10_vmr" name="mol10_vmr" >
+        </div>
+    </div>  
+
+    <div class="form-group">
+        <label class="col-md-3 control-label" for="fracH2He">Fraction of He/H2</label>
+        <div class="col-md-3">
+            <input type="text" class="form-control" id="fracH2He" name="fracH2He" value="0.73">
+            <p class="help-block">Only needed if you specified 'bkg' for H2 AND He</p>
+        </div>
+    </div> 
+
+
+    <div class="form-group">
+        <label class="col-md-3 control-label" for="g">Gravity (cgs)</label>
+        <div class="col-md-3">
+            <input type="text" class="form-control" id="g" name="g" >
+        </div>
+    </div> 
+
+    <div class="form-group">
+        <label class="col-md-3 control-label" for="Rp">Planet Radius (Rsun)</label>
+        <div class="col-md-3">
+            <input type="text" class="form-control" id="Rp" name="Rp" >
+        </div>
+    </div> 
+
+    <div class="form-group">
+        <label class="col-md-3 control-label" for="R*">Stellar Radius (Rsun)</label>
+        <div class="col-md-3">
+            <input type="text" class="form-control" id="R*" name="R*" >
+        </div>
+    </div> 
+    <div class="form-group">
+        <label class="col-md-3 control-label" for="T">Temperature Level (K)</label>
+        <div class="col-md-3">
+            <input type="text" class="form-control" id="T" name="T" >
+        </div>
+    </div>  
+
+
+    <div class="form-group">
+        <label class="col-md-3 control-label" for="P">Pressure Level (bar)</label>
+        <div class="col-md-3">
+            <input type="text" class="form-control" id="P" name="P" >
+        </div>
+    </div> 
+   <div class="form-group">
+        <label class="col-md-3 control-label" for="P0">Opaque Disk Level (bar)</label>
+        <div class="col-md-3">
+            <input type="text" class="form-control" id="P0" name="P0" >
+        </div>
+    </div>   
+    
+
+    <div class="form-group">
+        <div class="col-sm-offset-3 col-sm-9">
+            <button type="submit" class="btn btn-success">Submit</button>
+            {% module xsrf_form_html() %}
+        </div>
+    </div>
+    
+    
+    
+    
+</form>
+{% end %}
+
+{% block js %}        
+<script src="{{ static_url('js/starter.formspec.js') }}"></script>    
+
+
+<script type="text/javascript" src="http://cdn.pydata.org/bokeh/release/bokeh-0.11.1.min.js"></script>
+{% end %}
