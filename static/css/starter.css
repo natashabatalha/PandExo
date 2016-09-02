@@ -1,0 +1,68 @@
+body {
+    padding-top: 50px;
+}
+
+.table > tbody > tr > td {
+    vertical-align: middle;
+}
+
+.footer {
+    /*position: relative;*/
+    /*margin-top: -150px; !* negative value of footer height *!*/
+    /*height: 150px;*/
+    /*clear: both;*/
+    /*padding-top: 20px;*/
+}
+
+.footer p {
+    padding-top: 10px;
+    border: 1px solid #ccc;
+    border-width: 1px 0 0 0;
+}
+
+.container .text-muted {
+    margin: 20px 0;
+}
+
+/*Add image to jumbotron*/
+.jumbotron {
+    background: url("../img/bkg-w-logo.jpg") no-repeat center center;
+    background-size: cover;
+    color: #f5f5f5;
+    text-shadow: #0f0f0f;
+}
+
+/*Animated loading icon*/
+.glyphicon-refresh-animate {
+    -animation: spin .7s infinite linear;
+    -ms-animation: spin .7s infinite linear;
+    -webkit-animation: spinw .7s infinite linear;
+    -moz-animation: spinm .7s infinite linear;
+}
+
+@keyframes spin {
+    from {
+        transform: scale(1) rotate(0deg);
+    }
+    to {
+        transform: scale(1) rotate(360deg);
+    }
+}
+
+@-webkit-keyframes spinw {
+    from {
+        -webkit-transform: rotate(0deg);
+    }
+    to {
+        -webkit-transform: rotate(360deg);
+    }
+}
+
+@-moz-keyframes spinm {
+    from {
+        -moz-transform: rotate(0deg);
+    }
+    to {
+        -moz-transform: rotate(360deg);
+    }
+}
