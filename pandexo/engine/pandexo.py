@@ -97,6 +97,7 @@ def wrapper(dictinput):
     warnings = add_warnings(inn, timing, sat_level, flags, instrument) 
         
     #Extract relevant info from pandeia output (1d curves and wavelength) 
+    #extracted flux in units of electron/s
     w = out.curves['extracted_flux'][0]
     curves_out = out.curves
     curves_inn = inn.curves
@@ -112,6 +113,9 @@ def wrapper(dictinput):
     extracted_flux_out = curves_out['extracted_flux'][1]
     extracted_noise_out = curves_out['extracted_flux'][1]/(sn_out)
     
+    #units of this unconventional.. sigma/s
+    #because snr = extracted flux / extracted noise and 
+    #extracted flux in units of electrons /s
     varin = (extracted_noise_inn)**2.0
     varout = (extracted_noise_out)**2.0
     
@@ -125,6 +129,13 @@ def wrapper(dictinput):
     var_tot = var_in_bin + var_out_bin
     error = np.sqrt(var_tot)
     
+    #calculate error on spectrum
+    error_spec = error/photon_out_bin
+   
+    #Add in user specified noise floor 
+    error_spec_nfloor = add_noise_floor(noise_floor, wbin, error_spec) 
+
+    
     #add in random noise for the simulated spectrum 
     rand_noise= np.sqrt((var_in_bin+var_out_bin))*(np.random.randn(len(wbin)))
     raw_spec = (photon_out_bin-photon_in_bin)/photon_out_bin
@@ -135,10 +146,6 @@ def wrapper(dictinput):
         sim_spec = -1.0*sim_spec
         raw_spec = -1.0*raw_spec
     
-    error_spec = error/photon_out_bin
-   
-    #Add in user specified noise floor 
-    error_spec_nfloor = add_noise_floor(noise_floor, wbin, error_spec) 
    
     #package binned data
     binned = {'wave':wbin,
@@ -205,10 +212,14 @@ def compute_maxexptime_per_int(pandeia_input, sat_level):
     # count rate on the detector in e-/second 
     det = report_dict['2d']['detector']
     
+    timeinfo = report_dict['information']['exposure_specification']
+    totaltime = timeinfo['tgroup']*timeinfo['ngroup']*timeinfo['nint']
+    
+    maxdetvalue = np.max(det)*totaltime
     #maximum time before saturation per integration 
     #based on user specified saturation level
     try:
-        maxexptime_per_int = sat_level/np.max(det)
+        maxexptime_per_int = sat_level/maxdetvalue
     except: 
         maxexptime_per_int = np.nan
         
@@ -423,9 +434,9 @@ def add_warnings(inn, timing, sat_level, flags,instrument):
     flag_low = "All good"
     flag_perc = "All good"
 
-    if (sat_level > 60) & (ngroups_per_int <5):
+    if (sat_level > 80) & (ngroups_per_int <5):
         flag_low = "% full well>60% & only " + str(ngroups_per_int) + " groups"
-    if (sat_level > 60): 
+    if (sat_level > 80): 
         flag_perc = "% full well>60%"
 
      
