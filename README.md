@@ -18,7 +18,13 @@ Download or clone repo
 
 - To run PandExo in your local broswer simply type in the terminal: 
 
-`    run_pandexo` 
+`    python`
+
+`    import pandexo.engine.main as main`
+
+`    main.main()`
+- Open up an internet brower and go to:
+localhost:1111 
 
 
 
