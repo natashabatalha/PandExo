@@ -10,11 +10,14 @@ For complete description of how to install the following dependencies, please se
 
 #Installing PandExo 
 
-- Download or clone repo
+Download or clone repo
+
 `    cd pandexo_repo`
+
 `    python setup.py install`
 
 - To run PandExo in your local broswer simply type in the terminal: 
+
 `    run_pandexo` 
 
 
