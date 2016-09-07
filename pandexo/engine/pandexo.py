@@ -306,13 +306,13 @@ def compute_timing(m,transit_duration,expfact_out,noccultations):
     eff = exptime_per_int / (clocktime_per_int+overhead_per_int)
     
     #this says "per occultation" but this is just the in transit frames.. See below
-    nframes_per_occultation = long(transit_duration/exptime_per_frame)
-    ngroups_per_occultation = long(nframes_per_occultation/(nframe + nskip))
-    nint_per_occultation = ngroups_per_occultation/(ngroups_per_int + 2)
+    #nframes_per_occultation = long(transit_duration/exptime_per_frame)
+    #ngroups_per_occultation = long(nframes_per_occultation/(nframe + nskip))
+    nint_per_occultation =  transit_duration*eff/exptime_per_int
     
     #figure out how many integrations are in transit and how many are out of transit 
-    nint_in = long(nint_per_occultation)
-    nint_out = long(nint_in/expfact_out)
+    nint_in = np.ceil(nint_per_occultation)
+    nint_out = np.ceil(nint_in/expfact_out)
 
     if nint_in == 0:
         nint_in = 1.0
@@ -321,7 +321,7 @@ def compute_timing(m,transit_duration,expfact_out,noccultations):
         nint_out = 1.0
    
     timing = {
-        "Transit Duration" : transit_duration,
+        "Transit Duration" : transit_duration/60.0/60.0,
         "Seconds per Frame" : exptime_per_frame,
         "Exposure Time Per Integration (secs)":exptime_per_int,
         "Num Groups per Integration" :ngroups_per_int, 
