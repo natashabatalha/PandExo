@@ -20,7 +20,6 @@
             },
 
     "observation": {
-        "ncoadd": 1,
         "sat_level": 0.0,
         "transit_duration": 0.0,
         "noccultations": 1,
