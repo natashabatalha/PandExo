@@ -167,19 +167,16 @@ class AboutHandler(BaseHandler):
         """
         Render about PandExo Page
         """
-        self.check_login_status()
         self.render("about.html")
 
 class TablesHandler(BaseHandler):
     def get(self):
-        self.check_login_status()    
         # This sets an **unsecured** cookie. If user accounts gets
         # implemented, this must be changed to a secure cookie.
         self.render("tables.html")
 
 class HelpfulPlotsHandler(BaseHandler):
     def get(self):
-        self.check_login_status()
         # This sets an **unsecured** cookie. If user accounts gets
         # implemented, this must be changed to a secure cookie.
         self.render("helpfulplots.html")
@@ -191,7 +188,6 @@ class DashboardHandler(BaseHandler):
     the html template, along with the list of current task objects.
     """
     def get(self):
-        self.check_login_status()
         task_responses = [self._get_task_response(id) for id, nt in
                           self.buffer.items()
                           if ((nt.cookie == self.get_cookie("pandexo_user"))
@@ -205,7 +201,6 @@ class DashboardSpecHandler(BaseHandler):
     the html template, along with the list of current task objects.
     """
     def get(self):
-        self.check_login_status()
         task_responses = [self._get_task_response2(id) for id, nt in
                           self.buffer.items()
                           if ((nt.cookie == self.get_cookie("pandexo_user"))
@@ -219,7 +214,6 @@ class CalculationNewHandler(BaseHandler):
     a new calculation task to the parallelized workers.
     """
     def get(self):
-        self.check_login_status()
         self.render("new.html", id=id)
 
     def post(self):
@@ -337,7 +331,6 @@ class CalculationNewHandlerSpec(BaseHandler):
     a new calculation task to the parallelized workers.
     """
     def get(self):
-        self.check_login_status()
         self.render("newspec.html", id=id)
 
     def post(self):
@@ -436,7 +429,6 @@ class CalculationStatusHandler(BaseHandler):
     Handlers returning the status of a particular calculation task.
     """
     def get(self, id):
-        self.check_login_status()
         response = self._get_task_response(id)
 
         if self.request.connection.stream.closed():
@@ -449,7 +441,6 @@ class CalculationStatusHandlerSpec(BaseHandler):
     Handlers returning the status of a particular calculation task.
     """
     def get(self, id):
-        self.check_login_status()
         response = self._get_task_response2(id)
 
         if self.request.connection.stream.closed():
@@ -463,7 +454,6 @@ class CalculationDownloadHandler(BaseHandler):
     Handlers returning the status of a particular calculation task.
     """
     def get(self, id):
-        self.check_login_status()
         result = self._get_task_result(id)
   
         if self.request.connection.stream.closed():
@@ -499,7 +489,6 @@ class CalculationDownloadHandlerSpec(BaseHandler):
     Handlers returning the status of a particular calculation task.
     """
     def get(self, id):
-        self.check_login_status()
         result = self._get_task_result(id)
   
         if self.request.connection.stream.closed():
@@ -535,7 +524,6 @@ class CalculationDownloadHandlerPandIn(BaseHandler):
     Handlers returning the status of a particular calculation task.
     """
     def get(self, id):
-        self.check_login_status()
         result = self._get_task_result(id)
   
         if self.request.connection.stream.closed():
@@ -574,7 +562,6 @@ class CalculationViewHandler(BaseHandler):
     `create_component` function which generates the Bokeh interative plots.
     """
     def get(self, id):
-        self.check_login_status()
         result = self._get_task_result(id)
         script, div = create_component(result)
         div['timing_div'] = result['timing_div']
@@ -596,7 +583,6 @@ class CalculationViewHandlerSpec(BaseHandler):
     `create_component` function which generates the Bokeh interative plots.
     """
     def get(self, id):
-        self.check_login_status()
         result = self._get_task_result(id)
         script, div = create_component2(result)
 
