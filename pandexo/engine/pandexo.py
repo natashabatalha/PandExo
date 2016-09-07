@@ -321,6 +321,7 @@ def compute_timing(m,transit_duration,expfact_out,noccultations):
         nint_out = 1.0
    
     timing = {
+        "Transit Duration" : transit_duration,
         "Seconds per Frame" : exptime_per_frame,
         "Exposure Time Per Integration (secs)":exptime_per_int,
         "Num Groups per Integration" :ngroups_per_int, 
