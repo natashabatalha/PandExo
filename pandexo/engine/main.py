@@ -34,8 +34,6 @@ class Application(tornado.web.Application):
     def __init__(self):
         handlers = [
             (r"/", HomeHandler),
-            (r"/login", LoginHandler),
-            (r"/logout", LogoutHandler),
             (r"/about", AboutHandler),
             (r"/dashboard", DashboardHandler),
             (r"/dashboardspec", DashboardSpecHandler),
@@ -68,17 +66,7 @@ class BaseHandler(tornado.web.RequestHandler):
     """
     executor = ProcessPoolExecutor(max_workers=4)
     buffer = OrderedDict()
-    # NEW STUFF
-    def get_login_url(self):
-        return u"/login"
 
-    def get_current_user(self):
-        user_json = self.get_secure_cookie("user")
-        if user_json:
-            return tornado.escape.json_decode(user_json)
-        else:
-            return None
-    #END NEW STUFF
     def _get_task_response(self, id):
         """
         Simple function to grab a calculation that's stored in the buffer,
@@ -96,11 +84,6 @@ class BaseHandler(tornado.web.RequestHandler):
             response['code'] = 202
         elif task.done():
             response['state'] = 'finished'
-            allfiles = os.listdir(__TEMP__)
-            for i in allfiles:
-                if i.find(id) != -1:
-                    os.remove(os.path.join(__TEMP__,i))
-
         elif task.cancelled():
             response['state'] = 'cancelled'
         else:
@@ -168,63 +151,17 @@ class BaseHandler(tornado.web.RequestHandler):
         if len(self.buffer) > 15:
             self.buffer.popitem(last=False)
             
-    def check_login_status(self):
-        if not self.current_user: #self.get_cookie("pandexo_user"):
-            #self.set_cookie("pandexo_user", str(uuid.uuid4()))
-            self.redirect("/login")
-            return
-                    
-class LoginHandler(BaseHandler):
-
-    def get(self):
-        self.render("login.html", next=self.get_argument("next","/"))
-
-    def post(self):
-        username = self.get_argument("username", "")
-        password = self.get_argument("password", "")
-        # The authenticate method should match a username and password
-        # to a username and password hash in the database users table.
-        # Implementation left as an exercise for the reader.
-        a = pd.read_csv(open(os.path.join(os.path.dirname(__file__), "reference",
-                               "approved_users.csv"),"r"))
-        auth = False
-        for i,j in zip(a.username,a.password): 
-            if i.find(username)==0:
-                if j.find(password)==0:
-                    auth=True
-        if auth:
-            self.set_current_user(username)
-            self.redirect(self.get_argument("next", u"/"))
-        else:
-            error_msg = u"?error=" + tornado.escape.url_escape("Login incorrect.")
-            self.redirect(u"/login" + error_msg)
-    def set_current_user(self, user):
-        if user:
-            self.set_secure_cookie("user", tornado.escape.json_encode(user))
-        else:
-            self.clear_cookie("user")
-
-class LogoutHandler(BaseHandler):
-
-    def get(self):
-        self.clear_cookie("user")
-        self.redirect(u"/login")
 
 
 class HomeHandler(BaseHandler):
     def get(self):
         # This sets an **unsecured** cookie. If user accounts gets
         # implemented, this must be changed to a secure cookie.
-        #if not self.current_user: #self.get_cookie("pandexo_user"):
-        #    #self.set_cookie("pandexo_user", str(uuid.uuid4()))
-        #    self.redirect("/login")
-        #    return
-        if not self.current_user: #self.get_cookie("pandexo_user"):
-            #self.set_cookie("pandexo_user", str(uuid.uuid4()))
-            self.redirect("/login")
-            return
-        self.render("home.html")
+        if not self.get_cookie("pandexo_user"):
+            self.set_cookie("pandexo_user", str(uuid.uuid4()))
 
+        self.render("home.html")
+        
 class AboutHandler(BaseHandler):
     def get(self):
         """
