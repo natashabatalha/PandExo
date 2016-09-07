@@ -7,8 +7,6 @@
                 "f_unit": "FLAM",
                 "mag": 0.0,
                 "ref_wave": 1.250,
-                "wmin": 0.5,
-                "wmax": 30.0,
                 "temp": 4000.0,
                 "metal": 4000.0,
                 "logg": 4000.0
