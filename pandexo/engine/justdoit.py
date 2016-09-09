@@ -141,7 +141,7 @@ def run_pandexo(exo, inst, param_space = 0, param_range = 0,save_file = True,
     save_file: default saves file output but you can spefiy no file output
     output_path: path for output files. default will print out files in current working directory 
     output_file: file name, default = single.p for single run 
-                            'param_space'.p for parameter run 
+                            param_space.p for parameter run 
                             instrument_run.p for instrument parameter space 
     
     Outputs: 
@@ -160,9 +160,11 @@ def run_pandexo(exo, inst, param_space = 0, param_range = 0,save_file = True,
     #single instrument mode with dictionary input OR single planet 
     if type(inst) == dict: 
         print "Running Single Case w/ User Instrument Dict"
-        result =wrapper({"pandeia_input": inst , "pandexo_input":exo})
-        pkl.dump(results, open(os.path.join(output_path,output_file),'w'))
-        return result 
+        results =wrapper({"pandeia_input": inst , "pandexo_input":exo})
+        if output_file == '':
+            output_file = 'singlerun.p'
+        if save_file: pkl.dump(results, open(os.path.join(output_path,output_file),'w'))
+        return results
 
     #make sure inst is in list format.. makes my life so much easier
     try:
@@ -179,14 +181,16 @@ def run_pandexo(exo, inst, param_space = 0, param_range = 0,save_file = True,
         
         #start case of no parameter space run 
         if param_space==0 or param_range==0:
-            print "Running Single Case for: " + inst
-            inst_dict = load_mode_dict(inst)
-            result =wrapper({"pandeia_input": inst_dict , "pandexo_input":exo})
-            return result
+            print "Running Single Case for: " + inst[0]
+            inst_dict = load_mode_dict(inst[0])
+            results =wrapper({"pandeia_input": inst_dict , "pandexo_input":exo})
+            if output_file == '':
+                output_file = 'singlerun.p'
+            if save_file: pkl.dump(results, open(os.path.join(output_path,output_file),'w'))
+            return results
          
         #if there are parameters to cycle through this will run
         print "Running through exo parameters in parallel: " + param_space 
-        
         #run the above function in parallel 
         results = Parallel(n_jobs=num_cores)(delayed(run_param_space)(i,exo,inst,param_space) for i in param_range)
         
@@ -195,7 +199,7 @@ def run_pandexo(exo, inst, param_space = 0, param_range = 0,save_file = True,
         if output_file == '':
             output_file = param_space + '.p'
 
-        pkl.dump(results, open(os.path.join(output_path,output_file),'w'))
+        if save_file: pkl.dump(results, open(os.path.join(output_path,output_file),'w'))
         return results
         
     #run several different instrument modes and single planet
@@ -208,7 +212,7 @@ def run_pandexo(exo, inst, param_space = 0, param_range = 0,save_file = True,
         #and return results immediately to user
         if output_file == '':
             output_file =  'instrument_run.p'
-        pkl.dump(results, open(os.path.join(output_path,output_file),'w'))
+        if save_file: pkl.dump(results, open(os.path.join(output_path,output_file),'w'))
         return results
             
     #cycle through all options  
@@ -220,5 +224,5 @@ def run_pandexo(exo, inst, param_space = 0, param_range = 0,save_file = True,
         #and return results immediately to user
         if output_file == '':
             output_file =  'instrument_run.p'
-        pkl.dump(results, open(os.path.join(output_path,output_file),'w'))
+        if save_file: pkl.dump(results, open(os.path.join(output_path,output_file),'w'))
         return results
