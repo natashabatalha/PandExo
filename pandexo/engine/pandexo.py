@@ -79,19 +79,14 @@ def wrapper(dictinput):
     #add to pandeia input 
     pandeia_input['scene'][0]['spectrum']['sed']['spectrum'] = out_spectrum
     
-    print "Starting compute maxexptime"    
     #run pandeia once to determine max exposure time per int and get exposure params
     m = compute_maxexptime_per_int(pandeia_input, sat_level) 
-    print 'end compute maxexptime'
     #calculate all timing info
     timing, flags = compute_timing(m,transit_duration,expfact_out,noccultations)
 
     #Simulate out trans and in transit
-    print "start out"
     out = perform_out(pandeia_input, pandexo_input,timing, both_spec)
-    print "finish out"
     inn = perform_in(pandeia_input, pandexo_input,timing, both_spec)
-    print "finish in"
     #compute warning flags for timing info 
     warnings = add_warnings(inn, timing, sat_level, flags, instrument) 
         
