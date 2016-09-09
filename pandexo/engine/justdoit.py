@@ -119,13 +119,49 @@ def run_inst_space(inst,exo):
     return {inst: wrapper({"pandeia_input": inst_dict , "pandexo_input":exo})}
 
 
-def run_pandexo(exo, inst, param_space = 0, param_range = 0,
+def run_pandexo(exo, inst, param_space = 0, param_range = 0,save_file = True,
                             output_path=os.getcwd(), output_file = ''):  
+    """
+    Functionality: program contains functionality for running single or 
+    multiple runs of PandExo 
+    
+    Inputs: 
+    exo: exoplanet input dictionary 
+    inst: instrument input dictionary OR LIST of keys (for allowable keys 
+            see print_instruments()
+    param_space: Default is 0, no exoplanet parameter space, to run through a parameter 
+                need to specify which one need to specify two keys
+                from exo dict with + in between. 
+                i.e. observation+fraction
+                    star+temp
+                    planet+exopath
+    param_range: supply array or list over which to run the parameters space.. 
+                    i.e. array of temperatures if running through stellar temp or 
+                    array of files if running through planet models
+    save_file: default saves file output but you can spefiy no file output
+    output_path: path for output files. default will print out files in current working directory 
+    output_file: file name, default = single.p for single run 
+                            'param_space'.p for parameter run 
+                            instrument_run.p for instrument parameter space 
+    
+    Outputs: 
+    result: For single run output will just be a single PandExo output dictionary 
+            https://github.com/natashabatalha/PandExo/wiki/PandExo-Output
+            For multiple runs the output will be organized into a list with each 
+            a dictionary named by whatever you are looping through 
+            i.e. [{'First temp': PandExoDict}, {'Second temp': PandExoDict}, etc..]
+            
+    Attributes: 
+    load_mode_dict: to call instrument dictionaries based off keys 
+    run_inst_space: to run instrument parameters space in parallel 
+    run_param_space: to run exoplanet parameter space in parallel
+    """
 
     #single instrument mode with dictionary input OR single planet 
     if type(inst) == dict: 
         print "Running Single Case w/ User Instrument Dict"
         result =wrapper({"pandeia_input": inst , "pandexo_input":exo})
+        pkl.dump(results, open(os.path.join(output_path,output_file),'w'))
         return result 
 
     #make sure inst is in list format.. makes my life so much easier
