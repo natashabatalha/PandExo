@@ -62,25 +62,35 @@ def load_exo_dict():
     return pandexo_input   
     
 def load_mode_dict(inst):
+    '''
+    Small function to pull in correct instrument dictionary 
+    See load_modes.py 
+    '''
     return lm.SetDefaultModes(inst).pick()
 
-def get_thruput(instrument):
-    obsmode = {
-               'instrument': instrument,
-               'mode': mode,
-               'filter': config['filter'],
-               'aperture': config['aperture'],
-               'disperser': config['disperser']
-               }
+def get_thruput(inst):
+    """
+    Pulls complete instrument wave length solution and photon to 
+    electron conversion efficiency (PCE) based on instrument key input 
+    
+    input: 
+        one of the instrument keys above (ALL) 
+    attributes: 
+        calls load_mode_dict
+    returns dictionary with wave and pce
+    """
+    
+    #pull correct dictionary
+    input_dict = lm.SetDefaultModes(inst).pick()
                              
-    conf = {'instrument': obsmode}
+    conf = {'instrument': input_dict['configuration']['instrument']}
 
     i = InstrumentFactory(config=conf)
     wr = i.get_wave_range()
     wave = np.linspace(wr['wmin'], wr['wmax'], num=500)
     pce = i.get_total_eff(wave)
 
-    return wave,pce
+    return {'wave':wave,'pce':pce}
 
 
 def run_pandexo(exo=None, inst=None, param_space = None, param_range = None,
