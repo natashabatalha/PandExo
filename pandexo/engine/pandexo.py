@@ -69,8 +69,7 @@ def wrapper(dictinput):
     expfact_out = pandexo_input['observation']['fraction'] 
     noise_floor = pandexo_input['observation']['noise_floor']
 
-    #do you want condensed input? or all the dictionary output parameters 
-    online_true = pandexo_input['online']
+
 
     #get stellar spectrum and in transit spec
     star_spec = create.outTrans(pandexo_input['star'])
@@ -161,14 +160,9 @@ def wrapper(dictinput):
                 'wave':w,
                 'error_no_floor':np.sqrt(varin+varout)/extracted_flux_out
                 }
-    #condense output if online interface is running
-    if online_true: 
-        result_dict = as_dict(out,inn, both_spec ,binned, 
+ 
+    result_dict = as_dict(out,inn, both_spec ,binned, 
                 timing, mag, sat_level, warnings,pandexo_input['planet']['f_unit'], unbinned)
-    else: 
-        result_dict = {'out': out, 'in' : inn, 'both_spec':both_spec, 
-                        'binned':binned,'unbinned':unbinned ,'timing': timing}
-
     
     return result_dict 
 
