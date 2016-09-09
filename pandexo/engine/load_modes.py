@@ -27,9 +27,7 @@ class SetDefaultModes():
 
     def __init__(self, inst):
         self.instrument = inst[0:inst.find(' ')].lower()
-        print self.instrument
         self.config = inst[inst.find(' ')+1:len(inst)].lower()   
-        print self.config
     
     def pick(self): 
         getattr(self, self.instrument)()
