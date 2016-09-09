@@ -13,11 +13,14 @@ class SetDefaultModes():
 
     def __init__(self, inst):
         self.instrument = inst[0:inst.find(' ')].lower()
+        print self.instrument
         self.config = inst[inst.find(' ')+1:len(inst)].lower()   
+        print self.config
     
     def pick(self): 
+        getattr(self, self.instrument)()
         try: 
-            getattr(SetDefaultModes(), self.instrument)()
+            return getattr(self, self.instrument)()
         except: 
             print "INVALID INSTRUMENT NAME"
                                    
@@ -36,7 +39,8 @@ class SetDefaultModes():
     def nirspec(self):
         filters = {'g140m':'f070lp','g140h':'f070lp',
                     'g235m':'f170lp','g235h':'f170lp',
-                    'g395m':'f290lp','g395h':'f290lp'
+                    'g395m':'f290lp','g395h':'f290lp',
+                    'prism': 'clear'
                     }
         with open(os.path.join(os.path.dirname(__file__), "reference",
                                "nirspec_input.json")) as data_file:
