@@ -58,4 +58,3 @@ class SetDefaultModes():
                                "miri_input.json")) as data_file:
                 pandeia_data = json.load(data_file)
         return pandeia_data
-
