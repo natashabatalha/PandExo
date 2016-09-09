@@ -1,6 +1,7 @@
 import numpy as np
 from pandeia.engine.instrument_factory import InstrumentFactory
 from pandexo import wrapper
+import load_modes as lm
 import os 
 import pickle as pkl
 from joblib import Parallel, delayed
@@ -9,7 +10,8 @@ import multiprocessing
 num_cores = multiprocessing.cpu_count()
 
 ALL = {"MIRI LRS":False,
-       "NIRISS SOSS":False,
+       "NIRISS SOSS_Or1":False,
+       "NIRISS SOSS_Or2":False,
        "NIRSpec G140M":False,
        "NIRSpec G140H":False,
        "NIRSpec G235M":False,
@@ -60,8 +62,7 @@ def load_exo_dict():
     return pandexo_input   
     
 def load_mode_dict(inst):
-    
-    return
+    return lm.SetDefaultModes(inst).pick()
 
 def get_thruput(instrument):
     obsmode = {
