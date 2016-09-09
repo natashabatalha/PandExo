@@ -12,8 +12,8 @@ class SetDefaultModes():
     """
 
     def __init__(self, inst):
-		self.instrument = inst[0:inst.find(' ')].lower()
-		self.config = inst[inst.find(' ')+1:len(inst)].lower()   
+        self.instrument = inst[0:inst.find(' ')].lower()
+        self.config = inst[inst.find(' ')+1:len(inst)].lower()   
     
     def pick(self): 
         try: 
@@ -53,8 +53,8 @@ class SetDefaultModes():
         return pandeia_data
 
     def miri(self):
-            #only lrs slit less     
-            with open(os.path.join(os.path.dirname(__file__), "reference",
+        #only lrs slit less     
+        with open(os.path.join(os.path.dirname(__file__), "reference",
                                "miri_input.json")) as data_file:
                 pandeia_data = json.load(data_file)
         return pandeia_data
