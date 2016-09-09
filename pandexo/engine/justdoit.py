@@ -9,6 +9,10 @@ import multiprocessing
 
 num_cores = multiprocessing.cpu_count()
 
+def processInput(i):
+    return i * i
+
+
 ALL = {"MIRI LRS":False,
        "NIRISS SOSS_Or1":False,
        "NIRISS SOSS_Or2":False,
@@ -84,7 +88,7 @@ def get_thruput(inst):
     input_dict = lm.SetDefaultModes(inst).pick()
                              
     conf = {'instrument': input_dict['configuration']['instrument']}
-
+    print conf
     i = InstrumentFactory(config=conf)
     wr = i.get_wave_range()
     wave = np.linspace(wr['wmin'], wr['wmax'], num=500)
@@ -92,10 +96,20 @@ def get_thruput(inst):
 
     return {'wave':wave,'pce':pce}
 
+def run_param_space(i,exo,inst,param_space): 
+    #break up parameter space to two separate dictionary keys
+    key1 = param_space[0:param_space.find('+')]
+    key2 = param_space[param_space.find('+')+1:len(param_space)]
+    exo[key1][key2] = i 
+    #load in correct dict format
+    inst_dict = load_mode_dict(inst)
+    name = os.path.split(str(i))[1]
+    return {name: wrapper({"pandeia_input": inst_dict , "pandexo_input":exo})}
+
+
 
 def run_pandexo(exo=None, inst=None, param_space = None, param_range = None,
-                                            output_path=os.getcwd()):
-        
+                                            output_path=os.getcwd()):       
     #single instrument mode with dictionary input OR single planet 
     if type(inst) == dict: 
         print "Running Single Case w/ User Instrument Dict"
@@ -111,18 +125,9 @@ def run_pandexo(exo=None, inst=None, param_space = None, param_range = None,
             return result
          
         print "Running through parameters in parallel: " + param_space 
-        def run_param_space(i): 
-            #break up parameter space to two separate dictionary keys
-            key1 = param_space[0:param_space.find('+')]
-            key2 = param_space[param_space.find('+')+1:len(param_space)]
-            exo[key1][key2] = i 
-            #load in correct dict format
-            inst_dict = load_mode_dict(inst)
-            name = os.path.split(i)[1]
-            return {name: wrapper({"pandeia_input": inst_dict , "pandexo_input":exo})}
         
         #run the above function in parallel 
-        results = Parallel(n_jobs=num_cores)(delayed(run_param_space)(i) for i in param_range)
+        results = Parallel(n_jobs=num_cores)(delayed(run_param_space)(i,exo,inst,param_space) for i in param_range)
         
         #dump all results [an array of dictionaries] into single file
         filename = param_space + '.p'
@@ -133,4 +138,3 @@ def run_pandexo(exo=None, inst=None, param_space = None, param_range = None,
     if type(inst) == list or type(inst) == np.ndarray:
         return  
         
-    
