@@ -8,6 +8,20 @@ class SetDefaultModes():
     This class contains functionality for setting observing modes for exoplanet observations 
     This is NOT a complete set of observing modes. Instead, if offers a starting point for 
     choosing one instrument specification. There is one function for each instrument. 
+    
+    Possible inputs are: 
+       "MIRI LRS"
+       "NIRISS SOSS_Or1"
+       "NIRISS SOSS_Or2"
+       "NIRSpec G140M"
+       "NIRSpec G140H"
+       "NIRSpec G235M"
+       "NIRSpec G235H"
+       "NIRSpec G395M"
+       "NIRSpec G395H"
+       "NIRSpec Prism"
+       "NIRCam F322W2"
+       "NIRCam F444W"
 
     """
 
