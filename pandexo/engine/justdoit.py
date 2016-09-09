@@ -1,5 +1,12 @@
 import numpy as np
 from pandeia.engine.instrument_factory import InstrumentFactory
+from pandexo import wrapper
+import os 
+import pickle as pkl
+from joblib import Parallel, delayed
+import multiprocessing
+
+num_cores = multiprocessing.cpu_count()
 
 ALL = {"MIRI LRS":False,
        "NIRISS SOSS":False,
@@ -50,15 +57,13 @@ def load_exo_dict():
         }
     }
     print "Replace all inputs before feeding to run_modes:"
-    print pandexo_input
     return pandexo_input   
     
-def load_mode_dict()
+def load_mode_dict(inst):
+    
+    return
 
-
-
-def get_pce(instrument):
-
+def get_thruput(instrument):
     obsmode = {
                'instrument': instrument,
                'mode': mode,
@@ -77,8 +82,44 @@ def get_pce(instrument):
     return wave,pce
 
 
-def run_pandexo(modes_2_run, pandexo_input):
-    for i in modes_2_run: 
-        print "Starting PandExo Sim: "+ i 
+def run_pandexo(exo=None, inst=None, param_space = None, param_range = None,
+                                            output_path=os.getcwd()):
         
+    #single instrument mode with dictionary input OR single planet 
+    if type(inst) == dict: 
+        print "Running Single Case w/ User Instrument Dict"
+        result =wrapper({"pandeia_input": inst , "pandexo_input":exo})
+        return result 
+ 
+    #single instrument mode and single planet OR several planets   
+    if (type(inst) == str) or ((type(inst)==list or type(inst)==np.ndarray) and len(inst)==1): 
+        if param_space==None or param_range==None:
+            print "Running Single Case for: " + inst
+            inst_dict = load_mode_dict(inst)
+            result =wrapper({"pandeia_input": inst_dict , "pandexo_input":exo})
+            return result
+         
+        print "Running through parameters in parallel: " + param_space 
+        def run_param_space(i): 
+            #break up parameter space to two separate dictionary keys
+            key1 = param_space[0:param_space.find('+')]
+            key2 = param_space[param_space.find('+')+1:len(param_space)]
+            exo[key1][key2] = i 
+            #load in correct dict format
+            inst_dict = load_mode_dict(inst)
+            name = os.path.split(i)[1]
+            return {name: wrapper({"pandeia_input": inst_dict , "pandexo_input":exo})}
         
+        #run the above function in parallel 
+        results = Parallel(n_jobs=num_cores)(delayed(run_param_space)(i) for i in param_range)
+        
+        #dump all results [an array of dictionaries] into single file
+        filename = param_space + '.p'
+        pkl.dump(results, open(os.path.join(output_path,filename),'w'))
+        return results
+        
+    #run several different instrument modes and single planet
+    if type(inst) == list or type(inst) == np.ndarray:
+        return  
+        
+    
