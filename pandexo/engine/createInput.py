@@ -204,7 +204,6 @@ def bothTrans(out_trans, planet) :
         raise Exception('Units are not correct. Pick W/cm2/um, FLAM or Jy')
 
     results= {'wave':wave_pR, 'flux_in_trans': flux_in_trans, 'flux_out_trans':flux_out_trans} 
-    pickle.dump(results, open('TESTING.pkl','w'))
     return results
 
 
