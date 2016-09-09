@@ -56,6 +56,6 @@ class SetDefaultModes():
             #only lrs slit less     
             with open(os.path.join(os.path.dirname(__file__), "reference",
                                "miri_input.json")) as data_file:
-            pandeia_data = json.load(data_file)
+                pandeia_data = json.load(data_file)
         return pandeia_data
 
