@@ -20,7 +20,7 @@ class SetDefaultModes():
        "NIRSpec G395M"
        "NIRSpec G395H"
        "NIRSpec Prism"
-       "NIRCam F322W2"
+       "NIRCam F322W"
        "NIRCam F444W"
 
     """
