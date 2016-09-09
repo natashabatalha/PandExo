@@ -30,7 +30,6 @@ class SetDefaultModes():
         self.config = inst[inst.find(' ')+1:len(inst)].lower()   
     
     def pick(self): 
-        getattr(self, self.instrument)()
         try: 
             return getattr(self, self.instrument)()
         except: 
