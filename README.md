@@ -20,9 +20,9 @@ Download or clone repo
 
 `    python`
 
-`    import pandexo.engine.main as main`
+`    import pandexo.engine.run_online as ro`
 
-`    main.main()`
+`    ro.main()`
 - Open up an internet brower and go to:
 localhost:1111 
 
