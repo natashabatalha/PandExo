@@ -300,8 +300,8 @@ class CalculationNewHandler(BaseHandler):
             with open(os.path.join(os.path.dirname(__file__), "reference",
                                "nircam_input.json")) as data_file:
                 pandata = json.load(data_file) 
-                
                 pandata["configuration"]["instrument"]["filter"]  = self.get_argument("nircammode")
+                
         if (self.get_argument("instrument")=="NIRISS"): 
             with open(os.path.join(os.path.dirname(__file__), "reference",
                                "niriss_input.json")) as data_file:
