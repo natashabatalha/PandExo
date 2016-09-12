@@ -4,10 +4,11 @@ import copy
 import numpy as np
 import matplotlib.pyplot as plt
 from pandeia.engine.perform_calculation import perform_calculation
-import createInput as create
+import create_input as create
 import matplotlib.pyplot as plt
 import pandas as pd
 import warnings 
+from extract_spec import extract_region, sum_spatial
 
 #max groups in integration
 max_ngroup = 65536.0 
@@ -50,7 +51,6 @@ def wrapper(dictinput):
     
     #constant parameters.. consider putting these into json file 
 
-
     pandeia_input = dictinput['pandeia_input']
     pandexo_input = dictinput['pandexo_input']    
 
@@ -78,7 +78,7 @@ def wrapper(dictinput):
 
     #add to pandeia input 
     pandeia_input['scene'][0]['spectrum']['sed']['spectrum'] = out_spectrum
-    
+
     #run pandeia once to determine max exposure time per int and get exposure params
     m = compute_maxexptime_per_int(pandeia_input, sat_level) 
     #calculate all timing info
@@ -89,30 +89,41 @@ def wrapper(dictinput):
     inn = perform_in(pandeia_input, pandexo_input,timing, both_spec)
     #compute warning flags for timing info 
     warnings = add_warnings(inn, timing, sat_level, flags, instrument) 
+
+    if pandexo_input['calculation'].lower() == 'slope method': 
+        #Extract relevant info from pandeia output (1d curves and wavelength) 
+        #extracted flux in units of electron/s
+        w = out.curves['extracted_flux'][0]
+        curves_out = out.curves
+        curves_inn = inn.curves
+
+        #In the following the SN is changed to incorporate number of occultations 
+        #i.e. multiply by sqrt(n) 
+        sn_in = curves_inn['sn'][1]*np.sqrt(noccultations)
+        sn_out = curves_out['sn'][1]*np.sqrt(noccultations)
+    
+        extracted_flux_inn = curves_inn['extracted_flux'][1]
+        extracted_noise_inn = curves_inn['extracted_flux'][1]/(sn_in)
+
+        extracted_flux_out = curves_out['extracted_flux'][1]
+        extracted_noise_out = curves_out['extracted_flux'][1]/(sn_out)
+    
+        #units of this unconventional.. sigma/s
+        #because snr = extracted flux / extracted noise and 
+        #extracted flux in units of electrons /s
+        varin = (extracted_noise_inn)**2.0
+        varout = (extracted_noise_out)**2.0
         
-    #Extract relevant info from pandeia output (1d curves and wavelength) 
-    #extracted flux in units of electron/s
-    w = out.curves['extracted_flux'][0]
-    curves_out = out.curves
-    curves_inn = inn.curves
-
-    #In the following the SN is changed to incorporate number of occultations 
-    #i.e. multiply by sqrt(n) 
-    sn_in = curves_inn['sn'][1]*np.sqrt(noccultations)
-    sn_out = curves_out['sn'][1]*np.sqrt(noccultations)
-    
-    extracted_flux_inn = curves_inn['extracted_flux'][1]
-    extracted_noise_inn = curves_inn['extracted_flux'][1]/(sn_in)
-
-    extracted_flux_out = curves_out['extracted_flux'][1]
-    extracted_noise_out = curves_out['extracted_flux'][1]/(sn_out)
-    
-    #units of this unconventional.. sigma/s
-    #because snr = extracted flux / extracted noise and 
-    #extracted flux in units of electrons /s
-    varin = (extracted_noise_inn)**2.0
-    varout = (extracted_noise_out)**2.0
-    
+    elif pandexo_input['calculation'] == '2d extract':
+        w = out.curves['extracted_flux'][0]
+        extract = extract_region(inn, out, timing["Exposure Time Per Integration (secs)"], timing["Num Groups per Integration"])
+        sum2dto1d = sum_spatial(extract, noccultations, timing["Num Integrations In Transit"], timing["Num Integrations Out of Transit"])
+        varin = sum2dto1d['var_in_1d']
+        varout = sum2dto1d['var_out_1d']
+        extracted_flux_out = sum2dto1d['photon_out_1d']
+        extracted_flux_inn = sum2dto1d['photon_in_1d']
+        
+        
     #bin the data according to user input 
     wbin, photon_out_bin = bin_data(w, extracted_flux_out, wave_bin)
     wbin, photon_in_bin = bin_data(w, extracted_flux_inn, wave_bin)
