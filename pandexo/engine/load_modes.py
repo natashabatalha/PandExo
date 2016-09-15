@@ -34,6 +34,7 @@ class SetDefaultModes():
             return getattr(self, self.instrument)()
         except: 
             print "INVALID INSTRUMENT NAME"
+            return 
                                    
     def niriss(self):
         #need to add in functionality for two orders, right now you only have option to do sub80
