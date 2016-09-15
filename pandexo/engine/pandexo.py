@@ -8,7 +8,7 @@ import create_input as create
 import matplotlib.pyplot as plt
 import pandas as pd
 import warnings 
-from extract_spec import extract_region, sum_spatial
+from compute_noise import ExtractSpec
 
 #max groups in integration
 max_ngroup = 65536.0 
@@ -90,38 +90,23 @@ def wrapper(dictinput):
     #compute warning flags for timing info 
     warnings = add_warnings(inn, timing, sat_level, flags, instrument) 
 
+    compNoise = ExtractSpec(inn, out, timing)
+    
     if pandexo_input['calculation'].lower() == 'slope method': 
         #Extract relevant info from pandeia output (1d curves and wavelength) 
         #extracted flux in units of electron/s
         w = out.curves['extracted_flux'][0]
-        curves_out = out.curves
-        curves_inn = inn.curves
+        result = compNoise.run_slope_format()
 
-        #In the following the SN is changed to incorporate number of occultations 
-        #i.e. multiply by sqrt(n) 
-        sn_in = curves_inn['sn'][1]*np.sqrt(noccultations)
-        sn_out = curves_out['sn'][1]*np.sqrt(noccultations)
-    
-        extracted_flux_inn = curves_inn['extracted_flux'][1]
-        extracted_noise_inn = curves_inn['extracted_flux'][1]/(sn_in)
-
-        extracted_flux_out = curves_out['extracted_flux'][1]
-        extracted_noise_out = curves_out['extracted_flux'][1]/(sn_out)
-    
-        #units of this unconventional.. sigma/s
-        #because snr = extracted flux / extracted noise and 
-        #extracted flux in units of electrons /s
-        varin = (extracted_noise_inn)**2.0
-        varout = (extracted_noise_out)**2.0
-        
-    elif pandexo_input['calculation'] == '2d extract':
+    elif pandexo_input['calculation'].lower() == '2d extract':
         w = out.curves['extracted_flux'][0]
-        extract = extract_region(inn, out, timing["Exposure Time Per Integration (secs)"], timing["Num Groups per Integration"])
-        sum2dto1d = sum_spatial(extract, noccultations, timing["Num Integrations In Transit"], timing["Num Integrations Out of Transit"])
-        varin = sum2dto1d['var_in_1d']
-        varout = sum2dto1d['var_out_1d']
-        extracted_flux_out = sum2dto1d['photon_out_1d']
-        extracted_flux_inn = sum2dto1d['photon_in_1d']
+        result = compNoise.run_2d_extraction()
+    
+    
+    varin = result['var_in_1d']
+    varout = result['var_out_1d']
+    extracted_flux_out = result['photon_out_1d']
+    extracted_flux_inn = result['photon_in_1d']
         
         
     #bin the data according to user input 

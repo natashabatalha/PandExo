@@ -23,7 +23,7 @@ class ExtractSpec():
         self.nint_out = timing["Num Integrations Out of Transit"]
         self.nint_in = timing["Num Integrations In Transit"]
     
-    def loopingL(cen, signal_col, noise_col, bkg_col):
+    def loopingL(self, cen, signal_col, noise_col, bkg_col):
     #create function to find location where SNR is the highest
     #loop from the highest value of the signal downward 
         sn_old= 0
@@ -39,7 +39,7 @@ class ExtractSpec():
         return 0
 
 
-    def loopingU(cen, signal_col, noise_col, bkg_col):
+    def loopingU(self, cen, signal_col, noise_col, bkg_col):
     #create function to find location where SNR is the highest
     #loop from the highest value of the signal upward
         sn_old= 0
@@ -178,10 +178,10 @@ class ExtractSpec():
 
 
             #store lower and upper bound extraction regions for in and out of transit 
-            LBout[j] = loopingL(cenRo, signal_col_out, noise_col_out, bkg_col_out)
-            UBout[j] = loopingU(cenRo, signal_col_out, noise_col_out, bkg_col_out)
-            LBin[j] = loopingL(cenRi, signal_col_in, noise_col_in, bkg_col_in    )
-            UBin[j] = loopingU(cenRi, signal_col_in, noise_col_in, bkg_col_in)
+            LBout[j] = self.loopingL(cenRo, signal_col_out, noise_col_out, bkg_col_out)
+            UBout[j] = self.loopingU(cenRo, signal_col_out, noise_col_out, bkg_col_out)
+            LBin[j] = self.loopingL(cenRi, signal_col_in, noise_col_in, bkg_col_in    )
+            UBin[j] = self.loopingU(cenRi, signal_col_in, noise_col_in, bkg_col_in)
 
         #this could be made more elegant later... not very efficient 
         noise = {'rn_var_out':rn_var_out, 'rn_var_in':rn_var_in, 
@@ -194,18 +194,18 @@ class ExtractSpec():
 
     def run_2d_extraction(self):
         """
-        Contains functionality to extract noise from 2d detector image
+            Contains functionality to extract noise from 2d detector image
 
-        Attributes:
-           extract_region 
-           sum_spatial 
+            Attributes:
+                extract_region 
+                sum_spatial 
         """
         #optimize SNR and extract region 
         extract = self.extract_region()
         #return summed up pixels 
         return self.sum_spatial(extract)
         
-
+        
     def run_slope_format(self): 
         """
         contains functionality to compute noise using Pandeia 1d noise 
@@ -232,6 +232,4 @@ class ExtractSpec():
         varout = (extracted_noise_out)**2.0
 
         return {'photon_out_1d':extracted_flux_out, 'photon_in_1d':extracted_flux_inn, 
-                'var_in_1d':varin, 'var_out_1d': varout}
-
-
+                    'var_in_1d':varin, 'var_out_1d': varout}
