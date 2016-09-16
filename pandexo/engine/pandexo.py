@@ -3,6 +3,7 @@ import json
 import copy
 import numpy as np
 import matplotlib.pyplot as plt
+from pandeia.engine.instrument_factory import InstrumentFactory
 from pandeia.engine.perform_calculation import perform_calculation
 import create_input as create
 import matplotlib.pyplot as plt
@@ -13,11 +14,7 @@ from compute_noise import ExtractSpec
 #max groups in integration
 max_ngroup = 65536.0 
 #electron capacity full well 
-fullwell = {
-'niriss' : 85500.0, 
-'nircam' : 90000.0,
-'miri' : 250000.0, 
-'nirspec' : 55000.0}
+
 
 def wrapper(dictinput):
     """
@@ -56,8 +53,12 @@ def wrapper(dictinput):
 
 	#which instrument 
     instrument = pandeia_input['configuration']['instrument']['instrument']
-    
-    sat_level = pandexo_input['observation']['sat_level']/100.0*fullwell[instrument]
+    conf = {'instrument': pandeia_input['configuration']['instrument']}
+    i = InstrumentFactory(config=conf)
+    det_pars = i.get_detector_pars()
+    fullwell = det_pars['fullwell']
+    rn = det_pars['rn']
+    sat_level = pandexo_input['observation']['sat_level']/100.0*fullwell
 
     #parameteres needed from exo_input
     mag = pandexo_input['star']['mag']
@@ -90,19 +91,22 @@ def wrapper(dictinput):
     #compute warning flags for timing info 
     warnings = add_warnings(inn, timing, sat_level, flags, instrument) 
 
-    compNoise = ExtractSpec(inn, out, timing)
+    compNoise = ExtractSpec(inn, out, rn, timing)
     
     if pandexo_input['calculation'].lower() == 'slope method': 
         #Extract relevant info from pandeia output (1d curves and wavelength) 
         #extracted flux in units of electron/s
         w = out.curves['extracted_flux'][0]
-        result = compNoise.run_slope_format()
+        result = compNoise.run_slope_method()
 
     elif pandexo_input['calculation'].lower() == '2d extract':
         w = out.curves['extracted_flux'][0]
-        result = compNoise.run_2d_extraction()
+        result = compNoise.run_2d_extract()
     
-    
+    elif pandexo_input['calculation'].lower() == 'first minus last':
+        w = out.curves['extracted_flux'][0]
+        result = compNoise.run_f_minus_l()
+        
     varin = result['var_in_1d']
     varout = result['var_out_1d']
     extracted_flux_out = result['photon_out_1d']

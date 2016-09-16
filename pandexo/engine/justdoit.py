@@ -87,12 +87,10 @@ def get_thruput(inst):
     input_dict = lm.SetDefaultModes(inst).pick()
                              
     conf = {'instrument': input_dict['configuration']['instrument']}
-    print conf
     i = InstrumentFactory(config=conf)
     wr = i.get_wave_range()
     wave = np.linspace(wr['wmin'], wr['wmax'], num=500)
     pce = i.get_total_eff(wave)
-
     return {'wave':wave,'pce':pce}
 
 def run_param_space(i,exo,inst,param_space): 

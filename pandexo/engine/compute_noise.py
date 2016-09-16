@@ -14,7 +14,7 @@ class ExtractSpec():
     - Read noise 
     
     """
-    def __init__(self, inn, out, timing):
+    def __init__(self, inn, out, rn, timing):
         self.inn = inn
         self.out = out 
         self.exptime_per_int = timing["Exposure Time Per Integration (secs)"]
@@ -22,6 +22,8 @@ class ExtractSpec():
         self.nocc = timing["Number of Transits"]
         self.nint_out = timing["Num Integrations Out of Transit"]
         self.nint_in = timing["Num Integrations In Transit"]
+        self.tframe = timing["Seconds per Frame"]
+        self.rn = rn 
     
     def loopingL(self, cen, signal_col, noise_col, bkg_col):
     #create function to find location where SNR is the highest
@@ -56,8 +58,11 @@ class ExtractSpec():
         return len(signal_col)+1 
 
 
-    def sum_spatial(self, extract_info):    #last 
-        #extract info 
+    def sum_spatial(self, extract_info):    
+        """
+        Takes extraction info from "extract_retion" and sums pixels in that region 
+        takes into account integrations and number of transits 
+        """
         nocc = self.nocc
         nint_in = self.nint_in
         nint_out = self.nint_out
@@ -115,6 +120,14 @@ class ExtractSpec():
                 'extract_info':extract_info}
 
     def extract_region(self): #second to last 
+        """
+        Contains functionality to extract spectra from the 2d images. 
+        MULITACCUMM currently not accounted for. 
+        
+        attricutes: 
+            LoopingL: finds extraction box based on optimal SNR  
+            LoopingU: finds extraction box based on optimal SNR  
+        """
         inn = self.inn
         out = self.out
         exptime_per_int = self.exptime_per_int
@@ -143,12 +156,14 @@ class ExtractSpec():
         #define out of transit parameters to calculate extraction region
 
         #multiaccum sample data factor 
-        factor_flux = 6.0/5.0*(ngroups_per_int**2.0+1.0)/(ngroups_per_int**2.0+ngroups_per_int)
-        factor_rn = 12.0*(ngroups_per_int-1.0)/(ngroups_per_int**2.0 + ngroups_per_int)
+        factor_flux = 1.0 #6.0/5.0*(ngroups_per_int**2.0+1.0)/(ngroups_per_int**2.0+ngroups_per_int)
+        factor_rn = 1.0 #12.0*(ngroups_per_int-1.0)/(ngroups_per_int**2.0 + ngroups_per_int)
 
         photon_sig_out = s_out*exptime_per_int*factor_flux #total photons per pixel in signal
         photon_sky_out = bkgd_out*exptime_per_int*factor_flux #total photons per pixel in background 
-        rn_var_out= out.noise.var_rn_pix*factor_rn #variance stricly due to detector readnoise
+        #variance stricly due to detector readnoise.. You might think this is 
+        #wrong because usually RN isnt multiplie by time.. but Pandeia gives RN in rms/ sec. 
+        rn_var_out= out.noise.var_rn_pix*exptime_per_int*factor_rn 
         var_pix_out = photon_sig_out + photon_sky_out + rn_var_out # variance of noise per pixel
 
         #define parameters for IN transit 
@@ -190,9 +205,10 @@ class ExtractSpec():
         photons = {'photon_sig_out': photon_sig_out, 'photon_sig_in':photon_sig_in, 
                    'var_pix_in':var_pix_in,'var_pix_out': var_pix_out}
         extract_info ={'bounds':bounds, 'photons':photons, 'noise':noise}
+
         return extract_info
 
-    def run_2d_extraction(self):
+    def run_2d_extract(self):
         """
             Contains functionality to extract noise from 2d detector image
 
@@ -206,7 +222,7 @@ class ExtractSpec():
         return self.sum_spatial(extract)
         
         
-    def run_slope_format(self): 
+    def run_slope_method(self): 
         """
         contains functionality to compute noise using Pandeia 1d noise 
         output products (uses MULTIACCUM) noise formula 
@@ -233,3 +249,53 @@ class ExtractSpec():
 
         return {'photon_out_1d':extracted_flux_out, 'photon_in_1d':extracted_flux_inn, 
                     'var_in_1d':varin, 'var_out_1d': varout}
+    
+    
+    def run_f_minus_l(self):
+        """
+        Uses 1d exracted products from pandeia to compute noise without 
+        multiaccum noise formula from Rauscher 07 
+        
+        Uses robberto 2009 formula to compute readnoise (taken from 2d 
+        pandeia output). 1d readnoise is used by summing over entire postage stamp. 
+        Pandeia will use entire extraction region but if not this could just slightly 
+        over estimate read noise. 
+        
+        """
+        inn = self.inn
+        curves_out = self.out.curves
+        curves_inn = self.inn.curves
+        
+        
+        #on source out versus in 
+        on_source_in = self.tframe * (self.ngroups_per_int-1.0) * self.nint_in
+        on_source_out = self.tframe * (self.ngroups_per_int-1.0) * self.nint_out
+
+        #calculate rn 
+        rn_var = self.rn**2.
+        postage_size = inn.noise.var_rn_pix.shape
+        #1d rn       rn/pix * #pixs    *two reads (first & last) * # of integrations *nocc
+        rn_var_inn = rn_var * postage_size[0] * 2.0 * self.nint_in * self.nocc
+        rn_var_out = rn_var * postage_size[0] * 2.0 * self.nint_out * self.nocc
+
+        #extract fluxs
+        extracted_flux_inn = curves_inn['extracted_flux'][1] * on_source_in * self.nocc
+        extracted_flux_out = curves_out['extracted_flux'][1] * on_source_out * self.nocc
+                
+        #background + contamination extracted 
+        bkg_flux_inn = curves_inn['extracted_bg_total'][1] * on_source_in * self.nocc
+        bkg_flux_out = curves_out['extracted_bg_total'][1] * on_source_out * self.nocc
+        
+        #total nois 
+        varin = extracted_flux_inn + bkg_flux_inn + rn_var_inn
+        varout = extracted_flux_out + bkg_flux_out + rn_var_out
+        
+        return {'photon_out_1d':extracted_flux_out, 'photon_in_1d':extracted_flux_inn, 
+                    'var_in_1d':varin, 'var_out_1d': varout}
+    
+    
+    
+    
+    
+    
+    
