@@ -164,12 +164,13 @@ class ExtractSpec():
         #variance stricly due to detector readnoise.. You might think this is 
         #wrong because usually RN isnt multiplie by time.. but Pandeia gives RN in rms/ sec. 
         rn_var_out= out.noise.var_rn_pix*exptime_per_int*factor_rn 
+        print np.max(rn_var_out)
         var_pix_out = photon_sig_out + photon_sky_out + rn_var_out # variance of noise per pixel
 
         #define parameters for IN transit 
         photon_sig_in = s_in*exptime_per_int*factor_flux #total photons per pixel in signal
         photon_sky_in = bkgd_in*exptime_per_int*factor_flux #total photons per pixel in background 
-        rn_var_in= inn.noise.var_rn_pix*factor_rn #variance stricly due to detector readnoise
+        rn_var_in= inn.noise.var_rn_pix*exptime_per_int*factor_rn #variance stricly due to detector readnoise
         var_pix_in = photon_sig_in + photon_sky_in + rn_var_in # variance of noise per pixel 
 
         UBout = range(0,lenw)
@@ -272,19 +273,20 @@ class ExtractSpec():
         on_source_out = self.tframe * (self.ngroups_per_int-1.0) * self.nint_out
 
         #calculate rn 
-        rn_var = self.rn**2.
-        postage_size = inn.noise.var_rn_pix.shape
-        #1d rn       rn/pix * #pixs    *two reads (first & last) * # of integrations *nocc
-        rn_var_inn = rn_var * postage_size[0] * 2.0 * self.nint_in * self.nocc
-        rn_var_out = rn_var * postage_size[0] * 2.0 * self.nint_out * self.nocc
-
+        rn_var = self.rn**2.0
+        postage_size = inn.noise.var_rn_pix.shape[0]
+        #1d rn       rn/pix  *two reads (first & last) * # of integrations *nocc  * #pixs 
+        #just an estimate of the number of pixels ... should prob fix this
+        rn_var_inn = rn_var * self.nint_in * self.nocc * postage_size/2.0 #* 2.0
+        rn_var_out = rn_var * self.nint_out * self.nocc * postage_size/2.0 #* 2.0 
+        
         #extract fluxs
         extracted_flux_inn = curves_inn['extracted_flux'][1] * on_source_in * self.nocc
         extracted_flux_out = curves_out['extracted_flux'][1] * on_source_out * self.nocc
                 
         #background + contamination extracted 
-        bkg_flux_inn = curves_inn['extracted_bg_total'][1] * on_source_in * self.nocc
-        bkg_flux_out = curves_out['extracted_bg_total'][1] * on_source_out * self.nocc
+        bkg_flux_inn = curves_inn['extracted_bg_only'][1] * on_source_in * self.nocc
+        bkg_flux_out = curves_out['extracted_bg_only'][1] * on_source_out * self.nocc
         
         #total nois 
         varin = extracted_flux_inn + bkg_flux_inn + rn_var_inn

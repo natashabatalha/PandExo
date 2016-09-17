@@ -51,7 +51,7 @@ def wrapper(dictinput):
     pandeia_input = dictinput['pandeia_input']
     pandexo_input = dictinput['pandexo_input']    
 
-	#which instrument 
+    #which instrument 
     instrument = pandeia_input['configuration']['instrument']['instrument']
     conf = {'instrument': pandeia_input['configuration']['instrument']}
     i = InstrumentFactory(config=conf)
@@ -317,7 +317,7 @@ def compute_timing(m,transit_duration,expfact_out,noccultations):
         "Num Integrations Out of Transit":nint_out,
         "Num Integrations In Transit":nint_in,
         "Num Integrations per Occultation":nint_out+nint_in,
-        "On Source Time": noccultations*clocktime_per_int*(nint_out+nint_in)/60.0/60.0,
+        "On Source Time(sec)": noccultations*clocktime_per_int*(nint_out+nint_in),
         "Reset time Plus TA time (hrs)": overhead_per_int*(nint_in + nint_out)/60.0/60.0 + 0.5,
         "Observing Efficiency (%)": eff*100.0,
         "Number of Transits": noccultations

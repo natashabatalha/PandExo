@@ -52,8 +52,8 @@
     "strategy": {
             "method": "specapphot",
             "background_subtraction":true,
-            "aperture_size": 0.15,
-            "sky_annulus": [0.3,0.5],
+            "aperture_size": 0.7,
+            "sky_annulus": [0.8,1.6],
             "target_xy": [0.0, 0.0],
             "reference_wavelength":null,
             "units":"arcsec"
