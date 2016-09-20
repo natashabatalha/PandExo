@@ -29,11 +29,17 @@ def create_component(result_dict):
     # select the tools we want
     TOOLS = "pan,wheel_zoom,box_zoom,resize,reset,save"
 
-    #MAIN spectrum 
+    #Define units for x and y axis
     punit = result_dict['input']['Primary/Secondary']
     p=1.0
     if punit == 'fp/f*': p = -1.0
     else: punit = '('+punit+')^2'
+    
+    if result_dict['input']['Calculation Type'] =='phase_spec':
+        x_axis_label='Time (secs)'
+    else:
+        x_axis_label='Wavelength [microns]'
+        
 
     flux_out = result_dict['RawData']['flux_out']
     flux_in = result_dict['RawData']['flux_in']
@@ -49,7 +55,8 @@ def create_component(result_dict):
         np.array(x_err.append((px, px)))
         np.array(y_err.append((py - yerr, py + yerr)))
 
-    source = ColumnDataSource(data=dict(x=x, y=y, y_err=y_err, x_err=x_err, err=err, flux_out=flux_out, flux_in=flux_in, var_tot=var_tot, p=var_tot*0+p))
+    source = ColumnDataSource(data=dict(x=x, y=y, y_err=y_err, x_err=x_err, err=err, 
+                                flux_out=flux_out, flux_in=flux_in, var_tot=var_tot, p=var_tot*0+p,nocc=var_tot*0+noccultations))
     original = ColumnDataSource(data=dict(x=x, y=y, y_err=y_err, x_err=x_err, err=err, flux_out=flux_out, flux_in=flux_in, var_tot=var_tot))
 
     ylims = [min(result_dict['OriginalInput']['og_spec'])- 0.1*min(result_dict['OriginalInput']['og_spec']),
@@ -58,7 +65,7 @@ def create_component(result_dict):
 
     plot_spectrum = Figure(plot_width=800, plot_height=300, x_range=xlims,
                                y_range=ylims, tools=TOOLS,#responsive=True,
-                                 x_axis_label='Wavelength [microns]',
+                                 x_axis_label=x_axis_label,
                                  y_axis_label=punit, 
                                title="Original Model with Observation")
     
@@ -91,6 +98,7 @@ def create_component(result_dict):
             var x_err = sdata['x_err'];
             var err = sdata['err'];
             var p = sdata['p'];
+            var og_ntran = sdata['nocc']
 
             var flux_out = sdata['flux_out'];
             var flux_in = sdata['flux_in'];
@@ -147,20 +155,21 @@ def create_component(result_dict):
                 finout.push(finslice.reduce(add, 0));
                 varout.push(varslice.reduce(add, 0));
 
+                new_err = 1.0;
                 xslice = [];
-
                 foutslice = [];
                 finslice = [];
                 varslice = [];
             }
 
             for (i = 0; i < x.length; i++) {
-                y[i] = p[i]*(foutout[i]-finout[i]+ (Math.sqrt(varout[i]/ntran)*(Math.random()-Math.random())))/foutout[i]; 
+                new_err = Math.sqrt(varout[i]*og_ntran[i]/ntran)
+                y[i] = p[i]*(foutout[i]-finout[i]+ (new_err*(Math.random()-Math.random())))/foutout[i]; 
                 x[i] = xout[i];
                 x_err[i][0] = xout[i];
                 x_err[i][1] = xout[i];
-                y_err[i][0] = y[i] + (Math.sqrt(varout[i])/foutout[i]/Math.sqrt(ntran));
-                y_err[i][1] = y[i] -(Math.sqrt(varout[i])/foutout[i]/Math.sqrt(ntran));            
+                y_err[i][0] = y[i] + (new_err/foutout[i]);
+                y_err[i][1] = y[i] -(new_err/foutout[i]);            
             }
 
             source.trigger('change');
@@ -183,7 +192,7 @@ def create_component(result_dict):
 
     plot_flux_1d1 = Figure(tools=TOOLS,
                          x_axis_label='Wavelength [microns]',
-                         y_axis_label='Flux (e/s)', title="Out of Transit Flux",
+                         y_axis_label='Flux (e/s)', title="Out of Transit Flux Rate",
                          plot_width=800, plot_height=300)
     plot_flux_1d1.line(x, y, line_width = 4, alpha = .7)
     tab1 = Panel(child=plot_flux_1d1, title="Total Flux")
@@ -200,13 +209,14 @@ def create_component(result_dict):
     tab2 = Panel(child=plot_bg_1d1, title="Background Flux")
 
     # SNR 1d accounting for number of occultations
-    x, y = out['1d']['sn']
+    x= out['1d']['sn'][0]
+    y = flux_out/np.sqrt(result_dict['RawData']['var_out'])
     x = x[~np.isnan(y)]
     y = y[~np.isnan(y)]
-    y = y*np.sqrt(noccultations)
+    #y = y*np.sqrt(noccultations)
     plot_snr_1d1 = Figure(tools=TOOLS,
-                         x_axis_label='Wavelength [microns]',
-                         y_axis_label='SNR', title="Signal-to-Noise Ratio",
+                         x_axis_label=x_axis_label,
+                         y_axis_label='SNR', title="SNR Out of Trans",
                          plot_width=800, plot_height=300)
     plot_snr_1d1.line(x, y, line_width = 4, alpha = .7)
     tab3 = Panel(child=plot_snr_1d1, title="SNR")
@@ -222,7 +232,7 @@ def create_component(result_dict):
 
 
     plot_noise_1d1 = Figure(tools=TOOLS,#responsive=True,
-                         x_axis_label='Wavelength [microns]',
+                         x_axis_label=x_axis_label,
                          y_axis_label='Error on Spectrum (PPM)', title="Error Curve",
                          plot_width=800, plot_height=300, y_range = [0,2.0*ymed])
     ymed = np.median(y)
@@ -231,7 +241,7 @@ def create_component(result_dict):
 
     #Not happy? Need help picking a different mode? 
     plot_spectrum2 = Figure(plot_width=800, plot_height=300, x_range=xlims,y_range=ylims, tools=TOOLS,
-                             x_axis_label='Wavelength [microns]',
+                             x_axis_label=x_axis_label,
                              y_axis_label=punit, title="Original Model",y_axis_type="log")
 
     plot_spectrum2.line(result_dict['OriginalInput']['og_wave'],result_dict['OriginalInput']['og_spec'],
