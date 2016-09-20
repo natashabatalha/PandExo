@@ -263,7 +263,18 @@ class CalculationNewHandler(BaseHandler):
             exodata["observation"]["fraction"] = float(self.get_argument("fraction"))
             exodata["observation"]["noccultations"] = float(self.get_argument("numtrans"))
             exodata["observation"]["sat_level"] = float(self.get_argument("satlevel"))
-            exodata["observation"]["transit_duration"] = float(self.get_argument("transit_duration"))
+            
+            #for phase curves user doen't necessarily have to input a transit duration 
+            try:
+                exodata["observation"]["transit_duration"] = float(self.get_argument("transit_duration"))
+            except:
+                #but if they dont.. make sure that the planet units are in seconds... 
+                if exodata["planet"]["w_unit"] == 'sec':
+                    exodata["observation"]["transit_duration"] = 0.0
+                else: 
+                    print "Need to give transit duration"
+                    raise 
+                
             #noise floor, set to 0.0 of no values are input        
             try: 
                 exodata["observation"]["noise_floor"] = float(self.get_argument("noisefloor"))

@@ -97,7 +97,7 @@
 
         <div class="col-md-3">
             <input type="file" id="planFile" name="planFile">
-            <p class="help-block">Column 1: wavelength, Column 2: Model</p>
+            <p class="help-block">Column 1: wave or time, Column 2: Model</p>
         </div>
         <div class="col-md-3">
             <select id="planwunits" name="planwunits" class="form-control">
@@ -112,7 +112,7 @@
         <div class="col-md-3">
             <select id="planfunits" name="planfunits" class="form-control">
                 <option value="rp/r*">(Rp/R*)^2 (primary)</option>
-                <option value="fp/f*">Fp/F* (secondary)</option>
+                <option value="fp/f*">Fp/F* (secondary/phase curve)</option>
             </select>
         </div>  
     </div>    
@@ -121,7 +121,7 @@
         <label class="col-md-3 control-label" for="transit_duration">Transit Duration</label>
         <div class="col-md-3">
             <input type="text" class="form-control" id="transit_duration" name="transit_duration">
-            <p class="help-block">Time (in seconds)</p>
+            <p class="help-block">Time (in seconds). For phase curves, will derive duration of phase from input file.</p>
         </div>
     </div>
 
@@ -138,6 +138,7 @@
         <label class="col-md-3 control-label" for="numtrans">Number of Transits</label>
         <div class="col-md-3">
             <input type="text" class="form-control" id="numtrans" name="numtrans" >
+            <p class="help-block">Or number of phase observations</p>
         </div>
     </div>
 
