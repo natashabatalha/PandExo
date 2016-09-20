@@ -1,5 +1,5 @@
 {
-    "calculation":"slope method",
+    "calculation":"fml",
     "star":{
                 "type" : "user", 
                 "starpath" : "gl1132_star.txt",

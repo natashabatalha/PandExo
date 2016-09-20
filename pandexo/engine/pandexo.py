@@ -130,7 +130,7 @@ def wrapper(dictinput):
     #this is the noise calculation that PandExo uses online. It derives 
     #its own calculation of readnoise and does not use MULTIACUMM 
     #noise formula  
-    elif calculation == 'first minus last':
+    elif calculation == 'fml':
         w = out.curves['extracted_flux'][0]
         result = compNoise.run_f_minus_l()
     
