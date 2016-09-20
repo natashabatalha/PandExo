@@ -1,21 +1,18 @@
 import sys
 import json
-import copy
 import numpy as np
-import matplotlib.pyplot as plt
+import pandas as pd
+from copy import deepcopy 
+
 from pandeia.engine.instrument_factory import InstrumentFactory
 from pandeia.engine.perform_calculation import perform_calculation
 import create_input as create
-import matplotlib.pyplot as plt
-import pandas as pd
-import warnings 
 from compute_noise import ExtractSpec
 
 #max groups in integration
 max_ngroup = 65536.0 
 #minimum number of integrations
 min_nint_trans = 3
-min_nint_phase = 4 
 #electron capacity full well 
 
 
@@ -103,7 +100,7 @@ def wrapper(dictinput):
     
     #this kind of redundant going to compute inn from out instead 
     #keep perform_in but change inputs to (out, timing, both_spec)
-    inn = perform_in(pandeia_input, pandexo_input,timing, both_spec)
+    inn = perform_in(pandeia_input, pandexo_input,timing, both_spec, out, calculation)
     
     #compute warning flags for timing info 
     warnings = add_warnings(out, timing, sat_level, flags, instrument) 
@@ -338,7 +335,7 @@ def compute_timing(m,transit_duration,expfact_out,noccultations):
     #you would never want a single integration in transit. 
     #here we assume that for very dim things, you would want at least 
     #3 integrations in transit 
-    if nint_in < 4:
+    if nint_in < min_nint_trans:
         ngroups_per_int = np.floor(ngroups_per_int/3.0)
         exptime_per_int = (ngroups_per_int-1.)*exptime_per_frame
         clocktime_per_int = ngroups_per_int*exptime_per_frame
@@ -347,8 +344,8 @@ def compute_timing(m,transit_duration,expfact_out,noccultations):
         nint_in = np.ceil(nint_per_occultation)
         nint_out = np.ceil(nint_in/expfact_out)
         
-    if nint_out < 2:
-        nint_out = 2.0
+    if nint_out < min_nint_trans:
+        nint_out = min_nint_trans
    
     timing = {
         "Transit Duration" : transit_duration/60.0/60.0,
@@ -366,9 +363,10 @@ def compute_timing(m,transit_duration,expfact_out,noccultations):
         
     return timing, {'flag_default':flag_default,'flag_high':flag_high}
 
-def perform_in(pandeia_input, pandexo_input,timing, both_spec): 
+def perform_in(pandeia_input, pandexo_input,timing, both_spec, out, calculation): 
     """
-    Runs Pandeia for the in transit data 
+    Runs Pandeia for the in transit data or computs in transit from out of transit 
+    Pandeia run
 
 	Parameters
 	----------
@@ -384,12 +382,23 @@ def perform_in(pandeia_input, pandexo_input,timing, both_spec):
     Attributes
     ---------- 
         - perform_calculation
+        - bin_data_wave 
     """
     #function to run pandeia for in transit
-    if pandexo_input['planet']['w_unit'] == 'sec':
+    if calculation == 'phase_spec':
         #return the phase curve since it's all we need 
         report_in = {'time': both_spec['time'],'planet_phase': both_spec['planet_phase']}
-    else:
+    elif calculation == 'fml':
+        #for FML method, we only use the flux rate calculated in pandeia so 
+        #can compute in transit flux rate without running pandeia a third time     
+        report_in = deepcopy(out)
+        
+        transit_depth = np.interp(report_in.curves['extracted_flux'][0],
+                                    both_spec['wave'], both_spec['frac'])
+        report_in.curves['extracted_flux'][1] = report_in.curves['extracted_flux'][1]*transit_depth
+    else: 
+        #only run pandeia a third time if doing slope method and need accurate run for the 
+        #nint and timiing
         pandeia_input['configuration']['detector']['ngroup'] = timing['Num Groups per Integration']
         pandeia_input['configuration']['detector']['nint'] = timing['Num Integrations In Transit']
         pandeia_input['configuration']['detector']['nexp'] = 1
@@ -399,6 +408,7 @@ def perform_in(pandeia_input, pandexo_input,timing, both_spec):
         pandeia_input['scene'][0]['spectrum']['sed']['spectrum'] = in_transit_spec
 
         report_in = perform_calculation(pandeia_input, dict_report=False)
+    
     return report_in
           
 	
@@ -520,7 +530,39 @@ def add_noise_floor(noise_floor, wave_bin, error_spec):
         raise ValueError('Noise Floor added was not integer or file')
     return error_spec
         
+def bin_data_wave(wlgrid,old_wave, spec):
+    """
+    Instead of binning to a specific wave bin, this bins to a specific 
+    wavelength. 
+    Used for computing Pandeia In transit dict wihtout running pandeia a third time 
+    
+    Parameters:
+    -----------
+        Inputs:
+            wlgrid: wave grid you want to bin to
+            old_wave: old wavelength you want to change 
+            spec: spectra that needs to be binned to wlgrid
+        Outputs: 
+            Fint: new spectra on new wlgrid
+    """
+    wno = 1e4/old_wave
+    Fp = spec[::-1]
+    szmod=wlgrid.shape[0]
 
+    delta=np.zeros(szmod)
+    Fint=np.zeros(szmod)
+    delta[0:-1]=wlgrid[1:]-wlgrid[:-1]  
+    delta[szmod-1]=delta[szmod-2] 
+    #pdb.set_trace()
+    for i in range(szmod-1):
+        i=i+1
+        loc=np.where((1E4/wno >= wlgrid[i]-0.5*delta[i-1]) & (1E4/wno < wlgrid[i]+0.5*delta[i]))
+        Fint[i]=np.mean(Fp[loc])
+        print wlgrid[i]-0.5*delta[i-1], wlgrid[i]+0.5*delta[i-1], np.mean(Fp[loc])
+    loc=np.where((1E4/wno > wlgrid[0]-0.5*delta[0]) & (1E4/wno < wlgrid[0]+0.5*delta[0]))
+    Fint[0]=np.mean(Fp[loc])
+    
+    return Fint
 
 def bin_data(x,y,wlength):
     """ 
