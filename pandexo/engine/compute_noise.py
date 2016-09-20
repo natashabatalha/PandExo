@@ -14,7 +14,7 @@ class ExtractSpec():
     - Read noise 
     
     """
-    def __init__(self, inn, out, rn, timing):
+    def __init__(self, inn, out, rn,pix_size, timing):
         self.inn = inn
         self.out = out 
         self.exptime_per_int = timing["Exposure Time Per Integration (secs)"]
@@ -24,6 +24,7 @@ class ExtractSpec():
         self.nint_in = timing["Num Integrations In Transit"]
         self.tframe = timing["Seconds per Frame"]
         self.rn = rn 
+        self.pix_size = pix_size
     
     def loopingL(self, cen, signal_col, noise_col, bkg_col):
     #create function to find location where SNR is the highest
@@ -274,11 +275,13 @@ class ExtractSpec():
 
         #calculate rn 
         rn_var = self.rn**2.0
-        postage_size = inn.noise.var_rn_pix.shape[0]
-        #1d rn       rn/pix  *two reads (first & last) * # of integrations *nocc  * #pixs 
-        #just an estimate of the number of pixels ... should prob fix this
-        rn_var_inn = rn_var * self.nint_in * self.nocc * postage_size/2.0 #* 2.0
-        rn_var_out = rn_var * self.nint_out * self.nocc * postage_size/2.0 #* 2.0 
+        
+        #size of pix extraction region 
+        numpix = inn.as_dict()['scalar']['aperture_size']/self.pix_size
+
+        #1d rn     = rn/pix * # of integrations *nocc  * #pixs 
+        rn_var_inn = rn_var * self.nint_in * self.nocc * numpix 
+        rn_var_out = rn_var * self.nint_out * self.nocc * numpix 
         
         #extract fluxs
         extracted_flux_inn = curves_inn['extracted_flux'][1] * on_source_in * self.nocc
@@ -295,9 +298,44 @@ class ExtractSpec():
         return {'photon_out_1d':extracted_flux_out, 'photon_in_1d':extracted_flux_inn, 
                     'var_in_1d':varin, 'var_out_1d': varout}
     
+
     
-    
-    
-    
-    
+    def run_phase_spec(self):
+        """
+        Computes noise for phase curve analysis instead of spectroscopy. 
+        
+        Using MULTIACCUM formula here because presumably you can never do a 
+        first minus last in phase curve analysis 
+        
+        Does not return spectra for each time element... On your own for that. 
+        """
+        time = self.inn['time']
+        tint = self.exptime_per_int 
+        curves_out = self.out.curves
+        #don't be an idiot and input a ridiculously low res phase curve
+        new_t = np.arange(min(time), max(time), tint) 
+        planet_phase = np.interp(new_t, time, self.inn['planet_phase'])
+
+        rn_var = self.rn**2.0
+        #size of pix extraction region 
+        numpix = self.out.as_dict()['scalar']['aperture_size']/self.pix_size
+
+        #1d rn     = rn/pix * # of integrations *nocc  * #pixs 
+        rn_var_out = rn_var * self.nocc * numpix # the initial output is always sampled by 1 integration
+   
+        extracted_flux_out = sum(curves_out['extracted_flux'][1]) * tint * self.nocc
+        
+        flux_time_out = extracted_flux_out+ np.zeros(len(new_t))
+        
+        flux_time_in = flux_time_out*(1.0 + planet_phase)
+        
+        bkg_flux_out = sum(curves_out['extracted_bg_only'][1]) * tint * self.nocc
+        
+        varout = flux_time_out + bkg_flux_out + rn_var_out
+        varin = flux_time_in + bkg_flux_out + rn_var_out
+ 
+        
+        return {'photon_out_1d':flux_time_out, 'photon_in_1d':flux_time_in, 
+                    'var_in_1d':varin, 'var_out_1d': varout, 'time':new_t}
+        
     
