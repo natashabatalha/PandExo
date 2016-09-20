@@ -13,6 +13,9 @@ from compute_noise import ExtractSpec
 
 #max groups in integration
 max_ngroup = 65536.0 
+#minimum number of integrations
+min_nint_trans = 3
+min_nint_phase = 4 
 #electron capacity full well 
 
 
@@ -44,13 +47,16 @@ def wrapper(dictinput):
 	    add_noise_floor
 	    as_dict
 	"""
-	   
-    
     #constant parameters.. consider putting these into json file 
-
     pandeia_input = dictinput['pandeia_input']
-    pandexo_input = dictinput['pandexo_input']    
-
+    pandexo_input = dictinput['pandexo_input']    	
+	
+    #define the calculation we'll be doing 
+    if pandexo_input['planet']['w_unit'] == 'sec':
+        calculation = 'phase_spec'
+    else: 
+        calculation = pandexo_input['calculation'].lower()
+    
     #which instrument 
     instrument = pandeia_input['configuration']['instrument']['instrument']
     conf = {'instrument': pandeia_input['configuration']['instrument']}
@@ -58,12 +64,13 @@ def wrapper(dictinput):
     det_pars = i.get_detector_pars()
     fullwell = det_pars['fullwell']
     rn = det_pars['rn']
+    pix_size = det_pars['pix_size']*1e-3 #convert from miliarcsec to arcsec
     sat_level = pandexo_input['observation']['sat_level']/100.0*fullwell
 
     #parameteres needed from exo_input
     mag = pandexo_input['star']['mag']
     
-    transit_duration = pandexo_input['observation']['transit_duration']
+    
     noccultations = pandexo_input['observation']['noccultations']
     wave_bin = pandexo_input['observation']['wave_bin']
     #amount of exposure time out-of-occultation, as a fraction of in-occ time 
@@ -71,41 +78,65 @@ def wrapper(dictinput):
     noise_floor = pandexo_input['observation']['noise_floor']
 
 
-
     #get stellar spectrum and in transit spec
     star_spec = create.outTrans(pandexo_input['star'])
     both_spec = create.bothTrans(star_spec, pandexo_input['planet'])
     out_spectrum = np.array([both_spec['wave'], both_spec['flux_out_trans']])
+        
+    #get transit duration from phase curve or from input 
+    if calculation == 'phase_spec': 
+        transit_duration = max(both_spec['time']) - min(both_spec['time'])
+    else: 
+        transit_duration = pandexo_input['observation']['transit_duration']
 
     #add to pandeia input 
     pandeia_input['scene'][0]['spectrum']['sed']['spectrum'] = out_spectrum
-
+    
     #run pandeia once to determine max exposure time per int and get exposure params
     m = compute_maxexptime_per_int(pandeia_input, sat_level) 
+       
     #calculate all timing info
     timing, flags = compute_timing(m,transit_duration,expfact_out,noccultations)
-
+    
     #Simulate out trans and in transit
     out = perform_out(pandeia_input, pandexo_input,timing, both_spec)
-    inn = perform_in(pandeia_input, pandexo_input,timing, both_spec)
-    #compute warning flags for timing info 
-    warnings = add_warnings(inn, timing, sat_level, flags, instrument) 
-
-    compNoise = ExtractSpec(inn, out, rn, timing)
     
-    if pandexo_input['calculation'].lower() == 'slope method': 
+    #this kind of redundant going to compute inn from out instead 
+    #keep perform_in but change inputs to (out, timing, both_spec)
+    inn = perform_in(pandeia_input, pandexo_input,timing, both_spec)
+    
+    #compute warning flags for timing info 
+    warnings = add_warnings(out, timing, sat_level, flags, instrument) 
+
+    compNoise = ExtractSpec(inn, out, rn, pix_size, timing)
+    
+    #slope method is pandeia's pure noise calculation (taken from SNR)
+    #contains correlated noise, RN, dark current, sky, 
+    #uses MULTIACCUM formula so we deviated from this. 
+    #could eventually come back to this if Pandeia adopts First-Last formula
+    if calculation == 'slope method': 
         #Extract relevant info from pandeia output (1d curves and wavelength) 
         #extracted flux in units of electron/s
         w = out.curves['extracted_flux'][0]
         result = compNoise.run_slope_method()
 
-    elif pandexo_input['calculation'].lower() == '2d extract':
+    #derives noise from 2d postage stamps. Doing this results in a higher 
+    #1d flux rate than the Pandeia gets from extracting its own. 
+    #this should be used to benchmark Pandeia's 1d extraction  
+    elif calculation == '2d extract':
         w = out.curves['extracted_flux'][0]
         result = compNoise.run_2d_extract()
     
-    elif pandexo_input['calculation'].lower() == 'first minus last':
+    #this is the noise calculation that PandExo uses online. It derives 
+    #its own calculation of readnoise and does not use MULTIACUMM 
+    #noise formula  
+    elif calculation == 'first minus last':
         w = out.curves['extracted_flux'][0]
         result = compNoise.run_f_minus_l()
+    
+    elif calculation == 'phase_spec':
+        result = compNoise.run_phase_spec()
+        w = result['time']
         
     varin = result['var_in_1d']
     varout = result['var_out_1d']
@@ -156,8 +187,9 @@ def wrapper(dictinput):
                 'error_no_floor':np.sqrt(varin+varout)/extracted_flux_out
                 }
  
-    result_dict = as_dict(out,inn, both_spec ,binned, 
-                timing, mag, sat_level, warnings,pandexo_input['planet']['f_unit'], unbinned)
+    result_dict = as_dict(out,both_spec ,binned, 
+                timing, mag, sat_level, warnings,
+                pandexo_input['planet']['f_unit'], unbinned,calculation)
     
     return result_dict 
 
@@ -302,12 +334,21 @@ def compute_timing(m,transit_duration,expfact_out,noccultations):
     #figure out how many integrations are in transit and how many are out of transit 
     nint_in = np.ceil(nint_per_occultation)
     nint_out = np.ceil(nint_in/expfact_out)
-
-    if nint_in == 0:
-        nint_in = 1.0
+    
+    #you would never want a single integration in transit. 
+    #here we assume that for very dim things, you would want at least 
+    #3 integrations in transit 
+    if nint_in < 4:
+        ngroups_per_int = np.floor(ngroups_per_int/3.0)
+        exptime_per_int = (ngroups_per_int-1.)*exptime_per_frame
+        clocktime_per_int = ngroups_per_int*exptime_per_frame
+        eff = exptime_per_int / (clocktime_per_int+overhead_per_int)
+        nint_per_occultation =  transit_duration*eff/exptime_per_int
+        nint_in = np.ceil(nint_per_occultation)
+        nint_out = np.ceil(nint_in/expfact_out)
         
-    if nint_out == 0.0:
-        nint_out = 1.0
+    if nint_out < 2:
+        nint_out = 2.0
    
     timing = {
         "Transit Duration" : transit_duration/60.0/60.0,
@@ -345,15 +386,19 @@ def perform_in(pandeia_input, pandexo_input,timing, both_spec):
         - perform_calculation
     """
     #function to run pandeia for in transit
-    pandeia_input['configuration']['detector']['ngroup'] = timing['Num Groups per Integration']
-    pandeia_input['configuration']['detector']['nint'] = timing['Num Integrations In Transit']
-    pandeia_input['configuration']['detector']['nexp'] = 1
+    if pandexo_input['planet']['w_unit'] == 'sec':
+        #return the phase curve since it's all we need 
+        report_in = {'time': both_spec['time'],'planet_phase': both_spec['planet_phase']}
+    else:
+        pandeia_input['configuration']['detector']['ngroup'] = timing['Num Groups per Integration']
+        pandeia_input['configuration']['detector']['nint'] = timing['Num Integrations In Transit']
+        pandeia_input['configuration']['detector']['nexp'] = 1
   
-    in_transit_spec = np.array([both_spec['wave'], both_spec['flux_in_trans']])
+        in_transit_spec = np.array([both_spec['wave'], both_spec['flux_in_trans']])
     
-    pandeia_input['scene'][0]['spectrum']['sed']['spectrum'] = in_transit_spec
+        pandeia_input['scene'][0]['spectrum']['sed']['spectrum'] = in_transit_spec
 
-    report_in = perform_calculation(pandeia_input, dict_report=False)
+        report_in = perform_calculation(pandeia_input, dict_report=False)
     return report_in
           
 	
@@ -385,14 +430,14 @@ def perform_out(pandeia_input, pandexo_input,timing, both_spec):
 
     return report_out
     
-def add_warnings(inn, timing, sat_level, flags,instrument): 
+def add_warnings(pand_dict, timing, sat_level, flags,instrument): 
     """
     Adds in necessary warning flags. 
 
 	Parameters
 	----------               
     Input:
-        -inn: dictionary output from in transit data 
+        -pand_dict: dictionary output from pandeia run 
         -timing: timing calculated from "compute_timing()"
         -sat_level: user specified saturaiton level 
         -flags: two flags which are calculated in "compute_timing()"
@@ -412,11 +457,11 @@ def add_warnings(inn, timing, sat_level, flags,instrument):
   
     #check for saturation 
     try:  
-        flag_nonl = inn.as_dict()['warnings']['nonlinear']
+        flag_nonl = pand_dict.as_dict()['warnings']['nonlinear']
     except: 
         flag_nonl = "All good"    
     try: 
-        flag_sat = inn.as_dict()['warnings']['saturated']
+        flag_sat = pand_dict.as_dict()['warnings']['saturated']
     except: 
         flag_sat = "All good"
         
@@ -513,7 +558,7 @@ def bin_data(x,y,wlength):
         first = i 
     return np.array(xout),np.array(yout)
 
-def as_dict(out, inn, both_spec ,binned, timing, mag, sat_level, warnings, punit, unbinned): 
+def as_dict(out, both_spec ,binned, timing, mag, sat_level, warnings, punit, unbinned,calculation): 
     """
     computes full dictionary output for either output to user 
     or condenses the output for online pandexo interface
@@ -546,9 +591,12 @@ def as_dict(out, inn, both_spec ,binned, timing, mag, sat_level, warnings, punit
     input_div = pd.DataFrame(input_dict.items(), columns=['Component', 'Values']).to_html().encode()
     input_div = '<table class="table table-striped"> \n' + input_div[36:len(input_div)]
     
+    #add calc type to input dict (doing it here so it doesn't output on webpage
+    input_dict["Calculation Type"]= calculation
+    
     final_dict = {
-    'OriginalInput': {'og_spec':p*(both_spec['flux_out_trans']-both_spec['flux_in_trans'])/both_spec['flux_out_trans'],
-                     'og_wave' : both_spec['wave']},
+    'OriginalInput': {'og_spec':both_spec['og_spec'],
+                     'og_wave' : both_spec['og_wave']},
     'RawData': unbinned,
     'FinalSpectrum': binned,
         
