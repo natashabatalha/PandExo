@@ -52,6 +52,6 @@
     "strategy": {
             "method": "soss",
             "order": 1,
-            "background_subtraction": false
+            "background_subtraction": true
             }
 }
