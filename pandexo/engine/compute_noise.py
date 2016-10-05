@@ -229,8 +229,8 @@ class ExtractSpec():
         contains functionality to compute noise using Pandeia 1d noise 
         output products (uses MULTIACCUM) noise formula 
         """
-        curves_out = self.out.curves
-        curves_inn = self.inn.curves
+        curves_out = self.out['1d']
+        curves_inn = self.inn['1d']
         noccultations = self.nocc
         #In the following the SN is changed to incorporate number of occultations 
         #i.e. multiply by sqrt(n) 
@@ -265,8 +265,8 @@ class ExtractSpec():
         
         """
         inn = self.inn
-        curves_out = self.out.curves
-        curves_inn = self.inn.curves
+        curves_out = self.out['1d']
+        curves_inn = self.inn['1d']
         
         
         #on source out versus in 
@@ -277,7 +277,10 @@ class ExtractSpec():
         rn_var = self.rn**2.0
         
         #size of pix extraction region 
-        numpix = inn.as_dict()['scalar']['aperture_size']/self.pix_size
+        try:
+            numpix = self.out['scalar']['aperture_size']/self.pix_size
+        except: 
+            numpix = 25.0
 
         #1d rn     = rn/pix * # of integrations *nocc  * #pixs 
         rn_var_inn = rn_var * self.nint_in * self.nocc * numpix 
@@ -318,8 +321,10 @@ class ExtractSpec():
 
         rn_var = self.rn**2.0
         #size of pix extraction region 
-        numpix = self.out.as_dict()['scalar']['aperture_size']/self.pix_size
-
+        try:
+            numpix = self.out['scalar']['aperture_size']/self.pix_size
+        except: 
+            numpix = 25.0
         #1d rn     = rn/pix * # of integrations *nocc  * #pixs 
         rn_var_out = rn_var * self.nocc * numpix # the initial output is always sampled by 1 integration
    
