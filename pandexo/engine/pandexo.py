@@ -114,21 +114,21 @@ def wrapper(dictinput):
     if calculation == 'slope method': 
         #Extract relevant info from pandeia output (1d curves and wavelength) 
         #extracted flux in units of electron/s
-        w = out.curves['extracted_flux'][0]
+        w = out['1d']['extracted_flux'][0]
         result = compNoise.run_slope_method()
 
     #derives noise from 2d postage stamps. Doing this results in a higher 
     #1d flux rate than the Pandeia gets from extracting its own. 
     #this should be used to benchmark Pandeia's 1d extraction  
     elif calculation == '2d extract':
-        w = out.curves['extracted_flux'][0]
+        w = out['1d']['extracted_flux'][0]
         result = compNoise.run_2d_extract()
     
     #this is the noise calculation that PandExo uses online. It derives 
     #its own calculation of readnoise and does not use MULTIACUMM 
     #noise formula  
     elif calculation == 'fml':
-        w = out.curves['extracted_flux'][0]
+        w = out['1d']['extracted_flux'][0]
         result = compNoise.run_f_minus_l()
     
     elif calculation == 'phase_spec':
@@ -187,7 +187,7 @@ def wrapper(dictinput):
     result_dict = as_dict(out,both_spec ,binned, 
                 timing, mag, sat_level, warnings,
                 pandexo_input['planet']['f_unit'], unbinned,calculation)
-    
+
     return result_dict 
 
 
@@ -221,7 +221,8 @@ def compute_maxexptime_per_int(pandeia_input, sat_level):
     
     report = perform_calculation(pandeia_input, dict_report=False)
     report_dict = report.as_dict() 
-    
+
+            
     #check for hard saturation 
     if 'saturated' in report_dict['warnings'].keys(): 
         if report_dict['warnings']['saturated'][0:4] == 'Hard':
@@ -393,12 +394,12 @@ def perform_in(pandeia_input, pandexo_input,timing, both_spec, out, calculation)
         #can compute in transit flux rate without running pandeia a third time     
         report_in = deepcopy(out)
         
-        transit_depth = np.interp(report_in.curves['extracted_flux'][0],
+        transit_depth = np.interp(report_in['1d']['extracted_flux'][0],
                                     both_spec['wave'], both_spec['frac'])
-        report_in.curves['extracted_flux'][1] = report_in.curves['extracted_flux'][1]*transit_depth
+        report_in['1d']['extracted_flux'][1] = report_in['1d']['extracted_flux'][1]*transit_depth
     else: 
         #only run pandeia a third time if doing slope method and need accurate run for the 
-        #nint and timiing
+        #nint and timing
         pandeia_input['configuration']['detector']['ngroup'] = timing['Num Groups per Integration']
         pandeia_input['configuration']['detector']['nint'] = timing['Num Integrations In Transit']
         pandeia_input['configuration']['detector']['nexp'] = 1
@@ -407,7 +408,8 @@ def perform_in(pandeia_input, pandexo_input,timing, both_spec, out, calculation)
     
         pandeia_input['scene'][0]['spectrum']['sed']['spectrum'] = in_transit_spec
 
-        report_in = perform_calculation(pandeia_input, dict_report=False)
+        report_in = perform_calculation(pandeia_input, dict_report=True)
+   
     
     return report_in
           
@@ -436,7 +438,8 @@ def perform_out(pandeia_input, pandexo_input,timing, both_spec):
     pandeia_input['configuration']['detector']['nint'] = timing['Num Integrations Out of Transit']
     pandeia_input['configuration']['detector']['nexp'] = 1 
 
-    report_out = perform_calculation(pandeia_input, dict_report=False)
+    report_out = perform_calculation(pandeia_input, dict_report=True)
+
 
     return report_out
     
@@ -467,11 +470,11 @@ def add_warnings(pand_dict, timing, sat_level, flags,instrument):
   
     #check for saturation 
     try:  
-        flag_nonl = pand_dict.as_dict()['warnings']['nonlinear']
+        flag_nonl = pand_dict['warnings']['nonlinear']
     except: 
         flag_nonl = "All good"    
     try: 
-        flag_sat = pand_dict.as_dict()['warnings']['saturated']
+        flag_sat = pand_dict['warnings']['saturated']
     except: 
         flag_sat = "All good"
         
@@ -610,7 +613,6 @@ def as_dict(out, both_spec ,binned, timing, mag, sat_level, warnings, punit, unb
     p=1.0
     if punit == 'fp/f*': p = -1.0
     
-    out = out.as_dict()
     timing_div = pd.DataFrame(timing.items(), columns=['Timing Info', 'Values']).to_html().encode()
     timing_div = '<table class="table table-striped"> \n' + timing_div[36:len(timing_div)]
     
@@ -644,7 +646,6 @@ def as_dict(out, both_spec ,binned, timing, mag, sat_level, warnings, punit, unb
         
     #pic output 
     'PandeiaOutTrans': out, 
-    #'inn':inn.as_dict(),
 
     #all timing info 
     'timing': timing,

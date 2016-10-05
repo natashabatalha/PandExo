@@ -325,6 +325,7 @@ class CalculationNewHandler(BaseHandler):
 
         task = self.executor.submit(wrapper, finaldata)
 
+
         self._add_task(id, self.get_argument("calcName"), task)
 
         response = self._get_task_response(id)
@@ -573,7 +574,9 @@ class CalculationViewHandler(BaseHandler):
     `create_component` function which generates the Bokeh interative plots.
     """
     def get(self, id):
+        
         result = self._get_task_result(id)
+        
         script, div = create_component(result)
         div['timing_div'] = result['timing_div']
         div['input_div'] = result['input_div'] 
