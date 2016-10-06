@@ -190,7 +190,7 @@ def run_pandexo(exo, inst, param_space = 0, param_range = 0,save_file = True,
         #if there are parameters to cycle through this will run
         print "Running through exo parameters in parallel: " + param_space 
         #run the above function in parallel 
-        results = Parallel(n_jobs=num_cores)(delayed(run_param_space)(i,exo,inst,param_space) for i in param_range)
+        results = Parallel(n_jobs=num_cores)(delayed(run_param_space)(i,exo,inst[0],param_space) for i in param_range)
         
         #Default dump all results [an array of dictionaries] into single file
         #and return results immediately to user

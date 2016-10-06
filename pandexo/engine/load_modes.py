@@ -46,7 +46,7 @@ class SetDefaultModes():
             pandeia_data = json.load(data_file)
             pandeia_data["strategy"]["order"] = order
             pandeia_data["configuration"]["detector"]["subarray"] = subarray[str(order)]
-            pandeia_data["configuration"]["instrument"]["disperser"] = pandeia_data["configuration"]["instrument"]["disperser"] +'_'+str(order) 
+            pandeia_data["configuration"]["instrument"]["disperser"] = pandeia_data["configuration"]["instrument"]["disperser"] #+'_'+str(order) 
         return pandeia_data
         
     def nirspec(self):
