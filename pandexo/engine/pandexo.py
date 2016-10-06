@@ -409,7 +409,7 @@ def perform_in(pandeia_input, pandexo_input,timing, both_spec, out, calculation)
         pandeia_input['scene'][0]['spectrum']['sed']['spectrum'] = in_transit_spec
 
         report_in = perform_calculation(pandeia_input, dict_report=True)
-   
+        report_in.pop('3d')
     
     return report_in
           
@@ -439,7 +439,7 @@ def perform_out(pandeia_input, pandexo_input,timing, both_spec):
     pandeia_input['configuration']['detector']['nexp'] = 1 
 
     report_out = perform_calculation(pandeia_input, dict_report=True)
-
+    report_out.pop('3d')
 
     return report_out
     
