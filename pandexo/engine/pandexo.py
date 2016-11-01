@@ -90,18 +90,21 @@ def wrapper(dictinput):
     pandeia_input['scene'][0]['spectrum']['sed']['spectrum'] = out_spectrum
     
     #run pandeia once to determine max exposure time per int and get exposure params
+    print "Computing Duty Cycle"
     m = compute_maxexptime_per_int(pandeia_input, sat_level) 
-       
+    print "Finished Duty Cucle Calc"
     #calculate all timing info
     timing, flags = compute_timing(m,transit_duration,expfact_out,noccultations)
     
     #Simulate out trans and in transit
+    print "Starting Out of Transit Simulation"
     out = perform_out(pandeia_input, pandexo_input,timing, both_spec)
-    
+    print "End out of Transit"
     #this kind of redundant going to compute inn from out instead 
     #keep perform_in but change inputs to (out, timing, both_spec)
+    print "Starting In Transit Simulation"
     inn = perform_in(pandeia_input, pandexo_input,timing, both_spec, out, calculation)
-    
+    print "End In Transit" 
     #compute warning flags for timing info 
     warnings = add_warnings(out, timing, sat_level, flags, instrument) 
 
