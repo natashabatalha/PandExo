@@ -4,7 +4,7 @@ import pickle as pk
 import numpy as np
 
 def data(result_dict, model=True, title='Model + Data + Error Bars', outputfile = 'data.html',legend = False, 
-        R=False,  num_tran = 1.0, plot_width=800, plot_height=400):
+        R=False,  num_tran = 1.0, plot_width=800, plot_height=400,x_range=[1,10]):
     """
     Plots 1d data points with model in the background (if wanted) 
     
@@ -27,7 +27,7 @@ def data(result_dict, model=True, title='Model + Data + Error Bars', outputfile 
     """
     TOOLS = "pan,wheel_zoom,box_zoom,resize,reset,save"
     output_file(outputfile)
-    colors = ['black','blue','red','orange','yellow','green','purple','pink','cyan','grey','brown']
+    colors = ['black','blue','red','orange','yellow','purple','pink','cyan','grey','brown']
     #make sure its iterable
     if type(result_dict) != list: 
         result_dict = [result_dict]
@@ -37,10 +37,10 @@ def data(result_dict, model=True, title='Model + Data + Error Bars', outputfile 
         legend = True
         if type(legend_keys) != list:
             legend_keys = [legend_keys]
-        
+      
     i = 0     
     for dict in result_dict: 
-    
+        ntran_old = dict['timing']['Number of Transits']
         #remove any nans 
         y = dict['FinalSpectrum']['spectrum_w_rand']
         x = dict['FinalSpectrum']['wave'][~np.isnan(y)]
@@ -52,7 +52,19 @@ def data(result_dict, model=True, title='Model + Data + Error Bars', outputfile 
             x=x 
             y=y 
         else:
-            x, y ,err= binning(x,y,err,R)
+            wbin, out = bin_data(x,dict['RawData']['flux_out']*num_tran/ntran_old, R)
+            wbin, inn = bin_data(x,dict['RawData']['flux_in']*num_tran/ntran_old, R)
+            wbin, vout = bin_data(x,dict['RawData']['var_out']*num_tran/ntran_old, R)
+            wbin, vin = bin_data(x,dict['RawData']['var_in']*num_tran/ntran_old, R)
+            if dict['input']['Primary/Secondary']=='fp/f*':
+                fac = -1.0
+            else:
+                fac = 1.0
+            rand_noise = np.sqrt((vin+vout))*(np.random.randn(len(wbin)))
+            sim_spec = fac*(out-inn + rand_noise)/out 
+            x = wbin
+            y = sim_spec
+            err = np.sqrt(vout+vin)/out
             
         #create error bars for Bokeh's multi_line
         y_err = []
@@ -78,14 +90,18 @@ def data(result_dict, model=True, title='Model + Data + Error Bars', outputfile 
                  0.1*max(dict['OriginalInput']['og_spec'])+max(dict['OriginalInput']['og_spec'])]
             xlims = [min(x), max(x)]
          
-            fig1d = figure(x_range=xlims, y_range = ylims, 
+            fig1d = figure(x_range=x_range, y_range = ylims, 
                plot_width = plot_width, plot_height =plot_height,title=title,x_axis_label=x_axis_label,
-              y_axis_label = y_axis_label, tools=TOOLS)
+              y_axis_label = y_axis_label, tools=TOOLS, background_fill_color = 'white')
         
               
         #plot model, data, and errors 
         if model:
-            fig1d.line(dict['OriginalInput']['og_wave'], dict['OriginalInput']['og_spec'], color=colors[i],alpha=0.5)
+            mxx = dict['OriginalInput']['og_wave']
+            myy = dict['OriginalInput']['og_spec'][mxx>1]
+            mxx = mxx[mxx>1]
+            mx, my = bin_data_smoothe(mxx,myy , 50)
+            fig1d.line(mx,my, color='white',alpha=0.2, line_width = 4)
         if legend: 
             fig1d.circle(x, y, color=colors[i], legend = legend_keys[i])
         else: 
@@ -95,10 +111,10 @@ def data(result_dict, model=True, title='Model + Data + Error Bars', outputfile 
     show(fig1d)
     
 
-def binning(x, y,e, R):
+def bin_data(x,y,R):
     """ 
     Takes 2 arrays x and y and bins them into groups of blength.
-    only use for binning error bars. 
+    
     Parameters
 	----------
         Inputs:     
@@ -121,13 +137,48 @@ def binning(x, y,e, R):
     # convert to arrays if necessary
     x = np.array(x)
     y = np.array(y)
-    e = np.array(e)
 
-    xout,yout,eout= [],[],[]
+
+    xout,yout= [],[]
     first = 0
     for i in ind:
         xout.append(sum(x[first:i])/len(x[first:i]))
-        yout.append(sum(y[first:i])/len(y[first:i]))
-        eout.append(np.sqrt(sum([jj**2 for jj in e[first:i]]))/len(e[first:i]))
+        yout.append(sum(y[first:i]))
         first = i 
-    return np.array(xout),np.array(yout),np.array(eout)
+    return np.array(xout),np.array(yout)
+    
+def bin_data_smoothe(x,y,R):
+    """ 
+    Takes 2 arrays x and y and bins them into groups of blength.
+    
+    Parameters
+	----------
+        Inputs:     
+            -x, y:                   1D lists or numpy arrays
+        Outputs:    
+            - xout, yout, yerrout,noise:    1D numpy arrays
+    """
+    wlength = min(x)/R
+    ii = 0
+    start = 0
+    ind = []
+    for i in range(0, len(x)-1):
+        if x[i+1] - x[start] >= wlength:
+            ind.append(i+1)
+            start = i 
+    
+    if ind[len(ind)-1] != (len(x)):
+        ind.append(len(x))
+    
+    # convert to arrays if necessary
+    x = np.array(x)
+    y = np.array(y)
+
+
+    xout,yout= [],[]
+    first = 0
+    for i in ind:
+        xout.append(sum(x[first:i])/len(x[first:i]))
+        yout.append(sum(y[first:i])/len(x[first:i]))
+        first = i 
+    return np.array(xout),np.array(yout)
