@@ -12,7 +12,7 @@ from compute_noise import ExtractSpec
 #max groups in integration
 max_ngroup = 65536.0 
 #minimum number of integrations
-min_nint_trans = 3
+min_nint_trans = 1
 #electron capacity full well 
 
 
@@ -235,9 +235,9 @@ def compute_maxexptime_per_int(pandeia_input, sat_level):
     det = report_dict['2d']['detector']
     
     timeinfo = report_dict['information']['exposure_specification']
-    totaltime = timeinfo['tgroup']*timeinfo['ngroup']*timeinfo['nint']
+    #totaltime = timeinfo['tgroup']*timeinfo['ngroup']*timeinfo['nint']
     
-    maxdetvalue = np.max(det)*totaltime
+    maxdetvalue = np.max(det) 
     #maximum time before saturation per integration 
     #based on user specified saturation level
     try:
@@ -280,7 +280,7 @@ def compute_timing(m,transit_duration,expfact_out,noccultations):
     nskip = m['nskip']
     overhead_per_int = exptime_per_frame #overhead time added per integration 
     maxexptime_per_int = m['maxexptime_per_int']
-    
+
     flag_default = "All good"
     flag_high = "All good"
     try:
@@ -319,13 +319,13 @@ def compute_timing(m,transit_duration,expfact_out,noccultations):
                 
     #the integration time is related to the number of groups and the time of each 
     #group 
-    exptime_per_int = (ngroups_per_int-1.)*exptime_per_frame
+    exptime_per_int = ngroups_per_int*exptime_per_frame
     
     #clock time includes the reset frame 
     clocktime_per_int = ngroups_per_int*exptime_per_frame
     
     #observing efficiency (i.e. what percentage of total time is spent on soure)
-    eff = exptime_per_int / (clocktime_per_int+overhead_per_int)
+    eff = (ngroups_per_int - 1.0)/(ngroups_per_int + 1.0)
     
     #this says "per occultation" but this is just the in transit frames.. See below
     #nframes_per_occultation = long(transit_duration/exptime_per_frame)
@@ -343,7 +343,7 @@ def compute_timing(m,transit_duration,expfact_out,noccultations):
         ngroups_per_int = np.floor(ngroups_per_int/3.0)
         exptime_per_int = (ngroups_per_int-1.)*exptime_per_frame
         clocktime_per_int = ngroups_per_int*exptime_per_frame
-        eff = exptime_per_int / (clocktime_per_int+overhead_per_int)
+        eff = (ngroups_per_int - 1.0)/(ngroups_per_int + 1.0)
         nint_per_occultation =  transit_duration*eff/exptime_per_int
         nint_in = np.ceil(nint_per_occultation)
         nint_out = np.ceil(nint_in/expfact_out)
@@ -360,7 +360,7 @@ def compute_timing(m,transit_duration,expfact_out,noccultations):
         "Num Integrations In Transit":nint_in,
         "Num Integrations per Occultation":nint_out+nint_in,
         "On Source Time(sec)": noccultations*clocktime_per_int*(nint_out+nint_in),
-        "Reset time Plus TA time (hrs)": overhead_per_int*(nint_in + nint_out)/60.0/60.0 + 0.5,
+        "Reset time Plus 30 min TA time (hrs)": overhead_per_int*(nint_in + nint_out)/60.0/60.0 + 0.5,
         "Observing Efficiency (%)": eff*100.0,
         "Number of Transits": noccultations
         }      
