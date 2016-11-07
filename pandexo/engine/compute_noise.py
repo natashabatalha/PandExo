@@ -26,6 +26,10 @@ class ExtractSpec():
         self.rn = rn 
         self.pix_size = pix_size
     
+        #on source out versus in 
+        self.on_source_in = self.tframe * (self.ngroups_per_int-1.0) * self.nint_in
+        self.on_source_out = self.tframe * (self.ngroups_per_int-1.0) * self.nint_out
+
     def loopingL(self, cen, signal_col, noise_col, bkg_col):
     #create function to find location where SNR is the highest
     #loop from the highest value of the signal downward 
@@ -118,7 +122,8 @@ class ExtractSpec():
         return {'photon_out_1d':photon_out_1d, 'photon_in_1d':photon_in_1d, 
                 'var_in_1d':var_in_1d, 'var_out_1d':var_out_1d, 'rn_in_1d':rn_in_1d,
                 'rn_out_1d':rn_out_1d,'sky_in_1d': sky_in_1d, 'sky_out_1d': sky_out_1d, 
-                'extract_info':extract_info}
+                'extract_info':extract_info,'on_source_in':self.on_source_in, 
+                'on_source_out':self.on_source_out}
 
     def extract_region(self): #second to last 
         """
@@ -250,7 +255,8 @@ class ExtractSpec():
         varout = (extracted_noise_out)**2.0
 
         return {'photon_out_1d':extracted_flux_out, 'photon_in_1d':extracted_flux_inn, 
-                    'var_in_1d':varin, 'var_out_1d': varout}
+                    'var_in_1d':varin, 'var_out_1d': varout,'on_source_in':self.on_source_in, 
+                'on_source_out':self.on_source_out}
     
     
     def run_f_minus_l(self):
@@ -270,8 +276,8 @@ class ExtractSpec():
         
         
         #on source out versus in 
-        on_source_in = self.tframe * (self.ngroups_per_int-1.0) * self.nint_in
-        on_source_out = self.tframe * (self.ngroups_per_int-1.0) * self.nint_out
+        on_source_in = self.on_source_in
+        on_source_out = self.on_source_out
 
         #calculate rn 
         rn_var = self.rn**2.0
@@ -295,11 +301,12 @@ class ExtractSpec():
         bkg_flux_out = curves_out['extracted_bg_only'][1] * on_source_out * self.nocc
         
         #total nois 
-        varin = extracted_flux_inn + bkg_flux_inn + rn_var_inn
-        varout = extracted_flux_out + bkg_flux_out + rn_var_out
+        varin = (extracted_flux_inn + bkg_flux_inn + rn_var_inn)/on_source_in**2.0
+        varout = (extracted_flux_out + bkg_flux_out + rn_var_out)/on_source_out**2.0
         
-        return {'photon_out_1d':extracted_flux_out, 'photon_in_1d':extracted_flux_inn, 
-                    'var_in_1d':varin, 'var_out_1d': varout}
+        return {'photon_out_1d':extracted_flux_out/on_source_out, 'photon_in_1d':extracted_flux_inn/on_source_in, 
+                    'var_in_1d':varin, 'var_out_1d': varout,'on_source_in':self.on_source_in, 
+                'on_source_out':self.on_source_out}
     
 
     
@@ -341,6 +348,7 @@ class ExtractSpec():
  
         
         return {'photon_out_1d':flux_time_out, 'photon_in_1d':flux_time_in, 
-                    'var_in_1d':varin, 'var_out_1d': varout, 'time':new_t}
+                    'var_in_1d':varin, 'var_out_1d': varout, 'time':new_t,'on_source_in':'N/A', 
+                'on_source_out':'N/A'}
         
     

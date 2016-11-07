@@ -142,7 +142,7 @@ def wrapper(dictinput):
     varout = result['var_out_1d']
     extracted_flux_out = result['photon_out_1d']
     extracted_flux_inn = result['photon_in_1d']
-        
+
         
     #bin the data according to user input 
     wbin, photon_out_bin = bin_data(w, extracted_flux_out, wave_bin)
