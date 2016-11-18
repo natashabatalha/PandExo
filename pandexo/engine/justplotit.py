@@ -4,7 +4,7 @@ import pickle as pk
 import numpy as np
 
 def data(result_dict, model=True, title='Model + Data + Error Bars', outputfile = 'data.html',legend = False, 
-        R=False,  num_tran = 1.0, plot_width=800, plot_height=400,x_range=[1,10]):
+        R=False,  num_tran = False, plot_width=800, plot_height=400,x_range=[1,10], new_wave=False):
     """
     Plots 1d data points with model in the background (if wanted) 
     
@@ -47,24 +47,57 @@ def data(result_dict, model=True, title='Model + Data + Error Bars', outputfile 
         err = dict['FinalSpectrum']['error_w_floor'][~np.isnan(y)]
         y = y[~np.isnan(y)]
 
-
-        if R == False: 
+        
+        if (R == False) & (num_tran == False): 
             x=x 
             y=y 
-        else:
-            wbin, out = bin_data(x,dict['RawData']['flux_out']*num_tran/ntran_old, R)
-            wbin, inn = bin_data(x,dict['RawData']['flux_in']*num_tran/ntran_old, R)
-            wbin, vout = bin_data(x,dict['RawData']['var_out']*num_tran/ntran_old, R)
-            wbin, vin = bin_data(x,dict['RawData']['var_in']*num_tran/ntran_old, R)
+        elif (R != False) & (num_tran != False):     
+            new_wave = Rspec(x, R)
+            out = uniform_tophat_sum(new_wave,x, dict['RawData']['flux_out']*num_tran/ntran_old)
+            inn = uniform_tophat_sum(new_wave,x, dict['RawData']['flux_in']*num_tran/ntran_old)
+            vout = uniform_tophat_sum(new_wave,x, dict['RawData']['var_out']*num_tran/ntran_old)
+            vin = uniform_tophat_sum(new_wave,x, dict['RawData']['var_in']*num_tran/ntran_old)
             if dict['input']['Primary/Secondary']=='fp/f*':
                 fac = -1.0
             else:
                 fac = 1.0
-            rand_noise = np.sqrt((vin+vout))*(np.random.randn(len(wbin)))
+            rand_noise = np.sqrt((vin+vout))*(np.random.randn(len(new_wave)))
             sim_spec = fac*(out-inn + rand_noise)/out 
-            x = wbin
+            x = new_wave
             y = sim_spec
             err = np.sqrt(vout+vin)/out
+        elif (R == False) & (num_tran != False):     
+            new_wave = Rspec(x, R)
+            out = dict['RawData']['flux_out']*num_tran/ntran_old
+            inn = dict['RawData']['flux_in']*num_tran/ntran_old
+            vout = new_wave,dict['RawData']['var_out']*num_tran/ntran_old
+            vin = new_wave,dict['RawData']['var_in']*num_tran/ntran_old
+            if dict['input']['Primary/Secondary']=='fp/f*':
+                fac = -1.0
+            else:
+                fac = 1.0
+            rand_noise = np.sqrt((vin+vout))*(np.random.randn(len(new_wave)))
+            sim_spec = fac*(out-inn + rand_noise)/out 
+            x = new_wave
+            y = sim_spec
+            err = np.sqrt(vout+vin)/out
+        elif (R != False) & (num_tran == False):     
+            new_wave = Rspec(x, R)
+            out = uniform_tophat_sum(new_wave,x, dict['RawData']['flux_out'])
+            inn = uniform_tophat_sum(new_wave,x, dict['RawData']['flux_in'])
+            vout = uniform_tophat_sum(new_wave,x, dict['RawData']['var_out'])
+            vin = uniform_tophat_sum(new_wave,x, dict['RawData']['var_in'])
+            if dict['input']['Primary/Secondary']=='fp/f*':
+                fac = -1.0
+            else:
+                fac = 1.0
+            rand_noise = np.sqrt((vin+vout))*(np.random.randn(len(new_wave)))
+            sim_spec = fac*(out-inn + rand_noise)/out 
+            x = new_wave
+            y = sim_spec
+            err = np.sqrt(vout+vin)/out
+
+
             
         #create error bars for Bokeh's multi_line
         y_err = []
@@ -110,9 +143,9 @@ def data(result_dict, model=True, title='Model + Data + Error Bars', outputfile 
         i += 1 
     show(fig1d)
     
-
+"""
 def bin_data(x,y,R):
-    """ 
+ 
     Takes 2 arrays x and y and bins them into groups of blength.
     
     Parameters
@@ -121,7 +154,7 @@ def bin_data(x,y,R):
             -x, y:                   1D lists or numpy arrays
         Outputs:    
             - xout, yout, yerrout,noise:    1D numpy arrays
-    """
+
     wlength = min(x)/R
     ii = 0
     start = 0
@@ -146,7 +179,7 @@ def bin_data(x,y,R):
         yout.append(sum(y[first:i]))
         first = i 
     return np.array(xout),np.array(yout)
-    
+"""    
 def bin_data_smoothe(x,y,R):
     """ 
     Takes 2 arrays x and y and bins them into groups of blength.
@@ -182,3 +215,51 @@ def bin_data_smoothe(x,y,R):
         yout.append(sum(y[first:i])/len(x[first:i]))
         first = i 
     return np.array(xout),np.array(yout)
+    
+def Rspec(a, R):
+    """
+    given a wavelength axis and a resolution, rebins just the axis 
+    to the correct resolution
+    """
+    wave = []
+    tracker = min(a)
+    i = 1 
+    ind= 0
+    while(tracker<max(a)):
+        if i <len(a)-1:
+        
+            dlambda = a[i]-a[ind]
+            newR = a[i]/dlambda
+            if newR < R:
+                tracker = a[ind]+dlambda/2.0
+                wave +=[tracker]
+                ind = (np.abs(a-tracker)).argmin()
+                i = ind
+            else:            
+                i+=1    
+        else:
+            tracker = max(a)
+    return wave
+def find_nearest(array,value):
+    idx = (np.abs(array-value)).argmin()
+    return array[idx]   
+
+def uniform_tophat_sum(wlgrid,wno, Fp):
+    wlgrid = np.array(wlgrid)
+    szmod=wlgrid.shape[0]
+
+    delta=np.zeros(szmod)
+    Fint=np.zeros(szmod)
+    delta[0:-1]=wlgrid[1:]-wlgrid[:-1]  
+    delta[szmod-1]=delta[szmod-2] 
+    #pdb.set_trace()
+    for i in range(szmod-1):
+        i=i+1
+        loc=np.where((wno >= wlgrid[i]-0.5*delta[i-1]) & (wno < wlgrid[i]+0.5*delta[i]))
+        Fint[i]=np.sum(Fp[loc])
+	    
+    loc=np.where((wno > wlgrid[0]-0.5*delta[0]) & (wno < wlgrid[0]+0.5*delta[0]))
+    Fint[0]=np.sum(Fp[loc])
+    
+    return Fint
+     
