@@ -9,7 +9,8 @@ import multiprocessing
 
 num_cores = multiprocessing.cpu_count()
 
-ALL = {"MIRI LRS":False,
+ALL = {"WFC3 G141":False,
+       "MIRI LRS":False,
        "NIRISS SOSS_Or1":False,
        "NIRISS SOSS_Or2":False,
        "NIRSpec G140M":False,

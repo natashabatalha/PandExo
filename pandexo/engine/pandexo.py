@@ -12,7 +12,7 @@ from compute_noise import ExtractSpec
 #max groups in integration
 max_ngroup = 65536.0 
 #minimum number of integrations
-min_nint_trans = 3
+min_nint_trans = 1
 #electron capacity full well 
 
 
@@ -54,6 +54,24 @@ def wrapper(dictinput):
     else: 
         calculation = pandexo_input['calculation'].lower()
     
+    if calculation == 'scale':
+        import HST_TExoNS as hst
+        reload(hst)
+        hmag            = pandexo_input['star']['hmag']
+        trdur           = pandexo_input['observation']['transit_duration']
+        numTr           = pandexo_input['observation']['noccultations']
+        nchan           = pandexo_input['observation']['nchan']
+        scanDirection   = pandexo_input['observation']['scanDirection']
+        norbits         = pandexo_input['observation']['norbits']
+        schedulability  = pandexo_input['observation']['schedulability']
+        disperser       = pandeia_input['configuration']['instrument']['disperser'].lower()
+        subarray        = pandeia_input['configuration']['detector']['subarray'].lower()
+        nsamp           = pandeia_input['configuration']['detector']['nsamp']
+        samp_seq        = pandeia_input['configuration']['detector']['samp_seq']
+        deptherr        = hst.wfc3_TExoNS(hmag, trdur, numTr, nchan, disperser, scanDirection, subarray, nsamp, samp_seq, norbits)
+        
+        return deptherr
+    
     #which instrument 
     instrument = pandeia_input['configuration']['instrument']['instrument']
     conf = {'instrument': pandeia_input['configuration']['instrument']}
@@ -90,17 +108,23 @@ def wrapper(dictinput):
     pandeia_input['scene'][0]['spectrum']['sed']['spectrum'] = out_spectrum
     
     #run pandeia once to determine max exposure time per int and get exposure params
+    print "Computing Duty Cycle"
     m = compute_maxexptime_per_int(pandeia_input, sat_level) 
+    print "Finished Duty Cucle Calc"
        
     #calculate all timing info
     timing, flags = compute_timing(m,transit_duration,expfact_out,noccultations)
     
     #Simulate out trans and in transit
+    print "Starting Out of Transit Simulation"
     out = perform_out(pandeia_input, pandexo_input,timing, both_spec)
+    print "End out of Transit"
     
     #this kind of redundant going to compute inn from out instead 
     #keep perform_in but change inputs to (out, timing, both_spec)
+    print "Starting In Transit Simulation"
     inn = perform_in(pandeia_input, pandexo_input,timing, both_spec, out, calculation)
+    print "End In Transit" 
     
     #compute warning flags for timing info 
     warnings = add_warnings(out, timing, sat_level, flags, instrument) 
@@ -134,6 +158,9 @@ def wrapper(dictinput):
     elif calculation == 'phase_spec':
         result = compNoise.run_phase_spec()
         w = result['time']
+    else:
+        result = None
+        raise Exception('WARNING: Calculation method not found.')
         
     varin = result['var_in_1d']
     varout = result['var_out_1d']
@@ -232,9 +259,9 @@ def compute_maxexptime_per_int(pandeia_input, sat_level):
     det = report_dict['2d']['detector']
     
     timeinfo = report_dict['information']['exposure_specification']
-    totaltime = timeinfo['tgroup']*timeinfo['ngroup']*timeinfo['nint']
+    #totaltime = timeinfo['tgroup']*timeinfo['ngroup']*timeinfo['nint']
     
-    maxdetvalue = np.max(det)*totaltime
+    maxdetvalue = np.max(det)
     #maximum time before saturation per integration 
     #based on user specified saturation level
     try:
@@ -316,13 +343,13 @@ def compute_timing(m,transit_duration,expfact_out,noccultations):
                 
     #the integration time is related to the number of groups and the time of each 
     #group 
-    exptime_per_int = (ngroups_per_int-1.)*exptime_per_frame
+    exptime_per_int = ngroups_per_int*exptime_per_frame
     
     #clock time includes the reset frame 
     clocktime_per_int = ngroups_per_int*exptime_per_frame
     
     #observing efficiency (i.e. what percentage of total time is spent on soure)
-    eff = exptime_per_int / (clocktime_per_int+overhead_per_int)
+    eff = (ngroups_per_int - 1.0)/(ngroups_per_int + 1.0)
     
     #this says "per occultation" but this is just the in transit frames.. See below
     #nframes_per_occultation = long(transit_duration/exptime_per_frame)
@@ -340,7 +367,7 @@ def compute_timing(m,transit_duration,expfact_out,noccultations):
         ngroups_per_int = np.floor(ngroups_per_int/3.0)
         exptime_per_int = (ngroups_per_int-1.)*exptime_per_frame
         clocktime_per_int = ngroups_per_int*exptime_per_frame
-        eff = exptime_per_int / (clocktime_per_int+overhead_per_int)
+        eff = (ngroups_per_int - 1.0)/(ngroups_per_int + 1.0)
         nint_per_occultation =  transit_duration*eff/exptime_per_int
         nint_in = np.ceil(nint_per_occultation)
         nint_out = np.ceil(nint_in/expfact_out)
@@ -357,7 +384,7 @@ def compute_timing(m,transit_duration,expfact_out,noccultations):
         "Num Integrations In Transit":nint_in,
         "Num Integrations per Occultation":nint_out+nint_in,
         "On Source Time(sec)": noccultations*clocktime_per_int*(nint_out+nint_in),
-        "Reset time Plus TA time (hrs)": overhead_per_int*(nint_in + nint_out)/60.0/60.0 + 0.5,
+        "Reset time Plus 30 min TA time (hrs)": overhead_per_int*(nint_in + nint_out)/60.0/60.0 + 0.5,
         "Observing Efficiency (%)": eff*100.0,
         "Number of Transits": noccultations
         }      

@@ -40,6 +40,7 @@ class Application(tornado.web.Application):
             (r"/tables", TablesHandler),
             (r"/helpfulplots", HelpfulPlotsHandler),
             (r"/calculation/new", CalculationNewHandler),
+            (r"/calculation/newHST", CalculationNewHSTHandler),
             (r"/calculation/newspec", CalculationNewHandlerSpec),
             (r"/calculation/status/([^/]+)", CalculationStatusHandler),
             (r"/calculation/statusspec/([^/]+)", CalculationStatusHandlerSpec),
@@ -336,7 +337,108 @@ class CalculationNewHandler(BaseHandler):
         self.write(dict(response))
         self.redirect("/dashboard")
         
+    
+class CalculationNewHSTHandler(BaseHandler):
+    """
+    This request handler deals with processing the form data and submitting
+    a new HST calculation task to the parallelized workers.
+    """
+    def get(self):
+        self.render("newHST.html", id=id)
+
+    def post(self):
+        """
+        The post method contains the retured data from the form data (
+        accessed by using `self.get_argument(...)` for specific arguments,
+        or `self.request.body` to grab the entire returned object.
+        """
         
+        #print(self.request.body)
+        
+        id = str(uuid.uuid4())+'e'
+                
+        #upload planet file
+        fileinfo_plan = self.request.files['planFile'][0]
+        fname_plan = fileinfo_plan['filename']
+        extn_plan = os.path.splitext(fname_plan)[1]
+        cname_plan = id+'planet' + extn_plan
+        fh_plan = open(os.path.join(__TEMP__, cname_plan), 'w')
+        fh_plan.write(fileinfo_plan['body'])
+        
+        with open(os.path.join(os.path.dirname(__file__), "reference",
+                               "exo_input.json")) as data_file:
+            exodata = json.load(data_file)
+            '''
+            exodata["star"]["type"] = self.get_argument("type")
+            if exodata["star"]["type"] == "user":     
+                fileinfo_star = self.request.files['starFile'][0]
+                fname_star = fileinfo_star['filename']
+                extn_star = os.path.splitext(fname_star)[1]
+                cname_star = id+'star' + extn_star
+                fh_star = open(os.path.join(__TEMP__, cname_star), 'w')
+                fh_star.write(fileinfo_star['body'])
+                exodata["star"]["starpath"] = os.path.join(__TEMP__, cname_star)
+                exodata["star"]["f_unit"] = self.get_argument("starfunits")
+                exodata["star"]["w_unit"] = self.get_argument("starwunits")
+            else: 
+                exodata["star"]["temp"] = float(self.get_argument("temp"))
+                exodata["star"]["logg"] = float(self.get_argument("logg"))
+                exodata["star"]["metal"] = float(self.get_argument("metal"))
+            '''
+            exodata["star"]["hmag"]         = float(self.get_argument("mag"))
+            exodata["star"]["ref_wave"]     = float(self.get_argument("ref_wave"))
+            exodata["planet"]["exopath"]    = os.path.join(__TEMP__, cname_plan)
+            exodata["planet"]["w_unit"]     = self.get_argument("planwunits")
+            exodata["planet"]["f_unit"]     = self.get_argument("planfunits")
+            exodata["planet"]["depth"]      = float(self.get_argument("depth"))
+            exodata["planet"]["i"]          = float(self.get_argument("i"))
+            exodata["planet"]["ars"]        = float(self.get_argument("ars"))
+            exodata["planet"]["period"]     = float(self.get_argument("period"))
+            exodata["observation"]["transit_duration"]      = float(self.get_argument("transit_duration"))
+            try: 
+                exodata["observation"]["norbits"]           = int(self.get_argument("norbits"))
+            except:
+                exodata["observation"]["norbits"]           = None
+            exodata["observation"]["noccultations"]         = int(self.get_argument("noccultations"))
+            exodata["observation"]["nchan"]                 = int(self.get_argument("nchan"))
+            exodata["observation"]["scanDirection"]         = self.get_argument("scanDirection")
+            exodata["observation"]["noise_floor"]           = 0.0
+            exodata["calculation"]                          = 'scale'
+                
+        if (self.get_argument("instrument")=="STIS"): 
+            with open(os.path.join(os.path.dirname(__file__), "reference",
+                               "stis_input.json")) as data_file:   
+                pandata = json.load(data_file)       
+                stismode = self.get_argument("stismode")
+                #if (mirimode == "lrsslit"):
+                #    pandata["configuration"]["mode"] = mirimode
+                #    pandata["configuration"]["instrument"]["aperture"]="lrsslit"
+                    
+        if (self.get_argument("instrument")=="WFC3"): 
+            with open(os.path.join(os.path.dirname(__file__), "reference",
+                               "wfc3_input.json")) as data_file:
+                pandata = json.load(data_file)  
+                #wfc3mode = self.get_argument("wfc3mode")
+                pandata["configuration"]['detector']['subarray']    = self.get_argument("subarray")
+                pandata["configuration"]['detector']['nsamp']       = int(self.get_argument("nsamp"))
+                pandata["configuration"]['detector']['samp_seq']    = self.get_argument("samp_seq")
+                pandata["configuration"]['instrument']['disperser'] = self.get_argument("wfc3mode")
+        print pandata
+        finaldata = {"pandeia_input": pandata , "pandexo_input":exodata}
+
+        task = self.executor.submit(wrapper, finaldata)
+
+        self._add_task(id, self.get_argument("calcName"), task)
+
+        response = self._get_task_response(id)
+        response['info'] = {}
+        response['location'] = '/calculation/status/{}'.format(id)
+        
+        
+        self.write(dict(response))
+        self.redirect("/dashboard")
+        
+            
 class CalculationNewHandlerSpec(BaseHandler):
     """
     This request handler deals with processing the form data and submitting

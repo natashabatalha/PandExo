@@ -22,6 +22,8 @@ class SetDefaultModes():
        "NIRSpec Prism"
        "NIRCam F322W"
        "NIRCam F444W"
+       "WFC3 G102"
+       "WFC3 G141"
 
     """
 
@@ -36,6 +38,14 @@ class SetDefaultModes():
             print "INVALID INSTRUMENT NAME"
             return 
                                    
+    def wfc3(self):
+        #wfc3_input
+        with open(os.path.join(os.path.dirname(__file__), "reference",
+                               "wfc3_input.json")) as data_file:
+            pandeia_data = json.load(data_file)
+            pandeia_data["configuration"]["instrument"]["disperser"] = self.config
+        return pandeia_data
+    
     def niriss(self):
         #need to add in functionality for two orders, right now you only have option to do sub80
         order = int(self.config[7])
