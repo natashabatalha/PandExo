@@ -50,7 +50,7 @@ class SetDefaultModes():
         #need to add in functionality for two orders, right now you only have option to do sub80
         order = int(self.config[7])
         
-        subarray = {'2':'sub80', '1':'sub80'}
+        subarray = {'2':'substrip80', '1':'substrip80'}
         with open(os.path.join(os.path.dirname(__file__), "reference",
                                "niriss_input.json")) as data_file:
             pandeia_data = json.load(data_file)

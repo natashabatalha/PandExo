@@ -111,7 +111,7 @@ def wrapper(dictinput):
     print "Computing Duty Cycle"
     m = compute_maxexptime_per_int(pandeia_input, sat_level) 
     print "Finished Duty Cucle Calc"
-       
+
     #calculate all timing info
     timing, flags = compute_timing(m,transit_duration,expfact_out,noccultations)
     
@@ -119,13 +119,13 @@ def wrapper(dictinput):
     print "Starting Out of Transit Simulation"
     out = perform_out(pandeia_input, pandexo_input,timing, both_spec)
     print "End out of Transit"
-    
+
     #this kind of redundant going to compute inn from out instead 
     #keep perform_in but change inputs to (out, timing, both_spec)
     print "Starting In Transit Simulation"
     inn = perform_in(pandeia_input, pandexo_input,timing, both_spec, out, calculation)
     print "End In Transit" 
-    
+
     #compute warning flags for timing info 
     warnings = add_warnings(out, timing, sat_level, flags, instrument) 
 
@@ -166,7 +166,7 @@ def wrapper(dictinput):
     varout = result['var_out_1d']
     extracted_flux_out = result['photon_out_1d']
     extracted_flux_inn = result['photon_in_1d']
-        
+
         
     #bin the data according to user input 
     wbin, photon_out_bin = bin_data(w, extracted_flux_out, wave_bin)
@@ -261,7 +261,11 @@ def compute_maxexptime_per_int(pandeia_input, sat_level):
     timeinfo = report_dict['information']['exposure_specification']
     #totaltime = timeinfo['tgroup']*timeinfo['ngroup']*timeinfo['nint']
     
+<<<<<<< HEAD
     maxdetvalue = np.max(det)
+=======
+    maxdetvalue = np.max(det) 
+>>>>>>> 4415b75214c509cd9358e338d9aacd8701f5d08d
     #maximum time before saturation per integration 
     #based on user specified saturation level
     try:
@@ -304,7 +308,7 @@ def compute_timing(m,transit_duration,expfact_out,noccultations):
     nskip = m['nskip']
     overhead_per_int = exptime_per_frame #overhead time added per integration 
     maxexptime_per_int = m['maxexptime_per_int']
-    
+
     flag_default = "All good"
     flag_high = "All good"
     try:
