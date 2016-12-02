@@ -1,0 +1,314 @@
+{% extends "base.html" %}
+
+{% block css %}
+<link rel="stylesheet" href="http://cdn.pydata.org/bokeh/release/bokeh-0.11.1.min.css" type="text/css"/>
+{% end %}
+
+{% block body %}
+<h1 class="page-header">New HST Calculation</h1>
+
+<form enctype="multipart/form-data" class="form-horizontal" action="/calculation/newHST" method="post" id="calculation-form">
+
+    <div class="form-group">
+        <label class="col-md-3 control-label" for="calcName">Name</label>
+
+        <div class="col-md-9">
+            <input type="text" class="form-control" id="calcName" name="calcName" value="My New Calculation">
+            <p class="help-block">Provide a name for this calculation</p>
+        </div>
+    </div>
+    
+    <!--
+    <div class="form-group">
+        <label class="col-md-3 control-label" for="type">Stellar Model (Not Currently Used)</label>
+            <div class="radio">
+            <label>
+                <input type="radio" name="type" id="inlineRadio1" value="user"> User Defined Stellar Spectra
+            </label>
+            <label class="radio-inline">
+                <input type="radio" name="type" id="inlineRadio2" value="phoenix"> Phoenix Grid Models
+            </label>
+        </div>
+    </div>
+
+    
+    <div class="form-group" onchange="pickStar()">
+        <label class="col-md-3 control-label" for="starFile">Upload</label>
+        <div class="col-md-3">
+            <input type="file" id="starFile" name="starFile">
+            <p class="help-block">Column 1: wavelength, Column 2: flux</p>
+        </div>
+        <div class="col-md-3">
+            <select id="starwunits" name="starwunits" class="form-control">
+                <option value="um">micron</option>
+                <option value="nm">nanometer</option>
+                <option value="cm">centimeter</option>
+                <option value="Angs">Angstrom</option>
+                <option value="Hz">Hertz</option>                
+            </select>
+        </div>
+        <div class="col-md-3">
+            <select id="starfunits" name="starfunits" class="form-control">
+                <option value="Jy">Jy</option>
+                <option value="W/m2/um">W/m2/um</option>
+                <option value="FLAM">erg/cm2/s/Angs</option>
+                <option value="erg/s/cm2/Hz">erg/s/cm2/Hz</option>
+            </select>
+        </div>  
+    </div>  
+    
+    
+    <div class="form-group" id="phoenix" onchange="pickStar()">
+        <label class="col-md-3 control-label" for="phoenix">Or Enter Star Info</label>
+        <div class="col-md-3">
+            <input type="text" class="form-control" id="temp" name="temp" >
+            <p class="help-block">Provide stellar temperature (Kelvin) </p>
+        </div>
+        <div class="col-md-3">
+            <input type="text" class="form-control" id="metal" name="metal" >
+            <p class="help-block">Provide stellar metallically</p>
+        </div>
+        <div class="col-md-3">
+            <input type="text" class="form-control" id="logg" name="logg" >
+            <p class="help-block">Provide stellar log g</p>
+        </div>
+
+   </div> 
+    -->
+      
+    
+    <div class="form-group">
+        <label class="col-md-3 control-label" for="ref_wave">Stellar Magnitude</label>
+        <div class="col-md-3">
+            <select id="ref_wave" name="ref_wave" class="form-control">
+                <!--<option value="1.26">J</option>-->
+                <option value="1.60">H</option>
+                <!--<option value="2.22">K</option>-->
+            </select>
+        </div>  
+        <div class="col-md-3">
+            <input type="text" class="form-control" id="mag" name="mag" >
+            <p class="help-block">Magnitude of the host star.</p>
+        </div>
+    </div>
+    
+    <div class="form-group">
+        <label class="col-md-3 control-label" for="planFile">Planet Model</label>
+
+        <div class="col-md-3">
+            <input type="file" id="planFile" name="planFile">
+            <p class="help-block">Column 1: wavelength, Column 2: Model, no comments.</p>
+        </div>
+        <div class="col-md-3">
+            <select id="planwunits" name="planwunits" class="form-control">
+                <!--<option value="sec">seconds</option>-->
+                <option value="um">microns</option>
+                <option value="nm">nanometers</option>
+                <!--<option value="nm">nanometer</option>-->
+                <!--<option value="cm">centimeter</option>-->
+                <!--<option value="Angs">Angstrom</option>-->
+                <!--<option value="Hz">Hertz</option>    -->            
+            </select>
+        </div>
+        <div class="col-md-3">
+            <select id="planfunits" name="planfunits" class="form-control">
+                <option value="rp/r*">(Rp/R*)^2 (primary)</option>
+                <option value="fp/f*">Fp/F* (secondary)</option>
+            </select>
+        </div>  
+    </div>    
+
+    <div class="form-group">
+        <label class="col-md-3 control-label" for="planetParams">Planet Parameters</label>
+        <div class="col-md-3">
+            <input type="text" class="form-control" id="transit_duration" name="transit_duration">
+            <p class="help-block">Full transit duration in seconds.</p>
+        </div>
+    
+        <div class="col-md-3">
+            <input type="text" class="form-control" id="period" name="period">
+            <p class="help-block">Orbital period in days.</p>
+        </div>
+        
+        <div class="col-md-3">
+            <input type="text" class="form-control" id="depth" name="depth">
+            <p class="help-block">Approximate transit/eclipse depth for plotting purposes.</p>
+        </div>
+    
+        <div class="col-md-3">
+        </div>
+    
+        <div class="col-md-3">
+            <input type="text" class="form-control" id="i" name="i">
+            <p class="help-block">Orbital inclination in degrees.</p>
+        </div>
+    
+        <div class="col-md-3">
+            <input type="text" class="form-control" id="ars" name="ars">
+            <p class="help-block">Semi-major axis in units of stellar radii (a/R*).</p>
+        </div>
+    </div>
+    
+    <div class="form-group">
+        <label class="col-md-3 control-label" for="obsParams">Observation Parameters</label>
+        <div class="col-md-3">
+            <input type="text" class="form-control" id="norbits" name="norbits" >
+            <p class="help-block">Number of HST orbits per visit.  Leave blank to let the program determine this value.</p>
+        </div>
+    
+        <div class="col-md-3">
+            <input type="text" class="form-control" id="noccultations" name="noccultations" >
+            <p class="help-block">Number of transits/eclipses.</p>
+        </div>
+    
+        <div class="col-md-3">
+            <input type="text" class="form-control" id="nchan" name="nchan" >
+            <p class="help-block">Number of spectrophotometric channels.</p>
+        </div>
+    </div>
+
+    <!--
+    <div class="form-group">
+        <label class="col-md-3 control-label" for="eff">Photon-Electron Conv. Eff.</label>
+            <div class="col-md-6">
+                <img id="full" alt="-" width="660" height="426" src="../static/img/pec_res.jpg">
+            </div>
+    </div>
+    -->
+
+    <div class="form-group">
+        <label class="col-md-3 control-label" for="instrument" onchange="showForm()">Instrument</label>
+        <div class="col-md-3">
+            <select id="instrument" name="instrument" class="form-control" onchange ="showForm()">
+                <option value="0">Select Instrument</option>
+                <option value="STIS">STIS</option>
+                <option value="WFC3">WFC3</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="form-group" onchange="showForm()">
+        <label class="col-md-3 control-label" for="insParams">Instrument Parameters</label>
+        <div class="col-md-4" id = "STIS" style="display:none">
+            <select id="stismode" name="stismode" onchange="showForm()" class="form-control">
+                <option value="0">Select STIS Mode</option>
+                <option value="g430">G430</option>
+                <option value="g750">G750</option>
+            </select>
+        </div>
+        
+        <div class="col-md-4" id="WFC3" style="display:none">
+            <select id="wfc3mode" name="wfc3mode" onchange="showForm()" class="form-control">
+                <option value="0">Select WFC3 Disperser</option>
+                <option value="g102">G102</option>
+                <option value="g141">G141</option>
+            </select>
+            <select id="subarray" name="subarray" onchange="showForm()" class="form-control">
+                <option value="0">Select WFC3 Subarray Size</option>
+                <option value="GRISM256">GRISM256</option>
+                <option value="GRISM512">GRISM512</option>
+            </select>
+            <select id="nsamp" name="nsamp" onchange="showForm()" class="form-control">
+                <option value="0">Select WFC3 N_SAMP</option>
+                <option value="0">Optimal</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+                <option value="13">13</option>
+                <option value="14">14</option>
+                <option value="15">15</option>
+            </select>
+            <select id="samp_seq" name="samp_seq" onchange="showForm()" class="form-control">
+                <option value="None">Select WFC3 SAMP_SEQ</option>
+                <option value="None">Optimal</option>
+                <option value="SPARS5">SPARS5</option>
+                <option value="SPARS10">SPARS10</option>
+                <option value="SPARS25">SPARS25</option>
+            </select>
+            <select id="scanDirection" name="scanDirection" onchange="showForm()" class="form-control">
+                <option value="None">Select WFC3 Scan Direction</option>
+                <option value="Forward">Forward</option>
+                <option value="Round Trip">Round Trip</option>          
+            </select>
+            <select id="schedulability" name="schedulability" onchange="showForm()" class="form-control">
+                <option value="None">Select WFC3 Schedulability</option>
+                <option value="30">30 (Small/Medium Programs)</option>
+                <option value="100">100 (Large Programs)</option>
+            </select>
+            <p class="help-block">Choosing 'Optimal' lets the program determine the optimal values.</p>
+        </div>
+    </div>
+
+    
+
+
+
+    <div class="form-group">
+        <div class="col-sm-offset-3 col-sm-9">
+            <button type="submit" class="btn btn-success">Submit</button>
+            {% module xsrf_form_html() %}
+        </div>
+    </div>
+    
+    
+    
+    
+</form>
+{% end %}
+
+{% block js %}        
+<script src="{{ static_url('js/starter.form.js') }}"></script>
+        
+<script type="text/javascript">
+    function showForm() {
+        var selopt = document.getElementById("instrument").value;
+        if (selopt == "STIS") {
+            document.getElementById("STIS").style.display = "block";
+            document.getElementById("WFC3").style.display = "none";
+        }
+        if (selopt == "WFC3") {
+            document.getElementById("WFC3").style.display = "block";
+            document.getElementById("STIS").style.display = "none";
+        }
+        if (selopt == 0) {
+            document.getElementById("STIS").style.display = "none";
+            document.getElementById("WFC3").style.display = "none";
+        }
+    }
+</script>  
+<script type="text/javascript">    
+    function pickStar() {
+        var selopt1 = document.getElementById("type").value;
+        if (selopt1 == "user") {
+            document.getElementById("starFile").style.display = "block";
+            document.getElementById("starwunits").style.display = "block";
+            document.getElementById("starfunits").style.display = "block";
+            document.getElementById("phoenix").style.display = "none";
+        }
+        if (selopt1 == "phoenix") {
+            document.getElementById("starFile").style.display = "none";
+            document.getElementById("starwunits").style.display = "none";
+            document.getElementById("starfunits").style.display = "none";
+            document.getElementById("phoenix").style.display = "block";
+        }
+        if (selopt1 == "0") {
+            document.getElementById("starFile").style.display = "none";
+            document.getElementById("starwunits").style.display = "none";
+            document.getElementById("starfunits").style.display = "none";
+            document.getElementById("phoenix").style.display = "none";
+        }
+}
+</script>      
+
+
+<script type="text/javascript" src="http://cdn.pydata.org/bokeh/release/bokeh-0.11.1.min.js"></script>
+{% end %}
