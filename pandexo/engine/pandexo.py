@@ -261,11 +261,7 @@ def compute_maxexptime_per_int(pandeia_input, sat_level):
     timeinfo = report_dict['information']['exposure_specification']
     #totaltime = timeinfo['tgroup']*timeinfo['ngroup']*timeinfo['nint']
     
-<<<<<<< HEAD
     maxdetvalue = np.max(det)
-=======
-    maxdetvalue = np.max(det) 
->>>>>>> 4415b75214c509cd9358e338d9aacd8701f5d08d
     #maximum time before saturation per integration 
     #based on user specified saturation level
     try:
