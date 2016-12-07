@@ -6,6 +6,7 @@ import os
 import pickle as pkl
 from joblib import Parallel, delayed
 import multiprocessing
+import json 
 
 num_cores = multiprocessing.cpu_count()
 
@@ -33,37 +34,10 @@ def load_exo_dict():
     """
     Function loads in empty exoplanet dictionary for pandexo input
     """
-    pandexo_input = {
-        "star":{
-                "type" : "user or phoenix", 
-                "starpath" : "file path",
-                "w_unit": "Angs,cm,um,cm or Hz",
-                "f_unit": "W/m2/um, FLAM, Jy, or erg/s/cm2/Hz",
-                "mag": "magnitude",
-                "ref_wave": "corresponding ref wave",
-                "temp": "Only if phoenix, (in K)",
-                "metal": "in log Fe/H",
-                "logg": "cgs"
-            },
-
-    "planet" :{
-	        "type": "user",
-            "exopath" : "file path",
-            "w_unit": "Angs,cm,um,cm or Hz",
-            "f_unit": "rp/r* or fp/f*"
-            },
-
-    "observation": {
-        "sat_level": "in % sat level",
-        "transit_duration": "in seconds",
-        "noccultations": "num transits",
-        "wave_bin": "in micron",
-        "fraction": "time in/out", 
-        "noise_floor":"constant number or file name"
-        }
-    }
-    print "Replace all inputs before feeding to run_modes:"
-    return pandexo_input   
+    with open(os.path.join(os.path.dirname(__file__), "reference",
+                               "exo_input.json")) as data_file:
+        pandexo_input = json.load(data_file)
+    return pandexo_input
     
 def load_mode_dict(inst):
     '''
