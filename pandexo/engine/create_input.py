@@ -186,7 +186,7 @@ def bothTrans(out_trans, planet) :
         if planet['f_unit'] == 'fp/f*' :
             flux_planet = flux_planet 
         else: 
-            print "Seconds with Rp/R* units not an option. Switch to Fp/F*"
+            print "Seconds with rp^2/r*^2 units not an option. Switch to Fp/F*"
             return 
         
         return {'time':time, 'wave':wave_star,'flux_out_trans':flux_star, 'planet_phase':flux_planet,
@@ -210,14 +210,14 @@ def bothTrans(out_trans, planet) :
         flux_out_trans = np.interp(wave_pR, wave_star, flux_star)
 
         #convert to 1-depth 
-        if planet['f_unit'] == 'rp/r*' :
+        if planet['f_unit'] == 'rp^2/r*^2' :
             depth_fraction = 1.-flux_planet_R 
             flux_in_trans = depth_fraction*flux_out_trans
         elif planet['f_unit'] == 'fp/f*':
             depth_fraction = (1.0 + flux_planet_R)
             flux_in_trans = flux_out_trans*(1.0 + flux_planet_R)        
         else: 
-            raise Exception('Units are not correct. Pick W/cm2/um, FLAM or Jy')
+            raise Exception('Units are not correct. Pick rp^2/r*^2 or fp/f*')
     
         results= {'wave':wave_pR, 'flux_in_trans': flux_in_trans, 'flux_out_trans':flux_out_trans,
                     'og_wave':wave_pR, 'og_spec': flux_planet_R, 'frac':depth_fraction} 

@@ -240,7 +240,8 @@ class CalculationNewHandler(BaseHandler):
                                "exo_input.json")) as data_file:
 
             exodata = json.load(data_file)
-            
+            exodata["type"] = 'jwst'
+            exodata["calculation"] = 'fml' #always for online form
             exodata["star"]["type"] = self.get_argument("type")
             if exodata["star"]["type"] == "user":     
                 fileinfo_star = self.request.files['starFile'][0]
@@ -267,11 +268,11 @@ class CalculationNewHandler(BaseHandler):
             
             #for phase curves user doen't necessarily have to input a transit duration 
             try:
-                exodata["observation"]["transit_duration"] = float(self.get_argument("transit_duration"))
+                exodata["planet"]["transit_duration"] = float(self.get_argument("transit_duration"))
             except:
                 #but if they dont.. make sure that the planet units are in seconds... 
                 if exodata["planet"]["w_unit"] == 'sec':
-                    exodata["observation"]["transit_duration"] = 0.0
+                    exodata["planet"]["transit_duration"] = 0.0
                 else: 
                     print "Need to give transit duration"
                     raise 

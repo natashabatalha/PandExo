@@ -1,30 +1,39 @@
 {
+    "telescope": "jwst/hst/wfirst",
     "calculation":"fml",
     "star":{
-                "type" : "user", 
-                "starpath" : "gl1132_star.txt",
-                "w_unit": "Angs",
-                "f_unit": "FLAM",
-                "mag": 0.0,
-                "ref_wave": 1.250,
-                "temp": 4000.0,
-                "metal": 4000.0,
-                "logg": 4000.0
+                "type" : "user,phoenix", 
+                "starpath" : "filename_star",
+                "w_unit": "Angs,um,nm,Hz,sec,cm",
+                "f_unit": "FLAM or W/m2/um or erg/s/cm2/Hz or Jy",
+                "mag": "stellar magnitude (hst only allows H mag inputs)",
+                "ref_wave": "1.25 for J, 1.60 for H, 2.22 for K",
+                "temp": "Kelvin",
+                "metal": "log[M/H]",
+                "logg": "log gravity cgs"
             },
 
     "planet" :{
 	        "type": "user",
             "exopath" : "filename_planet",
-            "w_unit": "nm",
-            "f_unit": "rp/r*"
+            "w_unit": "Angs,um,nm,Hz,sec,cm",
+            "f_unit": "rp^2/r*^2 or fp/r*",
+            "transit_duration": "in seconds",
+            "depth":null, 
+            "i":null, 
+            "a":null, 
+            "period":null
             },
 
     "observation": {
-        "sat_level": 0.0,
-        "transit_duration": 0.0,
+        "sat_level": "% full well",
         "noccultations": 1,
-        "wave_bin": 0.00,
-        "fraction": 1.0, 
-        "noise_floor":0.0
+        "R": null,
+        "fraction": 1, 
+        "noise_floor":0.0,
+        "norbits":"HST specific:number of HST orbits",
+        "nchan": "HST specific: number of spec channels",
+        "scanDirection": "HST specific:Forward or Round Trip",
+        "schedulability":"100"
         }
 }
