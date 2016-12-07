@@ -1,9 +1,9 @@
 from bokeh.plotting import show, figure
-from bokeh.io import output_file 
+from bokeh.io import output_file as outputfile
 import pickle as pk
 import numpy as np
 
-def data(result_dict, model=True, title='Model + Data + Error Bars', outputfile = 'data.html',legend = False, 
+def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', output_file = 'data.html',legend = False, 
         R=False,  num_tran = False, plot_width=800, plot_height=400,x_range=[1,10], new_wave=False):
     """
     Plots 1d data points with model in the background (if wanted) 
@@ -25,8 +25,11 @@ def data(result_dict, model=True, title='Model + Data + Error Bars', outputfile 
         jpi.data(result_dict) #for a single plot 
         jpi.data([result_dict1, result_dict2], color_data= ['red','blue']) #for multiple 
     """
+    outx=[]
+    outy=[]
+    oute=[]
     TOOLS = "pan,wheel_zoom,box_zoom,resize,reset,save"
-    output_file(outputfile)
+    outputfile(output_file)
     colors = ['black','blue','red','orange','yellow','purple','pink','cyan','grey','brown']
     #make sure its iterable
     if type(result_dict) != list: 
@@ -139,10 +142,13 @@ def data(result_dict, model=True, title='Model + Data + Error Bars', outputfile 
             fig1d.circle(x, y, color=colors[i], legend = legend_keys[i])
         else: 
             fig1d.circle(x, y, color=colors[i])
+        outx += [x]
+        outy += [y]
+        oute += [err]
         fig1d.multi_line(x_err, y_err,color=colors[i])
         i += 1 
     show(fig1d)
-    
+    return outx,outy,oute
 """
 def bin_data(x,y,R):
  
@@ -240,9 +246,6 @@ def Rspec(a, R):
         else:
             tracker = max(a)
     return wave
-def find_nearest(array,value):
-    idx = (np.abs(array-value)).argmin()
-    return array[idx]   
 
 def uniform_tophat_sum(wlgrid,wno, Fp):
     wlgrid = np.array(wlgrid)
