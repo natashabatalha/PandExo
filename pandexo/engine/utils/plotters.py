@@ -5,25 +5,20 @@ from bokeh.embed import components
 from bokeh.models.widgets import Panel, Tabs
 from bokeh.models import CustomJS, ColumnDataSource, Slider,Select
 from bokeh.io import curdoc
+from bokeh.layouts import row
 
-
-def create_component(result_dict):
+def create_component_jwst(result_dict):
     """
-    Responsible for generating the front-end interactive plots.
+    Function that is responsible for generating the front-end interactive plots for JWST.
 
-    Parameters
-    ----------
-    result_dict : dict
-        The dictionary returned from a Pandeia run.
-
-    Returns
-    -------
-    result_comp : tuple
+    :param result_dict: the dictionary returned from a PandExo run
+    :type result_dict: dict
+    :returns: result_comp
         A tuple containing `(script, div)`, where the `script` is the
         front-end javascript required, and `div` is a dictionary of plot
         objects.
-    """
-    
+    :rtype: tuple
+    """  
     noccultations = result_dict['timing']['Number of Transits']
     
     # select the tools we want
@@ -59,8 +54,8 @@ def create_component(result_dict):
                                 flux_out=flux_out, flux_in=flux_in, var_tot=var_tot, p=var_tot*0+p,nocc=var_tot*0+noccultations))
     original = ColumnDataSource(data=dict(x=x, y=y, y_err=y_err, x_err=x_err, err=err, flux_out=flux_out, flux_in=flux_in, var_tot=var_tot))
 
-    ylims = [min(result_dict['OriginalInput']['og_spec'])- 0.1*min(result_dict['OriginalInput']['og_spec']),
-                 0.1*max(result_dict['OriginalInput']['og_spec'])+max(result_dict['OriginalInput']['og_spec'])]
+    ylims = [min(result_dict['OriginalInput']['model_spec'])- 0.1*min(result_dict['OriginalInput']['model_spec']),
+                 0.1*max(result_dict['OriginalInput']['model_spec'])+max(result_dict['OriginalInput']['model_spec'])]
     xlims = [min(result_dict['FinalSpectrum']['wave']), max(result_dict['FinalSpectrum']['wave'])]
 
     plot_spectrum = Figure(plot_width=800, plot_height=300, x_range=xlims,
@@ -69,7 +64,7 @@ def create_component(result_dict):
                                  y_axis_label=punit, 
                                title="Original Model with Observation")
     
-    plot_spectrum.line(result_dict['OriginalInput']['og_wave'],result_dict['OriginalInput']['og_spec'], color= "black", alpha = 0.5, line_width = 4)
+    plot_spectrum.line(result_dict['OriginalInput']['model_wave'],result_dict['OriginalInput']['model_spec'], color= "black", alpha = 0.5, line_width = 4)
         
     plot_spectrum.circle('x', 'y', source=source, line_width=3, line_alpha=0.6)
     plot_spectrum.multi_line('x_err', 'y_err', source=source)
@@ -244,7 +239,7 @@ def create_component(result_dict):
                              x_axis_label=x_axis_label,
                              y_axis_label=punit, title="Original Model",y_axis_type="log")
 
-    plot_spectrum2.line(result_dict['OriginalInput']['og_wave'],result_dict['OriginalInput']['og_spec'],
+    plot_spectrum2.line(result_dict['OriginalInput']['model_wave'],result_dict['OriginalInput']['model_spec'],
                         line_width = 4,alpha = .7)
     tab5 = Panel(child=plot_spectrum2, title="Original Model")
 
@@ -311,7 +306,18 @@ def create_component(result_dict):
 
     return result_comp
     
-def create_component2(result_dict):
+def create_component_spec(result_dict):
+    """
+    Function that is responsible for generating the front-end spectra plots.
+
+    :param result_dict: the dictionary returned from a PandExo run
+    :type result_dict: dict
+    :returns: result_comp
+        A tuple containing `(script, div)`, where the `script` is the
+        front-end javascript required, and `div` is a dictionary of plot
+        objects.
+    :rtype: tuple
+    """  
     num = -1
     color = ["red", "blue", "green", "purple", "black", "yellow", "orange", "pink","cyan","brown"]
 
@@ -345,8 +351,97 @@ def create_component2(result_dict):
                               'plot2': plot2})
     return result_comp 
 
-                                 
+def create_component_hst(result_dict):
+    """
+    Function that is responsible for generating the front-end spectra plots for HST.
+    :param result_dict: the dictionary returned from a PandExo (HST) run
+    :type result_dict: dict
+    :returns: result_comp
+        A tuple containing `(script, div)`, where the `script` is the
+        front-end javascript required, and `div` is a dictionary of plot
+        objects.
+    :rtype: tuple
+    """                                   
+    TOOLS = "pan,wheel_zoom,box_zoom,resize,reset,save"
+
+    #plot planet spectrum
+    mwave = result_dict['planet_spec']['model_wave']
+    mspec = result_dict['planet_spec']['model_spec']
+    
+    binwave = result_dict['planet_spec']['binwave']
+    binspec = result_dict['planet_spec']['binspec']
+    
+    error = result_dict['planet_spec']['error']
+    error = np.zeros(len(binspec))+ error
+    xlims = [result_dict['planet_spec']['wmin'], result_dict['planet_spec']['wmax']]
+    ylims = [np.min(binspec)-2.0*error[0], np.max(binspec)+2.0*error[0]]
+    
+    plot_spectrum = Figure(plot_width=800, plot_height=300, x_range=xlims,
+                               y_range=ylims, tools=TOOLS,#responsive=True,
+                                 x_axis_label='Wavelength [microns]',
+                                 y_axis_label='(Rp/R*)^2', 
+                               title="Original Model with Observation")
+    
+    y_err = []
+    x_err = []
+    for px, py, yerr in zip(binwave, binspec, error):
+        np.array(x_err.append((px, px)))
+        np.array(y_err.append((py - yerr, py + yerr)))
+
+    plot_spectrum.line(mwave,mspec, color= "black", alpha = 0.5, line_width = 4)
+    plot_spectrum.circle(binwave,binspec, line_width=3, line_alpha=0.6)
+    plot_spectrum.multi_line(x_err, y_err)
+    
+    
+    #earliest and latest start times 
+    obsphase1 = result_dict['calc_start_window']['obsphase1']
+    obstr1 = result_dict['calc_start_window']['obstr1']
+    rms = result_dict['calc_start_window']['rms']
+    obsphase2 = result_dict['calc_start_window']['obsphase2']
+    obstr2 = result_dict['calc_start_window']['obstr2']
+    phase1 = result_dict['calc_start_window']['phase1']    
+    phase2 = result_dict['calc_start_window']['phase2']
+    trmodel1 = result_dict['calc_start_window']['trmodel1']
+    trmodel2 = result_dict['calc_start_window']['trmodel2']    
+    
+    rms = np.zeros(len(obsphase1))+rms
+    y_err1 = []
+    x_err1 = []
+    for px, py, yerr in zip(obsphase1, obstr1, rms):
+        np.array(x_err1.append((px, px)))
+        np.array(y_err1.append((py - yerr, py + yerr)))
+
+    y_err2 = []
+    x_err2 = []
+    for px, py, yerr in zip(obsphase2, obstr2, rms):
+        np.array(x_err2.append((px, px)))
+        np.array(y_err2.append((py - yerr, py + yerr)))
+
+    early = Figure(plot_width=400, plot_height=300,
+                               tools=TOOLS,#responsive=True,
+                                 x_axis_label='Orbital Phase',
+                                 y_axis_label='Flux', 
+                               title="Earliest Start Time")
+    
+    early.line(phase1, trmodel1, color='black',alpha=0.5, line_width = 4)
+    early.circle(obsphase1, obstr1, line_width=3, line_alpha=0.6)
+    early.multi_line(x_err1, y_err1)
+     
+    late = Figure(plot_width=400, plot_height=300, 
+                                tools=TOOLS,#responsive=True,
+                                 x_axis_label='Orbital Phase',
+                                 y_axis_label='Flux', 
+                               title="Latest Start Time")
+    late.line(phase2, trmodel2, color='black',alpha=0.5, line_width = 3)
+    late.circle(obsphase2, obstr2, line_width=3, line_alpha=0.6)
+    late.multi_line(x_err2, y_err2)
+        
+    start_time = row(early, late)
+    
+    result_comp = components({'plot_spectrum':plot_spectrum, 
+                              'start_time':start_time})
+
+    return result_comp
 
 
-
-
+ 
