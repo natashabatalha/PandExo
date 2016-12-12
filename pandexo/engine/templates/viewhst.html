@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block css %}
+<link rel="stylesheet" href="https://cdn.pydata.org/bokeh/release/bokeh-0.12.0.min.css" type="text/css" />
+<link rel="stylesheet" href="https://cdn.pydata.org/bokeh/release/bokeh-widgets-0.12.0.min.css" type="text/css" />
+{% end %}
+
+{% block body %}
+<h1 class="page-header">Analyze</h1>
+
+<h2 id="plots">Spectrum</h2>
+
+<div class="row">
+    <div class="col-md-12">
+        {% raw div['plot_spectrum'] %}
+    </div>
+</div>
+
+<h2 id="images">Timing</h2>
+<div class="row">
+    <div class="col-md-9">
+        {% raw div['start_time'] %}
+    </div>
+</div>
+
+<div class="container">
+   <h2 id="timing">Important Info</h2>
+           {% raw div['info_div']  %}
+</div>
+
+
+<div class="container">
+    <a type="button" class="btn btn-success" href="/calculation/download/{{ id }}">Download Data</a>
+</div>
+
+{% end %}
+
+
+{% block js %}
+
+<script type="text/javascript" src="https://cdn.pydata.org/bokeh/release/bokeh-0.12.0.min.js"></script>
+<script type="text/javascript" src="https://cdn.pydata.org/bokeh/release/bokeh-widgets-0.12.0.min.js"></script>
+{% raw script %}
+{% end %}
+
