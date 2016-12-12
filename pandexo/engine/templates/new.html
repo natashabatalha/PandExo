@@ -5,7 +5,7 @@
 {% end %}
 
 {% block body %}
-<h1 class="page-header">New Calculation</h1>
+<h1 class="page-header">New JWST Calculation</h1>
 
 <form enctype="multipart/form-data" class="form-horizontal" action="/calculation/new" method="post" id="calculation-form">
 
@@ -36,7 +36,7 @@
         <label class="col-md-3 control-label" for="starFile">Upload</label>
         <div class="col-md-3">
             <input type="file" id="starFile" name="starFile">
-            <p class="help-block">Column 1: wavelength, Column 2: flux</p>
+            <p class="help-block">Column 1: wavelength, Column 2: flux, no header</p>
         </div>
         <div class="col-md-3">
             <select id="starwunits" name="starwunits" class="form-control">
@@ -97,7 +97,7 @@
 
         <div class="col-md-3">
             <input type="file" id="planFile" name="planFile">
-            <p class="help-block">Column 1: wave or time, Column 2: Model</p>
+            <p class="help-block">Column 1: wave or time, Column 2: Model, no header</p>
         </div>
         <div class="col-md-3">
             <select id="planwunits" name="planwunits" class="form-control">

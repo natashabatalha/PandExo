@@ -9,7 +9,7 @@
     <meta name="author" content="">
     <!--<link rel="icon" href="../../favicon.ico">-->
 
-    <title>PandExo - Exposure Time Calculator for Exoplanets</title>
+    <title>PandExo - ETC for Exoplanets</title>
 
     <!-- Bootstrap core CSS -->
     <link href="{{ static_url('css/bootstrap.min.css')}}" rel="stylesheet">
@@ -41,14 +41,28 @@
         </div>
         <div id="navbar" class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
-                <li><p class="navbar-btn"><a href="/calculation/new" type="button" class="btn btn-success"> 
-                    New JWST Observation</a></p></li>
-                <li><p class="navbar-btn"><a href="/calculation/newHST" type="button" class="btn btn-primary"> 
-                    New HST Observation</a></p></li>
-                <li><a href="/dashboard">Dashboard-ETC</a></li>
-                <li><p class="navbar-btn"><a href="/calculation/newspec" type="button" class="btn btn-info">
-                    New Spectrum</a></p></li>
-                <li><a href="/dashboardspec">Dashboard-Spec</a></li>
+                <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">JWST <span class="caret"></span></a>
+                 <ul class="dropdown-menu">
+                        <li><a href="/calculation/new">New Calculation</a></li>
+                        <li><a href="/dashboard">Dashboard</a></li>
+                </ul>
+                </li>
+                <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">HST <span class="caret"></span></a>
+                 <ul class="dropdown-menu">
+                        <li><a href="/calculation/newHST">New Calculation</a></li>
+                        <li><a href="/dashboardhst">Dashboard</a></li>
+                </ul>
+                </li>
+                <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Modeling <span class="caret"></span></a>
+                 <ul class="dropdown-menu">
+                        <li><a href="/calculation/newspec">New Spectrum</a></li>
+                        <li><a href="/dashboardspec">Dashboard</a></li>
+                </ul>
+                </li>            
+                <li><a href="/docs">DOCS</a></li>
 
             </ul>
         </div>
@@ -65,7 +79,7 @@
 <!-- /.container -->
 <footer class="footer">
     <div class="container">
-        <p class="text-muted">2016 Natasha Batalha at PSU/CEHW/NASA GSFC; Kevin Stevenson and Nicholas Earl at STScI</p>
+        <p class="text-muted">2016 Natasha Batalha at PSU/NASA GSFC; Kevin Stevenson and Nicholas Earl at STScI</p>
     </div>
 </footer>
 
