@@ -696,8 +696,8 @@ def as_dict(out, both_spec ,binned, timing, mag, sat_level, warnings, punit, unb
     input_dict["Calculation Type"]= calculation
     
     final_dict = {
-    'OriginalInput': {'og_spec':both_spec['og_spec'],
-                     'og_wave' : both_spec['og_wave']},
+    'OriginalInput': {'model_spec':both_spec['model_spec'],
+                     'model_wave' : both_spec['model_wave']},
     'RawData': unbinned,
     'FinalSpectrum': binned,
         
