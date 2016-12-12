@@ -5,7 +5,7 @@ from bokeh.io import vform,output_file, show, vplot
 import numpy as np
 from elements import ELEMENTS as ele
 #from sympy.mpmath import *
-from mpmath import *
+from sympy.mpmath import *
 
 '''
 molDict = {

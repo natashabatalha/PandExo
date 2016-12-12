@@ -190,7 +190,7 @@ def bothTrans(out_trans, planet) :
             return 
         
         return {'time':time, 'wave':wave_star,'flux_out_trans':flux_star, 'planet_phase':flux_planet,
-                'og_wave':time, 'og_spec':flux_planet, 'frac':(1.+flux_planet)}    
+                'model_wave':time, 'model_spec':flux_planet, 'frac':(1.+flux_planet)}    
         
     else:
         #star flux to calc transit depth
@@ -220,7 +220,7 @@ def bothTrans(out_trans, planet) :
             raise Exception('Units are not correct. Pick rp^2/r*^2 or fp/f*')
     
         results= {'wave':wave_pR, 'flux_in_trans': flux_in_trans, 'flux_out_trans':flux_out_trans,
-                    'og_wave':wave_pR, 'og_spec': flux_planet_R, 'frac':depth_fraction} 
+                    'model_wave':wave_pR, 'model_spec': flux_planet_R, 'frac':depth_fraction} 
     return results
 
 
