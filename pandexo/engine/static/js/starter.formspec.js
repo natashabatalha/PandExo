@@ -21,7 +21,7 @@ function newCalculation(form) {
     $.ajax({
         data: $.param(args),
         type: 'POST',
-        url: '/calculation/new2',
+        url: '/calculation/newspec',
         success: function(response) {
             response = eval("(" + response + ")");
             status_url = response.location;

@@ -1,3 +1,4 @@
+import pickle as pk
 def wrapper(dictinput):
     """
     Top level function which calls either jwst, hst or wfirst noise simulation. 
@@ -18,13 +19,13 @@ def wrapper(dictinput):
     """
     pandexo_input = dictinput['pandexo_input']    	
     telescope = pandexo_input['telescope']
-    
+
     if telescope=='jwst':
         from jwst import compute_full_sim
         return compute_full_sim(dictinput)
     elif telescope=='hst':
-        from hst import wfc3_TExoNS
-        return wfc3_TExoNS(dictinput)
+        from hst import compute_sim_hst 
+        return compute_sim_hst(dictinput)
     elif telescope=='wfirst':
         return     
     else:
