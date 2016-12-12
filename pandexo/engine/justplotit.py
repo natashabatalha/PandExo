@@ -70,18 +70,17 @@ def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', out
             y = sim_spec
             err = np.sqrt(vout+vin)/out
         elif (R == False) & (num_tran != False):     
-            new_wave = Rspec(x, R)
             out = dict['RawData']['flux_out']*num_tran/ntran_old
             inn = dict['RawData']['flux_in']*num_tran/ntran_old
-            vout = new_wave,dict['RawData']['var_out']*num_tran/ntran_old
-            vin = new_wave,dict['RawData']['var_in']*num_tran/ntran_old
+            vout = dict['RawData']['var_out']*num_tran/ntran_old
+            vin = dict['RawData']['var_in']*num_tran/ntran_old
             if dict['input']['Primary/Secondary']=='fp/f*':
                 fac = -1.0
             else:
                 fac = 1.0
-            rand_noise = np.sqrt((vin+vout))*(np.random.randn(len(new_wave)))
+            rand_noise = np.sqrt((vin+vout))*(np.random.randn(len(x)))
             sim_spec = fac*(out-inn + rand_noise)/out 
-            x = new_wave
+            x = x
             y = sim_spec
             err = np.sqrt(vout+vin)/out
         elif (R != False) & (num_tran == False):     
@@ -99,8 +98,9 @@ def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', out
             x = new_wave
             y = sim_spec
             err = np.sqrt(vout+vin)/out
-
-
+        else: 
+            print "Something went wrong. Cannot enter both resolution and ask to bin to new wave"
+            return
             
         #create error bars for Bokeh's multi_line
         y_err = []
@@ -110,7 +110,6 @@ def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', out
             np.array(y_err.append((py - yerr, py + yerr)))
         #initialize figure
         if i == 0: 
-        
             #Define units for x and y axis
             y_axis_label = dict['input']['Primary/Secondary']
 
@@ -122,8 +121,8 @@ def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', out
             else:
                 x_axis_label='Wavelength [microns]'
             
-            ylims = [min(dict['OriginalInput']['og_spec'])- 0.1*min(dict['OriginalInput']['og_spec']),
-                 0.1*max(dict['OriginalInput']['og_spec'])+max(dict['OriginalInput']['og_spec'])]
+            ylims = [min(dict['OriginalInput']['model_spec'])- 0.1*min(dict['OriginalInput']['model_spec']),
+                 0.1*max(dict['OriginalInput']['model_spec'])+max(dict['OriginalInput']['model_spec'])]
             xlims = [min(x), max(x)]
          
             fig1d = figure(x_range=x_range, y_range = ylims, 
@@ -133,8 +132,8 @@ def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', out
               
         #plot model, data, and errors 
         if model:
-            mxx = dict['OriginalInput']['og_wave']
-            myy = dict['OriginalInput']['og_spec'][mxx>1]
+            mxx = dict['OriginalInput']['model_wave']
+            myy = dict['OriginalInput']['model_spec'][mxx>1]
             mxx = mxx[mxx>1]
             mx, my = bin_data_smoothe(mxx,myy , 50)
             fig1d.line(mx,my, color='white',alpha=0.2, line_width = 4)

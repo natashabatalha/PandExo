@@ -145,7 +145,7 @@ def run_pandexo(exo, inst, param_space = 0, param_range = 0,save_file = True,
             raise ValueError
     except ValueError:
         print 'Instrument input is not dict so must be list'
-        print 'Enter in format [bla] or [bla,bla]' 
+        print 'Enter in format ["NIRSpec G140M"] or ["NIRISS SOSS","MIRI LRS"]' 
         return    
          
     #single instrument mode and single planet OR several planets  
