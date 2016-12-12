@@ -1,11 +1,9 @@
 import numpy as np
-
+import pandas as pd
 """
 ToDo:
     write another function to predict (nsamp, samp_seq, norbits) if values aren't given
 """
-
-
 def wfc3_GuessNOrbits(trdur):
     '''
     Predict number of HST orbits for transit observation when not provided by the user.
@@ -172,7 +170,7 @@ def wfc3_TExoNS(dictinput):
     pandeia_input = dictinput['pandeia_input']
     pandexo_input = dictinput['pandexo_input'] 
         
-    hmag            = pandexo_input['star']['hmag']
+    hmag            = pandexo_input['star']['mag']
     trdur           = pandexo_input['planet']['transit_duration']
     numTr           = pandexo_input['observation']['noccultations']
     nchan           = pandexo_input['observation']['nchan']
@@ -187,9 +185,11 @@ def wfc3_TExoNS(dictinput):
     #Assumptions: H-band
     disperser   = disperser.lower()
     subarray    = subarray.lower()
-    if isinstance(samp_seq, str):
+
+    try:
         samp_seq    = samp_seq.lower()
-    
+    except:
+        pass
     if disperser == 'g141':
         # Define reference Hmag, flux, variance, and exposure time for GJ1214
         refmag      = 9.094
@@ -281,10 +281,7 @@ def wfc3_TExoNS(dictinput):
     else:
         # Assume transit contains 2+ orbits timed to maximize # of data points.
         ptsInTr  = ptsOrbit * (np.floor(orbitsTr) + np.min((1,np.remainder(orbitsTr-np.floor(orbitsTr),1)/0.5))) - np.ceil(orbitsTr)
-    #foo.append(ptsInTr)
-    #plt.figure(1)
-    #plt.clf()
-    #plt.plot(bar,foo,'o-')
+
     
     # Estimate # of good points outside of transit
     # Discard first HST orbit
@@ -297,23 +294,23 @@ def wfc3_TExoNS(dictinput):
     chanflux    = flux/nchan
     chanvar     = fluxvar/nchan
     chanrms     = np.sqrt(chanvar)/chanflux*1e6     #ppm
-    #print("chanrms",chanrms)
     inTrrms     = chanrms/np.sqrt(ptsInTr*numTr)    #ppm
     outTrrms    = chanrms/np.sqrt(ptsOutTr*numTr)   #ppm
-    #print("in/out",inTrrms,outTrrms)
     deptherr    = np.sqrt(inTrrms**2 + outTrrms**2) #ppm
     
-    print("Number of HST orbits: %0.0f" % norbits)
-    print("WFC3 parameters: NSAMP = %0.0f, SAMP_SEQ = %s" %(nsamp,samp_seq.upper()))
-    print("Recommended scan rate: %0.3f arcsec/s" % scanRate)
-    print("Scan height: %0.1f pixels" % scanHeight)
-    print("Maximum pixel fluence: %0.0f electrons" % fluence)
-    print("Estimated duty cycle (outside of Earth occultation): %0.1f%%" % dutyCycle)
-    print("Transit depth uncertainty: %0.1f ppm for each of %0.0f channel(s)" % (deptherr, nchan))
+    info = {"Number of HST orbits": norbits,
+              "WFC3 parameters: NSAMP": nsamp, 
+              "WFC3 parameters: SAMP_SEQ":samp_seq.upper(),
+              "Recommended scan rate (arcsec/s)": scanRate,
+              "Scan height (pixels)": scanHeight,
+              "Maximum pixel fluence (electrons)":fluence,
+              "Estimated duty cycle (outside of Earth occultation)": dutyCycle,
+              "Transit depth uncertainty(ppm)":deptherr,
+              "Number of channels": nchan}
     
-    return {"spec_error": deptherr/1e6, "light_curve_rms":chanrms/1e6, "nframes_per_orb":ptsOrbit}
+    return {"spec_error": deptherr/1e6, "light_curve_rms":chanrms/1e6, "nframes_per_orb":ptsOrbit,"info":info}
 
-def calc_StartWindow(rms, ptsOrbit, numOrbits, depth, inc, aRs, period, tunc, duration=None, offset=0.):
+def calc_start_window(rms, ptsOrbit, numOrbits, depth, inc, aRs, period, tunc, duration=None, offset=0.):
     '''
     Plot earliest and latest possible spectroscopic light curves for given start window size
     Written by Kevin Stevenson      October 2016
@@ -389,36 +386,11 @@ def calc_StartWindow(rms, ptsOrbit, numOrbits, depth, inc, aRs, period, tunc, du
     m           = batman.TransitModel(params, obsphase2)
     obstr2      = m.light_curve(params) + np.random.normal(0, rms, obsphase2.shape)
     
-    plt.figure(1, figsize=(12,4))
-    plt.clf()
-    plt.subplot(121)
-    plt.title('Earliest Start Time')
-    plt.errorbar(obsphase1, obstr1, rms, fmt='go')
-    plt.plot(phase1, trmodel1, 'b-', lw=2)
-    ylim1   = plt.ylim()
-    xlim1   = plt.xlim()
-    plt.ylabel("Flux")
-    plt.xlabel("Orbital Phase")
-    plt.subplot(122)
-    plt.title('Latest Start Time')
-    plt.errorbar(obsphase2, obstr2, rms, fmt='ro')
-    plt.plot(phase2, trmodel2, 'b-', lw=2)
-    ylim2   = plt.ylim()
-    xlim2   = plt.xlim()
-    plt.ylabel("Flux")
-    plt.xlabel("Orbital Phase")
-    #Put both subplots onto same x,y scale
-    ylim    = [np.min((ylim1[0],ylim2[0])), np.max((ylim1[1],ylim2[1]))]
-    xlim    = [np.min((xlim1[0],xlim2[0])), np.max((xlim1[1],xlim2[1]))]
-    plt.ylim(ylim)
-    plt.xlim(xlim)
-    plt.subplot(121)
-    plt.ylim(ylim)
-    plt.xlim(xlim)
-    
-    return minphase, maxphase
+    return {'obsphase1':obsphase1,'rms':rms, 'obstr1':obstr1,'obsphase2':obsphase2,
+            'obstr2':obstr2,'minphase':minphase,'maxphase':maxphase,'phase1':phase1,
+            'phase2':phase2,'trmodel1':trmodel1,'trmodel2':trmodel2}
 
-def plot_PlanSpec(specfile, w_unit, disperser, deptherr, nchan, smooth=None):
+def planet_spec(specfile, w_unit, disperser, deptherr, nchan, smooth=None):
     '''
     Plot exoplanet transmission/emission spectrum
     Written by Kevin Stevenson      October 2016
@@ -451,7 +423,7 @@ def plot_PlanSpec(specfile, w_unit, disperser, deptherr, nchan, smooth=None):
     
     # Smooth model spectrum (optional)
     if smooth != None:
-        import smooth as sm
+        import hst_smooth as sm
         mspec = sm.smooth(mspec, smooth)
     
     # Determine disperser wavelength boundaries
@@ -477,14 +449,53 @@ def plot_PlanSpec(specfile, w_unit, disperser, deptherr, nchan, smooth=None):
         binspec[i]  = np.mean(mspec[ispec])
     binspec    += np.random.normal(0,deptherr,nchan)
     
-    plt.figure(1, figsize=(12,4))
-    plt.clf()
-    plt.plot(mwave, mspec, '-k')
-    plt.errorbar(binwave, binspec, deptherr, fmt='bo', ms=8, label='Simulated Spectrum')
-    plt.xlim(wmin, wmax)
-    plt.ylim(np.min(binspec)-2*deptherr, np.max(binspec)+2*deptherr)
-    plt.legend(loc='upper left')
-    plt.xlabel("Wavelength ($\mu m$)")
-    plt.ylabel("Depth")
+    return {'model_wave':mwave,'model_spec':mspec,'binwave':binwave,'binspec':binspec,
+             'error':deptherr,'wmin':wmin, 'wmax':wmax}
+  
+def compute_sim_hst(dictinput):
+    """
+    Function to set up explanet observations for HST only and 
+    compute simulated spectrum.
+    :param dictinput: instrument and pandexo dictionaries in format {"pandeia_input":dict1, "pandexo_input":dict2}
+    :param type: dictionary
+    :returns: dictionary with all hst output info needed to plot simulated data, light curves timing info
+    :rtype: dictionary
+    """
+    pandexo_input =dictinput['pandexo_input']
+    pandeia_input = dictinput['pandeia_input']
     
-    return
+    disperser       = pandeia_input['configuration']['instrument']['disperser'].lower()
+    hmag            = pandexo_input['star']['mag']
+    nchan           = pandexo_input['observation']['nchan']
+    specfile   = pandexo_input['planet']['exopath']
+    w_unit     = pandexo_input['planet']['w_unit']
+    numorbits = pandexo_input['observation']['norbits']
+    depth     = pandexo_input['planet']['depth']
+    inc       = pandexo_input['planet']['i']
+    aRs       = pandexo_input['planet']['ars']
+    period    = pandexo_input['planet']['period']
+    tunc      = 10 
+    
+    a = wfc3_TExoNS(dictinput)
+    b = calc_start_window(a['light_curve_rms'], a['nframes_per_orb'], numorbits, depth, inc, aRs, period, tunc)
+    c = planet_spec(specfile, w_unit, disperser, a['spec_error'], nchan,smooth=20) 
+    
+    info_div = create_out_div(a['info'], b['minphase'],b['maxphase'])
+    
+    return {"wfc3_TExoNS":a,"calc_start_window": b,"planet_spec":c,"info_div":info_div}
+    
+    
+def create_out_div(input_dict,minphase,maxphase):
+    """
+    Function to render input dicts in html format for web front end
+    
+    :param input_dict: any input dictionary
+    :param type: dictionary
+    :returns: input_div html table
+    :rtype: html div 
+    """
+    input_dict['Start observations between orbital phases'] = str(minphase)+'-'+str(maxphase)
+    input_div = pd.DataFrame(input_dict.items(), columns=['Component', 'Values']).to_html().encode()
+    input_div = '<table class="table table-striped"> \n' + input_div[36:len(input_div)]
+    return input_div
+    
