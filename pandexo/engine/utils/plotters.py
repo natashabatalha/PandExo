@@ -396,7 +396,7 @@ def create_component_hst(result_dict):
     #earliest and latest start times 
     obsphase1 = result_dict['calc_start_window']['obsphase1']
     obstr1 = result_dict['calc_start_window']['obstr1']
-    rms = result_dict['calc_start_window']['rms']
+    rms = result_dict['calc_start_window']['light_curve_rms']
     obsphase2 = result_dict['calc_start_window']['obsphase2']
     obstr2 = result_dict['calc_start_window']['obstr2']
     phase1 = result_dict['calc_start_window']['phase1']    
@@ -404,7 +404,8 @@ def create_component_hst(result_dict):
     trmodel1 = result_dict['calc_start_window']['trmodel1']
     trmodel2 = result_dict['calc_start_window']['trmodel2']    
     
-    rms = np.zeros(len(obsphase1))+rms
+    if isinstance(rms, float):
+        rms = np.zeros(len(obsphase1))+rms
     y_err1 = []
     x_err1 = []
     for px, py, yerr in zip(obsphase1, obstr1, rms):

@@ -170,6 +170,7 @@ def wfc3_TExoNS(dictinput):
     pandeia_input = dictinput['pandeia_input']
     pandexo_input = dictinput['pandexo_input'] 
         
+    #Assumptions: H-band
     hmag            = pandexo_input['star']['mag']
     trdur           = pandexo_input['planet']['transit_duration']
     numTr           = pandexo_input['observation']['noccultations']
@@ -181,15 +182,9 @@ def wfc3_TExoNS(dictinput):
     subarray        = pandeia_input['configuration']['detector']['subarray'].lower()
     nsamp           = pandeia_input['configuration']['detector']['nsamp']
     samp_seq        = pandeia_input['configuration']['detector']['samp_seq']    
-    
-    #Assumptions: H-band
-    disperser   = disperser.lower()
-    subarray    = subarray.lower()
-
-    try:
+    if isinstance(samp_seq, str):
         samp_seq    = samp_seq.lower()
-    except:
-        pass
+    
     if disperser == 'g141':
         # Define reference Hmag, flux, variance, and exposure time for GJ1214
         refmag      = 9.094
@@ -203,7 +198,7 @@ def wfc3_TExoNS(dictinput):
         refvar      = 9.75e7
         refexptime  = 103.129
     else:
-        print("Unknown disperser: %s" % disperser)
+        print("****HALTED: Unknown disperser: %s" % disperser)
         return
     
     # Determine max recommended scan height
@@ -212,30 +207,30 @@ def wfc3_TExoNS(dictinput):
     elif subarray == 'grism256':
         maxScanHeight = 180
     else:
-        print("Unknown subarray aperture: %s" % subarray)
+        print("****HALTED: Unknown subarray aperture: %s" % subarray)
         return
     
     # Define maximum frame time
     maxExptime  = 150.
     
-    # Estimate reasonable number of HST orbits
+    # Define available observing time per HST orbit in seconds
+    if schedulability == '30':
+        obsTime   = 51.3*60
+    elif schedulability == '100':
+        obsTime   = 46.3*60
+    else:
+        print("****HALTED: Unknown schedulability: %s" % schedulability)
+        return
+    
+    # Compute recommended number of HST orbits and compare to user specified value
     guessorbits = wfc3_GuessNOrbits(trdur)
     if norbits == None:
         norbits = guessorbits
     elif norbits != guessorbits:
         print("****WARNING: Number of specified HST orbits does not match number of recommended orbits: %0.0f" % guessorbits)
     
-    # Determine seconds of observing time per HST orbit
-    if schedulability == '30':
-        obsTime   = 51.3*60
-    elif schedulability == '100':
-        obsTime   = 46.3*60
-    else:
-        print("Unknown schedulability: %s" % schedulability)
-        return
-    
-    if nsamp == 0 or samp_seq == None or samp_seq == "None":
-        # Estimate reasonable values
+    if nsamp == 0 or nsamp == None or samp_seq == None or samp_seq == "none":
+        # Determine optimal nsamp and samp_seq values
         nsamp, samp_seq = wfc3_GuessParams(hmag, disperser, scanDirection, subarray, 
                                            obsTime, maxScanHeight, maxExptime)
     # Calculate observation parameters
@@ -246,12 +241,12 @@ def wfc3_TExoNS(dictinput):
     if exptime > maxExptime:
         print("****WARNING: Computed frame time (%0.0f seconds) exceeds maximum recommended duration of %0.0f seconds." % (exptime,maxExptime))
     
-    # Compute # of data points per orbit
-    # First point is always bad, but take into account later
+    # Compute number of data points (frames) per orbit
     ptsOrbit    = np.floor(obsTime/tottime)
+    # First point (frame) is always low, ignore when computing duty cycle
     dutyCycle   = (exptime*(ptsOrbit-1))/50./60*100
     
-    # Compute # of non-destructive reads per orbit
+    # Compute number of non-destructive reads per orbit
     readsOrbit  = ptsOrbit*(nsamp+1)
     
     # Look for mid-orbit buffer dumps
@@ -260,15 +255,12 @@ def wfc3_TExoNS(dictinput):
     if (subarray == 'grism512') and (readsOrbit >= 120) and (exptime <= 100):
         print("****WARNING: Observing plan may incur mid-orbit buffer dumps.  Check with APT.")
     
-    # Compute # of HST orbits per transit
+    # Compute number of HST orbits per transit
     # ~96 minutes per HST orbit
     orbitsTr    = trdur/96./60.
     
-    # Estimate # of good points during planet transit
+    # Estimate number of good points during planet transit
     # First point in each HST orbit is flagged as bad; therefore, subtract from total
-    #foo = []
-    #bar = np.arange(0.1,4,0.05)
-    #for orbitsTr in bar:
     if orbitsTr < 0.5:
         # Entire transit fits within one HST orbit
         ptsInTr  = ptsOrbit * orbitsTr/0.5 - 1
@@ -282,8 +274,7 @@ def wfc3_TExoNS(dictinput):
         # Assume transit contains 2+ orbits timed to maximize # of data points.
         ptsInTr  = ptsOrbit * (np.floor(orbitsTr) + np.min((1,np.remainder(orbitsTr-np.floor(orbitsTr),1)/0.5))) - np.ceil(orbitsTr)
 
-    
-    # Estimate # of good points outside of transit
+    # Estimate number of good points outside of transit
     # Discard first HST orbit
     ptsOutTr    = (ptsOrbit-1) * (norbits-1) - ptsInTr
     
@@ -299,14 +290,14 @@ def wfc3_TExoNS(dictinput):
     deptherr    = np.sqrt(inTrrms**2 + outTrrms**2) #ppm
     
     info = {"Number of HST orbits": norbits,
-              "WFC3 parameters: NSAMP": nsamp, 
-              "WFC3 parameters: SAMP_SEQ":samp_seq.upper(),
-              "Recommended scan rate (arcsec/s)": scanRate,
-              "Scan height (pixels)": scanHeight,
-              "Maximum pixel fluence (electrons)":fluence,
-              "Estimated duty cycle (outside of Earth occultation)": dutyCycle,
-              "Transit depth uncertainty(ppm)":deptherr,
-              "Number of channels": nchan}
+            "WFC3 parameters: NSAMP": nsamp, 
+            "WFC3 parameters: SAMP_SEQ":samp_seq.upper(),
+            "Recommended scan rate (arcsec/s)": scanRate,
+            "Scan height (pixels)": scanHeight,
+            "Maximum pixel fluence (electrons)":fluence,
+            "Estimated duty cycle (outside of Earth occultation)": dutyCycle,
+            "Transit depth uncertainty(ppm)":deptherr,
+            "Number of channels": nchan}
     
     return {"spec_error": deptherr/1e6, "light_curve_rms":chanrms/1e6, "nframes_per_orb":ptsOrbit,"info":info}
 
@@ -353,7 +344,7 @@ def calc_start_window(rms, ptsOrbit, numOrbits, depth, inc, aRs, period, tunc, d
 
     params          = batman.TransitParams()
     params.t0       = 1.                    #time of inferior conjunction
-    params.per      = 1.                    #orbital period
+    params.per      = 1.                    #orbital period is unity because units are phase
     params.rp       = rprs                  #planet radius (in units of stellar radii)
     params.a        = aRs                   #semi-major axis (in units of stellar radii)
     params.inc      = inc                   #orbital inclination (in degrees)
@@ -367,7 +358,7 @@ def calc_start_window(rms, ptsOrbit, numOrbits, depth, inc, aRs, period, tunc, d
     minphase    = (phase1+phase2)/2-punc
     maxphase    = (phase1+phase2)/2+punc
 
-    #Plot extremes of possible HST observations
+    #Compute light curves at extremes of HST start window
     npts        = 4 * ptsOrbit * numOrbits
     phdur       = duration/period
     phase1      = np.linspace(minphase+hstperiod/period,minphase+hstperiod/period*(numOrbits-1)+hstperiod/period/2,npts)
@@ -386,7 +377,7 @@ def calc_start_window(rms, ptsOrbit, numOrbits, depth, inc, aRs, period, tunc, d
     m           = batman.TransitModel(params, obsphase2)
     obstr2      = m.light_curve(params) + np.random.normal(0, rms, obsphase2.shape)
     
-    return {'obsphase1':obsphase1,'rms':rms, 'obstr1':obstr1,'obsphase2':obsphase2,
+    return {'obsphase1':obsphase1,'light_curve_rms':rms, 'obstr1':obstr1,'obsphase2':obsphase2,
             'obstr2':obstr2,'minphase':minphase,'maxphase':maxphase,'phase1':phase1,
             'phase2':phase2,'trmodel1':trmodel1,'trmodel2':trmodel2}
 
@@ -418,7 +409,7 @@ def planet_spec(specfile, w_unit, disperser, deptherr, nchan, smooth=None):
     elif w_unit == 'nm':
         mwave /= 1000.
     else:
-        print("****HALTED: Unrecognized wavelength unit '%s'" % w_unit)
+        print("****HALTED: Unrecognized wavelength unit: '%s'" % w_unit)
         return
     
     # Smooth model spectrum (optional)
@@ -434,7 +425,8 @@ def planet_spec(specfile, w_unit, disperser, deptherr, nchan, smooth=None):
         wmin = 0.84
         wmax = 1.13
     else:
-        print("WARNING: Unrecognized disperser name '%s'" % disperser)
+        print("****HALTED: Unrecognized disperser name: '%s'" % disperser)
+        return
     
     # Determine wavelength bins
     binsize     = (wmax - wmin)/nchan
@@ -461,20 +453,20 @@ def compute_sim_hst(dictinput):
     :returns: dictionary with all hst output info needed to plot simulated data, light curves timing info
     :rtype: dictionary
     """
-    pandexo_input =dictinput['pandexo_input']
-    pandeia_input = dictinput['pandeia_input']
+    pandexo_input   = dictinput['pandexo_input']
+    pandeia_input   = dictinput['pandeia_input']
     
     disperser       = pandeia_input['configuration']['instrument']['disperser'].lower()
     hmag            = pandexo_input['star']['mag']
     nchan           = pandexo_input['observation']['nchan']
-    specfile   = pandexo_input['planet']['exopath']
-    w_unit     = pandexo_input['planet']['w_unit']
-    numorbits = pandexo_input['observation']['norbits']
-    depth     = pandexo_input['planet']['depth']
-    inc       = pandexo_input['planet']['i']
-    aRs       = pandexo_input['planet']['ars']
-    period    = pandexo_input['planet']['period']
-    tunc      = 10 
+    specfile        = pandexo_input['planet']['exopath']
+    w_unit          = pandexo_input['planet']['w_unit']
+    numorbits       = pandexo_input['observation']['norbits']
+    depth           = pandexo_input['planet']['depth']
+    inc             = pandexo_input['planet']['i']
+    aRs             = pandexo_input['planet']['ars']
+    period          = pandexo_input['planet']['period']
+    tunc            = 10 
     
     a = wfc3_TExoNS(dictinput)
     b = calc_start_window(a['light_curve_rms'], a['nframes_per_orb'], numorbits, depth, inc, aRs, period, tunc)
