@@ -191,6 +191,7 @@ def wfc3_TExoNS(dictinput):
     pandeia_input = dictinput['pandeia_input']
     pandexo_input = dictinput['pandexo_input'] 
         
+    #Assumptions: H-band
     hmag            = pandexo_input['star']['mag']
     trdur           = pandexo_input['planet']['transit_duration']
     numTr           = pandexo_input['observation']['noccultations']
@@ -203,14 +204,11 @@ def wfc3_TExoNS(dictinput):
     nsamp           = pandeia_input['configuration']['detector']['nsamp']
     samp_seq        = pandeia_input['configuration']['detector']['samp_seq']    
     
-    #Assumptions: H-band
-    disperser   = disperser.lower()
-    subarray    = subarray.lower()
-
     try:
         samp_seq    = samp_seq.lower()
     except:
         pass
+        
     if disperser == 'g141':
         # Define reference Hmag, flux, variance, and exposure time for GJ1214
         refmag      = 9.094
@@ -247,17 +245,20 @@ def wfc3_TExoNS(dictinput):
     else:
         print("****HALTED: Unknown schedulability: %s" % schedulability)
         return
-        
-    # Estimate reasonable number of HST orbits
+
+    
+    # Compute recommended number of HST orbits and compare to user specified value
     guessorbits = wfc3_GuessNOrbits(trdur)
     if norbits == None:
         norbits = guessorbits
     elif norbits != guessorbits:
         print("****WARNING: Number of specified HST orbits does not match number of recommended orbits: %0.0f" % guessorbits)
+
      
     if nsamp == 0 or nsamp == None or samp_seq == None or samp_seq == "none":
         # Estimate reasonable values
         nsamp, samp_seq = wfc3_GuessParams(hmag, disperser, scanDirection, subarray, obsTime, maxExptime)
+
     # Calculate observation parameters
     exptime, tottime, scanRate, scanHeight, fluence = wfc3_obs(hmag, disperser, scanDirection, 
                                                                subarray, nsamp, samp_seq)
@@ -284,7 +285,7 @@ def wfc3_TExoNS(dictinput):
     # ~96 minutes per HST orbit
     orbitsTr    = trdur/96./60.
     
-    # Estimate # of good points during planet transit
+    # Estimate number of good points during planet transit
     # First point in each HST orbit is flagged as bad; therefore, subtract from total
 
     if orbitsTr < 0.5:
@@ -300,7 +301,6 @@ def wfc3_TExoNS(dictinput):
         # Assume transit contains 2+ orbits timed to maximize # of data points.
         ptsInTr  = ptsOrbit * (np.floor(orbitsTr) + np.min((1,np.remainder(orbitsTr-np.floor(orbitsTr),1)/0.5))) - np.ceil(orbitsTr)
 
-    
     # Estimate number of good points outside of transit
     # Discard first HST orbit
     ptsOutTr    = (ptsOrbit-1) * (norbits-1) - ptsInTr
@@ -317,14 +317,14 @@ def wfc3_TExoNS(dictinput):
     deptherr    = np.sqrt(inTrrms**2 + outTrrms**2) #ppm
     
     info = {"Number of HST orbits": norbits,
-              "WFC3 parameters: NSAMP": nsamp, 
-              "WFC3 parameters: SAMP_SEQ":samp_seq.upper(),
-              "Recommended scan rate (arcsec/s)": scanRate,
-              "Scan height (pixels)": scanHeight,
-              "Maximum pixel fluence (electrons)":fluence,
-              "Estimated duty cycle (outside of Earth occultation)": dutyCycle,
-              "Transit depth uncertainty(ppm)":deptherr,
-              "Number of channels": nchan}
+            "WFC3 parameters: NSAMP": nsamp, 
+            "WFC3 parameters: SAMP_SEQ":samp_seq.upper(),
+            "Recommended scan rate (arcsec/s)": scanRate,
+            "Scan height (pixels)": scanHeight,
+            "Maximum pixel fluence (electrons)":fluence,
+            "Estimated duty cycle (outside of Earth occultation)": dutyCycle,
+            "Transit depth uncertainty(ppm)":deptherr,
+            "Number of channels": nchan}
     
     return {"spec_error": deptherr/1e6, "light_curve_rms":chanrms/1e6, "nframes_per_orb":ptsOrbit,"info":info}
 
@@ -462,7 +462,7 @@ def planet_spec(specfile, w_unit, disperser, deptherr, nchan, smooth=None):
         wmin = 0.84
         wmax = 1.13
     else:
-        print("****HALTED: Unrecognized disperser name '%s'" % disperser)
+        print("****HALTED: Unrecognized disperser name: '%s'" % disperser)
         return
     
     # Determine wavelength bins

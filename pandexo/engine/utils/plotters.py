@@ -420,7 +420,8 @@ def create_component_hst(result_dict):
     trmodel1 = result_dict['calc_start_window']['trmodel1']
     trmodel2 = result_dict['calc_start_window']['trmodel2']    
     
-    rms = np.zeros(len(obsphase1))+rms
+    if isinstance(rms, float):
+        rms = np.zeros(len(obsphase1))+rms
     y_err1 = []
     x_err1 = []
     for px, py, yerr in zip(obsphase1, obstr1, rms):
