@@ -8,16 +8,21 @@ from bokeh.io import curdoc
 from bokeh.layouts import row
 
 def create_component_jwst(result_dict):
-    """
+    """Generate front end plots JWST
+    
     Function that is responsible for generating the front-end interactive plots for JWST.
 
-    :param result_dict: the dictionary returned from a PandExo run
-    :type result_dict: dict
-    :returns: result_comp
+    Parameters 
+    ----------
+    result_dict : dict 
+        the dictionary returned from a PandExo run
+    
+    Returns
+    -------
+    tuple 
         A tuple containing `(script, div)`, where the `script` is the
         front-end javascript required, and `div` is a dictionary of plot
         objects.
-    :rtype: tuple
     """  
     noccultations = result_dict['timing']['Number of Transits']
     
@@ -307,16 +312,21 @@ def create_component_jwst(result_dict):
     return result_comp
     
 def create_component_spec(result_dict):
-    """
+    """Generate front end plots of modeling
+    
     Function that is responsible for generating the front-end spectra plots.
+    
+    Parameters
+    ----------
+    result_dict : dict 
+        the dictionary returned from a PandExo run
 
-    :param result_dict: the dictionary returned from a PandExo run
-    :type result_dict: dict
-    :returns: result_comp
+    Returns
+    -------
+    tuple
         A tuple containing `(script, div)`, where the `script` is the
         front-end javascript required, and `div` is a dictionary of plot
         objects.
-    :rtype: tuple
     """  
     num = -1
     color = ["red", "blue", "green", "purple", "black", "yellow", "orange", "pink","cyan","brown"]
@@ -352,15 +362,21 @@ def create_component_spec(result_dict):
     return result_comp 
 
 def create_component_hst(result_dict):
-    """
+    """Generate front end plots HST
+    
     Function that is responsible for generating the front-end spectra plots for HST.
-    :param result_dict: the dictionary returned from a PandExo (HST) run
-    :type result_dict: dict
-    :returns: result_comp
+    
+    Parameters
+    ----------
+    result_dict : dict 
+        The dictionary returned from a PandExo (HST) run
+
+    Returns
+    -------
+    tuple
         A tuple containing `(script, div)`, where the `script` is the
         front-end javascript required, and `div` is a dictionary of plot
         objects.
-    :rtype: tuple
     """                                   
     TOOLS = "pan,wheel_zoom,box_zoom,resize,reset,save"
 
@@ -396,7 +412,7 @@ def create_component_hst(result_dict):
     #earliest and latest start times 
     obsphase1 = result_dict['calc_start_window']['obsphase1']
     obstr1 = result_dict['calc_start_window']['obstr1']
-    rms = result_dict['calc_start_window']['rms']
+    rms = result_dict['calc_start_window']['light_curve_rms']
     obsphase2 = result_dict['calc_start_window']['obsphase2']
     obstr2 = result_dict['calc_start_window']['obstr2']
     phase1 = result_dict['calc_start_window']['phase1']    
