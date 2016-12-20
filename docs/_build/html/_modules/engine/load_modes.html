@@ -1,0 +1,202 @@
+
+
+<!doctype html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>engine.load_modes &#8212; PandExo  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">PandExo  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for engine.load_modes</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+
+<div class="viewcode-block" id="SetDefaultModes"><a class="viewcode-back" href="../../engine.html#engine.load_modes.SetDefaultModes">[docs]</a><span class="k">class</span> <span class="nc">SetDefaultModes</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Class to load default instrument mode dicts</span>
+<span class="sd">    </span>
+<span class="sd">    This class contains functionality for loading observing modes for exoplanet observations </span>
+<span class="sd">    This is NOT a complete set of ALL possibleobserving modes. Instead, it offers a starting point for </span>
+<span class="sd">    choosing one instrument specification. There is one function for each instrument. For example, </span>
+<span class="sd">    It sets slitless mode for MIRI LRS. If users are interested in other specific observation modes </span>
+<span class="sd">    they should load in the dictionary and then edit individual keys. </span>
+<span class="sd">    </span>
+<span class="sd">    Included modes are: </span>
+<span class="sd">       - &quot;MIRI LRS&quot;</span>
+<span class="sd">       - &quot;NIRISS SOSS_Or1&quot;</span>
+<span class="sd">       - &quot;NIRISS SOSS_Or2&quot;</span>
+<span class="sd">       - &quot;NIRSpec G140M&quot;</span>
+<span class="sd">       - &quot;NIRSpec G140H&quot;</span>
+<span class="sd">       - &quot;NIRSpec G235M&quot;</span>
+<span class="sd">       - &quot;NIRSpec G235H&quot;</span>
+<span class="sd">       - &quot;NIRSpec G395M&quot;</span>
+<span class="sd">       - &quot;NIRSpec G395H&quot;</span>
+<span class="sd">       - &quot;NIRSpec Prism&quot;</span>
+<span class="sd">       - &quot;NIRCam F322W&quot;</span>
+<span class="sd">       - &quot;NIRCam F444W&quot;</span>
+<span class="sd">       - &quot;WFC3 G102&quot;</span>
+<span class="sd">       - &quot;WFC3 G141&quot;</span>
+<span class="sd">       </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    inst : str</span>
+<span class="sd">        Allowable strings listed above </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inst</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instrument</span> <span class="o">=</span> <span class="n">inst</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">inst</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">inst</span><span class="p">[</span><span class="n">inst</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="n">inst</span><span class="p">)]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>   
+    
+<div class="viewcode-block" id="SetDefaultModes.pick"><a class="viewcode-back" href="../../engine.html#engine.load_modes.SetDefaultModes.pick">[docs]</a>    <span class="k">def</span> <span class="nf">pick</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+        <span class="sd">&quot;&quot;&quot;Points to specific instrument based on key choice</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span> 
+            <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">instrument</span><span class="p">)()</span>
+        <span class="k">except</span><span class="p">:</span> 
+            <span class="nb">print</span> <span class="s2">&quot;INVALID INSTRUMENT NAME&quot;</span>
+            <span class="k">return</span> </div>
+                                   
+<div class="viewcode-block" id="SetDefaultModes.wfc3"><a class="viewcode-back" href="../../engine.html#engine.load_modes.SetDefaultModes.wfc3">[docs]</a>    <span class="k">def</span> <span class="nf">wfc3</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Handles WFC3 template</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">#wfc3_input</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s2">&quot;reference&quot;</span><span class="p">,</span>
+                               <span class="s2">&quot;wfc3_input.json&quot;</span><span class="p">))</span> <span class="k">as</span> <span class="n">data_file</span><span class="p">:</span>
+            <span class="n">pandeia_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">data_file</span><span class="p">)</span>
+            <span class="n">pandeia_data</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">][</span><span class="s2">&quot;instrument&quot;</span><span class="p">][</span><span class="s2">&quot;disperser&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span>
+        <span class="k">return</span> <span class="n">pandeia_data</span></div>
+    
+<div class="viewcode-block" id="SetDefaultModes.niriss"><a class="viewcode-back" href="../../engine.html#engine.load_modes.SetDefaultModes.niriss">[docs]</a>    <span class="k">def</span> <span class="nf">niriss</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Handles NIRISS template</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">#need to add in functionality for two orders, right now you only have option to do sub80</span>
+        <span class="n">order</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="mi">7</span><span class="p">])</span>
+        
+        <span class="n">subarray</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;2&#39;</span><span class="p">:</span><span class="s1">&#39;substrip80&#39;</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span><span class="s1">&#39;substrip80&#39;</span><span class="p">}</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s2">&quot;reference&quot;</span><span class="p">,</span>
+                               <span class="s2">&quot;niriss_input.json&quot;</span><span class="p">))</span> <span class="k">as</span> <span class="n">data_file</span><span class="p">:</span>
+            <span class="n">pandeia_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">data_file</span><span class="p">)</span>
+            <span class="n">pandeia_data</span><span class="p">[</span><span class="s2">&quot;strategy&quot;</span><span class="p">][</span><span class="s2">&quot;order&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">order</span>
+            <span class="n">pandeia_data</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">][</span><span class="s2">&quot;detector&quot;</span><span class="p">][</span><span class="s2">&quot;subarray&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">subarray</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">order</span><span class="p">)]</span>
+            <span class="n">pandeia_data</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">][</span><span class="s2">&quot;instrument&quot;</span><span class="p">][</span><span class="s2">&quot;disperser&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pandeia_data</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">][</span><span class="s2">&quot;instrument&quot;</span><span class="p">][</span><span class="s2">&quot;disperser&quot;</span><span class="p">]</span> <span class="c1">#+&#39;_&#39;+str(order) </span>
+        <span class="k">return</span> <span class="n">pandeia_data</span></div>
+        
+<div class="viewcode-block" id="SetDefaultModes.nirspec"><a class="viewcode-back" href="../../engine.html#engine.load_modes.SetDefaultModes.nirspec">[docs]</a>    <span class="k">def</span> <span class="nf">nirspec</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Handles NIRSpec template</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">filters</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;g140m&#39;</span><span class="p">:</span><span class="s1">&#39;f070lp&#39;</span><span class="p">,</span><span class="s1">&#39;g140h&#39;</span><span class="p">:</span><span class="s1">&#39;f070lp&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;g235m&#39;</span><span class="p">:</span><span class="s1">&#39;f170lp&#39;</span><span class="p">,</span><span class="s1">&#39;g235h&#39;</span><span class="p">:</span><span class="s1">&#39;f170lp&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;g395m&#39;</span><span class="p">:</span><span class="s1">&#39;f290lp&#39;</span><span class="p">,</span><span class="s1">&#39;g395h&#39;</span><span class="p">:</span><span class="s1">&#39;f290lp&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;prism&#39;</span><span class="p">:</span> <span class="s1">&#39;clear&#39;</span>
+                    <span class="p">}</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s2">&quot;reference&quot;</span><span class="p">,</span>
+                               <span class="s2">&quot;nirspec_input.json&quot;</span><span class="p">))</span> <span class="k">as</span> <span class="n">data_file</span><span class="p">:</span>
+            <span class="n">pandeia_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">data_file</span><span class="p">)</span>
+            <span class="n">pandeia_data</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">][</span><span class="s2">&quot;instrument&quot;</span><span class="p">][</span><span class="s2">&quot;disperser&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span>
+            <span class="n">pandeia_data</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">][</span><span class="s2">&quot;instrument&quot;</span><span class="p">][</span><span class="s2">&quot;filter&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">filters</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">]</span>                                  
+        <span class="k">return</span> <span class="n">pandeia_data</span></div>
+        
+<div class="viewcode-block" id="SetDefaultModes.nircam"><a class="viewcode-back" href="../../engine.html#engine.load_modes.SetDefaultModes.nircam">[docs]</a>    <span class="k">def</span> <span class="nf">nircam</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Handles NIRCam template</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s2">&quot;reference&quot;</span><span class="p">,</span>
+                               <span class="s2">&quot;nircam_input.json&quot;</span><span class="p">))</span> <span class="k">as</span> <span class="n">data_file</span><span class="p">:</span>
+            <span class="n">pandeia_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">data_file</span><span class="p">)</span>
+            <span class="n">pandeia_data</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">][</span><span class="s2">&quot;instrument&quot;</span><span class="p">][</span><span class="s2">&quot;filter&quot;</span><span class="p">]</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span>           
+        <span class="k">return</span> <span class="n">pandeia_data</span></div>
+
+<div class="viewcode-block" id="SetDefaultModes.miri"><a class="viewcode-back" href="../../engine.html#engine.load_modes.SetDefaultModes.miri">[docs]</a>    <span class="k">def</span> <span class="nf">miri</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Handles MIRI template</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">#only lrs slit less     </span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s2">&quot;reference&quot;</span><span class="p">,</span>
+                               <span class="s2">&quot;miri_input.json&quot;</span><span class="p">))</span> <span class="k">as</span> <span class="n">data_file</span><span class="p">:</span>
+                <span class="n">pandeia_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">data_file</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">pandeia_data</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">PandExo  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016, Natasha Batalha;Kevin Stevenson.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

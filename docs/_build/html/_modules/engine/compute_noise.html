@@ -1,0 +1,541 @@
+
+
+<!doctype html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>engine.compute_noise &#8212; PandExo  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">PandExo  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for engine.compute_noise</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<div class="viewcode-block" id="ExtractSpec"><a class="viewcode-back" href="../../engine.html#engine.compute_noise.ExtractSpec">[docs]</a><span class="k">class</span> <span class="nc">ExtractSpec</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Different methods for computing noise. </span>
+<span class="sd">    </span>
+<span class="sd">    PandExo has several different methods of computing noise.  </span>
+<span class="sd">    MULTIACCUM (slope method) assumses that each frame is fit for up the ramp and </span>
+<span class="sd">    that the final nosie includes correlated noise from fitting each frame up the ramp. </span>
+<span class="sd">    First Minus Last assumes that intermediate frames are not used and final noise is just </span>
+<span class="sd">    the first frame minus the last frame. 2d extract uses Pandeia&#39;s 2d simualtions to </span>
+<span class="sd">    extracts the spectrum from the 2d extraction box. It extracts the entire postage stamp </span>
+<span class="sd">    so it might be an overestimate of flux (in contrast pandeia requires background </span>
+<span class="sd">    extraction region to be at least equal to the flux extraction region)</span>
+<span class="sd">    </span>
+<span class="sd">    Noise Components Included: </span>
+<span class="sd">        - Shot</span>
+<span class="sd">        - Background and Dark Current</span>
+<span class="sd">        - Read noise </span>
+<span class="sd">        </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    inn : dict</span>
+<span class="sd">        In transit dictionary computed from PandExo </span>
+<span class="sd">    out : dict</span>
+<span class="sd">        Out of transit dictionary comptued from PandExo </span>
+<span class="sd">    rn : float</span>
+<span class="sd">        Read noise electrons </span>
+<span class="sd">    extraction_area : float</span>
+<span class="sd">        Number of extracted pixels (square pixels) </span>
+<span class="sd">    timing : dict  </span>
+<span class="sd">        Dictionary of computed JWST timing products </span>
+<span class="sd">    </span>
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    loopingL</span>
+<span class="sd">        extracts pixels from center to bottom</span>
+<span class="sd">    loopingU</span>
+<span class="sd">        extracts pixels from center to top</span>
+<span class="sd">    sum_spatial</span>
+<span class="sd">        sums pixels in optimal extraction region</span>
+<span class="sd">    extract_region</span>
+<span class="sd">        determines optimal extraction region</span>
+<span class="sd">    run_2d_extract</span>
+<span class="sd">        top level to extract spec from 2d pandeia output</span>
+<span class="sd">    run_slope_method</span>
+<span class="sd">        computes noise using multiaccum formulation</span>
+<span class="sd">    run_f_minus_l</span>
+<span class="sd">        computs noise using first minus last</span>
+<span class="sd">    run_phase_spec</span>
+<span class="sd">        computs noise for phase curve observations     </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inn</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">rn</span><span class="p">,</span> <span class="n">extraction_area</span><span class="p">,</span> <span class="n">timing</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inn</span> <span class="o">=</span> <span class="n">inn</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">out</span> <span class="o">=</span> <span class="n">out</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">exptime_per_int</span> <span class="o">=</span> <span class="n">timing</span><span class="p">[</span><span class="s2">&quot;Exposure Time Per Integration (secs)&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ngroups_per_int</span> <span class="o">=</span> <span class="n">timing</span><span class="p">[</span><span class="s2">&quot;Num Groups per Integration&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nocc</span> <span class="o">=</span> <span class="n">timing</span><span class="p">[</span><span class="s2">&quot;Number of Transits&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nint_out</span> <span class="o">=</span> <span class="n">timing</span><span class="p">[</span><span class="s2">&quot;Num Integrations Out of Transit&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nint_in</span> <span class="o">=</span> <span class="n">timing</span><span class="p">[</span><span class="s2">&quot;Num Integrations In Transit&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tframe</span> <span class="o">=</span> <span class="n">timing</span><span class="p">[</span><span class="s2">&quot;Seconds per Frame&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rn</span> <span class="o">=</span> <span class="n">rn</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">extraction_area</span> <span class="o">=</span> <span class="n">extraction_area</span>
+        
+        <span class="c1">#on source out versus in </span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">on_source_in</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tframe</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ngroups_per_int</span><span class="o">-</span><span class="mf">1.0</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">nint_in</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">on_source_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tframe</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ngroups_per_int</span><span class="o">-</span><span class="mf">1.0</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">nint_out</span>
+
+<div class="viewcode-block" id="ExtractSpec.loopingL"><a class="viewcode-back" href="../../engine.html#engine.compute_noise.ExtractSpec.loopingL">[docs]</a>    <span class="k">def</span> <span class="nf">loopingL</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cen</span><span class="p">,</span> <span class="n">signal_col</span><span class="p">,</span> <span class="n">noise_col</span><span class="p">,</span> <span class="n">bkg_col</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Finds bottom of the optimal extraction region.</span>
+<span class="sd">    </span>
+<span class="sd">        Find location where SNR is the highest and loop from highest value downward </span>
+<span class="sd">    </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        cen : float or int </span>
+<span class="sd">            Pixel where SNR is the highest </span>
+<span class="sd">        signal_col : array of float </span>
+<span class="sd">            Array of fluxes to be extracted in a single column on the detector </span>
+<span class="sd">        noise_col : array of float </span>
+<span class="sd">            Array of noise to be extracted in a single column on the detector </span>
+<span class="sd">        bkg_col : array of float </span>
+<span class="sd">            Array of background fluxes to be extracted in a single column on the detector </span>
+<span class="sd">    </span>
+<span class="sd">        Return </span>
+<span class="sd">        ------</span>
+<span class="sd">        int</span>
+<span class="sd">            Bottom most pixel to be extracted </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+    <span class="c1">#create function to find location where SNR is the highest</span>
+    <span class="c1">#loop from the highest value of the signal downward </span>
+        <span class="n">sn_old</span><span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">cen</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span> <span class="c1">#0,1,2,3,4,5 range(0,6).. center=5</span>
+            <span class="n">sig_sum</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">signal_col</span><span class="p">[</span><span class="n">cen</span><span class="o">-</span><span class="n">ii</span><span class="p">:</span><span class="n">cen</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">noi_sum</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">noise_col</span><span class="p">[</span><span class="n">cen</span><span class="o">-</span><span class="n">ii</span><span class="p">:</span><span class="n">cen</span><span class="o">+</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="n">bkg_sum</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">bkg_col</span><span class="p">[</span><span class="n">cen</span><span class="o">-</span><span class="n">ii</span><span class="p">:</span><span class="n">cen</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">sn_new</span> <span class="o">=</span> <span class="n">sig_sum</span><span class="o">/</span><span class="n">noi_sum</span>
+            <span class="k">if</span> <span class="n">sn_old</span> <span class="o">&gt;=</span><span class="n">sn_new</span><span class="p">:</span>               
+                <span class="k">return</span> <span class="n">cen</span><span class="o">-</span><span class="n">ii</span><span class="o">+</span><span class="mi">1</span>                     
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">sn_old</span> <span class="o">=</span> <span class="n">sn_new</span>
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+
+<div class="viewcode-block" id="ExtractSpec.loopingU"><a class="viewcode-back" href="../../engine.html#engine.compute_noise.ExtractSpec.loopingU">[docs]</a>    <span class="k">def</span> <span class="nf">loopingU</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cen</span><span class="p">,</span> <span class="n">signal_col</span><span class="p">,</span> <span class="n">noise_col</span><span class="p">,</span> <span class="n">bkg_col</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Finds top of the optimal extraction region.</span>
+<span class="sd">    </span>
+<span class="sd">        Find location where SNR is the highest and loop from highest value upward </span>
+<span class="sd">    </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        cen : float or int </span>
+<span class="sd">            Pixel where SNR is the highest </span>
+<span class="sd">        signal_col : array of float </span>
+<span class="sd">            Array of fluxes to be extracted in a single column on the detector </span>
+<span class="sd">        noise_col : array of float </span>
+<span class="sd">            Array of noise to be extracted in a single column on the detector </span>
+<span class="sd">        bkg_col : array of float </span>
+<span class="sd">            Array of background fluxes to be extracted in a single column on the detector </span>
+<span class="sd">    </span>
+<span class="sd">        Return </span>
+<span class="sd">        ------</span>
+<span class="sd">        int</span>
+<span class="sd">            Top most pixel to be extracted </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sn_old</span><span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,(</span><span class="nb">len</span><span class="p">(</span><span class="n">signal_col</span><span class="p">)</span><span class="o">-</span><span class="n">cen</span><span class="o">+</span><span class="mi">1</span><span class="p">)):</span> <span class="c1">#1,2,3,4,5,6 range(1,6).. center=5, edge =10</span>
+            <span class="n">sig_sum</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">signal_col</span><span class="p">[</span><span class="n">cen</span><span class="p">:</span><span class="n">cen</span><span class="o">+</span><span class="n">ii</span><span class="p">])</span>
+            <span class="n">noi_sum</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">noise_col</span><span class="p">[</span><span class="n">cen</span><span class="p">:</span><span class="n">cen</span><span class="o">+</span><span class="n">ii</span><span class="p">]))</span>
+            <span class="n">bkg_sum</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">bkg_col</span><span class="p">[</span><span class="n">cen</span><span class="p">:</span><span class="n">cen</span><span class="o">+</span><span class="n">ii</span><span class="p">])</span>
+            <span class="n">sn_new</span> <span class="o">=</span> <span class="n">sig_sum</span><span class="o">/</span><span class="n">noi_sum</span>
+
+            <span class="k">if</span> <span class="n">sn_old</span> <span class="o">&gt;=</span><span class="n">sn_new</span><span class="p">:</span>               
+                <span class="k">return</span> <span class="n">cen</span><span class="o">+</span><span class="n">ii</span><span class="o">-</span><span class="mi">1</span>                     
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">sn_old</span> <span class="o">=</span> <span class="n">sn_new</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">signal_col</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span> </div>
+
+
+<div class="viewcode-block" id="ExtractSpec.sum_spatial"><a class="viewcode-back" href="../../engine.html#engine.compute_noise.ExtractSpec.sum_spatial">[docs]</a>    <span class="k">def</span> <span class="nf">sum_spatial</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">extract_info</span><span class="p">):</span>    
+        <span class="sd">&quot;&quot;&quot;Sum pixel in the spatial direction </span>
+<span class="sd">        </span>
+<span class="sd">        Takes extraction info from `extract_region` and sums pixels in that region </span>
+<span class="sd">        taking into account integrations and number of transits </span>
+<span class="sd">        </span>
+<span class="sd">        Parameters </span>
+<span class="sd">        ----------</span>
+<span class="sd">        extract_info : dict </span>
+<span class="sd">            Dictionary with information on extraction box, flux and noise products</span>
+<span class="sd">            </span>
+<span class="sd">        Return</span>
+<span class="sd">        ------</span>
+<span class="sd">        dict </span>
+<span class="sd">            Dictionary with all extracted 1d products including noise, background, fluxes </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">nocc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nocc</span>
+        <span class="n">nint_in</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nint_in</span>
+        <span class="n">nint_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nint_out</span>
+        <span class="n">LBout</span> <span class="o">=</span> <span class="n">extract_info</span><span class="p">[</span><span class="s1">&#39;bounds&#39;</span><span class="p">][</span><span class="s1">&#39;LBout&#39;</span><span class="p">]</span>
+        <span class="n">LBin</span> <span class="o">=</span> <span class="n">extract_info</span><span class="p">[</span><span class="s1">&#39;bounds&#39;</span><span class="p">][</span><span class="s1">&#39;LBin&#39;</span><span class="p">]</span>
+        <span class="n">UBin</span> <span class="o">=</span> <span class="n">extract_info</span><span class="p">[</span><span class="s1">&#39;bounds&#39;</span><span class="p">][</span><span class="s1">&#39;UBin&#39;</span><span class="p">]</span>
+        <span class="n">UBout</span> <span class="o">=</span> <span class="n">extract_info</span><span class="p">[</span><span class="s1">&#39;bounds&#39;</span><span class="p">][</span><span class="s1">&#39;UBout&#39;</span><span class="p">]</span>
+        <span class="n">photon_sig_in</span> <span class="o">=</span> <span class="n">extract_info</span><span class="p">[</span><span class="s1">&#39;photons&#39;</span><span class="p">][</span><span class="s1">&#39;photon_sig_in&#39;</span><span class="p">]</span>    
+        <span class="n">photon_sig_out</span> <span class="o">=</span> <span class="n">extract_info</span><span class="p">[</span><span class="s1">&#39;photons&#39;</span><span class="p">][</span><span class="s1">&#39;photon_sig_out&#39;</span><span class="p">]</span>
+        <span class="n">var_pix_in</span> <span class="o">=</span> <span class="n">extract_info</span><span class="p">[</span><span class="s1">&#39;photons&#39;</span><span class="p">][</span><span class="s1">&#39;var_pix_in&#39;</span><span class="p">]</span>
+        <span class="n">var_pix_out</span> <span class="o">=</span> <span class="n">extract_info</span><span class="p">[</span><span class="s1">&#39;photons&#39;</span><span class="p">][</span><span class="s1">&#39;var_pix_out&#39;</span><span class="p">]</span>
+        <span class="n">photon_sky_in</span> <span class="o">=</span> <span class="n">extract_info</span><span class="p">[</span><span class="s1">&#39;noise&#39;</span><span class="p">][</span><span class="s1">&#39;photon_sky_in&#39;</span><span class="p">]</span>
+        <span class="n">photon_sky_out</span> <span class="o">=</span> <span class="n">extract_info</span><span class="p">[</span><span class="s1">&#39;noise&#39;</span><span class="p">][</span><span class="s1">&#39;photon_sky_out&#39;</span><span class="p">]</span>
+        <span class="n">rn_var_in</span> <span class="o">=</span> <span class="n">extract_info</span><span class="p">[</span><span class="s1">&#39;noise&#39;</span><span class="p">][</span><span class="s1">&#39;rn_var_in&#39;</span><span class="p">]</span>
+        <span class="n">rn_var_out</span> <span class="o">=</span> <span class="n">extract_info</span><span class="p">[</span><span class="s1">&#39;noise&#39;</span><span class="p">][</span><span class="s1">&#39;rn_var_out&#39;</span><span class="p">]</span>
+
+
+        <span class="n">rr</span><span class="p">,</span> <span class="n">lenw</span> <span class="o">=</span> <span class="n">photon_sig_in</span><span class="o">.</span><span class="n">shape</span>
+
+        <span class="c1"># sum spectrum in the spatial direction to create 1d spectrum </span>
+        <span class="n">photon_out_1d</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">lenw</span><span class="p">)</span>
+        <span class="n">photon_in_1d</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">lenw</span><span class="p">)</span>
+        <span class="n">var_out_1d</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">lenw</span><span class="p">)</span>
+        <span class="n">var_in_1d</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">lenw</span><span class="p">)</span>
+        <span class="n">sky_in_1d</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">lenw</span><span class="p">)</span>
+        <span class="n">sky_out_1d</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">lenw</span><span class="p">)</span>
+        <span class="n">rn_in_1d</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">lenw</span><span class="p">)</span>
+        <span class="n">rn_out_1d</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">lenw</span><span class="p">)</span>
+
+
+        <span class="c1">#sum 2d spectrum in extraction region in spatial direciton to create 1d spec</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">lenw</span><span class="p">):</span>
+            <span class="n">photon_out_1d</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">photon_sig_out</span><span class="p">[</span><span class="n">LBout</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span><span class="n">UBout</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">i</span><span class="p">])</span><span class="o">*</span><span class="n">nint_out</span><span class="o">*</span><span class="n">nocc</span>
+            <span class="n">photon_in_1d</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">photon_sig_in</span><span class="p">[</span><span class="n">LBout</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span><span class="n">UBout</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">i</span><span class="p">])</span><span class="o">*</span><span class="n">nint_in</span><span class="o">*</span><span class="n">nocc</span>
+            <span class="n">var_out_1d</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">var_pix_out</span><span class="p">[</span><span class="n">LBout</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span><span class="n">UBout</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">i</span><span class="p">])</span><span class="o">*</span><span class="n">nint_out</span><span class="o">*</span><span class="n">nocc</span>
+            <span class="n">var_in_1d</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">var_pix_in</span><span class="p">[</span><span class="n">LBout</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span><span class="n">UBout</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">i</span><span class="p">])</span><span class="o">*</span><span class="n">nint_in</span><span class="o">*</span><span class="n">nocc</span>
+            <span class="n">sky_out_1d</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">photon_sky_out</span><span class="p">[</span><span class="n">LBout</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span><span class="n">UBout</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">i</span><span class="p">])</span><span class="o">*</span><span class="n">nint_out</span><span class="o">*</span><span class="n">nocc</span>
+            <span class="n">sky_in_1d</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">photon_sky_in</span><span class="p">[</span><span class="n">LBout</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span><span class="n">UBout</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">i</span><span class="p">])</span><span class="o">*</span><span class="n">nint_in</span><span class="o">*</span><span class="n">nocc</span>
+            <span class="n">rn_out_1d</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">rn_var_out</span><span class="p">[</span><span class="n">LBout</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span><span class="n">UBout</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">i</span><span class="p">])</span><span class="o">*</span><span class="n">nint_out</span><span class="o">*</span><span class="n">nocc</span>
+            <span class="n">rn_in_1d</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">rn_var_in</span><span class="p">[</span><span class="n">LBout</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span><span class="n">UBout</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">i</span><span class="p">])</span><span class="o">*</span><span class="n">nint_in</span><span class="o">*</span><span class="n">nocc</span>
+
+
+        <span class="n">photon_out_1d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">photon_out_1d</span><span class="p">)</span>
+        <span class="n">photon_in_1d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">photon_in_1d</span><span class="p">)</span>
+        <span class="n">var_out_1d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">var_out_1d</span><span class="p">)</span>
+        <span class="n">var_in_1d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">var_in_1d</span><span class="p">)</span>
+        <span class="n">sky_in_1d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sky_in_1d</span><span class="p">)</span>
+        <span class="n">sky_out_1d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sky_out_1d</span><span class="p">)</span>
+        <span class="n">rn_out_1d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">rn_out_1d</span><span class="p">)</span>
+        <span class="n">rn_in_1d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">rn_in_1d</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;photon_out_1d&#39;</span><span class="p">:</span><span class="n">photon_out_1d</span><span class="p">,</span> <span class="s1">&#39;photon_in_1d&#39;</span><span class="p">:</span><span class="n">photon_in_1d</span><span class="p">,</span> 
+                <span class="s1">&#39;var_in_1d&#39;</span><span class="p">:</span><span class="n">var_in_1d</span><span class="p">,</span> <span class="s1">&#39;var_out_1d&#39;</span><span class="p">:</span><span class="n">var_out_1d</span><span class="p">,</span> <span class="s1">&#39;rn_in_1d&#39;</span><span class="p">:</span><span class="n">rn_in_1d</span><span class="p">,</span>
+                <span class="s1">&#39;rn_out_1d&#39;</span><span class="p">:</span><span class="n">rn_out_1d</span><span class="p">,</span><span class="s1">&#39;sky_in_1d&#39;</span><span class="p">:</span> <span class="n">sky_in_1d</span><span class="p">,</span> <span class="s1">&#39;sky_out_1d&#39;</span><span class="p">:</span> <span class="n">sky_out_1d</span><span class="p">,</span> 
+                <span class="s1">&#39;extract_info&#39;</span><span class="p">:</span><span class="n">extract_info</span><span class="p">,</span><span class="s1">&#39;on_source_in&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">on_source_in</span><span class="p">,</span> 
+                <span class="s1">&#39;on_source_out&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">on_source_out</span><span class="p">}</span></div>
+
+<div class="viewcode-block" id="ExtractSpec.extract_region"><a class="viewcode-back" href="../../engine.html#engine.compute_noise.ExtractSpec.extract_region">[docs]</a>    <span class="k">def</span> <span class="nf">extract_region</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="c1">#second to last </span>
+        <span class="sd">&quot;&quot;&quot;Determine extraction Region</span>
+<span class="sd">        </span>
+<span class="sd">        Contains functionality to determine extraction region from Pandeia 2d noise </span>
+<span class="sd">        simulations. Calls `self.loopingL` and `self.loopingU`. </span>
+<span class="sd">        </span>
+<span class="sd">        Return</span>
+<span class="sd">        ------</span>
+<span class="sd">        dict </span>
+<span class="sd">            bounding regions, photon and noise to be summed </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">inn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inn</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">out</span>
+        <span class="n">exptime_per_int</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exptime_per_int</span>
+        <span class="n">ngroups_per_int</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ngroups_per_int</span>
+        <span class="c1">#Full variance including all noise sources</span>
+        <span class="n">detector_var</span><span class="o">=</span><span class="n">out</span><span class="o">.</span><span class="n">noise</span><span class="o">.</span><span class="n">var_pix</span>
+        <span class="c1">#Standard deviation (i.e. sqrt(detector_var))</span>
+        <span class="n">detector_stdev</span><span class="o">=</span><span class="n">out</span><span class="o">.</span><span class="n">noise</span><span class="o">.</span><span class="n">stdev_pix</span>
+
+        <span class="c1">#signal (no noise no background)</span>
+        <span class="n">s_out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">signals</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">rate</span> 
+        <span class="n">s_in</span> <span class="o">=</span> <span class="n">inn</span><span class="o">.</span><span class="n">signals</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">rate</span> 
+
+        <span class="c1">#size of wavelength direction </span>
+        <span class="n">rr</span><span class="p">,</span><span class="n">lenw</span> <span class="o">=</span> <span class="n">s_out</span><span class="o">.</span><span class="n">shape</span>
+
+        <span class="c1">#background </span>
+        <span class="n">bkgd_out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">signals</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">rate_plus_bg</span> <span class="o">-</span> <span class="n">out</span><span class="o">.</span><span class="n">signals</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">rate</span>
+        <span class="n">bkgd_in</span> <span class="o">=</span> <span class="n">inn</span><span class="o">.</span><span class="n">signals</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">rate_plus_bg</span> <span class="o">-</span> <span class="n">inn</span><span class="o">.</span><span class="n">signals</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">rate</span>
+
+
+        <span class="c1">#define psf center based on max value on detector</span>
+        <span class="n">cenRo</span><span class="p">,</span><span class="n">cenCo</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unravel_index</span><span class="p">(</span><span class="n">s_out</span><span class="o">.</span><span class="n">argmax</span><span class="p">(),</span> <span class="n">s_out</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="n">cenRi</span><span class="p">,</span><span class="n">cenCi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unravel_index</span><span class="p">(</span><span class="n">s_out</span><span class="o">.</span><span class="n">argmax</span><span class="p">(),</span> <span class="n">s_in</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+        <span class="c1">#define out of transit parameters to calculate extraction region</span>
+
+        <span class="c1">#multiaccum sample data factor </span>
+        <span class="n">factor_flux</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="c1">#6.0/5.0*(ngroups_per_int**2.0+1.0)/(ngroups_per_int**2.0+ngroups_per_int)</span>
+        <span class="n">factor_rn</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="c1">#12.0*(ngroups_per_int-1.0)/(ngroups_per_int**2.0 + ngroups_per_int)</span>
+
+        <span class="n">photon_sig_out</span> <span class="o">=</span> <span class="n">s_out</span><span class="o">*</span><span class="n">exptime_per_int</span><span class="o">*</span><span class="n">factor_flux</span> <span class="c1">#total photons per pixel in signal</span>
+        <span class="n">photon_sky_out</span> <span class="o">=</span> <span class="n">bkgd_out</span><span class="o">*</span><span class="n">exptime_per_int</span><span class="o">*</span><span class="n">factor_flux</span> <span class="c1">#total photons per pixel in background </span>
+        <span class="c1">#variance stricly due to detector readnoise.. You might think this is </span>
+        <span class="c1">#wrong because usually RN isnt multiplie by time.. but Pandeia gives RN in rms/ sec. </span>
+        <span class="n">rn_var_out</span><span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">noise</span><span class="o">.</span><span class="n">var_rn_pix</span><span class="o">*</span><span class="n">exptime_per_int</span><span class="o">*</span><span class="n">factor_rn</span> 
+
+        <span class="n">var_pix_out</span> <span class="o">=</span> <span class="n">photon_sig_out</span> <span class="o">+</span> <span class="n">photon_sky_out</span> <span class="o">+</span> <span class="n">rn_var_out</span> <span class="c1"># variance of noise per pixel</span>
+
+        <span class="c1">#define parameters for IN transit </span>
+        <span class="n">photon_sig_in</span> <span class="o">=</span> <span class="n">s_in</span><span class="o">*</span><span class="n">exptime_per_int</span><span class="o">*</span><span class="n">factor_flux</span> <span class="c1">#total photons per pixel in signal</span>
+        <span class="n">photon_sky_in</span> <span class="o">=</span> <span class="n">bkgd_in</span><span class="o">*</span><span class="n">exptime_per_int</span><span class="o">*</span><span class="n">factor_flux</span> <span class="c1">#total photons per pixel in background </span>
+        <span class="n">rn_var_in</span><span class="o">=</span> <span class="n">inn</span><span class="o">.</span><span class="n">noise</span><span class="o">.</span><span class="n">var_rn_pix</span><span class="o">*</span><span class="n">exptime_per_int</span><span class="o">*</span><span class="n">factor_rn</span> <span class="c1">#variance stricly due to detector readnoise</span>
+        <span class="n">var_pix_in</span> <span class="o">=</span> <span class="n">photon_sig_in</span> <span class="o">+</span> <span class="n">photon_sky_in</span> <span class="o">+</span> <span class="n">rn_var_in</span> <span class="c1"># variance of noise per pixel </span>
+
+        <span class="n">UBout</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">lenw</span><span class="p">)</span>
+        <span class="n">LBout</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">lenw</span><span class="p">)</span>
+        <span class="n">UBin</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">lenw</span><span class="p">)</span>
+        <span class="n">LBin</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">lenw</span><span class="p">)</span>
+
+
+        <span class="c1">#start new loop over column</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">lenw</span><span class="p">):</span>
+
+            <span class="c1">#define column of interest</span>
+            <span class="n">noise_col_out</span> <span class="o">=</span> <span class="n">var_pix_out</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]</span>
+            <span class="n">signal_col_out</span> <span class="o">=</span> <span class="n">photon_sig_out</span><span class="p">[:,</span><span class="n">j</span><span class="p">]</span>
+            <span class="n">bkg_col_out</span> <span class="o">=</span> <span class="n">photon_sky_out</span><span class="p">[:,</span><span class="n">j</span><span class="p">]</span>
+            <span class="n">rn_col_out</span> <span class="o">=</span> <span class="n">rn_var_out</span><span class="p">[:,</span><span class="n">j</span><span class="p">]</span>
+
+            <span class="n">noise_col_in</span> <span class="o">=</span>  <span class="n">var_pix_in</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]</span>
+            <span class="n">signal_col_in</span> <span class="o">=</span> <span class="n">photon_sig_in</span><span class="p">[:,</span><span class="n">j</span><span class="p">]</span>
+            <span class="n">bkg_col_in</span> <span class="o">=</span> <span class="n">photon_sky_in</span><span class="p">[:,</span><span class="n">j</span><span class="p">]</span>
+
+
+            <span class="c1">#store lower and upper bound extraction regions for in and out of transit </span>
+            <span class="n">LBout</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loopingL</span><span class="p">(</span><span class="n">cenRo</span><span class="p">,</span> <span class="n">signal_col_out</span><span class="p">,</span> <span class="n">noise_col_out</span><span class="p">,</span> <span class="n">bkg_col_out</span><span class="p">)</span>
+            <span class="n">UBout</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loopingU</span><span class="p">(</span><span class="n">cenRo</span><span class="p">,</span> <span class="n">signal_col_out</span><span class="p">,</span> <span class="n">noise_col_out</span><span class="p">,</span> <span class="n">bkg_col_out</span><span class="p">)</span>
+            <span class="n">LBin</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loopingL</span><span class="p">(</span><span class="n">cenRi</span><span class="p">,</span> <span class="n">signal_col_in</span><span class="p">,</span> <span class="n">noise_col_in</span><span class="p">,</span> <span class="n">bkg_col_in</span>    <span class="p">)</span>
+            <span class="n">UBin</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loopingU</span><span class="p">(</span><span class="n">cenRi</span><span class="p">,</span> <span class="n">signal_col_in</span><span class="p">,</span> <span class="n">noise_col_in</span><span class="p">,</span> <span class="n">bkg_col_in</span><span class="p">)</span>
+
+        <span class="c1">#this could be made more elegant later... not very efficient </span>
+        <span class="n">noise</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;rn_var_out&#39;</span><span class="p">:</span><span class="n">rn_var_out</span><span class="p">,</span> <span class="s1">&#39;rn_var_in&#39;</span><span class="p">:</span><span class="n">rn_var_in</span><span class="p">,</span> 
+                 <span class="s1">&#39;photon_sky_in&#39;</span><span class="p">:</span><span class="n">photon_sky_in</span><span class="p">,</span> <span class="s1">&#39;photon_sky_out&#39;</span><span class="p">:</span> <span class="n">photon_sky_out</span> <span class="p">}</span>
+        <span class="n">bounds</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;LBout&#39;</span><span class="p">:</span><span class="n">LBout</span><span class="p">,</span> <span class="s1">&#39;UBout&#39;</span><span class="p">:</span><span class="n">UBout</span><span class="p">,</span> <span class="s1">&#39;LBin&#39;</span><span class="p">:</span><span class="n">LBin</span><span class="p">,</span> <span class="s1">&#39;UBin&#39;</span><span class="p">:</span><span class="n">UBin</span><span class="p">}</span>
+        <span class="n">photons</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;photon_sig_out&#39;</span><span class="p">:</span> <span class="n">photon_sig_out</span><span class="p">,</span> <span class="s1">&#39;photon_sig_in&#39;</span><span class="p">:</span><span class="n">photon_sig_in</span><span class="p">,</span> 
+                   <span class="s1">&#39;var_pix_in&#39;</span><span class="p">:</span><span class="n">var_pix_in</span><span class="p">,</span><span class="s1">&#39;var_pix_out&#39;</span><span class="p">:</span> <span class="n">var_pix_out</span><span class="p">}</span>
+        <span class="n">extract_info</span> <span class="o">=</span><span class="p">{</span><span class="s1">&#39;bounds&#39;</span><span class="p">:</span><span class="n">bounds</span><span class="p">,</span> <span class="s1">&#39;photons&#39;</span><span class="p">:</span><span class="n">photons</span><span class="p">,</span> <span class="s1">&#39;noise&#39;</span><span class="p">:</span><span class="n">noise</span><span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">extract_info</span></div>
+
+<div class="viewcode-block" id="ExtractSpec.run_2d_extract"><a class="viewcode-back" href="../../engine.html#engine.compute_noise.ExtractSpec.run_2d_extract">[docs]</a>    <span class="k">def</span> <span class="nf">run_2d_extract</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Extract noise from 2d detector image</span>
+<span class="sd">            </span>
+<span class="sd">        Contains functionality to extract noise from 2d detector image</span>
+<span class="sd">            </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict </span>
+<span class="sd">            all optimally extracted 1d products  </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">#optimize SNR and extract region </span>
+        <span class="n">extract</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">extract_region</span><span class="p">()</span>
+        <span class="c1">#return summed up pixels </span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sum_spatial</span><span class="p">(</span><span class="n">extract</span><span class="p">)</span></div>
+        
+        
+<div class="viewcode-block" id="ExtractSpec.run_slope_method"><a class="viewcode-back" href="../../engine.html#engine.compute_noise.ExtractSpec.run_slope_method">[docs]</a>    <span class="k">def</span> <span class="nf">run_slope_method</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+        <span class="sd">&quot;&quot;&quot;Compute noise using Pandeia 1d noise</span>
+<span class="sd">        </span>
+<span class="sd">        Contains functionality to compute noise using Pandeia 1d noise </span>
+<span class="sd">        output products (uses MULTIACCUM) noise formula </span>
+<span class="sd">        </span>
+<span class="sd">        Return</span>
+<span class="sd">        ------</span>
+<span class="sd">        dict </span>
+<span class="sd">            all optimally extracted 1d products        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">curves_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;1d&#39;</span><span class="p">]</span>
+        <span class="n">curves_inn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inn</span><span class="p">[</span><span class="s1">&#39;1d&#39;</span><span class="p">]</span>
+        <span class="n">noccultations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nocc</span>
+        <span class="c1">#In the following the SN is changed to incorporate number of occultations </span>
+        <span class="c1">#i.e. multiply by sqrt(n) </span>
+        <span class="n">sn_in</span> <span class="o">=</span> <span class="n">curves_inn</span><span class="p">[</span><span class="s1">&#39;sn&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">noccultations</span><span class="p">)</span>
+        <span class="n">sn_out</span> <span class="o">=</span> <span class="n">curves_out</span><span class="p">[</span><span class="s1">&#39;sn&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">noccultations</span><span class="p">)</span>
+
+        <span class="n">extracted_flux_inn</span> <span class="o">=</span> <span class="n">curves_inn</span><span class="p">[</span><span class="s1">&#39;extracted_flux&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">extracted_noise_inn</span> <span class="o">=</span> <span class="n">curves_inn</span><span class="p">[</span><span class="s1">&#39;extracted_flux&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="p">(</span><span class="n">sn_in</span><span class="p">)</span>
+
+        <span class="n">extracted_flux_out</span> <span class="o">=</span> <span class="n">curves_out</span><span class="p">[</span><span class="s1">&#39;extracted_flux&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">extracted_noise_out</span> <span class="o">=</span> <span class="n">curves_out</span><span class="p">[</span><span class="s1">&#39;extracted_flux&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="p">(</span><span class="n">sn_out</span><span class="p">)</span>
+
+        <span class="c1">#units of this unconventional.. sigma/s</span>
+        <span class="c1">#because snr = extracted flux / extracted noise and </span>
+        <span class="c1">#extracted flux in units of electrons /s</span>
+        <span class="n">varin</span> <span class="o">=</span> <span class="p">(</span><span class="n">extracted_noise_inn</span><span class="p">)</span><span class="o">**</span><span class="mf">2.0</span>
+        <span class="n">varout</span> <span class="o">=</span> <span class="p">(</span><span class="n">extracted_noise_out</span><span class="p">)</span><span class="o">**</span><span class="mf">2.0</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;photon_out_1d&#39;</span><span class="p">:</span><span class="n">extracted_flux_out</span><span class="p">,</span> <span class="s1">&#39;photon_in_1d&#39;</span><span class="p">:</span><span class="n">extracted_flux_inn</span><span class="p">,</span> 
+                    <span class="s1">&#39;var_in_1d&#39;</span><span class="p">:</span><span class="n">varin</span><span class="p">,</span> <span class="s1">&#39;var_out_1d&#39;</span><span class="p">:</span> <span class="n">varout</span><span class="p">,</span><span class="s1">&#39;on_source_in&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">on_source_in</span><span class="p">,</span> 
+                <span class="s1">&#39;on_source_out&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">on_source_out</span><span class="p">}</span></div>
+    
+    
+<div class="viewcode-block" id="ExtractSpec.run_f_minus_l"><a class="viewcode-back" href="../../engine.html#engine.compute_noise.ExtractSpec.run_f_minus_l">[docs]</a>    <span class="k">def</span> <span class="nf">run_f_minus_l</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Compute noise using first minus last formula</span>
+<span class="sd">        </span>
+<span class="sd">        Uses 1d exracted products from pandeia to compute noise without </span>
+<span class="sd">        multiaccum noise formula from Rauscher 07. Includes readnoise </span>
+<span class="sd">        background. </span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict </span>
+<span class="sd">            all optimally extracted 1d products        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">inn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inn</span>
+        <span class="n">curves_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;1d&#39;</span><span class="p">]</span>
+        <span class="n">curves_inn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inn</span><span class="p">[</span><span class="s1">&#39;1d&#39;</span><span class="p">]</span>
+        
+        
+        <span class="c1">#on source out versus in </span>
+        <span class="n">on_source_in</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_source_in</span>
+        <span class="n">on_source_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_source_out</span>
+
+        <span class="c1">#calculate rn </span>
+        <span class="n">rn_var</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rn</span><span class="o">**</span><span class="mf">2.0</span>
+                
+
+        <span class="c1">#1d rn     = rn/pix * # of integrations *nocc  * #pixs </span>
+        <span class="n">rn_var_inn</span> <span class="o">=</span> <span class="n">rn_var</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">nint_in</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">nocc</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">extraction_area</span> 
+        <span class="n">rn_var_out</span> <span class="o">=</span> <span class="n">rn_var</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">nint_out</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">nocc</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">extraction_area</span> 
+        
+        <span class="c1">#extract fluxs</span>
+        <span class="n">extracted_flux_inn</span> <span class="o">=</span> <span class="n">curves_inn</span><span class="p">[</span><span class="s1">&#39;extracted_flux&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">on_source_in</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">nocc</span>
+        <span class="n">extracted_flux_out</span> <span class="o">=</span> <span class="n">curves_out</span><span class="p">[</span><span class="s1">&#39;extracted_flux&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">on_source_out</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">nocc</span>
+                
+        <span class="c1">#background + contamination extracted </span>
+        <span class="n">bkg_flux_inn</span> <span class="o">=</span> <span class="n">curves_inn</span><span class="p">[</span><span class="s1">&#39;extracted_bg_only&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">on_source_in</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">nocc</span>
+        <span class="n">bkg_flux_out</span> <span class="o">=</span> <span class="n">curves_out</span><span class="p">[</span><span class="s1">&#39;extracted_bg_only&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">on_source_out</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">nocc</span>
+        
+        <span class="c1">#total nois </span>
+        <span class="n">varin</span> <span class="o">=</span> <span class="p">(</span><span class="n">extracted_flux_inn</span> <span class="o">+</span> <span class="n">bkg_flux_inn</span> <span class="o">+</span> <span class="n">rn_var_inn</span><span class="p">)</span><span class="o">/</span><span class="n">on_source_in</span><span class="o">**</span><span class="mf">2.0</span>
+        <span class="n">varout</span> <span class="o">=</span> <span class="p">(</span><span class="n">extracted_flux_out</span> <span class="o">+</span> <span class="n">bkg_flux_out</span> <span class="o">+</span> <span class="n">rn_var_out</span><span class="p">)</span><span class="o">/</span><span class="n">on_source_out</span><span class="o">**</span><span class="mf">2.0</span>
+        
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;photon_out_1d&#39;</span><span class="p">:</span><span class="n">extracted_flux_out</span><span class="o">/</span><span class="n">on_source_out</span><span class="p">,</span> <span class="s1">&#39;photon_in_1d&#39;</span><span class="p">:</span><span class="n">extracted_flux_inn</span><span class="o">/</span><span class="n">on_source_in</span><span class="p">,</span> 
+                    <span class="s1">&#39;var_in_1d&#39;</span><span class="p">:</span><span class="n">varin</span><span class="p">,</span> <span class="s1">&#39;var_out_1d&#39;</span><span class="p">:</span> <span class="n">varout</span><span class="p">,</span><span class="s1">&#39;on_source_in&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">on_source_in</span><span class="p">,</span> 
+                <span class="s1">&#39;on_source_out&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">on_source_out</span><span class="p">}</span></div>
+    
+
+    
+<div class="viewcode-block" id="ExtractSpec.run_phase_spec"><a class="viewcode-back" href="../../engine.html#engine.compute_noise.ExtractSpec.run_phase_spec">[docs]</a>    <span class="k">def</span> <span class="nf">run_phase_spec</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Computes time dependent noise for phase curves.</span>
+<span class="sd">        </span>
+<span class="sd">        Computes noise for phase curve analysis instead of spectroscopy. </span>
+<span class="sd">        Using MULTIACCUM formula here but this could be changed in the future.  Does not </span>
+<span class="sd">        return a spectra for each time element... On your own for that. </span>
+<span class="sd">        </span>
+<span class="sd">        Return</span>
+<span class="sd">        ------</span>
+<span class="sd">        dict </span>
+<span class="sd">            all optimally extracted 1d products        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inn</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span>
+        <span class="n">tint</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exptime_per_int</span> 
+        <span class="n">curves_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">out</span><span class="o">.</span><span class="n">curves</span>
+        <span class="c1">#don&#39;t be an idiot and input a ridiculously low res phase curve</span>
+        <span class="n">new_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">time</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">time</span><span class="p">),</span> <span class="n">tint</span><span class="p">)</span> 
+        <span class="n">planet_phase</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">new_t</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">inn</span><span class="p">[</span><span class="s1">&#39;planet_phase&#39;</span><span class="p">])</span>
+
+        <span class="n">rn_var</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rn</span><span class="o">**</span><span class="mf">2.0</span>
+
+
+        <span class="c1">#1d rn     = rn/pix * # of integrations *nocc  * #pixs </span>
+        <span class="n">rn_var_out</span> <span class="o">=</span> <span class="n">rn_var</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">nocc</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">extraction_area</span>  <span class="c1"># the initial output is always sampled by 1 integration</span>
+   
+        <span class="n">extracted_flux_out</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">curves_out</span><span class="p">[</span><span class="s1">&#39;extracted_flux&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="n">tint</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">nocc</span>
+        
+        <span class="n">flux_time_out</span> <span class="o">=</span> <span class="n">extracted_flux_out</span><span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">new_t</span><span class="p">))</span>
+        
+        <span class="n">flux_time_in</span> <span class="o">=</span> <span class="n">flux_time_out</span><span class="o">*</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">planet_phase</span><span class="p">)</span>
+        
+        <span class="n">bkg_flux_out</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">curves_out</span><span class="p">[</span><span class="s1">&#39;extracted_bg_only&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="n">tint</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">nocc</span>
+        
+        <span class="n">varout</span> <span class="o">=</span> <span class="n">flux_time_out</span> <span class="o">+</span> <span class="n">bkg_flux_out</span> <span class="o">+</span> <span class="n">rn_var_out</span>
+        <span class="n">varin</span> <span class="o">=</span> <span class="n">flux_time_in</span> <span class="o">+</span> <span class="n">bkg_flux_out</span> <span class="o">+</span> <span class="n">rn_var_out</span>
+ 
+        
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;photon_out_1d&#39;</span><span class="p">:</span><span class="n">flux_time_out</span><span class="p">,</span> <span class="s1">&#39;photon_in_1d&#39;</span><span class="p">:</span><span class="n">flux_time_in</span><span class="p">,</span> 
+                    <span class="s1">&#39;var_in_1d&#39;</span><span class="p">:</span><span class="n">varin</span><span class="p">,</span> <span class="s1">&#39;var_out_1d&#39;</span><span class="p">:</span> <span class="n">varout</span><span class="p">,</span> <span class="s1">&#39;time&#39;</span><span class="p">:</span><span class="n">new_t</span><span class="p">,</span><span class="s1">&#39;on_source_in&#39;</span><span class="p">:</span><span class="s1">&#39;N/A&#39;</span><span class="p">,</span> 
+                <span class="s1">&#39;on_source_out&#39;</span><span class="p">:</span><span class="s1">&#39;N/A&#39;</span><span class="p">}</span></div></div>
+        
+
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">PandExo  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016, Natasha Batalha;Kevin Stevenson.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

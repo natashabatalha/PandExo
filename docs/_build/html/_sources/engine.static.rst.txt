@@ -1,0 +1,20 @@
+engine.static package
+=====================
+
+Subpackages
+-----------
+
+.. toctree::
+
+    engine.static.css
+    engine.static.fonts
+    engine.static.img
+    engine.static.js
+
+Module contents
+---------------
+
+.. automodule:: engine.static
+    :members:
+    :undoc-members:
+    :show-inheritance:

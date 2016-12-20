@@ -1,0 +1,10 @@
+engine.static.fonts package
+===========================
+
+Module contents
+---------------
+
+.. automodule:: engine.static.fonts
+    :members:
+    :undoc-members:
+    :show-inheritance:

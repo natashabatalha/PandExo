@@ -1,0 +1,401 @@
+
+
+<!doctype html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>engine.justplotit &#8212; PandExo  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">PandExo  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for engine.justplotit</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">bokeh.plotting</span> <span class="k">import</span> <span class="n">show</span><span class="p">,</span> <span class="n">figure</span>
+<span class="kn">from</span> <span class="nn">bokeh.io</span> <span class="k">import</span> <span class="n">output_file</span> <span class="k">as</span> <span class="n">outputfile</span>
+<span class="kn">import</span> <span class="nn">pickle</span> <span class="k">as</span> <span class="nn">pk</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<div class="viewcode-block" id="jwst_1d_spec"><a class="viewcode-back" href="../../engine.html#engine.justplotit.jwst_1d_spec">[docs]</a><span class="k">def</span> <span class="nf">jwst_1d_spec</span><span class="p">(</span><span class="n">result_dict</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Model + Data + Error Bars&#39;</span><span class="p">,</span> <span class="n">output_file</span> <span class="o">=</span> <span class="s1">&#39;data.html&#39;</span><span class="p">,</span><span class="n">legend</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> 
+        <span class="n">R</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="n">num_tran</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">plot_width</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span> <span class="n">plot_height</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span><span class="n">x_range</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">10</span><span class="p">]):</span>
+    <span class="sd">&quot;&quot;&quot;Plots 1d simulated spectrum and rebin or rescale for more transits</span>
+<span class="sd">    </span>
+<span class="sd">    Plots 1d data points with model in the background (if wanted). Designed to read in exact </span>
+<span class="sd">    output of run_pandexo. </span>
+<span class="sd">    </span>
+<span class="sd">    Parameters </span>
+<span class="sd">    ----------</span>
+<span class="sd">    result_dict : dict or list of dict</span>
+<span class="sd">        Dictionary from pandexo output. If parameter space was run in run_pandexo </span>
+<span class="sd">        make sure to restructure the input as a list of dictionaries without they key words </span>
+<span class="sd">        that run_pandexo assigns. </span>
+<span class="sd">    model : bool </span>
+<span class="sd">        (Optional) True is default. True plots model, False does not plot model     </span>
+<span class="sd">    title : str</span>
+<span class="sd">        (Optional) Title of plot. Default is &quot;Model + Data + Error Bars&quot;.  </span>
+<span class="sd">    output_file : str </span>
+<span class="sd">        (Optional) name of html file for you bokeh plot. After bokeh plot is rendered you will </span>
+<span class="sd">        have the option to save as png. </span>
+<span class="sd">    legend : bool </span>
+<span class="sd">        (Optional) Default is False. True, plots legend. </span>
+<span class="sd">    R : float </span>
+<span class="sd">        (Optional) Rebin data from native instrument resolution to specified resolution. Dafult is False, </span>
+<span class="sd">        no binning. </span>
+<span class="sd">    num_tran : float</span>
+<span class="sd">        (Optional) Scales data by number of transits to improve error by sqrt(`num_trans`)</span>
+<span class="sd">    plot_width : int </span>
+<span class="sd">        (Optional) Sets the width of the plot. Default = 800</span>
+<span class="sd">    plot_height : int </span>
+<span class="sd">        (Optional) Sets the height of the plot. Default = 400 </span>
+<span class="sd">    x_range : list of int</span>
+<span class="sd">        (Optional) Sets x range of plot. Default = [1,10]</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    x,y,e : list of arrays </span>
+<span class="sd">        Returns wave axis, spectrum and associated error in list format. x[0] will be correspond </span>
+<span class="sd">        to the first dictionary input, x[1] to the second, etc. </span>
+<span class="sd">        </span>
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    </span>
+<span class="sd">    &gt;&gt;&gt; jwst_1d_data(result_dict, num_tran = 3, R = 35) #for a single plot </span>
+<span class="sd">    </span>
+<span class="sd">    If you wanted to save each of the axis that were being plotted: </span>
+<span class="sd">    </span>
+<span class="sd">    &gt;&gt;&gt; x,y,e = jwst_1d_data([result_dict1, result_dict2], model=False, num_tran = 5, R = 100) #for multiple </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">outx</span><span class="o">=</span><span class="p">[]</span>
+    <span class="n">outy</span><span class="o">=</span><span class="p">[]</span>
+    <span class="n">oute</span><span class="o">=</span><span class="p">[]</span>
+    <span class="n">TOOLS</span> <span class="o">=</span> <span class="s2">&quot;pan,wheel_zoom,box_zoom,resize,reset,save&quot;</span>
+    <span class="n">outputfile</span><span class="p">(</span><span class="n">output_file</span><span class="p">)</span>
+    <span class="n">colors</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;black&#39;</span><span class="p">,</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span><span class="s1">&#39;red&#39;</span><span class="p">,</span><span class="s1">&#39;orange&#39;</span><span class="p">,</span><span class="s1">&#39;yellow&#39;</span><span class="p">,</span><span class="s1">&#39;purple&#39;</span><span class="p">,</span><span class="s1">&#39;pink&#39;</span><span class="p">,</span><span class="s1">&#39;cyan&#39;</span><span class="p">,</span><span class="s1">&#39;grey&#39;</span><span class="p">,</span><span class="s1">&#39;brown&#39;</span><span class="p">]</span>
+    <span class="c1">#make sure its iterable</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">result_dict</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">list</span><span class="p">:</span> 
+        <span class="n">result_dict</span> <span class="o">=</span> <span class="p">[</span><span class="n">result_dict</span><span class="p">]</span>
+        
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">legend</span><span class="p">)</span><span class="o">!=</span><span class="nb">bool</span><span class="p">:</span>
+        <span class="n">legend_keys</span> <span class="o">=</span> <span class="n">legend</span>
+        <span class="n">legend</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">legend_keys</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">list</span><span class="p">:</span>
+            <span class="n">legend_keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">legend_keys</span><span class="p">]</span>
+      
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>     
+    <span class="k">for</span> <span class="nb">dict</span> <span class="ow">in</span> <span class="n">result_dict</span><span class="p">:</span> 
+        <span class="n">ntran_old</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;timing&#39;</span><span class="p">][</span><span class="s1">&#39;Number of Transits&#39;</span><span class="p">]</span>
+        <span class="c1">#remove any nans </span>
+        <span class="n">y</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;FinalSpectrum&#39;</span><span class="p">][</span><span class="s1">&#39;spectrum_w_rand&#39;</span><span class="p">]</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;FinalSpectrum&#39;</span><span class="p">][</span><span class="s1">&#39;wave&#39;</span><span class="p">][</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">y</span><span class="p">)]</span>
+        <span class="n">err</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;FinalSpectrum&#39;</span><span class="p">][</span><span class="s1">&#39;error_w_floor&#39;</span><span class="p">][</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">y</span><span class="p">)]</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">y</span><span class="p">)]</span>
+
+        
+        <span class="k">if</span> <span class="p">(</span><span class="n">R</span> <span class="o">==</span> <span class="kc">False</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">num_tran</span> <span class="o">==</span> <span class="kc">False</span><span class="p">):</span> 
+            <span class="n">x</span><span class="o">=</span><span class="n">x</span> 
+            <span class="n">y</span><span class="o">=</span><span class="n">y</span> 
+        <span class="k">elif</span> <span class="p">(</span><span class="n">R</span> <span class="o">!=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">num_tran</span> <span class="o">!=</span> <span class="kc">False</span><span class="p">):</span>     
+            <span class="n">new_wave</span> <span class="o">=</span> <span class="n">Rspec</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">R</span><span class="p">)</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">uniform_tophat_sum</span><span class="p">(</span><span class="n">new_wave</span><span class="p">,</span><span class="n">x</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;RawData&#39;</span><span class="p">][</span><span class="s1">&#39;flux_out&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">num_tran</span><span class="o">/</span><span class="n">ntran_old</span><span class="p">)</span>
+            <span class="n">inn</span> <span class="o">=</span> <span class="n">uniform_tophat_sum</span><span class="p">(</span><span class="n">new_wave</span><span class="p">,</span><span class="n">x</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;RawData&#39;</span><span class="p">][</span><span class="s1">&#39;flux_in&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">num_tran</span><span class="o">/</span><span class="n">ntran_old</span><span class="p">)</span>
+            <span class="n">vout</span> <span class="o">=</span> <span class="n">uniform_tophat_sum</span><span class="p">(</span><span class="n">new_wave</span><span class="p">,</span><span class="n">x</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;RawData&#39;</span><span class="p">][</span><span class="s1">&#39;var_out&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">num_tran</span><span class="o">/</span><span class="n">ntran_old</span><span class="p">)</span>
+            <span class="n">vin</span> <span class="o">=</span> <span class="n">uniform_tophat_sum</span><span class="p">(</span><span class="n">new_wave</span><span class="p">,</span><span class="n">x</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;RawData&#39;</span><span class="p">][</span><span class="s1">&#39;var_in&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">num_tran</span><span class="o">/</span><span class="n">ntran_old</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;Primary/Secondary&#39;</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;fp/f*&#39;</span><span class="p">:</span>
+                <span class="n">fac</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">fac</span> <span class="o">=</span> <span class="mf">1.0</span>
+            <span class="n">rand_noise</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">vin</span><span class="o">+</span><span class="n">vout</span><span class="p">))</span><span class="o">*</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">new_wave</span><span class="p">)))</span>
+            <span class="n">sim_spec</span> <span class="o">=</span> <span class="n">fac</span><span class="o">*</span><span class="p">(</span><span class="n">out</span><span class="o">-</span><span class="n">inn</span> <span class="o">+</span> <span class="n">rand_noise</span><span class="p">)</span><span class="o">/</span><span class="n">out</span> 
+            <span class="n">x</span> <span class="o">=</span> <span class="n">new_wave</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">sim_spec</span>
+            <span class="n">err</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">vout</span><span class="o">+</span><span class="n">vin</span><span class="p">)</span><span class="o">/</span><span class="n">out</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="n">R</span> <span class="o">==</span> <span class="kc">False</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">num_tran</span> <span class="o">!=</span> <span class="kc">False</span><span class="p">):</span>     
+            <span class="n">out</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;RawData&#39;</span><span class="p">][</span><span class="s1">&#39;flux_out&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">num_tran</span><span class="o">/</span><span class="n">ntran_old</span>
+            <span class="n">inn</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;RawData&#39;</span><span class="p">][</span><span class="s1">&#39;flux_in&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">num_tran</span><span class="o">/</span><span class="n">ntran_old</span>
+            <span class="n">vout</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;RawData&#39;</span><span class="p">][</span><span class="s1">&#39;var_out&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">num_tran</span><span class="o">/</span><span class="n">ntran_old</span>
+            <span class="n">vin</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;RawData&#39;</span><span class="p">][</span><span class="s1">&#39;var_in&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">num_tran</span><span class="o">/</span><span class="n">ntran_old</span>
+            <span class="k">if</span> <span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;Primary/Secondary&#39;</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;fp/f*&#39;</span><span class="p">:</span>
+                <span class="n">fac</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">fac</span> <span class="o">=</span> <span class="mf">1.0</span>
+            <span class="n">rand_noise</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">vin</span><span class="o">+</span><span class="n">vout</span><span class="p">))</span><span class="o">*</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
+            <span class="n">sim_spec</span> <span class="o">=</span> <span class="n">fac</span><span class="o">*</span><span class="p">(</span><span class="n">out</span><span class="o">-</span><span class="n">inn</span> <span class="o">+</span> <span class="n">rand_noise</span><span class="p">)</span><span class="o">/</span><span class="n">out</span> 
+            <span class="n">x</span> <span class="o">=</span> <span class="n">x</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">sim_spec</span>
+            <span class="n">err</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">vout</span><span class="o">+</span><span class="n">vin</span><span class="p">)</span><span class="o">/</span><span class="n">out</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="n">R</span> <span class="o">!=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">num_tran</span> <span class="o">==</span> <span class="kc">False</span><span class="p">):</span>     
+            <span class="n">new_wave</span> <span class="o">=</span> <span class="n">Rspec</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">R</span><span class="p">)</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">uniform_tophat_sum</span><span class="p">(</span><span class="n">new_wave</span><span class="p">,</span><span class="n">x</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;RawData&#39;</span><span class="p">][</span><span class="s1">&#39;flux_out&#39;</span><span class="p">])</span>
+            <span class="n">inn</span> <span class="o">=</span> <span class="n">uniform_tophat_sum</span><span class="p">(</span><span class="n">new_wave</span><span class="p">,</span><span class="n">x</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;RawData&#39;</span><span class="p">][</span><span class="s1">&#39;flux_in&#39;</span><span class="p">])</span>
+            <span class="n">vout</span> <span class="o">=</span> <span class="n">uniform_tophat_sum</span><span class="p">(</span><span class="n">new_wave</span><span class="p">,</span><span class="n">x</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;RawData&#39;</span><span class="p">][</span><span class="s1">&#39;var_out&#39;</span><span class="p">])</span>
+            <span class="n">vin</span> <span class="o">=</span> <span class="n">uniform_tophat_sum</span><span class="p">(</span><span class="n">new_wave</span><span class="p">,</span><span class="n">x</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;RawData&#39;</span><span class="p">][</span><span class="s1">&#39;var_in&#39;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;Primary/Secondary&#39;</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;fp/f*&#39;</span><span class="p">:</span>
+                <span class="n">fac</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">fac</span> <span class="o">=</span> <span class="mf">1.0</span>
+            <span class="n">rand_noise</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">vin</span><span class="o">+</span><span class="n">vout</span><span class="p">))</span><span class="o">*</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">new_wave</span><span class="p">)))</span>
+            <span class="n">sim_spec</span> <span class="o">=</span> <span class="n">fac</span><span class="o">*</span><span class="p">(</span><span class="n">out</span><span class="o">-</span><span class="n">inn</span> <span class="o">+</span> <span class="n">rand_noise</span><span class="p">)</span><span class="o">/</span><span class="n">out</span> 
+            <span class="n">x</span> <span class="o">=</span> <span class="n">new_wave</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">sim_spec</span>
+            <span class="n">err</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">vout</span><span class="o">+</span><span class="n">vin</span><span class="p">)</span><span class="o">/</span><span class="n">out</span>
+        <span class="k">else</span><span class="p">:</span> 
+            <span class="nb">print</span> <span class="s2">&quot;Something went wrong. Cannot enter both resolution and ask to bin to new wave&quot;</span>
+            <span class="k">return</span>
+            
+        <span class="c1">#create error bars for Bokeh&#39;s multi_line</span>
+        <span class="n">y_err</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">x_err</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">px</span><span class="p">,</span> <span class="n">py</span><span class="p">,</span> <span class="n">yerr</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">err</span><span class="p">):</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x_err</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">px</span><span class="p">,</span> <span class="n">px</span><span class="p">)))</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y_err</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">py</span> <span class="o">-</span> <span class="n">yerr</span><span class="p">,</span> <span class="n">py</span> <span class="o">+</span> <span class="n">yerr</span><span class="p">)))</span>
+        <span class="c1">#initialize figure</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> 
+            <span class="c1">#Define units for x and y axis</span>
+            <span class="n">y_axis_label</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;Primary/Secondary&#39;</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">y_axis_label</span> <span class="o">==</span> <span class="s1">&#39;fp/f*&#39;</span><span class="p">:</span> <span class="n">p</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span>
+            <span class="k">else</span><span class="p">:</span> <span class="n">y_axis_label</span> <span class="o">=</span> <span class="s1">&#39;(&#39;</span><span class="o">+</span><span class="n">y_axis_label</span><span class="o">+</span><span class="s1">&#39;)^2&#39;</span>
+
+            <span class="k">if</span> <span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;Calculation Type&#39;</span><span class="p">]</span> <span class="o">==</span><span class="s1">&#39;phase_spec&#39;</span><span class="p">:</span>
+                <span class="n">x_axis_label</span><span class="o">=</span><span class="s1">&#39;Time (secs)&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">x_axis_label</span><span class="o">=</span><span class="s1">&#39;Wavelength [microns]&#39;</span>
+            
+            <span class="n">ylims</span> <span class="o">=</span> <span class="p">[</span><span class="nb">min</span><span class="p">(</span><span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;OriginalInput&#39;</span><span class="p">][</span><span class="s1">&#39;model_spec&#39;</span><span class="p">])</span><span class="o">-</span> <span class="mf">0.1</span><span class="o">*</span><span class="nb">min</span><span class="p">(</span><span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;OriginalInput&#39;</span><span class="p">][</span><span class="s1">&#39;model_spec&#39;</span><span class="p">]),</span>
+                 <span class="mf">0.1</span><span class="o">*</span><span class="nb">max</span><span class="p">(</span><span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;OriginalInput&#39;</span><span class="p">][</span><span class="s1">&#39;model_spec&#39;</span><span class="p">])</span><span class="o">+</span><span class="nb">max</span><span class="p">(</span><span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;OriginalInput&#39;</span><span class="p">][</span><span class="s1">&#39;model_spec&#39;</span><span class="p">])]</span>
+            <span class="n">xlims</span> <span class="o">=</span> <span class="p">[</span><span class="nb">min</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">x</span><span class="p">)]</span>
+         
+            <span class="n">fig1d</span> <span class="o">=</span> <span class="n">figure</span><span class="p">(</span><span class="n">x_range</span><span class="o">=</span><span class="n">x_range</span><span class="p">,</span> <span class="n">y_range</span> <span class="o">=</span> <span class="n">ylims</span><span class="p">,</span> 
+               <span class="n">plot_width</span> <span class="o">=</span> <span class="n">plot_width</span><span class="p">,</span> <span class="n">plot_height</span> <span class="o">=</span><span class="n">plot_height</span><span class="p">,</span><span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span><span class="n">x_axis_label</span><span class="o">=</span><span class="n">x_axis_label</span><span class="p">,</span>
+              <span class="n">y_axis_label</span> <span class="o">=</span> <span class="n">y_axis_label</span><span class="p">,</span> <span class="n">tools</span><span class="o">=</span><span class="n">TOOLS</span><span class="p">,</span> <span class="n">background_fill_color</span> <span class="o">=</span> <span class="s1">&#39;white&#39;</span><span class="p">)</span>
+        
+              
+        <span class="c1">#plot model, data, and errors </span>
+        <span class="k">if</span> <span class="n">model</span><span class="p">:</span>
+            <span class="n">mxx</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;OriginalInput&#39;</span><span class="p">][</span><span class="s1">&#39;model_wave&#39;</span><span class="p">]</span>
+            <span class="n">myy</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;OriginalInput&#39;</span><span class="p">][</span><span class="s1">&#39;model_spec&#39;</span><span class="p">]</span>
+            
+            <span class="n">my</span> <span class="o">=</span> <span class="n">uniform_tophat_mean</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">mxx</span><span class="p">,</span><span class="n">myy</span><span class="p">)</span>
+            <span class="n">fig1d</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">my</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;white&#39;</span><span class="p">,</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">line_width</span> <span class="o">=</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">legend</span><span class="p">:</span> 
+            <span class="n">fig1d</span><span class="o">.</span><span class="n">circle</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">colors</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">legend</span> <span class="o">=</span> <span class="n">legend_keys</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span> 
+            <span class="n">fig1d</span><span class="o">.</span><span class="n">circle</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">colors</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">outx</span> <span class="o">+=</span> <span class="p">[</span><span class="n">x</span><span class="p">]</span>
+        <span class="n">outy</span> <span class="o">+=</span> <span class="p">[</span><span class="n">y</span><span class="p">]</span>
+        <span class="n">oute</span> <span class="o">+=</span> <span class="p">[</span><span class="n">err</span><span class="p">]</span>
+        <span class="n">fig1d</span><span class="o">.</span><span class="n">multi_line</span><span class="p">(</span><span class="n">x_err</span><span class="p">,</span> <span class="n">y_err</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="n">colors</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span> 
+    <span class="n">show</span><span class="p">(</span><span class="n">fig1d</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">outx</span><span class="p">,</span><span class="n">outy</span><span class="p">,</span><span class="n">oute</span></div>
+
+    
+<div class="viewcode-block" id="bin_wave_to_R"><a class="viewcode-back" href="../../engine.html#engine.justplotit.bin_wave_to_R">[docs]</a><span class="k">def</span> <span class="nf">bin_wave_to_R</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">R</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Creates new wavelength axis at specified resolution</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    w : list of float or numpy array of float</span>
+<span class="sd">        Wavelength axis to be rebinned </span>
+<span class="sd">    R : float or int </span>
+<span class="sd">        Resolution to bin axis to </span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list of float</span>
+<span class="sd">        New wavelength axis at specified resolution</span>
+<span class="sd">    </span>
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    </span>
+<span class="sd">    &gt;&gt;&gt; newwave = bin_wave_to_R(np.linspace(1,2,1000), 10)</span>
+<span class="sd">    &gt;&gt;&gt; print len(newwave)</span>
+<span class="sd">    11</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">wave</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">tracker</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span> 
+    <span class="n">ind</span><span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span><span class="p">(</span><span class="n">tracker</span><span class="o">&lt;</span><span class="nb">max</span><span class="p">(</span><span class="n">w</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span><span class="nb">len</span><span class="p">(</span><span class="n">w</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        
+            <span class="n">dlambda</span> <span class="o">=</span> <span class="n">w</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-</span><span class="n">w</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span>
+            <span class="n">newR</span> <span class="o">=</span> <span class="n">w</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">/</span><span class="n">dlambda</span>
+            <span class="k">if</span> <span class="n">newR</span> <span class="o">&lt;</span> <span class="n">R</span><span class="p">:</span>
+                <span class="n">tracker</span> <span class="o">=</span> <span class="n">w</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span><span class="o">+</span><span class="n">dlambda</span><span class="o">/</span><span class="mf">2.0</span>
+                <span class="n">wave</span> <span class="o">+=</span><span class="p">[</span><span class="n">tracker</span><span class="p">]</span>
+                <span class="n">ind</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">w</span><span class="o">-</span><span class="n">tracker</span><span class="p">))</span><span class="o">.</span><span class="n">argmin</span><span class="p">()</span>
+                <span class="n">i</span> <span class="o">=</span> <span class="n">ind</span>
+            <span class="k">else</span><span class="p">:</span>            
+                <span class="n">i</span><span class="o">+=</span><span class="mi">1</span>    
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">tracker</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">wave</span></div>
+
+<div class="viewcode-block" id="uniform_tophat_sum"><a class="viewcode-back" href="../../engine.html#engine.justplotit.uniform_tophat_sum">[docs]</a><span class="k">def</span> <span class="nf">uniform_tophat_sum</span><span class="p">(</span><span class="n">xnew</span><span class="p">,</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Adapted from Mike R. Line to rebin spectra</span>
+<span class="sd">    </span>
+<span class="sd">    Takes sum of group of points in bin of wave points </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    xnew : list of float or numpy array of float</span>
+<span class="sd">        New wavelength grid to rebin to </span>
+<span class="sd">    x : list of float or numpy array of float </span>
+<span class="sd">        Old wavelength grid to get rid of </span>
+<span class="sd">    y : list of float or numpy array of float </span>
+<span class="sd">        New rebinned y axis </span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    array of floats </span>
+<span class="sd">        new y axis</span>
+
+<span class="sd">    Examples </span>
+<span class="sd">    --------</span>
+<span class="sd">        </span>
+<span class="sd">    &gt;&gt;&gt; oldgrid = np.linspace(1,3,100)</span>
+<span class="sd">    &gt;&gt;&gt; y = np.zeros(100)+10.0</span>
+<span class="sd">    &gt;&gt;&gt; newy = uniform_tophat_sum(np.linspace(2,3,3), oldgrid, y)</span>
+<span class="sd">    &gt;&gt;&gt; newy</span>
+<span class="sd">    array([ 240.,  250.,  130.])</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">xnew</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">newx</span><span class="p">)</span>
+    <span class="n">szmod</span><span class="o">=</span><span class="n">newx</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">delta</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">szmod</span><span class="p">)</span>
+    <span class="n">ynew</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">szmod</span><span class="p">)</span>
+    <span class="n">delta</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">=</span><span class="n">newx</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">-</span><span class="n">newx</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>  
+    <span class="n">delta</span><span class="p">[</span><span class="n">szmod</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">=</span><span class="n">delta</span><span class="p">[</span><span class="n">szmod</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> 
+    <span class="c1">#pdb.set_trace()</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">szmod</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">i</span><span class="o">=</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span>
+        <span class="n">loc</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">((</span><span class="n">x</span> <span class="o">&gt;=</span> <span class="n">newx</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-</span><span class="mf">0.5</span><span class="o">*</span><span class="n">delta</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">x</span> <span class="o">&lt;</span> <span class="n">newx</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">+</span><span class="mf">0.5</span><span class="o">*</span><span class="n">delta</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+        <span class="n">ynew</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">loc</span><span class="p">])</span>
+    <span class="n">loc</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">((</span><span class="n">x</span> <span class="o">&gt;</span> <span class="n">newx</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mf">0.5</span><span class="o">*</span><span class="n">delta</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">x</span> <span class="o">&lt;</span> <span class="n">newx</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="mf">0.5</span><span class="o">*</span><span class="n">delta</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+    <span class="n">ynew</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">loc</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">ynew</span></div>
+
+<div class="viewcode-block" id="uniform_tophat_mean"><a class="viewcode-back" href="../../engine.html#engine.justplotit.uniform_tophat_mean">[docs]</a><span class="k">def</span> <span class="nf">uniform_tophat_mean</span><span class="p">(</span><span class="n">xnew</span><span class="p">,</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Adapted from Mike R. Line to rebin spectra</span>
+<span class="sd">    </span>
+<span class="sd">    Takes average of group of points in bin</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    xnew : list of float or numpy array of float</span>
+<span class="sd">        New wavelength grid to rebin to </span>
+<span class="sd">    x : list of float or numpy array of float </span>
+<span class="sd">        Old wavelength grid to get rid of </span>
+<span class="sd">    y : list of float or numpy array of float </span>
+<span class="sd">        New rebinned y axis </span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    array of floats </span>
+<span class="sd">        new y axis </span>
+
+<span class="sd">    Examples </span>
+<span class="sd">    --------</span>
+<span class="sd">        </span>
+<span class="sd">    &gt;&gt;&gt; oldgrid = np.linspace(1,3,100)</span>
+<span class="sd">    &gt;&gt;&gt; y = np.zeros(100)+10.0</span>
+<span class="sd">    &gt;&gt;&gt; newy = uniform_tophat_sum(np.linspace(2,3,3), oldgrid, y)</span>
+<span class="sd">    &gt;&gt;&gt; newy</span>
+<span class="sd">    array([ 240.,  250.,  130.])</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">xnew</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">newx</span><span class="p">)</span>
+    <span class="n">szmod</span><span class="o">=</span><span class="n">newx</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">delta</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">szmod</span><span class="p">)</span>
+    <span class="n">ynew</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">szmod</span><span class="p">)</span>
+    <span class="n">delta</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">=</span><span class="n">newx</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">-</span><span class="n">newx</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>  
+    <span class="n">delta</span><span class="p">[</span><span class="n">szmod</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">=</span><span class="n">delta</span><span class="p">[</span><span class="n">szmod</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> 
+    <span class="c1">#pdb.set_trace()</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">szmod</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">i</span><span class="o">=</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span>
+        <span class="n">loc</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">((</span><span class="n">x</span> <span class="o">&gt;=</span> <span class="n">newx</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-</span><span class="mf">0.5</span><span class="o">*</span><span class="n">delta</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">x</span> <span class="o">&lt;</span> <span class="n">newx</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">+</span><span class="mf">0.5</span><span class="o">*</span><span class="n">delta</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+        <span class="n">ynew</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">loc</span><span class="p">])</span>
+    <span class="n">loc</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">((</span><span class="n">x</span> <span class="o">&gt;</span> <span class="n">newx</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mf">0.5</span><span class="o">*</span><span class="n">delta</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">x</span> <span class="o">&lt;</span> <span class="n">newx</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="mf">0.5</span><span class="o">*</span><span class="n">delta</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+    <span class="n">ynew</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">loc</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">ynew</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">PandExo  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016, Natasha Batalha;Kevin Stevenson.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

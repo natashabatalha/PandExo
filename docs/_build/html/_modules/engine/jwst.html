@@ -1,0 +1,882 @@
+
+
+<!doctype html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>engine.jwst &#8212; PandExo  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">PandExo  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for engine.jwst</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="k">import</span> <span class="n">deepcopy</span> 
+
+<span class="kn">from</span> <span class="nn">pandeia.engine.instrument_factory</span> <span class="k">import</span> <span class="n">InstrumentFactory</span>
+<span class="kn">from</span> <span class="nn">pandeia.engine.perform_calculation</span> <span class="k">import</span> <span class="n">perform_calculation</span>
+<span class="kn">import</span> <span class="nn">create_input</span> <span class="k">as</span> <span class="nn">create</span>
+<span class="kn">from</span> <span class="nn">compute_noise</span> <span class="k">import</span> <span class="n">ExtractSpec</span>
+
+<span class="c1">#constant parameters.. consider putting these into json file </span>
+<span class="c1">#max groups in integration</span>
+<span class="n">max_ngroup</span> <span class="o">=</span> <span class="mf">65536.0</span> 
+<span class="c1">#minimum number of integrations</span>
+<span class="n">min_nint_trans</span> <span class="o">=</span> <span class="mi">1</span>
+
+<div class="viewcode-block" id="compute_full_sim"><a class="viewcode-back" href="../../engine.html#engine.jwst.compute_full_sim">[docs]</a><span class="k">def</span> <span class="nf">compute_full_sim</span><span class="p">(</span><span class="n">dictinput</span><span class="p">):</span> 
+    <span class="sd">&quot;&quot;&quot;Top level function to set up exoplanet obs. for JW</span>
+<span class="sd">    </span>
+<span class="sd">    Function to set up explanet observations for JWST only and </span>
+<span class="sd">    compute simulated spectrum. It uses STScI&#39;s Pandeia to compute </span>
+<span class="sd">    instrument throughputs and WebbPSF to compute PSFs. </span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    dictinput : dict</span>
+<span class="sd">        dictionary containing instrument parameters and exoplanet specific </span>
+<span class="sd">        parameters. {&quot;pandeia_input&quot;:dict1, &quot;pandexo_input&quot;:dict1}</span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        large dictionary with 1d, 2d simualtions, timing info, instrument info, warnings</span>
+<span class="sd">    </span>
+<span class="sd">    Examples</span>
+<span class="sd">    --------  </span>
+<span class="sd">      </span>
+<span class="sd">    &gt;&gt;&gt; from pandexo.engine.jwst import compute_full_sim </span>
+<span class="sd">    &gt;&gt;&gt; from pandexo.engine.justplotit import jwst_1d_spec</span>
+<span class="sd">    &gt;&gt;&gt; a = compute_full_sim({&quot;pandeia_input&quot;: pandeiadict, &quot;pandexo_input&quot;:exodict})</span>
+<span class="sd">    &gt;&gt;&gt; jwst_1d_spec(a)</span>
+<span class="sd">    .. image:: 1d_spec.png</span>
+<span class="sd">    </span>
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    It is much easier to run simulations through either **run_online** or **justdoit**. **justdoit** contains functions to create input dictionaries and **run_online** contains web forms to create input dictionaries.</span>
+<span class="sd">    </span>
+<span class="sd">    See Also</span>
+<span class="sd">    -------- </span>
+<span class="sd">        pandexo.engine.justdoit.run_pandexo : Best function for running pandexo runs</span>
+<span class="sd">        pandexo.engine.run_online : Allows running functions through online interface</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pandeia_input</span> <span class="o">=</span> <span class="n">dictinput</span><span class="p">[</span><span class="s1">&#39;pandeia_input&#39;</span><span class="p">]</span>
+    <span class="n">pandexo_input</span> <span class="o">=</span> <span class="n">dictinput</span><span class="p">[</span><span class="s1">&#39;pandexo_input&#39;</span><span class="p">]</span>    	
+	
+    <span class="c1">#define the calculation we&#39;ll be doing </span>
+    <span class="k">if</span> <span class="n">pandexo_input</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;w_unit&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;sec&#39;</span><span class="p">:</span>
+        <span class="n">calculation</span> <span class="o">=</span> <span class="s1">&#39;phase_spec&#39;</span>
+    <span class="k">else</span><span class="p">:</span> 
+        <span class="n">calculation</span> <span class="o">=</span> <span class="n">pandexo_input</span><span class="p">[</span><span class="s1">&#39;calculation&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+    <span class="c1">#which instrument </span>
+    <span class="n">instrument</span> <span class="o">=</span> <span class="n">pandeia_input</span><span class="p">[</span><span class="s1">&#39;configuration&#39;</span><span class="p">][</span><span class="s1">&#39;instrument&#39;</span><span class="p">][</span><span class="s1">&#39;instrument&#39;</span><span class="p">]</span>
+    <span class="n">conf</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;instrument&#39;</span><span class="p">:</span> <span class="n">pandeia_input</span><span class="p">[</span><span class="s1">&#39;configuration&#39;</span><span class="p">][</span><span class="s1">&#39;instrument&#39;</span><span class="p">]}</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="n">InstrumentFactory</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">conf</span><span class="p">)</span>
+    <span class="n">det_pars</span> <span class="o">=</span> <span class="n">i</span><span class="o">.</span><span class="n">get_detector_pars</span><span class="p">()</span>
+    <span class="n">fullwell</span> <span class="o">=</span> <span class="n">det_pars</span><span class="p">[</span><span class="s1">&#39;fullwell&#39;</span><span class="p">]</span>
+    <span class="n">rn</span> <span class="o">=</span> <span class="n">det_pars</span><span class="p">[</span><span class="s1">&#39;rn&#39;</span><span class="p">]</span>
+    <span class="n">sat_level</span> <span class="o">=</span> <span class="n">pandexo_input</span><span class="p">[</span><span class="s1">&#39;observation&#39;</span><span class="p">][</span><span class="s1">&#39;sat_level&#39;</span><span class="p">]</span><span class="o">/</span><span class="mf">100.0</span><span class="o">*</span><span class="n">fullwell</span>
+
+    <span class="c1">#parameteres needed from exo_input</span>
+    <span class="n">mag</span> <span class="o">=</span> <span class="n">pandexo_input</span><span class="p">[</span><span class="s1">&#39;star&#39;</span><span class="p">][</span><span class="s1">&#39;mag&#39;</span><span class="p">]</span>
+    
+    
+    <span class="n">noccultations</span> <span class="o">=</span> <span class="n">pandexo_input</span><span class="p">[</span><span class="s1">&#39;observation&#39;</span><span class="p">][</span><span class="s1">&#39;noccultations&#39;</span><span class="p">]</span>
+    <span class="n">R</span> <span class="o">=</span> <span class="n">pandexo_input</span><span class="p">[</span><span class="s1">&#39;observation&#39;</span><span class="p">][</span><span class="s1">&#39;R&#39;</span><span class="p">]</span>
+    <span class="c1">#amount of exposure time out-of-occultation, as a fraction of in-occ time </span>
+    <span class="n">expfact_out</span> <span class="o">=</span> <span class="n">pandexo_input</span><span class="p">[</span><span class="s1">&#39;observation&#39;</span><span class="p">][</span><span class="s1">&#39;fraction&#39;</span><span class="p">]</span> 
+    <span class="n">noise_floor</span> <span class="o">=</span> <span class="n">pandexo_input</span><span class="p">[</span><span class="s1">&#39;observation&#39;</span><span class="p">][</span><span class="s1">&#39;noise_floor&#39;</span><span class="p">]</span>
+
+
+    <span class="c1">#get stellar spectrum and in transit spec</span>
+    <span class="n">star_spec</span> <span class="o">=</span> <span class="n">create</span><span class="o">.</span><span class="n">outTrans</span><span class="p">(</span><span class="n">pandexo_input</span><span class="p">[</span><span class="s1">&#39;star&#39;</span><span class="p">])</span>
+    <span class="n">both_spec</span> <span class="o">=</span> <span class="n">create</span><span class="o">.</span><span class="n">bothTrans</span><span class="p">(</span><span class="n">star_spec</span><span class="p">,</span> <span class="n">pandexo_input</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">])</span>
+    <span class="n">out_spectrum</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">both_spec</span><span class="p">[</span><span class="s1">&#39;wave&#39;</span><span class="p">],</span> <span class="n">both_spec</span><span class="p">[</span><span class="s1">&#39;flux_out_trans&#39;</span><span class="p">]])</span>
+        
+    <span class="c1">#get transit duration from phase curve or from input </span>
+    <span class="k">if</span> <span class="n">calculation</span> <span class="o">==</span> <span class="s1">&#39;phase_spec&#39;</span><span class="p">:</span> 
+        <span class="n">transit_duration</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">both_spec</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">])</span> <span class="o">-</span> <span class="nb">min</span><span class="p">(</span><span class="n">both_spec</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span> 
+        <span class="n">transit_duration</span> <span class="o">=</span> <span class="n">pandexo_input</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;transit_duration&#39;</span><span class="p">]</span>
+
+    <span class="c1">#add to pandeia input </span>
+    <span class="n">pandeia_input</span><span class="p">[</span><span class="s1">&#39;scene&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;spectrum&#39;</span><span class="p">][</span><span class="s1">&#39;sed&#39;</span><span class="p">][</span><span class="s1">&#39;spectrum&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">out_spectrum</span>
+    
+    <span class="c1">#run pandeia once to determine max exposure time per int and get exposure params</span>
+    <span class="nb">print</span> <span class="s2">&quot;Computing Duty Cycle&quot;</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">compute_maxexptime_per_int</span><span class="p">(</span><span class="n">pandeia_input</span><span class="p">,</span> <span class="n">sat_level</span><span class="p">)</span> 
+    <span class="n">extraction_area</span> <span class="o">=</span> <span class="n">m</span><span class="p">[</span><span class="s1">&#39;extraction_area&#39;</span><span class="p">]</span>
+    <span class="nb">print</span> <span class="s2">&quot;Finished Duty Cucle Calc&quot;</span>
+
+    <span class="c1">#calculate all timing info</span>
+    <span class="n">timing</span><span class="p">,</span> <span class="n">flags</span> <span class="o">=</span> <span class="n">compute_timing</span><span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="n">transit_duration</span><span class="p">,</span><span class="n">expfact_out</span><span class="p">,</span><span class="n">noccultations</span><span class="p">)</span>
+    
+    <span class="c1">#Simulate out trans and in transit</span>
+    <span class="nb">print</span> <span class="s2">&quot;Starting Out of Transit Simulation&quot;</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">perform_out</span><span class="p">(</span><span class="n">pandeia_input</span><span class="p">,</span> <span class="n">pandexo_input</span><span class="p">,</span><span class="n">timing</span><span class="p">,</span> <span class="n">both_spec</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="s2">&quot;End out of Transit&quot;</span>
+
+    <span class="c1">#this kind of redundant going to compute inn from out instead </span>
+    <span class="c1">#keep perform_in but change inputs to (out, timing, both_spec)</span>
+    <span class="nb">print</span> <span class="s2">&quot;Starting In Transit Simulation&quot;</span>
+    <span class="n">inn</span> <span class="o">=</span> <span class="n">perform_in</span><span class="p">(</span><span class="n">pandeia_input</span><span class="p">,</span> <span class="n">pandexo_input</span><span class="p">,</span><span class="n">timing</span><span class="p">,</span> <span class="n">both_spec</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">calculation</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="s2">&quot;End In Transit&quot;</span> 
+
+    <span class="c1">#compute warning flags for timing info </span>
+    <span class="n">warnings</span> <span class="o">=</span> <span class="n">add_warnings</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">timing</span><span class="p">,</span> <span class="n">sat_level</span><span class="p">,</span> <span class="n">flags</span><span class="p">,</span> <span class="n">instrument</span><span class="p">)</span> 
+
+    <span class="n">compNoise</span> <span class="o">=</span> <span class="n">ExtractSpec</span><span class="p">(</span><span class="n">inn</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">rn</span><span class="p">,</span> <span class="n">extraction_area</span><span class="p">,</span> <span class="n">timing</span><span class="p">)</span>
+    
+    <span class="c1">#slope method is pandeia&#39;s pure noise calculation (taken from SNR)</span>
+    <span class="c1">#contains correlated noise, RN, dark current, sky, </span>
+    <span class="c1">#uses MULTIACCUM formula so we deviated from this. </span>
+    <span class="c1">#could eventually come back to this if Pandeia adopts First-Last formula</span>
+    <span class="k">if</span> <span class="n">calculation</span> <span class="o">==</span> <span class="s1">&#39;slope method&#39;</span><span class="p">:</span> 
+        <span class="c1">#Extract relevant info from pandeia output (1d curves and wavelength) </span>
+        <span class="c1">#extracted flux in units of electron/s</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;1d&#39;</span><span class="p">][</span><span class="s1">&#39;extracted_flux&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">compNoise</span><span class="o">.</span><span class="n">run_slope_method</span><span class="p">()</span>
+
+    <span class="c1">#derives noise from 2d postage stamps. Doing this results in a higher </span>
+    <span class="c1">#1d flux rate than the Pandeia gets from extracting its own. </span>
+    <span class="c1">#this should be used to benchmark Pandeia&#39;s 1d extraction  </span>
+    <span class="k">elif</span> <span class="n">calculation</span> <span class="o">==</span> <span class="s1">&#39;2d extract&#39;</span><span class="p">:</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;1d&#39;</span><span class="p">][</span><span class="s1">&#39;extracted_flux&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">compNoise</span><span class="o">.</span><span class="n">run_2d_extract</span><span class="p">()</span>
+    
+    <span class="c1">#this is the noise calculation that PandExo uses online. It derives </span>
+    <span class="c1">#its own calculation of readnoise and does not use MULTIACUMM </span>
+    <span class="c1">#noise formula  </span>
+    <span class="k">elif</span> <span class="n">calculation</span> <span class="o">==</span> <span class="s1">&#39;fml&#39;</span><span class="p">:</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;1d&#39;</span><span class="p">][</span><span class="s1">&#39;extracted_flux&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">compNoise</span><span class="o">.</span><span class="n">run_f_minus_l</span><span class="p">()</span>
+    
+    <span class="k">elif</span> <span class="n">calculation</span> <span class="o">==</span> <span class="s1">&#39;phase_spec&#39;</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">compNoise</span><span class="o">.</span><span class="n">run_phase_spec</span><span class="p">()</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;WARNING: Calculation method not found.&#39;</span><span class="p">)</span>
+        
+    <span class="n">varin</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;var_in_1d&#39;</span><span class="p">]</span>
+    <span class="n">varout</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;var_out_1d&#39;</span><span class="p">]</span>
+    <span class="n">extracted_flux_out</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;photon_out_1d&#39;</span><span class="p">]</span>
+    <span class="n">extracted_flux_inn</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;photon_in_1d&#39;</span><span class="p">]</span>
+
+        
+    <span class="c1">#bin the data according to user input </span>
+    <span class="k">if</span> <span class="n">R</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span> 
+        <span class="n">wbin</span> <span class="o">=</span> <span class="n">bin_wave_to_R</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">R</span><span class="p">)</span>
+        <span class="n">photon_out_bin</span> <span class="o">=</span> <span class="n">uniform_tophat_sum</span><span class="p">(</span><span class="n">wbin</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span><span class="n">extracted_flux_out</span><span class="p">)</span>
+        <span class="n">photon_in_bin</span> <span class="o">=</span> <span class="n">uniform_tophat_sum</span><span class="p">(</span><span class="n">wbin</span><span class="p">,</span><span class="n">w</span><span class="p">,</span> <span class="n">extracted_flux_inn</span><span class="p">)</span>
+        <span class="n">var_in_bin</span> <span class="o">=</span> <span class="n">uniform_tophat_sum</span><span class="p">(</span><span class="n">wbin</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span><span class="n">varin</span><span class="p">)</span>
+        <span class="n">var_out_bin</span> <span class="o">=</span> <span class="n">uniform_tophat_sum</span><span class="p">(</span><span class="n">wbin</span><span class="p">,</span><span class="n">w</span><span class="p">,</span> <span class="n">varout</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span> 
+        <span class="n">wbin</span> <span class="o">=</span> <span class="n">w</span>
+        <span class="n">photon_out_bin</span> <span class="o">=</span> <span class="n">extracted_flux_out</span>
+        <span class="n">photon_in_bin</span> <span class="o">=</span> <span class="n">extracted_flux_inn</span>
+        <span class="n">var_in_bin</span> <span class="o">=</span> <span class="n">varin</span>
+        <span class="n">var_out_bin</span> <span class="o">=</span> <span class="n">varout</span>
+    
+    <span class="c1">#calculate total variance</span>
+    <span class="n">var_tot</span> <span class="o">=</span> <span class="n">var_in_bin</span> <span class="o">+</span> <span class="n">var_out_bin</span>
+    <span class="n">error</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">var_tot</span><span class="p">)</span>
+    
+    <span class="c1">#calculate error on spectrum</span>
+    <span class="n">error_spec</span> <span class="o">=</span> <span class="n">error</span><span class="o">/</span><span class="n">photon_out_bin</span>
+   
+    <span class="c1">#Add in user specified noise floor </span>
+    <span class="n">error_spec_nfloor</span> <span class="o">=</span> <span class="n">add_noise_floor</span><span class="p">(</span><span class="n">noise_floor</span><span class="p">,</span> <span class="n">wbin</span><span class="p">,</span> <span class="n">error_spec</span><span class="p">)</span> 
+
+    
+    <span class="c1">#add in random noise for the simulated spectrum </span>
+    <span class="n">rand_noise</span><span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">var_in_bin</span><span class="o">+</span><span class="n">var_out_bin</span><span class="p">))</span><span class="o">*</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">wbin</span><span class="p">)))</span>
+    <span class="n">raw_spec</span> <span class="o">=</span> <span class="p">(</span><span class="n">photon_out_bin</span><span class="o">-</span><span class="n">photon_in_bin</span><span class="p">)</span><span class="o">/</span><span class="n">photon_out_bin</span>
+    <span class="n">sim_spec</span> <span class="o">=</span> <span class="p">(</span><span class="n">photon_out_bin</span><span class="o">-</span><span class="n">photon_in_bin</span> <span class="o">+</span> <span class="n">rand_noise</span><span class="p">)</span><span class="o">/</span><span class="n">photon_out_bin</span> 
+    
+    <span class="c1">#if secondary tranist, multiply spectra by -1 </span>
+    <span class="k">if</span> <span class="n">pandexo_input</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;f_unit&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;fp/f*&#39;</span><span class="p">:</span>
+        <span class="n">sim_spec</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span><span class="o">*</span><span class="n">sim_spec</span>
+        <span class="n">raw_spec</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span><span class="o">*</span><span class="n">raw_spec</span>
+    
+   
+    <span class="c1">#package processed data</span>
+    <span class="n">binned</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;wave&#39;</span><span class="p">:</span><span class="n">wbin</span><span class="p">,</span>
+              <span class="s1">&#39;spectrum&#39;</span><span class="p">:</span> <span class="n">raw_spec</span><span class="p">,</span>
+              <span class="s1">&#39;spectrum_w_rand&#39;</span><span class="p">:</span><span class="n">sim_spec</span><span class="p">,</span>
+              <span class="s1">&#39;error_w_floor&#39;</span><span class="p">:</span><span class="n">error_spec_nfloor</span><span class="p">}</span>
+    
+    <span class="n">unbinned</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;flux_out&#39;</span><span class="p">:</span><span class="n">extracted_flux_out</span><span class="p">,</span> 
+                <span class="s1">&#39;flux_in&#39;</span><span class="p">:</span><span class="n">extracted_flux_inn</span><span class="p">,</span>
+                <span class="s1">&#39;var_in&#39;</span><span class="p">:</span><span class="n">varin</span><span class="p">,</span> 
+                <span class="s1">&#39;var_out&#39;</span><span class="p">:</span><span class="n">varout</span><span class="p">,</span> 
+                <span class="s1">&#39;wave&#39;</span><span class="p">:</span><span class="n">w</span><span class="p">,</span>
+                <span class="s1">&#39;error_no_floor&#39;</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">varin</span><span class="o">+</span><span class="n">varout</span><span class="p">)</span><span class="o">/</span><span class="n">extracted_flux_out</span>
+                <span class="p">}</span>
+ 
+    <span class="n">result_dict</span> <span class="o">=</span> <span class="n">as_dict</span><span class="p">(</span><span class="n">out</span><span class="p">,</span><span class="n">both_spec</span> <span class="p">,</span><span class="n">binned</span><span class="p">,</span> 
+                <span class="n">timing</span><span class="p">,</span> <span class="n">mag</span><span class="p">,</span> <span class="n">sat_level</span><span class="p">,</span> <span class="n">warnings</span><span class="p">,</span>
+                <span class="n">pandexo_input</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;f_unit&#39;</span><span class="p">],</span> <span class="n">unbinned</span><span class="p">,</span><span class="n">calculation</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">result_dict</span> </div>
+    
+<div class="viewcode-block" id="compute_maxexptime_per_int"><a class="viewcode-back" href="../../engine.html#engine.jwst.compute_maxexptime_per_int">[docs]</a><span class="k">def</span> <span class="nf">compute_maxexptime_per_int</span><span class="p">(</span><span class="n">pandeia_input</span><span class="p">,</span> <span class="n">sat_level</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Computes optimal maximum exposure time per integration</span>
+<span class="sd">    </span>
+<span class="sd">    Function to simulate 2d jwst image with 2 groups, 1 integration, 1 exposure </span>
+<span class="sd">    and return the maximum time </span>
+<span class="sd">    for one integration before saturation occurs. If saturation has </span>
+<span class="sd">    already occured, returns maxexptime_per_int as np.nan. This then </span>
+<span class="sd">    tells Pandexo to set min number of groups (ngroups =2). This avoids </span>
+<span class="sd">    error if saturation occurs. This routine assumes that min ngroups is 2. </span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    pandeia_input : dict </span>
+<span class="sd">        pandeia dictionary input </span>
+<span class="sd">    sat_level : int or float</span>
+<span class="sd">        user defined saturation level in units of electrons</span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    ------- </span>
+<span class="sd">    dict </span>
+<span class="sd">        Maximum exposure time per integration, nframes, nskip, frame time</span>
+<span class="sd">    </span>
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    </span>
+<span class="sd">    &gt;&gt;&gt; max_time = compute_maxexptime_per_int(pandeia_input, 50000.0)</span>
+<span class="sd">    &gt;&gt;&gt; print max_time </span>
+<span class="sd">    {&#39;maxexptime_per_int&#39;:12.0, &#39;nframe&#39;:1, &#39;nskip&#39;:0, &#39;exptime_per_frame&#39;: 0.55}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="c1">#run once to get 2d rate image </span>
+    <span class="n">pandeia_input</span><span class="p">[</span><span class="s1">&#39;configuration&#39;</span><span class="p">][</span><span class="s1">&#39;detector&#39;</span><span class="p">][</span><span class="s1">&#39;ngroup&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span> 
+    <span class="n">pandeia_input</span><span class="p">[</span><span class="s1">&#39;configuration&#39;</span><span class="p">][</span><span class="s1">&#39;detector&#39;</span><span class="p">][</span><span class="s1">&#39;nint&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> 
+    <span class="n">pandeia_input</span><span class="p">[</span><span class="s1">&#39;configuration&#39;</span><span class="p">][</span><span class="s1">&#39;detector&#39;</span><span class="p">][</span><span class="s1">&#39;nexp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    
+    <span class="n">report</span> <span class="o">=</span> <span class="n">perform_calculation</span><span class="p">(</span><span class="n">pandeia_input</span><span class="p">,</span> <span class="n">dict_report</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">extraction_area</span> <span class="o">=</span> <span class="n">report</span><span class="o">.</span><span class="n">extraction_area</span>
+    <span class="n">report_dict</span> <span class="o">=</span> <span class="n">report</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span> 
+
+            
+    <span class="c1">#check for hard saturation </span>
+    <span class="k">if</span> <span class="s1">&#39;saturated&#39;</span> <span class="ow">in</span> <span class="n">report_dict</span><span class="p">[</span><span class="s1">&#39;warnings&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span> 
+        <span class="k">if</span> <span class="n">report_dict</span><span class="p">[</span><span class="s1">&#39;warnings&#39;</span><span class="p">][</span><span class="s1">&#39;saturated&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Hard&#39;</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Hard saturation with minimum number of groups&#39;</span><span class="p">)</span>
+    
+    <span class="c1"># count rate on the detector in e-/second </span>
+    <span class="n">det</span> <span class="o">=</span> <span class="n">report_dict</span><span class="p">[</span><span class="s1">&#39;2d&#39;</span><span class="p">][</span><span class="s1">&#39;detector&#39;</span><span class="p">]</span>
+    
+    <span class="n">timeinfo</span> <span class="o">=</span> <span class="n">report_dict</span><span class="p">[</span><span class="s1">&#39;information&#39;</span><span class="p">][</span><span class="s1">&#39;exposure_specification&#39;</span><span class="p">]</span>
+    <span class="c1">#totaltime = timeinfo[&#39;tgroup&#39;]*timeinfo[&#39;ngroup&#39;]*timeinfo[&#39;nint&#39;]</span>
+    
+    <span class="n">maxdetvalue</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">det</span><span class="p">)</span>
+    <span class="c1">#maximum time before saturation per integration </span>
+    <span class="c1">#based on user specified saturation level</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">maxexptime_per_int</span> <span class="o">=</span> <span class="n">sat_level</span><span class="o">/</span><span class="n">maxdetvalue</span>
+    <span class="k">except</span><span class="p">:</span> 
+        <span class="n">maxexptime_per_int</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        
+    <span class="n">exptime_per_frame</span> <span class="o">=</span> <span class="n">report_dict</span><span class="p">[</span><span class="s1">&#39;information&#39;</span><span class="p">][</span><span class="s1">&#39;exposure_specification&#39;</span><span class="p">][</span><span class="s1">&#39;tframe&#39;</span><span class="p">]</span>
+    <span class="n">nframe</span> <span class="o">=</span> <span class="n">report_dict</span><span class="p">[</span><span class="s1">&#39;information&#39;</span><span class="p">][</span><span class="s1">&#39;exposure_specification&#39;</span><span class="p">][</span><span class="s1">&#39;nframe&#39;</span><span class="p">]</span>
+    <span class="n">nskip</span> <span class="o">=</span> <span class="n">report_dict</span><span class="p">[</span><span class="s1">&#39;information&#39;</span><span class="p">][</span><span class="s1">&#39;exposure_specification&#39;</span><span class="p">][</span><span class="s1">&#39;nskip&#39;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;maxexptime_per_int&#39;</span><span class="p">:</span><span class="n">maxexptime_per_int</span><span class="p">,</span> <span class="s1">&#39;nframe&#39;</span><span class="p">:</span><span class="n">nframe</span><span class="p">,</span> <span class="s1">&#39;nskip&#39;</span><span class="p">:</span><span class="n">nskip</span><span class="p">,</span> 
+            <span class="s1">&#39;exptime_per_frame&#39;</span><span class="p">:</span> <span class="n">exptime_per_frame</span><span class="p">,</span>
+            <span class="s1">&#39;extraction_area&#39;</span><span class="p">:</span><span class="n">extraction_area</span><span class="p">}</span></div>
+        
+<div class="viewcode-block" id="compute_timing"><a class="viewcode-back" href="../../engine.html#engine.jwst.compute_timing">[docs]</a><span class="k">def</span> <span class="nf">compute_timing</span><span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="n">transit_duration</span><span class="p">,</span><span class="n">expfact_out</span><span class="p">,</span><span class="n">noccultations</span><span class="p">):</span> 
+    <span class="sd">&quot;&quot;&quot;Computes all timing info for observation</span>
+<span class="sd">    </span>
+<span class="sd">    Computes all JWST specific timing info for observation including. Some pertinent </span>
+<span class="sd">    JWST terminology:</span>
+
+<span class="sd">        - frame: The result of sequentially clocking and digitizing all pixels in a rectangular area of an SCA. **Full-fame readout** means to digitize all pixels in an SCA, including reference pixels. **Frame** also applies to the result of clocking and digitizing a subarray on an SCA.</span>
+<span class="sd">        - group: One or more consecutively read frames. There are no intervening resets. Frames may be averaged to form a group but for exoplanets the read out scheme is always 1 frame = 1 group</span>
+<span class="sd">        - integration: The end result of resetting the detector and then non-destructively sampling it one or more times over a finite period of time before resetting the detector again. This is a unit of data for which signal is proportional to intensity, and it consists of one or more GROUPS.</span>
+<span class="sd">        - exposure: The end result of one or more INTEGRATIONS over a finite period of time.  EXPOSURE defines the contents of a single FITS file.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ---------</span>
+<span class="sd">    m : dict </span>
+<span class="sd">        Dictionary output from **compute_maxexptime_per_int**</span>
+<span class="sd">    transit_duration : float or int </span>
+<span class="sd">        transit duration in seconds </span>
+<span class="sd">    expfact_out : float or int </span>
+<span class="sd">        fraction of time spent in transit versus out of transit </span>
+<span class="sd">    noccultations : int </span>
+<span class="sd">        number of transits </span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    ------- </span>
+<span class="sd">    timing : dict</span>
+<span class="sd">        All timing info</span>
+<span class="sd">    warningflag : dict </span>
+<span class="sd">        Warning flags</span>
+<span class="sd">    </span>
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; timing, flags = compute_timing(m, 2*60.0*60.0, 1.0, 1.0)</span>
+<span class="sd">    &gt;&gt;&gt; print timing.keys()</span>
+<span class="sd">    [&#39;Number of Transits&#39;, &#39;Num Integrations Out of Transit&#39;, &#39;Num Integrations In Transit&#39;, </span>
+<span class="sd">    &#39;Num Groups per Integration&#39;, &#39;Seconds per Frame&#39;, &#39;Observing Efficiency (%)&#39;, &#39;On Source Time(sec)&#39;, </span>
+<span class="sd">    &#39;Exposure Time Per Integration (secs)&#39;, &#39;Reset time Plus 30 min TA time (hrs)&#39;,</span>
+<span class="sd">    &#39;Num Integrations per Occultation&#39;, &#39;Transit Duration&#39;]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">exptime_per_frame</span> <span class="o">=</span> <span class="n">m</span><span class="p">[</span><span class="s1">&#39;exptime_per_frame&#39;</span><span class="p">]</span>
+    <span class="n">nframe</span> <span class="o">=</span> <span class="n">m</span><span class="p">[</span><span class="s1">&#39;nframe&#39;</span><span class="p">]</span>
+    <span class="n">nskip</span> <span class="o">=</span> <span class="n">m</span><span class="p">[</span><span class="s1">&#39;nskip&#39;</span><span class="p">]</span>
+    <span class="n">overhead_per_int</span> <span class="o">=</span> <span class="n">exptime_per_frame</span> <span class="c1">#overhead time added per integration </span>
+    <span class="n">maxexptime_per_int</span> <span class="o">=</span> <span class="n">m</span><span class="p">[</span><span class="s1">&#39;maxexptime_per_int&#39;</span><span class="p">]</span>
+
+    <span class="n">flag_default</span> <span class="o">=</span> <span class="s2">&quot;All good&quot;</span>
+    <span class="n">flag_high</span> <span class="o">=</span> <span class="s2">&quot;All good&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1">#number of frames in one integration is the maximum time beofre exposure </span>
+        <span class="c1">#divided by the time it takes for one frame. Note this does not include </span>
+        <span class="c1">#reset frames </span>
+
+        <span class="n">nframes_per_int</span> <span class="o">=</span> <span class="n">long</span><span class="p">(</span><span class="n">maxexptime_per_int</span><span class="o">/</span><span class="n">exptime_per_frame</span><span class="p">)</span>
+    
+        <span class="c1">#for exoplanets nframe =1 an nskip always = 1 so ngroups_per_int </span>
+        <span class="c1">#and nframes_per_int area always the same </span>
+        <span class="n">ngroups_per_int</span> <span class="o">=</span> <span class="n">long</span><span class="p">(</span><span class="n">nframes_per_int</span><span class="o">/</span><span class="p">(</span><span class="n">nframe</span> <span class="o">+</span> <span class="n">nskip</span><span class="p">))</span> 
+    
+        <span class="c1">#put restriction on number of groups </span>
+        <span class="c1">#there is a hard limit to the maximum number groups. </span>
+        <span class="c1">#if you exceed that limit, set it to the maximum value instead.</span>
+        <span class="c1">#also set another check for saturation</span>
+    
+        <span class="k">if</span> <span class="n">ngroups_per_int</span> <span class="o">&gt;</span> <span class="n">max_ngroup</span><span class="p">:</span>
+            <span class="n">ngroups_per_int</span> <span class="o">=</span> <span class="n">max_ngroup</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Num of groups per int exceeded max num of allowed groups&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">ngroups_per_int</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Setting number of groups to max value = 65536.0&quot;</span><span class="p">)</span>
+            <span class="n">flag_high</span> <span class="o">=</span> <span class="s2">&quot;Groups/int &gt; max num of allowed groups&quot;</span>
+ 
+        <span class="k">if</span> <span class="n">ngroups_per_int</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">ngroups_per_int</span> <span class="o">=</span> <span class="mf">2.0</span>  
+            <span class="n">nframes_per_int</span> <span class="o">=</span> <span class="mi">2</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Hard saturation during first group. Check Pandeia Warnings.&quot;</span><span class="p">)</span>
+            <span class="n">flag_default</span> <span class="o">=</span> <span class="s2">&quot;NGROUPS&lt;2, SET TO NGROUPS=2 BY DEFAULT&quot;</span>
+    <span class="k">except</span><span class="p">:</span> 
+        <span class="c1">#if maxexptime_per_int is nan then just ngroups and nframe to 2 </span>
+        <span class="c1">#for the sake of not returning error</span>
+        <span class="n">nframes_per_int</span> <span class="o">=</span> <span class="mi">2</span>
+        <span class="n">ngroups_per_int</span> <span class="o">=</span> <span class="mi">2</span>
+        <span class="n">flag_default</span> <span class="o">=</span> <span class="s2">&quot;NGROUPS&lt;2, SET TO NGROUPS=2 BY DEFAULT&quot;</span>
+                
+    <span class="c1">#the integration time is related to the number of groups and the time of each </span>
+    <span class="c1">#group </span>
+    <span class="n">exptime_per_int</span> <span class="o">=</span> <span class="n">ngroups_per_int</span><span class="o">*</span><span class="n">exptime_per_frame</span>
+    
+    <span class="c1">#clock time includes the reset frame </span>
+    <span class="n">clocktime_per_int</span> <span class="o">=</span> <span class="n">ngroups_per_int</span><span class="o">*</span><span class="n">exptime_per_frame</span>
+    
+    <span class="c1">#observing efficiency (i.e. what percentage of total time is spent on soure)</span>
+    <span class="n">eff</span> <span class="o">=</span> <span class="p">(</span><span class="n">ngroups_per_int</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">ngroups_per_int</span> <span class="o">+</span> <span class="mf">1.0</span><span class="p">)</span>
+    
+    <span class="c1">#this says &quot;per occultation&quot; but this is just the in transit frames.. See below</span>
+    <span class="c1">#nframes_per_occultation = long(transit_duration/exptime_per_frame)</span>
+    <span class="c1">#ngroups_per_occultation = long(nframes_per_occultation/(nframe + nskip))</span>
+    <span class="n">nint_per_occultation</span> <span class="o">=</span>  <span class="n">transit_duration</span><span class="o">*</span><span class="n">eff</span><span class="o">/</span><span class="n">exptime_per_int</span>
+    
+    <span class="c1">#figure out how many integrations are in transit and how many are out of transit </span>
+    <span class="n">nint_in</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">nint_per_occultation</span><span class="p">)</span>
+    <span class="n">nint_out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">nint_in</span><span class="o">/</span><span class="n">expfact_out</span><span class="p">)</span>
+    
+    <span class="c1">#you would never want a single integration in transit. </span>
+    <span class="c1">#here we assume that for very dim things, you would want at least </span>
+    <span class="c1">#3 integrations in transit </span>
+    <span class="k">if</span> <span class="n">nint_in</span> <span class="o">&lt;</span> <span class="n">min_nint_trans</span><span class="p">:</span>
+        <span class="n">ngroups_per_int</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">ngroups_per_int</span><span class="o">/</span><span class="mf">3.0</span><span class="p">)</span>
+        <span class="n">exptime_per_int</span> <span class="o">=</span> <span class="p">(</span><span class="n">ngroups_per_int</span><span class="o">-</span><span class="mf">1.</span><span class="p">)</span><span class="o">*</span><span class="n">exptime_per_frame</span>
+        <span class="n">clocktime_per_int</span> <span class="o">=</span> <span class="n">ngroups_per_int</span><span class="o">*</span><span class="n">exptime_per_frame</span>
+        <span class="n">eff</span> <span class="o">=</span> <span class="p">(</span><span class="n">ngroups_per_int</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">ngroups_per_int</span> <span class="o">+</span> <span class="mf">1.0</span><span class="p">)</span>
+        <span class="n">nint_per_occultation</span> <span class="o">=</span>  <span class="n">transit_duration</span><span class="o">*</span><span class="n">eff</span><span class="o">/</span><span class="n">exptime_per_int</span>
+        <span class="n">nint_in</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">nint_per_occultation</span><span class="p">)</span>
+        <span class="n">nint_out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">nint_in</span><span class="o">/</span><span class="n">expfact_out</span><span class="p">)</span>
+        
+    <span class="k">if</span> <span class="n">nint_out</span> <span class="o">&lt;</span> <span class="n">min_nint_trans</span><span class="p">:</span>
+        <span class="n">nint_out</span> <span class="o">=</span> <span class="n">min_nint_trans</span>
+   
+    <span class="n">timing</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;Transit Duration&quot;</span> <span class="p">:</span> <span class="n">transit_duration</span><span class="o">/</span><span class="mf">60.0</span><span class="o">/</span><span class="mf">60.0</span><span class="p">,</span>
+        <span class="s2">&quot;Seconds per Frame&quot;</span> <span class="p">:</span> <span class="n">exptime_per_frame</span><span class="p">,</span>
+        <span class="s2">&quot;Exposure Time Per Integration (secs)&quot;</span><span class="p">:</span><span class="n">exptime_per_int</span><span class="p">,</span>
+        <span class="s2">&quot;Num Groups per Integration&quot;</span> <span class="p">:</span><span class="n">ngroups_per_int</span><span class="p">,</span> 
+        <span class="s2">&quot;Num Integrations Out of Transit&quot;</span><span class="p">:</span><span class="n">nint_out</span><span class="p">,</span>
+        <span class="s2">&quot;Num Integrations In Transit&quot;</span><span class="p">:</span><span class="n">nint_in</span><span class="p">,</span>
+        <span class="s2">&quot;Num Integrations per Occultation&quot;</span><span class="p">:</span><span class="n">nint_out</span><span class="o">+</span><span class="n">nint_in</span><span class="p">,</span>
+        <span class="s2">&quot;On Source Time(sec)&quot;</span><span class="p">:</span> <span class="n">noccultations</span><span class="o">*</span><span class="n">clocktime_per_int</span><span class="o">*</span><span class="p">(</span><span class="n">nint_out</span><span class="o">+</span><span class="n">nint_in</span><span class="p">),</span>
+        <span class="s2">&quot;Reset time Plus 30 min TA time (hrs)&quot;</span><span class="p">:</span> <span class="n">overhead_per_int</span><span class="o">*</span><span class="p">(</span><span class="n">nint_in</span> <span class="o">+</span> <span class="n">nint_out</span><span class="p">)</span><span class="o">/</span><span class="mf">60.0</span><span class="o">/</span><span class="mf">60.0</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">,</span>
+        <span class="s2">&quot;Observing Efficiency (%)&quot;</span><span class="p">:</span> <span class="n">eff</span><span class="o">*</span><span class="mf">100.0</span><span class="p">,</span>
+        <span class="s2">&quot;Number of Transits&quot;</span><span class="p">:</span> <span class="n">noccultations</span>
+        <span class="p">}</span>      
+        
+    <span class="k">return</span> <span class="n">timing</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;flag_default&#39;</span><span class="p">:</span><span class="n">flag_default</span><span class="p">,</span><span class="s1">&#39;flag_high&#39;</span><span class="p">:</span><span class="n">flag_high</span><span class="p">}</span></div>
+
+<div class="viewcode-block" id="perform_out"><a class="viewcode-back" href="../../engine.html#engine.jwst.perform_out">[docs]</a><span class="k">def</span> <span class="nf">perform_out</span><span class="p">(</span><span class="n">pandeia_input</span><span class="p">,</span> <span class="n">pandexo_input</span><span class="p">,</span><span class="n">timing</span><span class="p">,</span> <span class="n">both_spec</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Runs pandeia for the out of transit data</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    pandeia_input : dict </span>
+<span class="sd">        pandeia specific input info </span>
+<span class="sd">    pandexo_input : dict </span>
+<span class="sd">        exoplanet specific observation info </span>
+<span class="sd">    timing : dict </span>
+<span class="sd">        timing dictionary from **compute_timing** </span>
+<span class="sd">    both_spec : dict </span>
+<span class="sd">        dictionary transit spectra computed from **createInput.bothTrans** </span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict </span>
+<span class="sd">        pandeia output dictionary for out of transit data </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#pandeia inputs, simulate one integration at a time </span>
+    <span class="n">pandeia_input</span><span class="p">[</span><span class="s1">&#39;configuration&#39;</span><span class="p">][</span><span class="s1">&#39;detector&#39;</span><span class="p">][</span><span class="s1">&#39;ngroup&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">timing</span><span class="p">[</span><span class="s1">&#39;Num Groups per Integration&#39;</span><span class="p">]</span>
+    <span class="n">pandeia_input</span><span class="p">[</span><span class="s1">&#39;configuration&#39;</span><span class="p">][</span><span class="s1">&#39;detector&#39;</span><span class="p">][</span><span class="s1">&#39;nint&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">timing</span><span class="p">[</span><span class="s1">&#39;Num Integrations Out of Transit&#39;</span><span class="p">]</span>
+    <span class="n">pandeia_input</span><span class="p">[</span><span class="s1">&#39;configuration&#39;</span><span class="p">][</span><span class="s1">&#39;detector&#39;</span><span class="p">][</span><span class="s1">&#39;nexp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> 
+
+    <span class="n">report_out</span> <span class="o">=</span> <span class="n">perform_calculation</span><span class="p">(</span><span class="n">pandeia_input</span><span class="p">,</span> <span class="n">dict_report</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">report_out</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;3d&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">report_out</span></div>
+
+    
+<div class="viewcode-block" id="perform_in"><a class="viewcode-back" href="../../engine.html#engine.jwst.perform_in">[docs]</a><span class="k">def</span> <span class="nf">perform_in</span><span class="p">(</span><span class="n">pandeia_input</span><span class="p">,</span> <span class="n">pandexo_input</span><span class="p">,</span><span class="n">timing</span><span class="p">,</span> <span class="n">both_spec</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">calculation</span><span class="p">):</span> 
+    <span class="sd">&quot;&quot;&quot;Computes in transit data </span>
+<span class="sd">    </span>
+<span class="sd">    Runs Pandeia for the in transit data or computes the in transit simulation </span>
+<span class="sd">    from the out of transit pandeia run </span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    pandeia_input : dict </span>
+<span class="sd">        pandeia specific input info </span>
+<span class="sd">    pandexo_input : dict </span>
+<span class="sd">        exoplanet specific observation info </span>
+<span class="sd">    timing : dict </span>
+<span class="sd">        timing dictionary from **compute_timing** </span>
+<span class="sd">    both_spec : dict </span>
+<span class="sd">        dictionary transit spectra computed from **createInput.bothTrans** </span>
+<span class="sd">    out : dict </span>
+<span class="sd">        out of transit dictionary from **perform_in**</span>
+<span class="sd">    calculation : str</span>
+<span class="sd">        key which speficies the kind of noise calcualtion </span>
+<span class="sd">        (2d extract, slope method, fml, phase_spec). </span>
+<span class="sd">        Recommended for transit transmisstion spectra = fml</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        pandeia output dictionary </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="c1">#function to run pandeia for in transit</span>
+    <span class="k">if</span> <span class="n">calculation</span> <span class="o">==</span> <span class="s1">&#39;phase_spec&#39;</span><span class="p">:</span>
+        <span class="c1">#return the phase curve since it&#39;s all we need </span>
+        <span class="n">report_in</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;time&#39;</span><span class="p">:</span> <span class="n">both_spec</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">],</span><span class="s1">&#39;planet_phase&#39;</span><span class="p">:</span> <span class="n">both_spec</span><span class="p">[</span><span class="s1">&#39;planet_phase&#39;</span><span class="p">]}</span>
+    <span class="k">elif</span> <span class="n">calculation</span> <span class="o">==</span> <span class="s1">&#39;fml&#39;</span><span class="p">:</span>
+        <span class="c1">#for FML method, we only use the flux rate calculated in pandeia so </span>
+        <span class="c1">#can compute in transit flux rate without running pandeia a third time     </span>
+        <span class="n">report_in</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+        
+        <span class="n">transit_depth</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">report_in</span><span class="p">[</span><span class="s1">&#39;1d&#39;</span><span class="p">][</span><span class="s1">&#39;extracted_flux&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+                                    <span class="n">both_spec</span><span class="p">[</span><span class="s1">&#39;wave&#39;</span><span class="p">],</span> <span class="n">both_spec</span><span class="p">[</span><span class="s1">&#39;frac&#39;</span><span class="p">])</span>
+        <span class="n">report_in</span><span class="p">[</span><span class="s1">&#39;1d&#39;</span><span class="p">][</span><span class="s1">&#39;extracted_flux&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">report_in</span><span class="p">[</span><span class="s1">&#39;1d&#39;</span><span class="p">][</span><span class="s1">&#39;extracted_flux&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">transit_depth</span>
+    <span class="k">else</span><span class="p">:</span> 
+        <span class="c1">#only run pandeia a third time if doing slope method and need accurate run for the </span>
+        <span class="c1">#nint and timing</span>
+        <span class="n">pandeia_input</span><span class="p">[</span><span class="s1">&#39;configuration&#39;</span><span class="p">][</span><span class="s1">&#39;detector&#39;</span><span class="p">][</span><span class="s1">&#39;ngroup&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">timing</span><span class="p">[</span><span class="s1">&#39;Num Groups per Integration&#39;</span><span class="p">]</span>
+        <span class="n">pandeia_input</span><span class="p">[</span><span class="s1">&#39;configuration&#39;</span><span class="p">][</span><span class="s1">&#39;detector&#39;</span><span class="p">][</span><span class="s1">&#39;nint&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">timing</span><span class="p">[</span><span class="s1">&#39;Num Integrations In Transit&#39;</span><span class="p">]</span>
+        <span class="n">pandeia_input</span><span class="p">[</span><span class="s1">&#39;configuration&#39;</span><span class="p">][</span><span class="s1">&#39;detector&#39;</span><span class="p">][</span><span class="s1">&#39;nexp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+  
+        <span class="n">in_transit_spec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">both_spec</span><span class="p">[</span><span class="s1">&#39;wave&#39;</span><span class="p">],</span> <span class="n">both_spec</span><span class="p">[</span><span class="s1">&#39;flux_in_trans&#39;</span><span class="p">]])</span>
+    
+        <span class="n">pandeia_input</span><span class="p">[</span><span class="s1">&#39;scene&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;spectrum&#39;</span><span class="p">][</span><span class="s1">&#39;sed&#39;</span><span class="p">][</span><span class="s1">&#39;spectrum&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">in_transit_spec</span>
+
+        <span class="n">report_in</span> <span class="o">=</span> <span class="n">perform_calculation</span><span class="p">(</span><span class="n">pandeia_input</span><span class="p">,</span> <span class="n">dict_report</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">report_in</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;3d&#39;</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">report_in</span></div>
+          
+<div class="viewcode-block" id="add_warnings"><a class="viewcode-back" href="../../engine.html#engine.jwst.add_warnings">[docs]</a><span class="k">def</span> <span class="nf">add_warnings</span><span class="p">(</span><span class="n">pand_dict</span><span class="p">,</span> <span class="n">timing</span><span class="p">,</span> <span class="n">sat_level</span><span class="p">,</span> <span class="n">flags</span><span class="p">,</span><span class="n">instrument</span><span class="p">):</span> 
+    <span class="sd">&quot;&quot;&quot;Add warnings for front end </span>
+<span class="sd">    </span>
+<span class="sd">    Adds in necessary warning flags for a JWST observation usually associated with </span>
+<span class="sd">    too few or too many groups or saturation. Alerts user if saturation level is higher </span>
+<span class="sd">    than 80 percent and if the number of groups is less than 5. Or, if the full well is </span>
+<span class="sd">    greater than 80. These warnings are currently very arbitrary. Will be updated as </span>
+<span class="sd">    better JWST recommendations are made. </span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    pand_dict : </span>
+<span class="sd">        output from pandeia run </span>
+<span class="sd">    timing : dict </span>
+<span class="sd">        output from **compute_timing** </span>
+<span class="sd">    sat_level : int or float </span>
+<span class="sd">        user specified saturation level in electrons </span>
+<span class="sd">    flags : dict </span>
+<span class="sd">        warning flags taken from output of **compute_timing**</span>
+<span class="sd">    instrument : str </span>
+<span class="sd">        Only allowable strings are: &quot;nirspec&quot;, &quot;niriss&quot;, &quot;nircam&quot;, &quot;miri&quot;</span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict </span>
+<span class="sd">        all warnings </span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----    </span>
+<span class="sd">    These are warnings are just suggestions and are not yet required.   </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">ngroups_per_int</span> <span class="o">=</span> <span class="n">timing</span><span class="p">[</span><span class="s1">&#39;Num Groups per Integration&#39;</span><span class="p">]</span>
+  
+    <span class="c1">#check for saturation </span>
+    <span class="k">try</span><span class="p">:</span>  
+        <span class="n">flag_nonl</span> <span class="o">=</span> <span class="n">pand_dict</span><span class="p">[</span><span class="s1">&#39;warnings&#39;</span><span class="p">][</span><span class="s1">&#39;nonlinear&#39;</span><span class="p">]</span>
+    <span class="k">except</span><span class="p">:</span> 
+        <span class="n">flag_nonl</span> <span class="o">=</span> <span class="s2">&quot;All good&quot;</span>    
+    <span class="k">try</span><span class="p">:</span> 
+        <span class="n">flag_sat</span> <span class="o">=</span> <span class="n">pand_dict</span><span class="p">[</span><span class="s1">&#39;warnings&#39;</span><span class="p">][</span><span class="s1">&#39;saturated&#39;</span><span class="p">]</span>
+    <span class="k">except</span><span class="p">:</span> 
+        <span class="n">flag_sat</span> <span class="o">=</span> <span class="s2">&quot;All good&quot;</span>
+        
+    <span class="c1">#check for too small number of groups</span>
+    <span class="n">flag_low</span> <span class="o">=</span> <span class="s2">&quot;All good&quot;</span>
+    <span class="n">flag_perc</span> <span class="o">=</span> <span class="s2">&quot;All good&quot;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">sat_level</span> <span class="o">&gt;</span> <span class="mi">80</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">ngroups_per_int</span> <span class="o">&lt;</span><span class="mi">5</span><span class="p">):</span>
+        <span class="n">flag_low</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">% f</span><span class="s2">ull well&gt;80% &amp; only &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">ngroups_per_int</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; groups&quot;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">sat_level</span> <span class="o">&gt;</span> <span class="mi">80</span><span class="p">):</span> 
+        <span class="n">flag_perc</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">% f</span><span class="s2">ull well&gt;80%&quot;</span>
+
+     
+    <span class="n">warnings</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;Group Number Too Low?&quot;</span> <span class="p">:</span> <span class="n">flag_low</span><span class="p">,</span>
+            <span class="s2">&quot;Group Number Too High?&quot;</span><span class="p">:</span> <span class="n">flags</span><span class="p">[</span><span class="s2">&quot;flag_high&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;Non linear?&quot;</span> <span class="p">:</span> <span class="n">flag_nonl</span><span class="p">,</span>
+            <span class="s2">&quot;Saturated?&quot;</span> <span class="p">:</span> <span class="n">flag_sat</span><span class="p">,</span>
+            <span class="s2">&quot;</span><span class="si">% f</span><span class="s2">ull well high?&quot;</span><span class="p">:</span> <span class="n">flag_perc</span><span class="p">,</span> 
+            <span class="s2">&quot;Num Groups Reset?&quot;</span><span class="p">:</span> <span class="n">flags</span><span class="p">[</span><span class="s2">&quot;flag_default&quot;</span><span class="p">]</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">warnings</span>     </div>
+    
+<div class="viewcode-block" id="add_noise_floor"><a class="viewcode-back" href="../../engine.html#engine.jwst.add_noise_floor">[docs]</a><span class="k">def</span> <span class="nf">add_noise_floor</span><span class="p">(</span><span class="n">noise_floor</span><span class="p">,</span> <span class="n">wave_bin</span><span class="p">,</span> <span class="n">error_spec</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Add in noise floor </span>
+<span class="sd">    </span>
+<span class="sd">    This adds in a user speficied noise floor. Does not add the noise floor in quadrature </span>
+<span class="sd">    isntead it sets error[error&lt;noise_floor] = noise_floor. If a wavelength dependent </span>
+<span class="sd">    noise floor is given and the wavelength ranges are off, it interpolates the out of </span>
+<span class="sd">    range noise floor. </span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    noise_floor : str or int </span>
+<span class="sd">        file with two column [wavelength, noise(ppm)] or single number with constant noise floor in ppm </span>
+<span class="sd">    wave_bin : array of float</span>
+<span class="sd">        final binned wavelength grid from simulation </span>
+<span class="sd">    error_spec : array of float </span>
+<span class="sd">        final computed error on the planet spectrum in units of rp^2/r*^2 or fp/f*</span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    array of float </span>
+<span class="sd">        error_spec-- new error</span>
+<span class="sd">    </span>
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    </span>
+<span class="sd">    &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">    &gt;&gt;&gt; wave = np.linspace(1,2.7,10)</span>
+<span class="sd">    &gt;&gt;&gt; error = np.zeros(10)+1e-6</span>
+<span class="sd">    &gt;&gt;&gt; newerror = add_noise_floor(20, wave, error)</span>
+<span class="sd">    &gt;&gt;&gt; print newerror</span>
+<span class="sd">    [  2.00000000e-05   2.00000000e-05   2.00000000e-05   2.00000000e-05</span>
+<span class="sd">       2.00000000e-05   2.00000000e-05   2.00000000e-05   2.00000000e-05</span>
+<span class="sd">       2.00000000e-05   2.00000000e-05]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#add user specified noise floor </span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">noise_floor</span><span class="p">)</span><span class="o">==</span><span class="nb">float</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">noise_floor</span><span class="p">)</span> <span class="o">==</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="n">error_spec</span><span class="p">[</span><span class="n">error_spec</span><span class="o">&lt;</span><span class="n">noise_floor</span><span class="o">*</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">6</span><span class="p">]</span> <span class="o">=</span> <span class="n">noise_floor</span><span class="o">*</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">6</span>
+    <span class="k">elif</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">noise_floor</span><span class="p">)</span><span class="o">==</span><span class="nb">str</span><span class="p">):</span>
+        <span class="n">read_noise</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span><span class="n">noise_floor</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span> <span class="n">names</span><span class="o">=</span><span class="s1">&#39;w, n&#39;</span><span class="p">)</span>
+        <span class="n">w_overlap</span> <span class="o">=</span> <span class="p">(</span><span class="n">wave_bin</span><span class="o">&gt;=</span><span class="nb">min</span><span class="p">(</span><span class="n">read_noise</span><span class="p">[</span><span class="s1">&#39;w&#39;</span><span class="p">]))</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">wave_bin</span><span class="o">&lt;=</span><span class="nb">max</span><span class="p">(</span><span class="n">read_noise</span><span class="p">[</span><span class="s1">&#39;w&#39;</span><span class="p">]))</span> 
+        <span class="n">wnoise</span> <span class="o">=</span> <span class="n">wave_bin</span><span class="p">[</span><span class="n">w_overlap</span><span class="p">]</span>
+        <span class="n">noise</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">wave_bin</span><span class="p">))</span>
+        <span class="n">noise</span><span class="p">[</span><span class="n">w_overlap</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">wnoise</span> <span class="p">,</span> <span class="n">read_noise</span><span class="p">[</span><span class="s1">&#39;w&#39;</span><span class="p">],</span> <span class="n">read_noise</span><span class="p">[</span><span class="s1">&#39;n&#39;</span><span class="p">])</span>
+        <span class="n">noise</span><span class="p">[(</span><span class="n">wave_bin</span><span class="o">&gt;</span><span class="nb">max</span><span class="p">(</span><span class="n">read_noise</span><span class="p">[</span><span class="s1">&#39;w&#39;</span><span class="p">]))]</span> <span class="o">=</span> <span class="n">read_noise</span><span class="p">[</span><span class="s1">&#39;n&#39;</span><span class="p">][</span><span class="n">read_noise</span><span class="p">[</span><span class="s1">&#39;w&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="nb">max</span><span class="p">(</span><span class="n">read_noise</span><span class="p">[</span><span class="s1">&#39;w&#39;</span><span class="p">])]</span>
+        <span class="n">noise</span><span class="p">[(</span><span class="n">wave_bin</span><span class="o">&lt;</span><span class="nb">min</span><span class="p">(</span><span class="n">read_noise</span><span class="p">[</span><span class="s1">&#39;w&#39;</span><span class="p">]))]</span> <span class="o">=</span> <span class="n">read_noise</span><span class="p">[</span><span class="s1">&#39;n&#39;</span><span class="p">][</span><span class="n">read_noise</span><span class="p">[</span><span class="s1">&#39;w&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="nb">min</span><span class="p">(</span><span class="n">read_noise</span><span class="p">[</span><span class="s1">&#39;w&#39;</span><span class="p">])]</span>
+        <span class="n">error_spec</span><span class="p">[</span><span class="n">error_spec</span><span class="o">&lt;</span><span class="n">noise</span><span class="o">*</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">6</span><span class="p">]</span> <span class="o">=</span> <span class="n">noise</span><span class="p">[</span><span class="n">error_spec</span><span class="o">&lt;</span><span class="n">noise</span><span class="o">*</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">6</span><span class="p">]</span><span class="o">*</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">6</span>
+    <span class="k">else</span><span class="p">:</span> 
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Noise Floor added was not integer or file&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">error_spec</span></div>
+
+<div class="viewcode-block" id="bin_wave_to_R"><a class="viewcode-back" href="../../engine.html#engine.jwst.bin_wave_to_R">[docs]</a><span class="k">def</span> <span class="nf">bin_wave_to_R</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">R</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Creates new wavelength axis at specified resolution</span>
+<span class="sd">    </span>
+<span class="sd">    Rebins wavelength bin to a certain R </span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    w : list of float or numpy array of float</span>
+<span class="sd">        Wavelength axis to be rebinned </span>
+<span class="sd">    R : float or int </span>
+<span class="sd">        Resolution to bin axis to </span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list of float</span>
+<span class="sd">        New wavelength axis at specified resolution</span>
+<span class="sd">    </span>
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    </span>
+<span class="sd">    &gt;&gt;&gt; newwave = bin_wave_to_R(np.linspace(1,2,1000), 10)</span>
+<span class="sd">    &gt;&gt;&gt; print len(newwave)</span>
+<span class="sd">    11</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">wave</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">tracker</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span> 
+    <span class="n">ind</span><span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span><span class="p">(</span><span class="n">tracker</span><span class="o">&lt;</span><span class="nb">max</span><span class="p">(</span><span class="n">w</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span><span class="nb">len</span><span class="p">(</span><span class="n">w</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        
+            <span class="n">dlambda</span> <span class="o">=</span> <span class="n">w</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-</span><span class="n">w</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span>
+            <span class="n">newR</span> <span class="o">=</span> <span class="n">w</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">/</span><span class="n">dlambda</span>
+            <span class="k">if</span> <span class="n">newR</span> <span class="o">&lt;</span> <span class="n">R</span><span class="p">:</span>
+                <span class="n">tracker</span> <span class="o">=</span> <span class="n">w</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span><span class="o">+</span><span class="n">dlambda</span><span class="o">/</span><span class="mf">2.0</span>
+                <span class="n">wave</span> <span class="o">+=</span><span class="p">[</span><span class="n">tracker</span><span class="p">]</span>
+                <span class="n">ind</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">w</span><span class="o">-</span><span class="n">tracker</span><span class="p">))</span><span class="o">.</span><span class="n">argmin</span><span class="p">()</span>
+                <span class="n">i</span> <span class="o">=</span> <span class="n">ind</span>
+            <span class="k">else</span><span class="p">:</span>            
+                <span class="n">i</span><span class="o">+=</span><span class="mi">1</span>    
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">tracker</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">wave</span></div>
+    
+<div class="viewcode-block" id="uniform_tophat_sum"><a class="viewcode-back" href="../../engine.html#engine.jwst.uniform_tophat_sum">[docs]</a><span class="k">def</span> <span class="nf">uniform_tophat_sum</span><span class="p">(</span><span class="n">xnew</span><span class="p">,</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Adapted from Mike R. Line to rebin spectra</span>
+<span class="sd">    </span>
+<span class="sd">    Sums groups of points in certain wave bin </span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    xnew : list of float or numpy array of float</span>
+<span class="sd">        New wavelength grid to rebin to </span>
+<span class="sd">    x : list of float or numpy array of float </span>
+<span class="sd">        Old wavelength grid to get rid of </span>
+<span class="sd">    y : list of float or numpy array of float </span>
+<span class="sd">        New rebinned y axis </span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    array of floats </span>
+<span class="sd">        new wavelength grid </span>
+<span class="sd">        </span>
+<span class="sd">    Examples </span>
+<span class="sd">    --------</span>
+<span class="sd">        </span>
+<span class="sd">    &gt;&gt;&gt; from pandexo.engine.jwst import uniform_tophat_sum</span>
+<span class="sd">    &gt;&gt;&gt; oldgrid = np.linspace(1,3,100)</span>
+<span class="sd">    &gt;&gt;&gt; y = np.zeros(100)+10.0</span>
+<span class="sd">    &gt;&gt;&gt; newy = uniform_tophat_sum(np.linspace(2,3,3), oldgrid, y)</span>
+<span class="sd">    &gt;&gt;&gt; newy</span>
+<span class="sd">    array([ 240.,  250.,  130.])</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">xnew</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">newx</span><span class="p">)</span>
+    <span class="n">szmod</span><span class="o">=</span><span class="n">newx</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">delta</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">szmod</span><span class="p">)</span>
+    <span class="n">ynew</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">szmod</span><span class="p">)</span>
+    <span class="n">delta</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">=</span><span class="n">newx</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">-</span><span class="n">newx</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>  
+    <span class="n">delta</span><span class="p">[</span><span class="n">szmod</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">=</span><span class="n">delta</span><span class="p">[</span><span class="n">szmod</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> 
+    <span class="c1">#pdb.set_trace()</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">szmod</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">i</span><span class="o">=</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span>
+        <span class="n">loc</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">((</span><span class="n">x</span> <span class="o">&gt;=</span> <span class="n">newx</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-</span><span class="mf">0.5</span><span class="o">*</span><span class="n">delta</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">x</span> <span class="o">&lt;</span> <span class="n">newx</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">+</span><span class="mf">0.5</span><span class="o">*</span><span class="n">delta</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+        <span class="n">ynew</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">loc</span><span class="p">])</span>
+    <span class="n">loc</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">((</span><span class="n">x</span> <span class="o">&gt;</span> <span class="n">newx</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mf">0.5</span><span class="o">*</span><span class="n">delta</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">x</span> <span class="o">&lt;</span> <span class="n">newx</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="mf">0.5</span><span class="o">*</span><span class="n">delta</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+    <span class="n">ynew</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">loc</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">ynew</span></div>
+    
+<div class="viewcode-block" id="as_dict"><a class="viewcode-back" href="../../engine.html#engine.jwst.as_dict">[docs]</a><span class="k">def</span> <span class="nf">as_dict</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">both_spec</span> <span class="p">,</span><span class="n">binned</span><span class="p">,</span> <span class="n">timing</span><span class="p">,</span> <span class="n">mag</span><span class="p">,</span> <span class="n">sat_level</span><span class="p">,</span> <span class="n">warnings</span><span class="p">,</span> <span class="n">punit</span><span class="p">,</span> <span class="n">unbinned</span><span class="p">,</span><span class="n">calculation</span><span class="p">):</span> 
+    <span class="sd">&quot;&quot;&quot;Format dictionary for output data </span>
+<span class="sd">    </span>
+<span class="sd">    Takes all output from jwst run and converts it to simple dictionary </span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    out : dict </span>
+<span class="sd">        output dictionary from **compute_out**</span>
+<span class="sd">    both_spec : dict </span>
+<span class="sd">        output dictionary from **createInput.bothTrans**</span>
+<span class="sd">    binned : dict </span>
+<span class="sd">        dictionary from **wrapper** </span>
+<span class="sd">    timing : dict </span>
+<span class="sd">        dictionary from **compute_timing**</span>
+<span class="sd">    mag : dict </span>
+<span class="sd">        magnitude of system </span>
+<span class="sd">    sat_level : float or int</span>
+<span class="sd">        saturation level in electrons </span>
+<span class="sd">    warnings : dict </span>
+<span class="sd">        warning dictionary from **add_warnings**</span>
+<span class="sd">    punit : &quot;fp/f*&quot; or &quot;rp^2/r*^2&quot;</span>
+<span class="sd">        unit of supplied spectra options are: only options are fp/f* or rp^2/r*^2</span>
+<span class="sd">    unbinned : dict </span>
+<span class="sd">        unbinned raw data from **wrapper**</span>
+<span class="sd">    calculation : str </span>
+<span class="sd">        noise calculation type</span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict </span>
+<span class="sd">        compressed dictionary </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#for emission spectrum</span>
+
+    <span class="n">p</span><span class="o">=</span><span class="mf">1.0</span>
+    <span class="k">if</span> <span class="n">punit</span> <span class="o">==</span> <span class="s1">&#39;fp/f*&#39;</span><span class="p">:</span> <span class="n">p</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span>
+    
+    <span class="n">timing_div</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">timing</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Timing Info&#39;</span><span class="p">,</span> <span class="s1">&#39;Values&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">to_html</span><span class="p">()</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span>
+    <span class="n">timing_div</span> <span class="o">=</span> <span class="s1">&#39;&lt;table class=&quot;table table-striped&quot;&gt; </span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">timing_div</span><span class="p">[</span><span class="mi">36</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="n">timing_div</span><span class="p">)]</span>
+    
+    <span class="n">warnings_div</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">warnings</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Check&#39;</span><span class="p">,</span> <span class="s1">&#39;Status&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">to_html</span><span class="p">()</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span>
+    <span class="n">warnings_div</span> <span class="o">=</span> <span class="s1">&#39;&lt;table class=&quot;table table-striped&quot;&gt; </span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">warnings_div</span><span class="p">[</span><span class="mi">36</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="n">warnings_div</span><span class="p">)]</span>
+       
+    <span class="n">input_dict</span> <span class="o">=</span> <span class="p">{</span>
+   	 <span class="s2">&quot;Target Mag&quot;</span><span class="p">:</span> <span class="n">mag</span> <span class="p">,</span> 
+   	 <span class="s2">&quot;Saturation Level (electons)&quot;</span><span class="p">:</span> <span class="n">sat_level</span><span class="p">,</span> 
+   	 <span class="s2">&quot;Instrument&quot;</span><span class="p">:</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;configuration&#39;</span><span class="p">][</span><span class="s1">&#39;instrument&#39;</span><span class="p">][</span><span class="s1">&#39;instrument&#39;</span><span class="p">],</span> 
+   	 <span class="s2">&quot;Mode&quot;</span><span class="p">:</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;configuration&#39;</span><span class="p">][</span><span class="s1">&#39;instrument&#39;</span><span class="p">][</span><span class="s1">&#39;mode&#39;</span><span class="p">],</span> 
+   	 <span class="s2">&quot;Aperture&quot;</span><span class="p">:</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;configuration&#39;</span><span class="p">][</span><span class="s1">&#39;instrument&#39;</span><span class="p">][</span><span class="s1">&#39;aperture&#39;</span><span class="p">],</span> 
+   	 <span class="s2">&quot;Disperser&quot;</span><span class="p">:</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;configuration&#39;</span><span class="p">][</span><span class="s1">&#39;instrument&#39;</span><span class="p">][</span><span class="s1">&#39;disperser&#39;</span><span class="p">],</span> 
+   	 <span class="s2">&quot;Subarray&quot;</span><span class="p">:</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;configuration&#39;</span><span class="p">][</span><span class="s1">&#39;detector&#39;</span><span class="p">][</span><span class="s1">&#39;subarray&#39;</span><span class="p">],</span> 
+   	 <span class="s2">&quot;Readmode&quot;</span><span class="p">:</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;configuration&#39;</span><span class="p">][</span><span class="s1">&#39;detector&#39;</span><span class="p">][</span><span class="s1">&#39;readmode&#39;</span><span class="p">],</span> 
+ 	 <span class="s2">&quot;Filter&quot;</span><span class="p">:</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;configuration&#39;</span><span class="p">][</span><span class="s1">&#39;instrument&#39;</span><span class="p">][</span><span class="s1">&#39;filter&#39;</span><span class="p">],</span>
+ 	 <span class="s2">&quot;Primary/Secondary&quot;</span><span class="p">:</span> <span class="n">punit</span>
+    <span class="p">}</span>
+    
+    <span class="n">input_div</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">input_dict</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Component&#39;</span><span class="p">,</span> <span class="s1">&#39;Values&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">to_html</span><span class="p">()</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span>
+    <span class="n">input_div</span> <span class="o">=</span> <span class="s1">&#39;&lt;table class=&quot;table table-striped&quot;&gt; </span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">input_div</span><span class="p">[</span><span class="mi">36</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="n">input_div</span><span class="p">)]</span>
+    
+    <span class="c1">#add calc type to input dict (doing it here so it doesn&#39;t output on webpage</span>
+    <span class="n">input_dict</span><span class="p">[</span><span class="s2">&quot;Calculation Type&quot;</span><span class="p">]</span><span class="o">=</span> <span class="n">calculation</span>
+    
+    <span class="n">final_dict</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;OriginalInput&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;model_spec&#39;</span><span class="p">:</span><span class="n">both_spec</span><span class="p">[</span><span class="s1">&#39;model_spec&#39;</span><span class="p">],</span>
+                     <span class="s1">&#39;model_wave&#39;</span> <span class="p">:</span> <span class="n">both_spec</span><span class="p">[</span><span class="s1">&#39;model_wave&#39;</span><span class="p">]},</span>
+    <span class="s1">&#39;RawData&#39;</span><span class="p">:</span> <span class="n">unbinned</span><span class="p">,</span>
+    <span class="s1">&#39;FinalSpectrum&#39;</span><span class="p">:</span> <span class="n">binned</span><span class="p">,</span>
+        
+    <span class="c1">#pic output </span>
+    <span class="s1">&#39;PandeiaOutTrans&#39;</span><span class="p">:</span> <span class="n">out</span><span class="p">,</span> 
+
+    <span class="c1">#all timing info </span>
+    <span class="s1">&#39;timing&#39;</span><span class="p">:</span> <span class="n">timing</span><span class="p">,</span>
+    <span class="s1">&#39;warning&#39;</span><span class="p">:</span><span class="n">warnings</span><span class="p">,</span>
+    <span class="s1">&#39;input&#39;</span><span class="p">:</span><span class="n">input_dict</span><span class="p">,</span>
+    
+    <span class="c1">#divs for html rendering    </span>
+    <span class="s1">&#39;timing_div&#39;</span><span class="p">:</span><span class="n">timing_div</span><span class="p">,</span> 
+    <span class="s1">&#39;input_div&#39;</span><span class="p">:</span><span class="n">input_div</span><span class="p">,</span>
+    <span class="s1">&#39;warnings_div&#39;</span><span class="p">:</span><span class="n">warnings_div</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">final_dict</span></div>
+
+    
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">PandExo  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016, Natasha Batalha;Kevin Stevenson.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,385 @@
+
+
+<!doctype html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>engine.ComputeZ &#8212; PandExo  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">PandExo  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for engine.ComputeZ</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">scipy.io.idl</span> <span class="k">import</span> <span class="n">readsav</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">bokeh.plotting</span> <span class="k">import</span> <span class="n">figure</span>
+<span class="kn">from</span> <span class="nn">bokeh.io</span> <span class="k">import</span> <span class="n">vform</span><span class="p">,</span><span class="n">output_file</span><span class="p">,</span> <span class="n">show</span><span class="p">,</span> <span class="n">vplot</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">elements</span> <span class="k">import</span> <span class="n">ELEMENTS</span> <span class="k">as</span> <span class="n">ele</span>
+<span class="c1">#from sympy.mpmath import *</span>
+<span class="kn">from</span> <span class="nn">sympy.mpmath</span> <span class="k">import</span> <span class="o">*</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">molDict = {</span>
+<span class="sd">    &quot;mols&quot;: {</span>
+<span class="sd">        &quot;H2O&quot;:1e-3, </span>
+<span class="sd">        &quot;H2&quot;: 99.0, </span>
+<span class="sd">        &quot;CH4&quot;: 1e-3, </span>
+<span class="sd">        &quot;CO&quot;:1e-3, </span>
+<span class="sd">        &quot;C2H2&quot;:1e-3, </span>
+<span class="sd">        &quot;HCN&quot;: 1e-3}, </span>
+<span class="sd">    &quot;T&quot;:1500.0, </span>
+<span class="sd">    &quot;g&quot;:, </span>
+<span class="sd">    &quot;Rp&quot;:, </span>
+<span class="sd">    &quot;R*&quot;:, </span>
+<span class="sd">    &quot;beta&quot;:, </span>
+<span class="sd">    &quot;P&quot;: 1e-4, </span>
+<span class="sd">    &quot;P0&quot;: 10.0, </span>
+<span class="sd">    &quot;taueq&quot;: 0.56</span>
+<span class="sd">}</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="n">k</span> <span class="o">=</span> <span class="mf">1.380658e-16</span> <span class="c1">#cgs </span>
+<span class="n">rsun</span> <span class="o">=</span> <span class="mf">6.96e10</span> <span class="c1">#cm </span>
+<span class="n">barye</span> <span class="o">=</span> <span class="mf">1000000.0</span> <span class="c1">#1 bar to 1e6 barye</span>
+<span class="n">amu</span> <span class="o">=</span><span class="mf">1.66e-24</span> <span class="c1">#grams</span>
+<span class="n">color</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="s2">&quot;blue&quot;</span><span class="p">,</span> <span class="s2">&quot;green&quot;</span><span class="p">,</span> <span class="s2">&quot;purple&quot;</span><span class="p">,</span> <span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="s2">&quot;yellow&quot;</span><span class="p">,</span> <span class="s2">&quot;orange&quot;</span><span class="p">,</span> <span class="s2">&quot;pink&quot;</span><span class="p">,</span><span class="s2">&quot;cyan&quot;</span><span class="p">,</span><span class="s2">&quot;brown&quot;</span><span class="p">]</span>
+<span class="n">__XSEC__</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s2">&quot;reference/CrossSections/&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="readXSecs"><a class="viewcode-back" href="../../engine.html#engine.ComputeZ.readXSecs">[docs]</a><span class="k">def</span> <span class="nf">readXSecs</span><span class="p">(</span><span class="n">molDict</span><span class="p">):</span>
+    
+    
+    <span class="n">MOL</span> <span class="o">=</span> <span class="n">molDict</span><span class="p">[</span><span class="s2">&quot;mols&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+    
+
+    <span class="n">files</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">__XSEC__</span><span class="p">)</span>
+    <span class="n">output_file</span><span class="p">(</span><span class="s2">&quot;cross.html&quot;</span><span class="p">)</span>
+    <span class="n">TOOLS</span> <span class="o">=</span> <span class="s2">&quot;pan,wheel_zoom,box_zoom,resize,reset,save&quot;</span>
+
+        
+    <span class="n">xsec</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">waves</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="c1">#compute concentration of background gas </span>
+    <span class="n">molDict</span> <span class="o">=</span> <span class="n">addBackground</span><span class="p">(</span><span class="n">molDict</span><span class="p">)</span>
+    
+    <span class="c1">#create dictionary of wavelengths and cross sections</span>
+    <span class="k">for</span> <span class="n">nmol</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">MOL</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">MOL</span><span class="p">[</span><span class="n">nmol</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;H2&quot;</span><span class="p">:</span> 
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span> 
+                <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;H2H2&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="n">readthis</span> <span class="o">=</span> <span class="n">i</span>  
+                    
+        <span class="k">elif</span> <span class="n">MOL</span><span class="p">[</span><span class="n">nmol</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;He&quot;</span><span class="p">:</span> 
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span> 
+                <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;H2He&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="n">readthis</span> <span class="o">=</span> <span class="n">i</span>
+                    
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span> 
+                <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">MOL</span><span class="p">[</span><span class="n">nmol</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;_&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="n">readthis</span> <span class="o">=</span> <span class="n">i</span>
+                    
+         
+        <span class="n">cross</span> <span class="o">=</span> <span class="n">readsav</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">__XSEC__</span><span class="p">,</span><span class="n">readthis</span><span class="p">))</span>
+        <span class="n">Tind</span> <span class="o">=</span> <span class="n">find_nearest</span><span class="p">(</span><span class="n">cross</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">molDict</span><span class="p">[</span><span class="s2">&quot;T&quot;</span><span class="p">])</span>
+        <span class="n">Pind</span> <span class="o">=</span> <span class="n">find_nearest</span><span class="p">(</span><span class="n">cross</span><span class="o">.</span><span class="n">P</span><span class="p">,</span> <span class="n">molDict</span><span class="p">[</span><span class="s2">&quot;P&quot;</span><span class="p">])</span>
+
+        <span class="n">actualT</span> <span class="o">=</span> <span class="n">cross</span><span class="o">.</span><span class="n">T</span><span class="p">[</span><span class="n">Tind</span><span class="p">]</span>
+        <span class="n">actualP</span> <span class="o">=</span> <span class="n">cross</span><span class="o">.</span><span class="n">P</span><span class="p">[</span><span class="n">Pind</span><span class="p">]</span>
+        
+        <span class="n">xsec</span><span class="p">[</span><span class="n">MOL</span><span class="p">[</span><span class="n">nmol</span><span class="p">]]</span> <span class="o">=</span> <span class="n">cross</span><span class="o">.</span><span class="n">xsecarr</span><span class="p">[</span><span class="n">Pind</span><span class="p">,</span> <span class="n">Tind</span><span class="p">]</span>
+        <span class="n">waves</span><span class="p">[</span><span class="n">MOL</span><span class="p">[</span><span class="n">nmol</span><span class="p">]]</span> <span class="o">=</span> <span class="n">cross</span><span class="o">.</span><span class="n">wno</span>
+        
+        
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;waves&quot;</span><span class="p">:</span><span class="n">waves</span><span class="p">,</span> <span class="s2">&quot;xsec&quot;</span><span class="p">:</span><span class="n">xsec</span><span class="p">}</span></div>
+    
+<div class="viewcode-block" id="computeAlpha"><a class="viewcode-back" href="../../engine.html#engine.ComputeZ.computeAlpha">[docs]</a><span class="k">def</span> <span class="nf">computeAlpha</span><span class="p">(</span><span class="n">molDict</span><span class="p">,</span> <span class="n">plot</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+    <span class="n">plot1</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">plot2</span> <span class="o">=</span> <span class="kc">False</span> 
+    
+    <span class="n">MOL</span> <span class="o">=</span> <span class="n">molDict</span><span class="p">[</span><span class="s2">&quot;mols&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+    <span class="n">read</span> <span class="o">=</span> <span class="n">readXSecs</span><span class="p">(</span><span class="n">molDict</span><span class="p">)</span>
+    <span class="n">waves</span> <span class="o">=</span> <span class="n">read</span><span class="p">[</span><span class="s2">&quot;waves&quot;</span><span class="p">]</span>
+    <span class="n">xsec</span> <span class="o">=</span> <span class="n">read</span><span class="p">[</span><span class="s2">&quot;xsec&quot;</span><span class="p">]</span>
+    
+    <span class="n">TOOLS</span> <span class="o">=</span> <span class="s2">&quot;pan,wheel_zoom,box_zoom,resize,reset,save&quot;</span>
+    <span class="k">if</span> <span class="n">plot</span><span class="p">:</span>
+        <span class="n">plot2</span> <span class="o">=</span> <span class="n">figure</span><span class="p">(</span><span class="n">plot_width</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span> <span class="n">plot_height</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>  <span class="n">tools</span><span class="o">=</span><span class="n">TOOLS</span><span class="p">,</span> <span class="n">responsive</span> <span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">y_axis_type</span><span class="o">=</span><span class="s2">&quot;log&quot;</span><span class="p">,</span>
+                                 <span class="n">x_axis_label</span><span class="o">=</span><span class="s1">&#39;Wavelength [um]&#39;</span><span class="p">,</span> <span class="n">x_axis_type</span><span class="o">=</span><span class="s2">&quot;log&quot;</span><span class="p">,</span>
+                                 <span class="n">y_axis_label</span><span class="o">=</span><span class="s1">&#39;Weighted Cross Section&#39;</span><span class="p">,</span> <span class="n">y_range</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">29</span><span class="p">,</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">17</span><span class="p">])</span>
+
+    <span class="c1">#compute mean molecular weight and beta </span>
+    <span class="n">mu</span> <span class="o">=</span> <span class="n">computeMu</span><span class="p">(</span><span class="n">molDict</span><span class="p">[</span><span class="s2">&quot;mols&quot;</span><span class="p">])</span><span class="o">*</span><span class="n">amu</span>
+    
+    <span class="n">beta</span> <span class="o">=</span> <span class="n">molDict</span><span class="p">[</span><span class="s2">&quot;P0&quot;</span><span class="p">]</span><span class="o">*</span><span class="n">barye</span> <span class="o">/</span> <span class="n">molDict</span><span class="p">[</span><span class="s2">&quot;taueq&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.0</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">molDict</span><span class="p">[</span><span class="s2">&quot;Rp&quot;</span><span class="p">]</span><span class="o">*</span><span class="n">rsun</span><span class="p">)</span>
+
+    <span class="n">H</span> <span class="o">=</span> <span class="n">k</span><span class="o">*</span><span class="n">molDict</span><span class="p">[</span><span class="s2">&quot;T&quot;</span><span class="p">]</span><span class="o">/</span><span class="n">mu</span><span class="o">/</span><span class="n">molDict</span><span class="p">[</span><span class="s2">&quot;g&quot;</span><span class="p">]</span>
+    
+    <span class="n">sumprod</span> <span class="o">=</span> <span class="n">computeZSum</span><span class="p">(</span><span class="n">xsec</span><span class="p">,</span> <span class="n">molDict</span><span class="p">[</span><span class="s2">&quot;mols&quot;</span><span class="p">],</span> <span class="n">waves</span><span class="p">,</span> <span class="n">plot2</span><span class="p">,</span><span class="n">plot</span><span class="p">)</span>
+    
+    <span class="n">Z</span> <span class="o">=</span> <span class="n">H</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">k</span><span class="o">*</span><span class="n">molDict</span><span class="p">[</span><span class="s2">&quot;T&quot;</span><span class="p">]</span><span class="o">*</span><span class="n">mu</span><span class="o">*</span><span class="n">molDict</span><span class="p">[</span><span class="s2">&quot;g&quot;</span><span class="p">])</span> <span class="o">*</span> <span class="n">beta</span>
+                    <span class="o">*</span> <span class="n">sumprod</span><span class="p">)</span>
+    
+    <span class="n">C</span> <span class="o">=</span> <span class="mf">2.0</span><span class="o">*</span><span class="p">(</span><span class="n">molDict</span><span class="p">[</span><span class="s2">&quot;Rp&quot;</span><span class="p">]</span><span class="o">*</span><span class="n">rsun</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">molDict</span><span class="p">[</span><span class="s2">&quot;R*&quot;</span><span class="p">]</span><span class="o">*</span><span class="n">rsun</span><span class="p">)</span><span class="o">**</span><span class="mf">2.0</span>
+    
+    <span class="n">alpha</span> <span class="o">=</span> <span class="n">C</span><span class="o">*</span><span class="n">Z</span>
+    
+    <span class="k">if</span> <span class="n">plot</span><span class="p">:</span>
+        <span class="n">plot1</span> <span class="o">=</span> <span class="n">figure</span><span class="p">(</span><span class="n">plot_width</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span> <span class="n">plot_height</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>  <span class="n">tools</span><span class="o">=</span><span class="n">TOOLS</span><span class="p">,</span> <span class="n">responsive</span> <span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="c1">#y_axis_type=&quot;log&quot;,</span>
+                                 <span class="n">x_axis_label</span><span class="o">=</span><span class="s1">&#39;Wavelength [um]&#39;</span><span class="p">,</span> <span class="n">x_axis_type</span><span class="o">=</span><span class="s2">&quot;log&quot;</span><span class="p">,</span>
+                                 <span class="n">y_axis_label</span><span class="o">=</span><span class="s1">&#39;Alpha Lambda&#39;</span><span class="p">,</span> <span class="n">y_range</span> <span class="o">=</span> <span class="p">[</span><span class="nb">min</span><span class="p">(</span><span class="n">alpha</span><span class="p">[</span><span class="n">alpha</span><span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">]),</span> <span class="nb">max</span><span class="p">(</span><span class="n">alpha</span><span class="p">[</span><span class="n">alpha</span><span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">])])</span> 
+        <span class="n">plot1</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="mi">1</span><span class="n">e4</span><span class="o">/</span><span class="n">waves</span><span class="p">[</span><span class="n">MOL</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">alpha</span><span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">],</span> <span class="n">alpha</span><span class="p">[</span><span class="n">alpha</span><span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">],</span> <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">line_width</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span>
+    
+   <span class="c1">#&quot;plot1&quot;:plot1,&quot;plot2&quot;:plot2, </span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;w&quot;</span><span class="p">:</span><span class="mi">1</span><span class="n">e4</span><span class="o">/</span><span class="n">waves</span><span class="p">[</span><span class="n">MOL</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">alpha</span><span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">],</span>
+             <span class="s2">&quot;Z&quot;</span><span class="p">:</span><span class="n">Z</span><span class="p">,</span> <span class="s2">&quot;alpha&quot;</span><span class="p">:</span><span class="n">alpha</span><span class="p">[</span><span class="n">alpha</span><span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">],</span> <span class="s2">&quot;H&quot;</span><span class="p">:</span><span class="n">H</span><span class="p">,</span> <span class="s2">&quot;mu&quot;</span><span class="p">:</span><span class="n">mu</span><span class="p">,</span> <span class="s2">&quot;xsec&quot;</span><span class="p">:</span><span class="n">xsec</span><span class="p">,</span><span class="s2">&quot;mols&quot;</span><span class="p">:</span><span class="n">molDict</span><span class="p">[</span><span class="s2">&quot;mols&quot;</span><span class="p">]}</span></div>
+    
+<div class="viewcode-block" id="find_nearest"><a class="viewcode-back" href="../../engine.html#engine.ComputeZ.find_nearest">[docs]</a><span class="k">def</span> <span class="nf">find_nearest</span><span class="p">(</span><span class="n">array</span><span class="p">,</span><span class="n">value</span><span class="p">):</span>
+    <span class="c1">#small program to find the a temp and pressure match in the cross section data </span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">array</span><span class="o">-</span><span class="n">value</span><span class="p">))</span><span class="o">.</span><span class="n">argmin</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">idx</span></div>
+
+<div class="viewcode-block" id="computeZSum"><a class="viewcode-back" href="../../engine.html#engine.ComputeZ.computeZSum">[docs]</a><span class="k">def</span> <span class="nf">computeZSum</span><span class="p">(</span><span class="n">xsec</span><span class="p">,</span> <span class="n">squig</span><span class="p">,</span> <span class="n">waves</span><span class="p">,</span> <span class="n">plot2</span><span class="p">,</span><span class="n">plot</span><span class="p">):</span>
+    <span class="n">sumprod</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">num</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">squig</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>  
+        <span class="k">if</span> <span class="n">i</span><span class="o">==</span><span class="s2">&quot;H2&quot;</span><span class="p">:</span>
+            <span class="n">sumprod</span> <span class="o">+=</span> <span class="n">squig</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">xsec</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">squig</span><span class="p">[</span><span class="s2">&quot;H2&quot;</span><span class="p">]</span>
+            <span class="n">num</span> <span class="o">+=</span><span class="mi">1</span>
+            <span class="k">if</span> <span class="n">plot</span><span class="p">:</span>
+                <span class="n">plot2</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="mi">1</span><span class="n">e4</span><span class="o">/</span><span class="n">waves</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">squig</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">xsec</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">squig</span><span class="p">[</span><span class="s2">&quot;H2&quot;</span><span class="p">],</span> <span class="n">color</span> <span class="o">=</span> <span class="n">color</span><span class="p">[</span><span class="n">num</span><span class="p">],</span> <span class="n">legend</span> <span class="o">=</span> <span class="n">i</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">i</span><span class="o">==</span><span class="s2">&quot;He&quot;</span><span class="p">:</span>
+            <span class="n">sumprod</span> <span class="o">+=</span> <span class="n">squig</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">xsec</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">squig</span><span class="p">[</span><span class="s2">&quot;H2&quot;</span><span class="p">]</span>
+            <span class="n">num</span> <span class="o">+=</span><span class="mi">1</span>
+            <span class="k">if</span> <span class="n">plot</span><span class="p">:</span>
+                <span class="n">plot2</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="mi">1</span><span class="n">e4</span><span class="o">/</span><span class="n">waves</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">squig</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">xsec</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">squig</span><span class="p">[</span><span class="s2">&quot;H2&quot;</span><span class="p">],</span> <span class="n">color</span> <span class="o">=</span> <span class="n">color</span><span class="p">[</span><span class="n">num</span><span class="p">],</span> <span class="n">legend</span> <span class="o">=</span> <span class="n">i</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sumprod</span> <span class="o">+=</span> <span class="n">squig</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">xsec</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">num</span> <span class="o">+=</span><span class="mi">1</span>
+            <span class="k">if</span> <span class="n">plot</span><span class="p">:</span>
+                <span class="n">plot2</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="mi">1</span><span class="n">e4</span><span class="o">/</span><span class="n">waves</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">squig</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">xsec</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">color</span> <span class="o">=</span> <span class="n">color</span><span class="p">[</span><span class="n">num</span><span class="p">],</span> <span class="n">legend</span> <span class="o">=</span> <span class="n">i</span><span class="p">)</span>
+
+            
+    <span class="k">return</span> <span class="n">sumprod</span></div>
+
+<div class="viewcode-block" id="computeMu"><a class="viewcode-back" href="../../engine.html#engine.ComputeZ.computeMu">[docs]</a><span class="k">def</span> <span class="nf">computeMu</span><span class="p">(</span><span class="n">squig</span><span class="p">):</span> 
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute mean molecular weight of an atmosphere </span>
+
+<span class="sd">    Input: </span>
+<span class="sd">        Dict of molecules with mixing ratios </span>
+<span class="sd">        i.e. {&quot;H2O&quot;: 0.98, &quot;H2&quot;:0.2}</span>
+<span class="sd">    Output: </span>
+<span class="sd">        mean molecular weight, float</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">mu</span> <span class="o">=</span> <span class="mi">0</span> 
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">squig</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">totmass</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">i</span><span class="p">)):</span>
+            <span class="k">try</span><span class="p">:</span> 
+                <span class="n">check</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>        
+            <span class="k">except</span><span class="p">:</span> 
+                <span class="k">if</span> <span class="n">i</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">isupper</span><span class="p">():</span> <span class="n">elem</span> <span class="o">=</span> <span class="n">ele</span><span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="n">j</span><span class="p">]]</span>
+                <span class="k">try</span><span class="p">:</span> 
+                    <span class="n">num</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
+                <span class="k">except</span><span class="p">:</span> 
+                    <span class="k">if</span> <span class="n">i</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">islower</span><span class="p">():</span>
+                        <span class="n">elem</span> <span class="o">=</span> <span class="n">ele</span><span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">]]</span>
+                        <span class="n">num</span> <span class="o">=</span> <span class="mf">1.0</span>
+                    <span class="k">else</span><span class="p">:</span> 
+                        <span class="n">num</span> <span class="o">=</span> <span class="mf">1.0</span>
+                <span class="n">totmass</span> <span class="o">+=</span> <span class="n">elem</span><span class="o">.</span><span class="n">mass</span> <span class="o">*</span> <span class="n">num</span>
+            
+        <span class="n">mu</span> <span class="o">+=</span> <span class="n">squig</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">totmass</span>
+
+    <span class="k">return</span> <span class="n">mu</span></div>
+    
+            
+<div class="viewcode-block" id="addBackground"><a class="viewcode-back" href="../../engine.html#engine.ComputeZ.addBackground">[docs]</a><span class="k">def</span> <span class="nf">addBackground</span><span class="p">(</span><span class="n">molDict</span><span class="p">):</span>
+    <span class="c1">#compute concentration of background gas </span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">molDict</span><span class="p">[</span><span class="s2">&quot;mols&quot;</span><span class="p">][</span><span class="s2">&quot;H2&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;bkg&quot;</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">molDict</span><span class="p">[</span><span class="s2">&quot;mols&quot;</span><span class="p">][</span><span class="s2">&quot;He&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;bkg&quot;</span><span class="p">):</span> 
+        <span class="n">molDict</span><span class="p">[</span><span class="s2">&quot;mols&quot;</span><span class="p">][</span><span class="s2">&quot;H2&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">molDict</span><span class="p">[</span><span class="s2">&quot;mols&quot;</span><span class="p">][</span><span class="s2">&quot;He&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">fH2He</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="nb">sum</span><span class="p">(</span><span class="n">molDict</span><span class="p">[</span><span class="s2">&quot;mols&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="k">try</span><span class="p">:</span> 
+            <span class="n">check1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">fH2He</span><span class="p">)</span>
+            <span class="n">check2</span> <span class="o">=</span> <span class="mf">1.0</span><span class="o">/</span><span class="n">fH2He</span>
+        <span class="k">except</span><span class="p">:</span> 
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Mixing Ratios Exceed total sum = 1, no background gas&quot;</span><span class="p">)</span>
+        <span class="n">frac</span> <span class="o">=</span> <span class="n">molDict</span><span class="p">[</span><span class="s2">&quot;fracH2He&quot;</span><span class="p">]</span>
+        <span class="n">molDict</span><span class="p">[</span><span class="s2">&quot;mols&quot;</span><span class="p">][</span><span class="s2">&quot;H2&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fH2He</span><span class="o">/</span><span class="p">(</span><span class="mf">1.</span><span class="o">+</span><span class="n">frac</span><span class="p">)</span>
+        <span class="n">molDict</span><span class="p">[</span><span class="s2">&quot;mols&quot;</span><span class="p">][</span><span class="s2">&quot;He&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">frac</span><span class="o">*</span><span class="n">molDict</span><span class="p">[</span><span class="s2">&quot;mols&quot;</span><span class="p">][</span><span class="s2">&quot;H2&quot;</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="p">(</span><span class="n">molDict</span><span class="p">[</span><span class="s2">&quot;mols&quot;</span><span class="p">][</span><span class="s2">&quot;H2&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;bkg&quot;</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">molDict</span><span class="p">[</span><span class="s2">&quot;mols&quot;</span><span class="p">][</span><span class="s2">&quot;He&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;bkg&quot;</span><span class="p">):</span> 
+        <span class="n">molDict</span><span class="p">[</span><span class="s2">&quot;mols&quot;</span><span class="p">][</span><span class="s2">&quot;H2&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">molDict</span><span class="p">[</span><span class="s2">&quot;mols&quot;</span><span class="p">][</span><span class="s2">&quot;H2&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="nb">sum</span><span class="p">(</span><span class="n">molDict</span><span class="p">[</span><span class="s2">&quot;mols&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+    <span class="k">elif</span> <span class="p">(</span><span class="n">molDict</span><span class="p">[</span><span class="s2">&quot;mols&quot;</span><span class="p">][</span><span class="s2">&quot;H2&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;bkg&quot;</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">molDict</span><span class="p">[</span><span class="s2">&quot;mols&quot;</span><span class="p">][</span><span class="s2">&quot;He&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;bkg&quot;</span><span class="p">):</span> 
+        <span class="n">molDict</span><span class="p">[</span><span class="s2">&quot;mols&quot;</span><span class="p">][</span><span class="s2">&quot;He&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">molDict</span><span class="p">[</span><span class="s2">&quot;mols&quot;</span><span class="p">][</span><span class="s2">&quot;He&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="nb">sum</span><span class="p">(</span><span class="n">molDict</span><span class="p">[</span><span class="s2">&quot;mols&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+    <span class="k">else</span><span class="p">:</span> 
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">molDict</span><span class="p">[</span><span class="s2">&quot;mols&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">molDict</span><span class="p">[</span><span class="s2">&quot;mols&quot;</span><span class="p">][</span><span class="n">name</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;bkg&quot;</span><span class="p">:</span> 
+                <span class="n">molDict</span><span class="p">[</span><span class="s2">&quot;mols&quot;</span><span class="p">][</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+                <span class="n">molDict</span><span class="p">[</span><span class="s2">&quot;mols&quot;</span><span class="p">][</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="nb">sum</span><span class="p">(</span><span class="n">molDict</span><span class="p">[</span><span class="s2">&quot;mols&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        
+
+    <span class="k">return</span> <span class="n">molDict</span>   </div>
+
+
+<span class="c1">####### Should probably eventually separate into two classes starting here. #######</span>
+
+    
+<div class="viewcode-block" id="computeJac"><a class="viewcode-back" href="../../engine.html#engine.ComputeZ.computeJac">[docs]</a><span class="k">def</span> <span class="nf">computeJac</span><span class="p">(</span><span class="n">molDict</span><span class="p">):</span> 
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Function to construct Jacobian of equation alpha http://arxiv.org/pdf/1511.09443v2.pdf</span>
+<span class="sd">    eqn. 4 </span>
+<span class="sd">    </span>
+<span class="sd">    Inputs: </span>
+<span class="sd">        T, mu, g, beta: float</span>
+<span class="sd">        xsec: dict of cross sections</span>
+<span class="sd">        squig: dict of mixing ratios</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">squig</span> <span class="o">=</span> <span class="n">molDict</span><span class="p">[</span><span class="s2">&quot;mols&quot;</span><span class="p">]</span>
+    <span class="n">T</span> <span class="o">=</span> <span class="n">molDict</span><span class="p">[</span><span class="s2">&quot;T&quot;</span><span class="p">]</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">molDict</span><span class="p">[</span><span class="s2">&quot;g&quot;</span><span class="p">]</span>
+    
+    <span class="n">read</span> <span class="o">=</span> <span class="n">readXSecs</span><span class="p">(</span><span class="n">molDict</span><span class="p">)</span>
+    <span class="n">xsec</span> <span class="o">=</span> <span class="n">read</span><span class="p">[</span><span class="s2">&quot;xsec&quot;</span><span class="p">]</span>
+    
+    <span class="c1">#xsec= {</span>
+    <span class="c1">#    &quot;H2O&quot;:[1.0,2.0], </span>
+    <span class="c1">#    &quot;H2&quot;: [1.0,2.0], </span>
+    <span class="c1">#    &quot;He&quot;: [1.0,2.0],</span>
+    <span class="c1">#    &quot;CH4&quot;: [1.0,2.0], </span>
+    <span class="c1">#    &quot;CO&quot;:[1.0,2.0], </span>
+    <span class="c1">#    &quot;C2H2&quot;:[1.0,2.0], </span>
+    <span class="c1">#    &quot;HCN&quot;: [1.0,2.0]}</span>
+    
+    <span class="c1">#compute mean molecular weight and beta </span>
+    <span class="n">mu</span> <span class="o">=</span> <span class="n">computeMu</span><span class="p">(</span><span class="n">squig</span><span class="p">)</span><span class="o">*</span><span class="n">amu</span>
+    <span class="c1">#mu = 1.0</span>
+    <span class="n">beta</span> <span class="o">=</span> <span class="n">molDict</span><span class="p">[</span><span class="s2">&quot;P0&quot;</span><span class="p">]</span><span class="o">*</span><span class="n">barye</span> <span class="o">/</span> <span class="n">molDict</span><span class="p">[</span><span class="s2">&quot;taueq&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.0</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">molDict</span><span class="p">[</span><span class="s2">&quot;Rp&quot;</span><span class="p">]</span><span class="o">*</span><span class="n">rsun</span><span class="p">)</span>
+
+    
+    <span class="n">flag</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">squig</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="o">+</span><span class="mf">3.0</span><span class="p">)</span>
+    <span class="n">lenW</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">xsec</span><span class="p">[</span><span class="s2">&quot;CO&quot;</span><span class="p">])</span>
+    <span class="n">J</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">lenW</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">flag</span><span class="p">)))</span>
+    <span class="n">mp</span><span class="o">.</span><span class="n">dps</span> <span class="o">=</span> <span class="mi">15</span><span class="p">;</span> <span class="n">mp</span><span class="o">.</span><span class="n">pretty</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">lenW</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">flag</span><span class="p">)):</span>
+            <span class="n">flag</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">aCO</span> <span class="o">=</span> <span class="n">xsec</span><span class="p">[</span><span class="s2">&quot;CO&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">aH2H2</span><span class="o">=</span> <span class="n">xsec</span><span class="p">[</span><span class="s2">&quot;H2&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">aH2O</span><span class="o">=</span> <span class="n">xsec</span><span class="p">[</span><span class="s2">&quot;H2O&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">aCH4</span><span class="o">=</span> <span class="n">xsec</span><span class="p">[</span><span class="s2">&quot;CH4&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">aHCN</span><span class="o">=</span> <span class="n">xsec</span><span class="p">[</span><span class="s2">&quot;HCN&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">aC2H2</span><span class="o">=</span> <span class="n">xsec</span><span class="p">[</span><span class="s2">&quot;C2H2&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">aH2He</span><span class="o">=</span> <span class="n">xsec</span><span class="p">[</span><span class="s2">&quot;He&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+            
+            <span class="n">val</span> <span class="o">=</span> <span class="n">diff</span><span class="p">(</span><span class="k">lambda</span> <span class="n">Td</span><span class="p">,</span><span class="n">mud</span><span class="p">,</span><span class="n">gd</span><span class="p">,</span> <span class="n">xCO</span><span class="p">,</span> <span class="n">xH2</span><span class="p">,</span><span class="n">xH2O</span><span class="p">,</span><span class="n">xCH4</span><span class="p">,</span><span class="n">xHCN</span><span class="p">,</span><span class="n">xC2H2</span><span class="p">,</span><span class="n">xHe</span><span class="p">:</span> <span class="n">k</span><span class="o">*</span><span class="n">Td</span><span class="o">/</span><span class="n">mud</span><span class="o">/</span><span class="n">gd</span> <span class="o">*</span> <span class="n">log</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">k</span><span class="o">*</span><span class="n">Td</span><span class="o">*</span><span class="n">mud</span><span class="o">*</span><span class="n">gd</span><span class="p">)</span> <span class="o">*</span> <span class="n">beta</span> <span class="o">*</span> 
+                                                <span class="p">(</span><span class="n">xCO</span><span class="o">*</span><span class="n">aCO</span><span class="o">+</span><span class="n">xH2</span><span class="o">*</span><span class="n">xH2</span><span class="o">*</span><span class="n">aH2H2</span><span class="o">+</span><span class="n">xH2O</span><span class="o">*</span><span class="n">aH2O</span><span class="o">+</span><span class="n">xCH4</span><span class="o">*</span><span class="n">aCH4</span><span class="o">+</span>
+                                                  <span class="n">xHCN</span><span class="o">*</span><span class="n">aHCN</span><span class="o">+</span><span class="n">xC2H2</span><span class="o">*</span><span class="n">aC2H2</span><span class="o">+</span><span class="n">xH2</span><span class="o">*</span><span class="n">xHe</span><span class="o">*</span><span class="n">aH2He</span><span class="p">)),</span> 
+                 <span class="p">(</span><span class="n">T</span><span class="p">,</span><span class="n">mu</span><span class="p">,</span><span class="n">g</span><span class="p">,</span><span class="n">squig</span><span class="p">[</span><span class="s2">&quot;CO&quot;</span><span class="p">],</span><span class="n">squig</span><span class="p">[</span><span class="s2">&quot;H2&quot;</span><span class="p">],</span><span class="n">squig</span><span class="p">[</span><span class="s2">&quot;H2O&quot;</span><span class="p">],</span><span class="n">squig</span><span class="p">[</span><span class="s2">&quot;CH4&quot;</span><span class="p">],</span><span class="n">squig</span><span class="p">[</span><span class="s2">&quot;HCN&quot;</span><span class="p">],</span><span class="n">squig</span><span class="p">[</span><span class="s2">&quot;C2H2&quot;</span><span class="p">],</span><span class="n">squig</span><span class="p">[</span><span class="s2">&quot;He&quot;</span><span class="p">]),</span>
+                             <span class="p">(</span><span class="n">flag</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">flag</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">flag</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="n">flag</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span><span class="n">flag</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span><span class="n">flag</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span><span class="n">flag</span><span class="p">[</span><span class="mi">6</span><span class="p">],</span><span class="n">flag</span><span class="p">[</span><span class="mi">7</span><span class="p">],</span><span class="n">flag</span><span class="p">[</span><span class="mi">8</span><span class="p">],</span><span class="n">flag</span><span class="p">[</span><span class="mi">9</span><span class="p">]))</span>
+            
+            <span class="c1">#since this does not stable enough to handle mu derivative .. calculate analytically  instead</span>
+            <span class="k">if</span> <span class="n">j</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span> 
+                <span class="n">val</span> <span class="o">=</span> <span class="o">-</span><span class="n">k</span><span class="o">*</span><span class="n">T</span><span class="o">/</span><span class="n">mu</span><span class="o">**</span><span class="mf">2.0</span><span class="o">/</span><span class="n">g</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">beta</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">k</span><span class="o">*</span><span class="n">T</span><span class="o">*</span><span class="n">mu</span><span class="o">*</span><span class="n">g</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">squig</span><span class="p">[</span><span class="s2">&quot;CO&quot;</span><span class="p">]</span><span class="o">*</span><span class="n">aCO</span><span class="o">+</span><span class="n">squig</span><span class="p">[</span><span class="s2">&quot;H2&quot;</span><span class="p">]</span><span class="o">*</span><span class="n">squig</span><span class="p">[</span><span class="s2">&quot;H2&quot;</span><span class="p">]</span>
+                                                                    <span class="o">*</span><span class="n">aH2H2</span><span class="o">+</span><span class="n">squig</span><span class="p">[</span><span class="s2">&quot;H2O&quot;</span><span class="p">]</span><span class="o">*</span><span class="n">aH2O</span><span class="o">+</span><span class="n">squig</span><span class="p">[</span><span class="s2">&quot;CH4&quot;</span><span class="p">]</span><span class="o">*</span><span class="n">aCH4</span><span class="o">+</span>
+                                                  <span class="n">squig</span><span class="p">[</span><span class="s2">&quot;HCN&quot;</span><span class="p">]</span><span class="o">*</span><span class="n">aHCN</span><span class="o">+</span><span class="n">squig</span><span class="p">[</span><span class="s2">&quot;C2H2&quot;</span><span class="p">]</span><span class="o">*</span><span class="n">aC2H2</span><span class="o">+</span><span class="n">squig</span><span class="p">[</span><span class="s2">&quot;H2&quot;</span><span class="p">]</span><span class="o">*</span><span class="n">squig</span><span class="p">[</span><span class="s2">&quot;He&quot;</span><span class="p">]</span><span class="o">*</span><span class="n">aH2He</span><span class="p">))</span> <span class="o">-</span> <span class="p">(</span>
+                    <span class="n">k</span><span class="o">*</span><span class="n">T</span><span class="o">/</span><span class="mf">2.0</span><span class="o">/</span><span class="n">mu</span><span class="o">**</span><span class="mf">2.0</span><span class="o">/</span><span class="n">g</span><span class="p">)</span>
+            
+            <span class="n">flag</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+            
+            <span class="c1">#print i, j, val, type(val)</span>
+            <span class="n">J</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">J</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">PandExo  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016, Natasha Batalha;Kevin Stevenson.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

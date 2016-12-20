@@ -1,0 +1,197 @@
+
+
+<!doctype html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>engine.utils package &#8212; PandExo  documentation</title>
+    
+    <link rel="stylesheet" href="_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="The Code" href="engine.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="engine.html" title="The Code"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">PandExo  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="engine.html" accesskey="U">The Code</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">engine.utils package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-engine.utils.plotters">engine.utils.plotters module</a></li>
+<li><a class="reference internal" href="#module-engine.utils">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="engine.html"
+                        title="previous chapter">The Code</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/engine.utils.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="engine-utils-package">
+<h1>engine.utils package<a class="headerlink" href="#engine-utils-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-engine.utils.plotters">
+<span id="engine-utils-plotters-module"></span><h2>engine.utils.plotters module<a class="headerlink" href="#module-engine.utils.plotters" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="engine.utils.plotters.create_component_hst">
+<code class="descclassname">engine.utils.plotters.</code><code class="descname">create_component_hst</code><span class="sig-paren">(</span><em>result_dict</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/utils/plotters.html#create_component_hst"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.utils.plotters.create_component_hst" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate front end plots HST</p>
+<p>Function that is responsible for generating the front-end spectra plots for HST.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>result_dict</strong> (<em>dict</em>) &#8211; The dictionary returned from a PandExo (HST) run</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A tuple containing <cite>(script, div)</cite>, where the <cite>script</cite> is the
+front-end javascript required, and <cite>div</cite> is a dictionary of plot
+objects.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">tuple</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="engine.utils.plotters.create_component_jwst">
+<code class="descclassname">engine.utils.plotters.</code><code class="descname">create_component_jwst</code><span class="sig-paren">(</span><em>result_dict</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/utils/plotters.html#create_component_jwst"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.utils.plotters.create_component_jwst" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate front end plots JWST</p>
+<p>Function that is responsible for generating the front-end interactive plots for JWST.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>result_dict</strong> (<em>dict</em>) &#8211; the dictionary returned from a PandExo run</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A tuple containing <cite>(script, div)</cite>, where the <cite>script</cite> is the
+front-end javascript required, and <cite>div</cite> is a dictionary of plot
+objects.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">tuple</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="engine.utils.plotters.create_component_spec">
+<code class="descclassname">engine.utils.plotters.</code><code class="descname">create_component_spec</code><span class="sig-paren">(</span><em>result_dict</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/utils/plotters.html#create_component_spec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.utils.plotters.create_component_spec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate front end plots of modeling</p>
+<p>Function that is responsible for generating the front-end spectra plots.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>result_dict</strong> (<em>dict</em>) &#8211; the dictionary returned from a PandExo run</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A tuple containing <cite>(script, div)</cite>, where the <cite>script</cite> is the
+front-end javascript required, and <cite>div</cite> is a dictionary of plot
+objects.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">tuple</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-engine.utils">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-engine.utils" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="engine.html" title="The Code"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">PandExo  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="engine.html" >The Code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016, Natasha Batalha;Kevin Stevenson.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

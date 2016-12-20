@@ -1,0 +1,10 @@
+engine.static.js package
+========================
+
+Module contents
+---------------
+
+.. automodule:: engine.static.js
+    :members:
+    :undoc-members:
+    :show-inheritance:

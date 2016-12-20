@@ -1,0 +1,10 @@
+engine.static.img package
+=========================
+
+Module contents
+---------------
+
+.. automodule:: engine.static.img
+    :members:
+    :undoc-members:
+    :show-inheritance:
