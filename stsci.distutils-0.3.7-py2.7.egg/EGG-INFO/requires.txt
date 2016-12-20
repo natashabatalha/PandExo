@@ -1,0 +1,2 @@
+setuptools
+d2to1>=0.2.5

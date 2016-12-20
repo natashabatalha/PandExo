@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block css %}
+<link rel="stylesheet" href="https://cdn.pydata.org/bokeh/release/bokeh-0.11.1.min.css" type="text/css" />
+<link rel="stylesheet" href="https://cdn.pydata.org/bokeh/release/bokeh-widgets-0.11.1.min.css" type="text/css" />
+{% end %}
+
+{% block body %}
+<h1 class="page-header">Analyze</h1>
+
+<h2 id="plots">Transmission Spectrum</h2>
+
+<div class="row">
+    <div class="col-md-12">
+        {% raw div['plot1'] %}
+    </div>
+</div>
+
+
+<h2 id="images">Individual Molecular Contributions</h2>
+<div class="row">
+    <div class="col-md-9">
+        {% raw div['plot2'] %}
+    </div>
+</div>
+
+<div class="container">
+    <a type="button" class="btn btn-success" href="/calculation/downloadspec/{{ id }}">Download All Data</a>
+    <a type="button" class="btn btn-primary" href="/calculation/downloadpandin/{{ id }}">Download in Pandexo Format</a>
+</div>
+
+
+{% end %}
+
+
+{% block js %}
+
+<script type="text/javascript" src="https://cdn.pydata.org/bokeh/release/bokeh-0.11.1.min.js"></script>
+<script type="text/javascript" src="https://cdn.pydata.org/bokeh/release/bokeh-widgets-0.11.1.min.js"></script>
+{% raw script %}
+{% end %}
+

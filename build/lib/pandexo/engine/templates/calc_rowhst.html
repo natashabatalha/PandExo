@@ -1,0 +1,26 @@
+<tr class="response" id="m{{ response['id'] }}">
+    <td>{{ response['count'] }}</td>
+    <td>{{ response['name'] }}</td>
+    <td>
+    {% if response['state'] == 'running' %}<span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Running
+    {% elif response['state'] == 'cancelled' %}<span class="glyphicon glyphicon-remove-circle"></span> Cancelled
+    {% elif response['state'] == 'finished' %}<span class="glyphicon glyphicon-ok-circle"></span> Finished
+    {% else %}<span class="glyphicon glyphicon-record"> Pending</span>
+    {% end %}
+    </td>
+    <td>
+        {% if response['state'] == 'finished' %}
+        <div class="btn-group" role="group" aria-label="...">
+          <a class="btn btn-default" href="#" role="button"><span class="glyphicon glyphicon-edit"></span></a>
+          <a class="btn btn-default" href="/calculation/viewhst/{{ response['id'] }}" role="button"><span
+                  class="glyphicon glyphicon-eye-open"></span></a>
+        </div>
+        {% else %}
+        <div class="btn-group" role="group" aria-label="...">
+          <a class="btn btn-default" href="#" role="button" disabled><span class="glyphicon glyphicon-edit"></span></a>
+          <a class="btn btn-default" href="/calculation/viewhst/{{ response['id'] }}" role="button" disabled><span
+                  class="glyphicon glyphicon-eye-open"></span></a>
+        </div>
+        {% end %}
+    </td>
+</tr>

@@ -44,4 +44,3 @@ setup(
     namespace_packages=['pandexo'], packages=['pandexo'],
     d2to1=True
 )
-

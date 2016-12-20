@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block css %}
+<link rel="stylesheet" href="https://cdn.pydata.org/bokeh/release/bokeh-0.12.0.min.css" type="text/css" />
+<link rel="stylesheet" href="https://cdn.pydata.org/bokeh/release/bokeh-widgets-0.12.0.min.css" type="text/css" />
+{% end %}
+
+{% block body %}
+<h1 class="page-header">Analyze</h1>
+
+<a type="button" class="btn btn-success" href="#plots">1D Plots</a>
+
+<!-- Contextual button for informational alert messages -->
+<a type="button" class="btn btn-info" href="#images">2D Images</a>
+
+<!-- Indicates caution should be taken with this action -->
+<a type="button" class="btn btn-primary" href="#instrument">Original Inputs</a>
+
+<!-- Indicates caution should be taken with this action -->
+<a type="button" class="btn btn-warning" href="#timing">Timing Output</a>
+
+<!-- Indicates a dangerous or potentially negative action -->
+<a type="button" class="btn btn-danger" href="#warnings">Warnings</a>
+
+<h2 id="plots">1D Plots</h2>
+
+<div class="row">
+    <div class="col-md-12">
+        {% raw div['plot_spectrum'] %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-9">
+        {% raw div['tabs1d'] %}
+    </div>
+</div>
+
+<h2 id="images">2D Images</h2>
+<div class="row">
+    <div class="col-md-9">
+        {% raw div['det_2d'] %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-9">
+        {% raw div['tabs2d'] %}
+    </div>
+</div>
+
+<div class="container">
+   <h2 id="instrument">Table of Original Inputs</h2>
+       <p> All inputs used for the calculation </p>
+           {% raw div['input_div']  %} 
+</div>
+
+<div class="container">
+   <h2 id="timing">Timing Info</h2>
+       <p> All the timing info needed for your observation. Overhead calculation assumes 30 minute target acquisition time.  </p>
+           {% raw div['timing_div']  %}
+</div>
+
+
+<div class="container">
+   <h2 id="warnings">Warnings</h2>
+       <p> Pay attention to these warnings! If you do not see 'All good' written in each box, reconsider your run.  </p>
+           {% raw div['warnings_div']  %}
+</div>
+
+<div class="container">
+    <a type="button" class="btn btn-success" href="/calculation/download/{{ id }}">Download Data</a>
+</div>
+
+{% end %}
+
+
+{% block js %}
+
+<script type="text/javascript" src="https://cdn.pydata.org/bokeh/release/bokeh-0.12.0.min.js"></script>
+<script type="text/javascript" src="https://cdn.pydata.org/bokeh/release/bokeh-widgets-0.12.0.min.js"></script>
+{% raw script %}
+{% end %}
+

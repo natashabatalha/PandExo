@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block body %}
+<h1 class="page-header">Dashboard HST</h1>
+{% if len(calculations) == 0 %}
+<p class="bg-info">You have no recent or running calculations. Create one my clicking the green button at the top.</p>
+{% else %}
+<table id="calculation-table" class="table table-hover">
+    <thead>
+    <tr>
+        <th>#</th>
+        <th>Name</th>
+        <th>Status</th>
+        <th>Tools</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for calc in calculations %}
+        {% module Template("calc_rowhst.html", response=calc) %}
+    {% end %}
+    </tbody>
+</table>
+{% end %}
+{% end %}
+
+{% block js %}
+<script src="{{ static_url('js/starter.homehst.js') }}"></script>
+{% end %}
