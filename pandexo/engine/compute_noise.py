@@ -1,20 +1,55 @@
 import numpy as np
 
 class ExtractSpec():
-    """
-    Now that PandExo has several different methods of computing noise, 
-    I am creating different classes to handle different noise claculations 
+    """Different methods for computing noise. 
     
-    This one extracts the spectrum from the 2d extraction box. It does NOT 
-    use the multiaccum noise formula (Rauscher 07). 
+    PandExo has several different methods of computing noise.  
+    MULTIACCUM (slope method) assumses that each frame is fit for up the ramp and 
+    that the final nosie includes correlated noise from fitting each frame up the ramp. 
+    First Minus Last assumes that intermediate frames are not used and final noise is just 
+    the first frame minus the last frame. 2d extract uses Pandeia's 2d simualtions to 
+    extracts the spectrum from the 2d extraction box. It extracts the entire postage stamp 
+    so it might be an overestimate of flux (in contrast pandeia requires background 
+    extraction region to be at least equal to the flux extraction region)
     
     Noise Components Included: 
-    - Shot
-    - Background 
-    - Read noise 
+        - Shot
+        - Background and Dark Current
+        - Read noise 
+        
+    Parameters
+    ----------
+    inn : dict
+        In transit dictionary computed from PandExo 
+    out : dict
+        Out of transit dictionary comptued from PandExo 
+    rn : float
+        Read noise electrons 
+    extraction_area : float
+        Number of extracted pixels (square pixels) 
+    timing : dict  
+        Dictionary of computed JWST timing products 
     
+    Methods
+    -------
+    loopingL
+        extracts pixels from center to bottom
+    loopingU
+        extracts pixels from center to top
+    sum_spatial
+        sums pixels in optimal extraction region
+    extract_region
+        determines optimal extraction region
+    run_2d_extract
+        top level to extract spec from 2d pandeia output
+    run_slope_method
+        computes noise using multiaccum formulation
+    run_f_minus_l
+        computs noise using first minus last
+    run_phase_spec
+        computs noise for phase curve observations     
     """
-    def __init__(self, inn, out, rn,pix_size, timing):
+    def __init__(self, inn, out, rn, extraction_area, timing):
         self.inn = inn
         self.out = out 
         self.exptime_per_int = timing["Exposure Time Per Integration (secs)"]
@@ -24,13 +59,33 @@ class ExtractSpec():
         self.nint_in = timing["Num Integrations In Transit"]
         self.tframe = timing["Seconds per Frame"]
         self.rn = rn 
-        self.pix_size = pix_size
-    
+        self.extraction_area = extraction_area
+        
         #on source out versus in 
         self.on_source_in = self.tframe * (self.ngroups_per_int-1.0) * self.nint_in
         self.on_source_out = self.tframe * (self.ngroups_per_int-1.0) * self.nint_out
 
     def loopingL(self, cen, signal_col, noise_col, bkg_col):
+        """Finds bottom of the optimal extraction region.
+    
+        Find location where SNR is the highest and loop from highest value downward 
+    
+        Parameters
+        ----------
+        cen : float or int 
+            Pixel where SNR is the highest 
+        signal_col : array of float 
+            Array of fluxes to be extracted in a single column on the detector 
+        noise_col : array of float 
+            Array of noise to be extracted in a single column on the detector 
+        bkg_col : array of float 
+            Array of background fluxes to be extracted in a single column on the detector 
+    
+        Return 
+        ------
+        int
+            Bottom most pixel to be extracted 
+        """
     #create function to find location where SNR is the highest
     #loop from the highest value of the signal downward 
         sn_old= 0
@@ -47,8 +102,26 @@ class ExtractSpec():
 
 
     def loopingU(self, cen, signal_col, noise_col, bkg_col):
-    #create function to find location where SNR is the highest
-    #loop from the highest value of the signal upward
+        """Finds top of the optimal extraction region.
+    
+        Find location where SNR is the highest and loop from highest value upward 
+    
+        Parameters
+        ----------
+        cen : float or int 
+            Pixel where SNR is the highest 
+        signal_col : array of float 
+            Array of fluxes to be extracted in a single column on the detector 
+        noise_col : array of float 
+            Array of noise to be extracted in a single column on the detector 
+        bkg_col : array of float 
+            Array of background fluxes to be extracted in a single column on the detector 
+    
+        Return 
+        ------
+        int
+            Top most pixel to be extracted 
+        """
         sn_old= 0
         for ii in range(1,(len(signal_col)-cen+1)): #1,2,3,4,5,6 range(1,6).. center=5, edge =10
             sig_sum = sum(signal_col[cen:cen+ii])
@@ -64,9 +137,20 @@ class ExtractSpec():
 
 
     def sum_spatial(self, extract_info):    
-        """
-        Takes extraction info from "extract_retion" and sums pixels in that region 
-        takes into account integrations and number of transits 
+        """Sum pixel in the spatial direction 
+        
+        Takes extraction info from `extract_region` and sums pixels in that region 
+        taking into account integrations and number of transits 
+        
+        Parameters 
+        ----------
+        extract_info : dict 
+            Dictionary with information on extraction box, flux and noise products
+            
+        Return
+        ------
+        dict 
+            Dictionary with all extracted 1d products including noise, background, fluxes 
         """
         nocc = self.nocc
         nint_in = self.nint_in
@@ -126,13 +210,15 @@ class ExtractSpec():
                 'on_source_out':self.on_source_out}
 
     def extract_region(self): #second to last 
-        """
-        Contains functionality to extract spectra from the 2d images. 
-        MULITACCUMM currently not accounted for. 
+        """Determine extraction Region
         
-        attricutes: 
-            LoopingL: finds extraction box based on optimal SNR  
-            LoopingU: finds extraction box based on optimal SNR  
+        Contains functionality to determine extraction region from Pandeia 2d noise 
+        simulations. Calls `self.loopingL` and `self.loopingU`. 
+        
+        Return
+        ------
+        dict 
+            bounding regions, photon and noise to be summed 
         """
         inn = self.inn
         out = self.out
@@ -170,7 +256,7 @@ class ExtractSpec():
         #variance stricly due to detector readnoise.. You might think this is 
         #wrong because usually RN isnt multiplie by time.. but Pandeia gives RN in rms/ sec. 
         rn_var_out= out.noise.var_rn_pix*exptime_per_int*factor_rn 
-        print np.max(rn_var_out)
+
         var_pix_out = photon_sig_out + photon_sky_out + rn_var_out # variance of noise per pixel
 
         #define parameters for IN transit 
@@ -216,11 +302,14 @@ class ExtractSpec():
         return extract_info
 
     def run_2d_extract(self):
-        """
-            Contains functionality to extract noise from 2d detector image
-            Attributes:
-                extract_region 
-                sum_spatial 
+        """Extract noise from 2d detector image
+            
+        Contains functionality to extract noise from 2d detector image
+            
+        Returns
+        -------
+        dict 
+            all optimally extracted 1d products  
         """
         #optimize SNR and extract region 
         extract = self.extract_region()
@@ -229,9 +318,15 @@ class ExtractSpec():
         
         
     def run_slope_method(self): 
-        """
-        contains functionality to compute noise using Pandeia 1d noise 
+        """Compute noise using Pandeia 1d noise
+        
+        Contains functionality to compute noise using Pandeia 1d noise 
         output products (uses MULTIACCUM) noise formula 
+        
+        Return
+        ------
+        dict 
+            all optimally extracted 1d products        
         """
         curves_out = self.out['1d']
         curves_inn = self.inn['1d']
@@ -259,16 +354,18 @@ class ExtractSpec():
     
     
     def run_f_minus_l(self):
-        """
+        """Compute noise using first minus last formula
+        
         Uses 1d exracted products from pandeia to compute noise without 
-        multiaccum noise formula from Rauscher 07 
+        multiaccum noise formula from Rauscher 07. Includes readnoise 
+        background. 
         
-        Uses robberto 2009 formula to compute readnoise (taken from 2d 
-        pandeia output). 1d readnoise is used by summing over entire postage stamp. 
-        Pandeia will use entire extraction region but if not this could just slightly 
-        over estimate read noise. 
-        
+        Returns
+        -------
+        dict 
+            all optimally extracted 1d products        
         """
+
         inn = self.inn
         curves_out = self.out['1d']
         curves_inn = self.inn['1d']
@@ -280,16 +377,11 @@ class ExtractSpec():
 
         #calculate rn 
         rn_var = self.rn**2.0
-        
-        #size of pix extraction region 
-        try:
-            numpix = self.out['scalar']['aperture_size']/self.pix_size
-        except: 
-            numpix = 25.0
+                
 
         #1d rn     = rn/pix * # of integrations *nocc  * #pixs 
-        rn_var_inn = rn_var * self.nint_in * self.nocc * numpix 
-        rn_var_out = rn_var * self.nint_out * self.nocc * numpix 
+        rn_var_inn = rn_var * self.nint_in * self.nocc * self.extraction_area 
+        rn_var_out = rn_var * self.nint_out * self.nocc * self.extraction_area 
         
         #extract fluxs
         extracted_flux_inn = curves_inn['extracted_flux'][1] * on_source_in * self.nocc
@@ -310,13 +402,16 @@ class ExtractSpec():
 
     
     def run_phase_spec(self):
-        """
+        """Computes time dependent noise for phase curves.
+        
         Computes noise for phase curve analysis instead of spectroscopy. 
+        Using MULTIACCUM formula here but this could be changed in the future.  Does not 
+        return a spectra for each time element... On your own for that. 
         
-        Using MULTIACCUM formula here because presumably you can never do a 
-        first minus last in phase curve analysis 
-        
-        Does not return spectra for each time element... On your own for that. 
+        Return
+        ------
+        dict 
+            all optimally extracted 1d products        
         """
         time = self.inn['time']
         tint = self.exptime_per_int 
@@ -326,13 +421,10 @@ class ExtractSpec():
         planet_phase = np.interp(new_t, time, self.inn['planet_phase'])
 
         rn_var = self.rn**2.0
-        #size of pix extraction region 
-        try:
-            numpix = self.out['scalar']['aperture_size']/self.pix_size
-        except: 
-            numpix = 25.0
+
+
         #1d rn     = rn/pix * # of integrations *nocc  * #pixs 
-        rn_var_out = rn_var * self.nocc * numpix # the initial output is always sampled by 1 integration
+        rn_var_out = rn_var * self.nocc * self.extraction_area  # the initial output is always sampled by 1 integration
    
         extracted_flux_out = sum(curves_out['extracted_flux'][1]) * tint * self.nocc
         

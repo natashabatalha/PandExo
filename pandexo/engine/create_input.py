@@ -3,15 +3,28 @@ import numpy as np
 import pickle
 
 def binning(x, y, R=2000.0):
-    """ 
+    """Bins spectra at fixed dlambda 
+    
     Takes 2 arrays x and y and bins them into groups of blength.
-    only use for binning error bars. 
-    Parameters
-	----------
-        Inputs:     
-            -x, y:                   1D lists or numpy arrays
-        Outputs:    
-            - xout, yout, yerrout,noise:    1D numpy arrays
+    Uses uniform top hat to bin. This is necessary because really high resolution 
+    spectra cannot go through pandeia without crashing it. User is advised to bin spectra 
+    before running it through pandexo. 
+    
+    Parameters 
+    ----------
+	x : list or numpy array of float
+	    x (micron) 
+	y : list or numpy array of float
+	    (any unit)
+	R : int or float 
+	    (optional) Default is 2000.0 at micron which is approximately max resolution pandeia can handle.
+    
+    Returns
+    -------  
+    xout : numpy array of flaot
+        1D numpy arrays at new resolution 
+    yout : numpy array of flaot
+        1D numpy arrays at new resolution 
     """
     wlength = 1.0/R
     ii = 0
@@ -38,18 +51,21 @@ def binning(x, y, R=2000.0):
     return np.array(xout),np.array(yout)
        
 def outTrans(input) :
-    """
-    This class contains functionality for calculating the in transit 
-    spectra in milliJy vs micron, normalized to a specific 
-    Magnitude 
+    """Compute out of transit spectra
+    
+    Computes the out of transit spectra by normalizing flux to specified 
+    magnitude and convert to specified Pandeia units of milliJy and microns.  
   
     Parameters 
-    ---------
-         Stellar scene: includes directory for stellar spectra in fits file, 
-         wavelength and flux units and reference wavelength
-    Returns
-    --------
-         In transit stellar spectrum in FLAM units 
+    ----------
+    input : dict
+        stellar scene which includes parameters to extract phoenix database or a 
+        filename which points to a stellar spectrum 
+    
+    Return
+    ------
+    dict 
+        contains wave and flux_out_trans
     """ 
     
     if input['type'] == 'user':
@@ -124,24 +140,28 @@ def outTrans(input) :
     flux_out_trans = flux*wave/1.509e7*1e3 #inverse of eq. C times 1e3 to get to milliJy instead of Jy 
     wave = wave*1e-3  #nm to micron
 
-    
-    return {'flux_out_trans': flux_out_trans, 'wave': wave, 'flux': flux} 
+    return {'flux_out_trans': flux_out_trans, 'wave': wave} 
 
 
 def bothTrans(out_trans, planet) :
-   
-    """
-    This class contains functionality for calculating the in transit 
-    spectra in FLAM units, normalized to a specific 
+    """Calculates in transit flux 
+    
+    Takes output from `outTrans`, which is the normalized stellar flux, and 
+    creates either a transit transmission spectrum, phase curve or emission spectrum. 
     Magnitude 
   
     Parameters 
-    ---------
-         Planet scene: includes directory for planet spectra, wavelength and flux units
-                       And stellar flux output from outTrans()            
-    Returns
-    --------
-         Out of transit stellar spectrum in FLAM units 
+    ----------
+    out_trans: dict 
+        includes dictionary from `outTrans` output. 
+    planet: dict
+        dictionary with direction to planet spectra, wavelength and flux units
+
+    Return
+    ------
+    dict 
+        dictionary with out of transit flux, in transit flux, original model 
+        and corresponding wavelengths
     """ 
     
     if planet['type'] =='user':
