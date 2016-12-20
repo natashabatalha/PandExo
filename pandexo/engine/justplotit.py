@@ -1,4 +1,4 @@
-from bokeh.plotting import show, figure
+from bokeh.plotting import show, Figure
 from bokeh.io import output_file as outputfile
 import pickle as pk
 import numpy as np
@@ -135,7 +135,7 @@ def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', out
         for px, py, yerr in zip(x, y, err):
             np.array(x_err.append((px, px)))
             np.array(y_err.append((py - yerr, py + yerr)))
-        #initialize figure
+        #initialize Figure
         if i == 0: 
             #Define units for x and y axis
             y_axis_label = dict['input']['Primary/Secondary']
@@ -152,7 +152,7 @@ def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', out
                  0.1*max(dict['OriginalInput']['model_spec'])+max(dict['OriginalInput']['model_spec'])]
             xlims = [min(x), max(x)]
          
-            fig1d = figure(x_range=x_range, y_range = ylims, 
+            fig1d = Figure(x_range=x_range, y_range = ylims, 
                plot_width = plot_width, plot_height =plot_height,title=title,x_axis_label=x_axis_label,
               y_axis_label = y_axis_label, tools=TOOLS, background_fill_color = 'white')
         
@@ -303,3 +303,232 @@ def uniform_tophat_mean(xnew,x, y):
     loc=np.where((x > newx[0]-0.5*delta[0]) & (x < newx[0]+0.5*delta[0]))
     ynew[0]=np.mean(y[loc])
     return ynew
+
+def jwst_1d_flux(result_dict, plot=True, output_file= 'flux.html'): 
+    """Plot flux rate in e/s
+    
+    Parameters
+    ----------
+    result_dict : dict
+        Dictionary from pandexo output. If parameter space was run in run_pandexo 
+        make sure to restructure the input as a list of dictionaries without they key words 
+        that run_pandexo assigns. 
+    plot : bool 
+        (Optional) True renders plot, Flase does not. Default=True
+    output_file : str
+        (Optional) Default = 'flux.html'    
+    Return
+    ------
+    x : numpy array
+        micron
+    y : numpy array
+        1D flux rate in electrons/s
+    """
+    TOOLS = "pan,wheel_zoom,box_zoom,resize,reset,save"
+    out = result_dict['PandeiaOutTrans']
+    
+    # Flux 1d
+    x, y = out['1d']['extracted_flux']
+    x = x[~np.isnan(y)]
+    y = y[~np.isnan(y)]
+
+    plot_flux_1d1 = Figure(tools=TOOLS,
+                         x_axis_label='Wavelength [microns]',
+                         y_axis_label='Flux (e/s)', title="Out of Transit Flux Rate",
+                         plot_width=800, plot_height=300)
+    plot_flux_1d1.line(x, y, line_width = 4, alpha = .7)
+    
+    if plot: 
+        outputfile(output_file)
+        show(plot_flux_1d1)
+    return x,y
+    
+def jwst_1d_snr(result_dict, plot=True, output_file='snr.html'): 
+    """Plot SNR
+    
+    Parameters
+    ----------
+    result_dict : dict
+        Dictionary from pandexo output. If parameter space was run in run_pandexo 
+        make sure to restructure the input as a list of dictionaries without they key words 
+        that run_pandexo assigns. 
+    plot : bool 
+        (Optional) True renders plot, Flase does not. Default=True
+    output_file : str
+        (Optional) Default = 'snr.html'   
+                
+    Return
+    ------
+    x : numpy array
+        micron
+    y : numpy array
+        1D SNR
+    """    
+    TOOLS = "pan,wheel_zoom,box_zoom,resize,reset,save"
+    # Flux 1d
+    x= result_dict['RawData']['wave']
+    flux_out = result_dict['RawData']['flux_out']
+    y = flux_out/np.sqrt(result_dict['RawData']['var_out'])
+    x = x[~np.isnan(y)]
+    y = y[~np.isnan(y)]
+    plot_snr_1d1 = Figure(tools=TOOLS,
+                         x_axis_label=x_axis_label,
+                         y_axis_label='SNR', title="SNR Out of Trans",
+                         plot_width=800, plot_height=300)
+    plot_snr_1d1.line(x, y, line_width = 4, alpha = .7)
+    if plot: 
+        outputfile(output_file)
+        show(plot_snr_1d1)
+    return x,y
+
+def jwst_1d_bkg(result_dict, plot=True, output_file='bkg.html')
+    """Plot background
+    
+    Parameters
+    ----------
+    result_dict : dict
+        Dictionary from pandexo output. If parameter space was run in run_pandexo 
+        make sure to restructure the input as a list of dictionaries without they key words 
+        that run_pandexo assigns. 
+    plot : bool 
+        (Optional) True renders plot, Flase does not. Default=True
+    output_file : str
+        (Optional) Default = bkt.html
+    
+    Return
+    ------
+    x : numpy array
+        micron
+    y : numpy array
+        1D bakground e/s
+    """    
+    TOOLS = "pan,wheel_zoom,box_zoom,resize,reset,save"
+    # BG 1d
+    x, y = out['1d']['bg']
+    y = y[~np.isnan(y)]
+    x = x[~np.isnan(y)]
+    plot_bg_1d1 = Figure(tools=TOOLS,
+                         x_axis_label='Wavelength [microns]',
+                         y_axis_label='Flux (e/s)', title="Background",
+                         plot_width=800, plot_height=300)
+    plot_bg_1d1.line(x, y, line_width = 4, alpha = .7)
+    if plot: 
+        outputfile(output_file)
+        show(plot_bg_1d1)
+    return, x,y
+    
+def jwst_noise(result_dict, plot=True, output_file= 'noise.html'): 
+    """Plot background
+    
+    Parameters
+    ----------
+    result_dict : dict
+        Dictionary from pandexo output. If parameter space was run in run_pandexo 
+        make sure to restructure the input as a list of dictionaries without they key words 
+        that run_pandexo assigns. 
+    plot : bool 
+        (Optional) True renders plot, Flase does not. Default=True
+    output_file : str
+        (Optional) Default = 'noise.html'
+    Return
+    ------
+    x : numpy array
+        micron
+    y : numpy array
+        1D noise (ppm)
+    """  
+    x = result_dict['FinalSpectrum']['wave']
+    y = result_dict['FinalSpectrum']['error_w_floor']*1e6
+    x = x[~np.isnan(y)]
+    y = y[~np.isnan(y)]    
+    ymed = np.median(y)
+
+
+    plot_noise_1d1 = Figure(tools=TOOLS,#responsive=True,
+                         x_axis_label=x_axis_label,
+                         y_axis_label='Error on Spectrum (PPM)', title="Error Curve",
+                         plot_width=800, plot_height=300, y_range = [0,2.0*ymed])
+    ymed = np.median(y)
+    plot_noise_1d1.circle(x, y, line_width = 4, alpha = .7)
+    if plot: 
+        outputfile(output_file)
+        show(plot_noise_1d1)
+    return x,y
+    
+def jwst_2d_det(result_dict, plot=True, output_file='det2d.html'): 
+    """Plot 2d detector image
+    
+    Parameters
+    ----------
+    result_dict : dict
+        Dictionary from pandexo output. If parameter space was run in run_pandexo 
+        make sure to restructure the input as a list of dictionaries without they key words 
+        that run_pandexo assigns. 
+    
+    plot : bool 
+        (Optional) True renders plot, Flase does not. Default=True
+    output_file : str
+        (Optional) Default = 'det2d.html'    
+    
+    Return
+    ------
+    numpy array
+        2D array of out of transit detector simulation
+    """
+    TOOLS = "pan,wheel_zoom,box_zoom,resize,reset,save"
+    out = result_dict['PandeiaOutTrans']
+    data = out['2d']['detector']
+
+    
+    xr, yr = data.shape
+    
+    plot_detector_2d = Figure(tools="pan,wheel_zoom,box_zoom,resize,reset,hover,save",
+                         x_range=[0, yr], y_range=[0, xr],
+                         x_axis_label='Pixel', y_axis_label='Spatial',
+                         title="2D Detector Image",
+                        plot_width=800, plot_height=300)
+    
+    plot_detector_2d.image(image=[data], x=[0], y=[0], dh=[xr], dw=[yr],
+                      palette="Spectral11")
+    if plot:
+        outputfile(output_file)
+        show(plot_detector_2d)
+    return data
+
+
+def jwst_2d_det(result_dict, plot=True, output_file='sat2d.html'): 
+    """Plot 2d saturation profile
+    
+    Parameters
+    ----------
+    result_dict : dict 
+        Dictionary from pandexo output. If parameter space was run in run_pandexo 
+        make sure to restructure the input as a list of dictionaries without they key words 
+        that run_pandexo assigns. 
+    
+    plot : bool 
+        (Optional) True renders plot, Flase does not. Default=True
+    output_file : str
+        (Optional) Default = 'sat2d.html'    
+    
+    Return
+    ------
+    numpy array
+        2D array of out of transit detector simulation
+    """
+    TOOLS = "pan,wheel_zoom,box_zoom,resize,reset,save"    #saturation
+    
+    data = out['2d']['saturation']
+    xr, yr = data.shape
+    plot_sat_2d = Figure(tools=TOOLS,
+                         x_range=[0, yr], y_range=[0, xr],
+                         x_axis_label='Pixel', y_axis_label='Spatial',
+                         title="Saturation",
+                        plot_width=800, plot_height=300)
+    
+    plot_sat_2d.image(image=[data], x=[0], y=[0], dh=[xr], dw=[yr],
+                      palette="Spectral11")
+    if plot:
+        outputfile(output_file)
+        show(plot_sat_2d)
+    return data
