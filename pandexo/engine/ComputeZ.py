@@ -4,8 +4,10 @@ from bokeh.plotting import figure
 from bokeh.io import vform,output_file, show, vplot
 import numpy as np
 from elements import ELEMENTS as ele
-#from sympy.mpmath import *
-from sympy.mpmath import *
+try:
+    from sympy.mpmath import *
+except:
+    from mpmath import *
 
 '''
 molDict = {

@@ -428,7 +428,12 @@ class CalculationNewHSTHandler(BaseHandler):
             exodata["planet"]["i"]          = float(self.get_argument("i"))
             exodata["planet"]["ars"]        = float(self.get_argument("ars"))
             exodata["planet"]["period"]     = float(self.get_argument("period"))
-            exodata["planet"]["transit_duration"]      = float(self.get_argument("transit_duration"))
+            exodata["planet"]["ecc"]        = float(self.get_argument("ecc"))
+            try:
+                exodata["planet"]["w"]      = float(self.get_argument("w"))
+            except:
+                exodata["planet"]["w"]      = 90.
+            exodata["planet"]["transit_duration"]   = float(self.get_argument("transit_duration"))
             try: 
                 exodata["observation"]["norbits"]           = int(self.get_argument("norbits"))
             except:
@@ -436,6 +441,10 @@ class CalculationNewHSTHandler(BaseHandler):
             exodata["observation"]["noccultations"]         = int(self.get_argument("noccultations"))
             exodata["observation"]["nchan"]                 = int(self.get_argument("nchan"))
             exodata["observation"]["scanDirection"]         = self.get_argument("scanDirection")
+            try:
+                exodata["observation"]["windowSize"]        = float(self.get_argument("windowSize"))
+            except:
+                exodata["observation"]["windowSize"]        = 20.
             exodata["observation"]["noise_floor"]           = 0.0
             exodata["calculation"]                          = 'scale'
                 

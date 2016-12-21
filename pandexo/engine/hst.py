@@ -9,7 +9,7 @@ def wfc3_GuessNOrbits(trdur):
     Parameters
     ----------
     trdur : float 
-        transit duration in seconds
+        transit duration in days
     
     Returns
     -------
@@ -18,7 +18,7 @@ def wfc3_GuessNOrbits(trdur):
     '''
     # Compute # of HST orbits during transit
     # ~96 minutes per HST orbit
-    orbitsTr    = trdur/96./60.
+    orbitsTr    = trdur*24.*60/96
     if orbitsTr <= 1.5:
         norbits = 4.
     elif orbitsTr <= 2.0:
@@ -283,7 +283,7 @@ def wfc3_TExoNS(dictinput):
     
     # Compute number of HST orbits per transit
     # ~96 minutes per HST orbit
-    orbitsTr    = trdur/96./60.
+    orbitsTr    = trdur*24.*60/96
     
     # Estimate number of good points during planet transit
     # First point in each HST orbit is flagged as bad; therefore, subtract from total
@@ -328,13 +328,15 @@ def wfc3_TExoNS(dictinput):
     
     return {"spec_error": deptherr/1e6, "light_curve_rms":chanrms/1e6, "nframes_per_orb":ptsOrbit,"info":info}
 
-def calc_start_window(rms, ptsOrbit, numOrbits, depth, inc, aRs, period, tunc, duration=None, offset=0.):
+def calc_start_window(eventType, rms, ptsOrbit, numOrbits, depth, inc, aRs, period, windowSize, ecc=0, w=90., duration=None, offset=0.):
     '''Calculate earliest and latest start times
     
     Plot earliest and latest possible spectroscopic light curves for given start window size
 
     Parameters
     ----------
+    eventType : str
+        'transit' or 'eclipse'
     rms : float 
         light curve root-mean-square
     ptsOrbit : float 
@@ -349,10 +351,14 @@ def calc_start_window(rms, ptsOrbit, numOrbits, depth, inc, aRs, period, tunc, d
         Semi-major axis in units of stellar radii (a/R*)
     period : float 
         orbital period in days
-    tunc : float
-        +/- start time range in minutes
+    windowSize : float
+        observation start window size in minutes
+    ecc : float
+        (Optional) eccentricity
+    w : float
+        (Optional) longitude of periastron
     duration : float 
-        (Optional) full transit/eclipse duration in seconds
+        (Optional) full transit/eclipse duration in days
     offset : float 
         (Optional) manual offset in observation start time, in minutes
 
@@ -367,26 +373,37 @@ def calc_start_window(rms, ptsOrbit, numOrbits, depth, inc, aRs, period, tunc, d
     import batman
     
     hstperiod   = 96./60/24                 # HST orbital period, days
-    gsacq       = 0.                        # Guide star acquisition time, days
-    punc        = tunc/60./24/period        # Start time range, phase
+    punc        = windowSize/120./24/period # Half start window size, in phase
     cosi        = np.cos(inc*np.pi/180)     # Cosine of the inclination
     rprs        = np.sqrt(depth)            # Planet-star radius ratio
-    if duration == None:                    # Transit duration
-        duration    = period/np.pi*np.arcsin(1./aRs*np.sqrt(((1+rprs)**2-(aRs*cosi)**2)/(1-cosi**2)))
 
     params          = batman.TransitParams()
-    params.t0       = 1.                    #time of inferior conjunction
-    params.per      = 1.                    #orbital period  is unity because units are phase
-    params.rp       = rprs                  #planet radius (in units of stellar radii)
-    params.a        = aRs                   #semi-major axis (in units of stellar radii)
-    params.inc      = inc                   #orbital inclination (in degrees)
-    params.ecc      = 0.                    #eccentricity
-    params.w        = 90.                   #longitude of periastron (in degrees)
-    params.u        = [0.0, 0.0]            #limb darkening coefficients
-    params.limb_dark= "quadratic"           #limb darkening model
+    if eventType == 'transit':
+        midpt       = period
+        b           = aRs*cosi*(1-ecc**2)/(1+ecc*np.sin(w*np.pi/180)) # Impact parameter
+        sfactor     = np.sqrt(1-ecc**2)/(1+ecc*np.sin(w*np.pi/180))   # Account for planet speed on eccentric orbits
+        params.u    = [0.1, 0.1]                                      # limb darkening coefficients
+    elif eventType == 'eclipse':
+        midpt       = period/2*(1+4*ecc*np.cos(w*np.pi/180)/np.pi)
+        b           = aRs*cosi*(1-ecc**2)/(1-ecc*np.sin(w*np.pi/180)) # Impact parameter
+        sfactor     = np.sqrt(1-ecc**2)/(1-ecc*np.sin(w*np.pi/180))   # Account for planet speed on eccentric orbits
+        params.u    = [0.0, 0.0]                                      # limb darkening coefficients
+    else:
+        print("****HALTED: Unknown event type: %s" % eventType)
+        return
+    params.t0       = midpt/period          # phase of transit/eclipse
+    params.per      = 1.                    # orbital period, units are orbital phase
+    params.rp       = rprs                  # planet radius (in units of stellar radii)
+    params.a        = aRs                   # semi-major axis (in units of stellar radii)
+    params.inc      = inc                   # orbital inclination (in degrees)
+    params.ecc      = ecc                   # eccentricity
+    params.w        = w                     # longitude of periastron (in degrees)
+    params.limb_dark= "quadratic"           # limb darkening model
 
-    phase1      = (period + duration/2. - hstperiod*(numOrbits-2) - hstperiod/2 + offset/24./60)/period
-    phase2      = (period - duration/2. - hstperiod*2 + offset/24./60)/period
+    if duration == None:                    # Transit/eclipse duration (in days)
+        duration = period/np.pi*np.arcsin(1./aRs*np.sqrt(((1+rprs)**2-(aRs*cosi)**2)/(1-cosi**2)))*sfactor
+    phase1      = (midpt + duration/2. - hstperiod*(numOrbits-2) - hstperiod/2 + offset/24./60)/period
+    phase2      = (midpt - duration/2. - hstperiod*2 + offset/24./60)/period
     minphase    = (phase1+phase2)/2-punc
     maxphase    = (phase1+phase2)/2+punc
 
@@ -504,16 +521,23 @@ def compute_sim_hst(dictinput):
     hmag            = pandexo_input['star']['mag']
     nchan           = pandexo_input['observation']['nchan']
     specfile        = pandexo_input['planet']['exopath']
-    w_unit          = pandexo_input['planet']['w_unit']
+    w_unit          = pandexo_input['planet']['planwunits']
+    f_unit          = pandexo_input['planet']['planfunits']
     numorbits       = pandexo_input['observation']['norbits']
+    windowSize      = pandexo_input['observation']['windowSize']
     depth           = pandexo_input['planet']['depth']
     inc             = pandexo_input['planet']['i']
     aRs             = pandexo_input['planet']['ars']
     period          = pandexo_input['planet']['period']
-    tunc            = 10 
+    ecc             = pandexo_input['planet']['ecc']
+    w               = pandexo_input['planet']['w']
+    if f_unit == "rp/r*":
+        eventType       ='transit'
+    else:
+        eventType       ='eclipse'
     
     a = wfc3_TExoNS(dictinput)
-    b = calc_start_window(a['light_curve_rms'], a['nframes_per_orb'], numorbits, depth, inc, aRs, period, tunc)
+    b = calc_start_window(eventType, a['light_curve_rms'], a['nframes_per_orb'], numorbits, depth, inc, aRs, period, windowSize, ecc, w)
     c = planet_spec(specfile, w_unit, disperser, a['spec_error'], nchan,smooth=20) 
     
     info_div = create_out_div(a['info'], b['minphase'],b['maxphase'])
