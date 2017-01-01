@@ -25,8 +25,8 @@ def wrapper(dictinput):
     pandexo.engine.justdoit : gives ability to simply submit runs 
     pandexo.engine.run_online : submit runs through user interface 
     """
-    pandexo_input = dictinput['pandexo_input']    	
-    telescope = pandexo_input['telescope']
+    pandeia_input = dictinput['pandeia_input']    	
+    telescope = pandeia_input['telescope']
 
     if telescope=='jwst':
         from jwst import compute_full_sim

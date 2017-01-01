@@ -238,9 +238,9 @@ def wfc3_TExoNS(dictinput):
     maxExptime  = 150.   
 
     # Define available observing time per HST orbit in seconds
-    if schedulability == '30':
+    if str(schedulability) == '30':
         obsTime   = 51.3*60
-    elif schedulability == '100':
+    elif str(schedulability) == '100':
         obsTime   = 46.3*60
     else:
         print("****HALTED: Unknown schedulability: %s" % schedulability)
@@ -521,8 +521,8 @@ def compute_sim_hst(dictinput):
     hmag            = pandexo_input['star']['mag']
     nchan           = pandexo_input['observation']['nchan']
     specfile        = pandexo_input['planet']['exopath']
-    w_unit          = pandexo_input['planet']['planwunits']
-    f_unit          = pandexo_input['planet']['planfunits']
+    w_unit          = pandexo_input['planet']['w_unit']
+    f_unit          = pandexo_input['planet']['f_unit']
     numorbits       = pandexo_input['observation']['norbits']
     windowSize      = pandexo_input['observation']['windowSize']
     depth           = pandexo_input['planet']['depth']
@@ -531,7 +531,14 @@ def compute_sim_hst(dictinput):
     period          = pandexo_input['planet']['period']
     ecc             = pandexo_input['planet']['ecc']
     w               = pandexo_input['planet']['w']
-    if f_unit == "rp/r*":
+    #check to see if ecc or w was provided 
+    if (type(ecc)!=float) and (type(ecc)!= int): 
+        ecc = 0.0 
+    if (type(w)!=float) and (type(w)!= int):    
+        w = 90.0 
+    if (type(windowSize)!=float) and (type(windowSize)!= int):
+        windowSize = 20.0
+    if f_unit == "rp^2/r*^2":
         eventType       ='transit'
     else:
         eventType       ='eclipse'
@@ -539,7 +546,6 @@ def compute_sim_hst(dictinput):
     a = wfc3_TExoNS(dictinput)
     b = calc_start_window(eventType, a['light_curve_rms'], a['nframes_per_orb'], numorbits, depth, inc, aRs, period, windowSize, ecc, w)
     c = planet_spec(specfile, w_unit, disperser, a['spec_error'], nchan,smooth=20) 
-    
     info_div = create_out_div(a['info'], b['minphase'],b['maxphase'])
     
     return {"wfc3_TExoNS":a,"calc_start_window": b,"planet_spec":c,"info_div":info_div}

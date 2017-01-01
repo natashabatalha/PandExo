@@ -46,11 +46,16 @@ def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', out
     Examples
     --------
     
-    >>> jwst_1d_data(result_dict, num_tran = 3, R = 35) #for a single plot 
+    >>> jwst_1d_spec(result_dict, num_tran = 3, R = 35) #for a single plot 
     
     If you wanted to save each of the axis that were being plotted: 
     
     >>> x,y,e = jwst_1d_data([result_dict1, result_dict2], model=False, num_tran = 5, R = 100) #for multiple 
+    
+    See Also
+    --------
+    jwst_noise, jwst_1d_bkg, jwst_1d_flux, jwst_1d_snr, jwst_2d_det, jwst_2d_sat
+
     """
     outx=[]
     outy=[]
@@ -82,7 +87,7 @@ def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', out
             x=x 
             y=y 
         elif (R != False) & (num_tran != False):     
-            new_wave = Rspec(x, R)
+            new_wave = bin_wave_to_R(x, R)
             out = uniform_tophat_sum(new_wave,x, dict['RawData']['flux_out']*num_tran/ntran_old)
             inn = uniform_tophat_sum(new_wave,x, dict['RawData']['flux_in']*num_tran/ntran_old)
             vout = uniform_tophat_sum(new_wave,x, dict['RawData']['var_out']*num_tran/ntran_old)
@@ -111,7 +116,7 @@ def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', out
             y = sim_spec
             err = np.sqrt(vout+vin)/out
         elif (R != False) & (num_tran == False):     
-            new_wave = Rspec(x, R)
+            new_wave = bin_wave_to_R(x, R)
             out = uniform_tophat_sum(new_wave,x, dict['RawData']['flux_out'])
             inn = uniform_tophat_sum(new_wave,x, dict['RawData']['flux_in'])
             vout = uniform_tophat_sum(new_wave,x, dict['RawData']['var_out'])
@@ -219,7 +224,7 @@ def bin_wave_to_R(w, R):
             tracker = max(w)
     return wave
 
-def uniform_tophat_sum(xnew,x, y):
+def uniform_tophat_sum(newx,x, y):
     """Adapted from Mike R. Line to rebin spectra
     
     Takes sum of group of points in bin of wave points 
@@ -246,7 +251,7 @@ def uniform_tophat_sum(xnew,x, y):
     >>> newy
     array([ 240.,  250.,  130.])
     """
-    xnew = np.array(newx)
+    newx = np.array(newx)
     szmod=newx.shape[0]
     delta=np.zeros(szmod)
     ynew=np.zeros(szmod)
@@ -281,8 +286,7 @@ def uniform_tophat_mean(xnew,x, y):
         new y axis 
 
     Examples 
-    --------
-        
+    -------- 
     >>> oldgrid = np.linspace(1,3,100)
     >>> y = np.zeros(100)+10.0
     >>> newy = uniform_tophat_sum(np.linspace(2,3,3), oldgrid, y)
@@ -323,6 +327,10 @@ def jwst_1d_flux(result_dict, plot=True, output_file= 'flux.html'):
         micron
     y : numpy array
         1D flux rate in electrons/s
+        
+    See Also
+    --------
+    jwst_1d_spec, jwst_1d_bkg, jwst_noise, jwst_1d_snr, jwst_2d_det, jwst_2d_sat
     """
     TOOLS = "pan,wheel_zoom,box_zoom,resize,reset,save"
     out = result_dict['PandeiaOutTrans']
@@ -363,6 +371,10 @@ def jwst_1d_snr(result_dict, plot=True, output_file='snr.html'):
         micron
     y : numpy array
         1D SNR
+
+    See Also
+    --------
+    jwst_1d_bkg, jwst_noise, jwst_1d_flux, jwst_1d_spec, jwst_2d_det, jwst_2d_sat
     """    
     TOOLS = "pan,wheel_zoom,box_zoom,resize,reset,save"
     # Flux 1d
@@ -372,7 +384,7 @@ def jwst_1d_snr(result_dict, plot=True, output_file='snr.html'):
     x = x[~np.isnan(y)]
     y = y[~np.isnan(y)]
     plot_snr_1d1 = Figure(tools=TOOLS,
-                         x_axis_label=x_axis_label,
+                         x_axis_label='Wavelength (micron)',
                          y_axis_label='SNR', title="SNR Out of Trans",
                          plot_width=800, plot_height=300)
     plot_snr_1d1.line(x, y, line_width = 4, alpha = .7)
@@ -381,7 +393,7 @@ def jwst_1d_snr(result_dict, plot=True, output_file='snr.html'):
         show(plot_snr_1d1)
     return x,y
 
-def jwst_1d_bkg(result_dict, plot=True, output_file='bkg.html')
+def jwst_1d_bkg(result_dict, plot=True, output_file='bkg.html'):
     """Plot background
     
     Parameters
@@ -401,9 +413,14 @@ def jwst_1d_bkg(result_dict, plot=True, output_file='bkg.html')
         micron
     y : numpy array
         1D bakground e/s
+
+    See Also
+    --------
+    jwst_1d_spec, jwst_noise, jwst_1d_flux, jwst_1d_snr, jwst_2d_det, jwst_2d_sat
     """    
     TOOLS = "pan,wheel_zoom,box_zoom,resize,reset,save"
     # BG 1d
+    out = result_dict['PandeiaOutTrans']
     x, y = out['1d']['bg']
     y = y[~np.isnan(y)]
     x = x[~np.isnan(y)]
@@ -415,7 +432,7 @@ def jwst_1d_bkg(result_dict, plot=True, output_file='bkg.html')
     if plot: 
         outputfile(output_file)
         show(plot_bg_1d1)
-    return, x,y
+    return x,y
     
 def jwst_noise(result_dict, plot=True, output_file= 'noise.html'): 
     """Plot background
@@ -436,7 +453,13 @@ def jwst_noise(result_dict, plot=True, output_file= 'noise.html'):
         micron
     y : numpy array
         1D noise (ppm)
+
+    See Also
+    --------
+    jwst_1d_spec, jwst_1d_bkg, jwst_1d_flux, jwst_1d_snr, jwst_2d_det, jwst_2d_sat
     """  
+    TOOLS = "pan,wheel_zoom,box_zoom,resize,reset,save"    #saturation
+
     x = result_dict['FinalSpectrum']['wave']
     y = result_dict['FinalSpectrum']['error_w_floor']*1e6
     x = x[~np.isnan(y)]
@@ -445,7 +468,7 @@ def jwst_noise(result_dict, plot=True, output_file= 'noise.html'):
 
 
     plot_noise_1d1 = Figure(tools=TOOLS,#responsive=True,
-                         x_axis_label=x_axis_label,
+                         x_axis_label='Wavelength (micron)',
                          y_axis_label='Error on Spectrum (PPM)', title="Error Curve",
                          plot_width=800, plot_height=300, y_range = [0,2.0*ymed])
     ymed = np.median(y)
@@ -474,6 +497,10 @@ def jwst_2d_det(result_dict, plot=True, output_file='det2d.html'):
     ------
     numpy array
         2D array of out of transit detector simulation
+    See Also
+    --------
+    jwst_1d_spec, jwst_1d_bkg, jwst_1d_flux, jwst_1d_snr, jwst_noise, jwst_2d_sat
+
     """
     TOOLS = "pan,wheel_zoom,box_zoom,resize,reset,save"
     out = result_dict['PandeiaOutTrans']
@@ -496,7 +523,7 @@ def jwst_2d_det(result_dict, plot=True, output_file='det2d.html'):
     return data
 
 
-def jwst_2d_det(result_dict, plot=True, output_file='sat2d.html'): 
+def jwst_2d_sat(result_dict, plot=True, output_file='sat2d.html'): 
     """Plot 2d saturation profile
     
     Parameters
@@ -515,9 +542,13 @@ def jwst_2d_det(result_dict, plot=True, output_file='sat2d.html'):
     ------
     numpy array
         2D array of out of transit detector simulation
+
+    See Also
+    --------
+    jwst_1d_spec, jwst_1d_bkg, jwst_1d_flux, jwst_1d_snr, jwst_2d_det, jwst_noise
     """
     TOOLS = "pan,wheel_zoom,box_zoom,resize,reset,save"    #saturation
-    
+    out = result_dict['PandeiaOutTrans']
     data = out['2d']['saturation']
     xr, yr = data.shape
     plot_sat_2d = Figure(tools=TOOLS,
@@ -532,3 +563,66 @@ def jwst_2d_det(result_dict, plot=True, output_file='sat2d.html'):
         outputfile(output_file)
         show(plot_sat_2d)
     return data
+    
+def hst_spec(result_dict, plot=True, output_file ='hstspec.html', model = True):
+    """Plot 1d spec with error bars
+    
+    Parameters
+    ----------
+    result_dict : dict 
+        Dictionary from pandexo output.
+    
+    plot : bool 
+        (Optional) True renders plot, Flase does not. Default=True
+    model : bool 
+        (Optional) Plot model under data. Default=True
+    output_file : str
+        (Optional) Default = 'hstspec.html'    
+    
+    Return
+    ------
+    x : numpy array
+        micron
+    y : numpy array
+        1D spec fp/f* or rp^2/r*^2
+    e : numpy array
+        1D rms noise
+        
+    See Also
+    --------
+    hst_time
+    """
+    TOOLS = "pan,wheel_zoom,box_zoom,resize,reset,save"
+    #plot planet spectrum
+    mwave = result_dict['planet_spec']['model_wave']
+    mspec = result_dict['planet_spec']['model_spec']
+    
+    binwave = result_dict['planet_spec']['binwave']
+    binspec = result_dict['planet_spec']['binspec']
+    
+    error = result_dict['planet_spec']['error']
+    error = np.zeros(len(binspec))+ error
+    xlims = [result_dict['planet_spec']['wmin'], result_dict['planet_spec']['wmax']]
+    ylims = [np.min(binspec)-2.0*error[0], np.max(binspec)+2.0*error[0]]
+    
+    plot_spectrum = Figure(plot_width=800, plot_height=300, x_range=xlims,
+                               y_range=ylims, tools=TOOLS,#responsive=True,
+                                 x_axis_label='Wavelength [microns]',
+                                 y_axis_label='Ratio', 
+                               title="Original Model with Observation")
+    
+    y_err = []
+    x_err = []
+    for px, py, yerr in zip(binwave, binspec, error):
+        np.array(x_err.append((px, px)))
+        np.array(y_err.append((py - yerr, py + yerr)))
+    if model:
+        plot_spectrum.line(mwave,mspec, color= "black", alpha = 0.5, line_width = 4)
+    plot_spectrum.circle(binwave,binspec, line_width=3, line_alpha=0.6)
+    plot_spectrum.multi_line(x_err, y_err)
+    
+    if plot: 
+        outputfile(output_file)
+        show(plot_spectrum)
+
+    return binwave, binspec, error, mwave, mspec
