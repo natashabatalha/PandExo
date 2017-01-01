@@ -1,4 +1,5 @@
 {
+    "telescope":"hst",
     "configuration":{
     "instrument": {
             "instrument": "wfc3",

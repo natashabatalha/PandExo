@@ -1,5 +1,4 @@
 {
-    "telescope": "jwst/hst/wfirst",
     "calculation":"fml",
     "star":{
                 "type" : "user,phoenix", 
@@ -22,7 +21,9 @@
             "depth":null, 
             "i":null, 
             "a":null, 
-            "period":null
+            "period":null,
+            "ecc":null,
+            "w":null
             },
 
     "observation": {
@@ -34,6 +35,7 @@
         "norbits":"HST specific:number of HST orbits",
         "nchan": "HST specific: number of spec channels",
         "scanDirection": "HST specific:Forward or Round Trip",
-        "schedulability":"100"
+        "schedulability":"HST specific: 30 or 100",
+        "windowSize": 20
         }
 }
