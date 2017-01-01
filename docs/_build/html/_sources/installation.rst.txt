@@ -3,7 +3,7 @@ Installation
 .. warning::
     Before reading further, if you do not wish to install `PandExo`,\
     there is an online version of the code at \
-    PSU Science and NASA GSFC
+    PSU Science and NASA GSFC. 
 
 Installation Procedure 
 ----------------------
@@ -21,7 +21,7 @@ in order to easily pull Stellar SED's from phoenix database.
 
 .. code-block:: bash
 
-    mkdir stellar_data
+    mkdir pysynphot_data
     mv synphot5.tar.gz pysynphot_data
     tar -xvf synphot5.tar.gz
     export PYSYN_CDBS=USRDIR/pysynphot_data
@@ -29,8 +29,8 @@ in order to easily pull Stellar SED's from phoenix database.
 Troubleshooting Pandeia
 -----------------------
 
-PYFFTW
-``````
+Problems with PYFFTW?
+`````````````````````
 Many users experience issues when downloading Pandeia because of it's dependency \
 on `pyfftw`. If you experience this problem try these steps:
 
@@ -45,8 +45,8 @@ on `pyfftw`. If you experience this problem try these steps:
     chmod +x build_fftw.sh
     ./build_fftw
 
-Pandeia Reference Data
-``````````````````````
+Can't find Pandeia Reference Data
+`````````````````````````````````
 Did you forget to point to Pandeia's reference data?? 
 
 - Make sure PandExo knows where the Pandeia reference data is: 

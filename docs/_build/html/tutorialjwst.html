@@ -56,6 +56,36 @@
     </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">JWST Tutorial</a><ul>
+<li><a class="reference internal" href="#editting-inputs">Editting Inputs</a><ul>
+<li><a class="reference internal" href="#step-1-load-in-a-blank-exoplanet-dictionary">Step 1) Load in a blank exoplanet dictionary</a><ul>
+<li><a class="reference internal" href="#edit-exoplanet-observation-inputs">Edit exoplanet observation inputs</a></li>
+<li><a class="reference internal" href="#edit-exoplanet-star-inputs">Edit exoplanet star inputs</a></li>
+<li><a class="reference internal" href="#edit-exoplanet-planet-inputs">Edit exoplanet planet inputs</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#step-2-load-in-instrument-dictionary-optional">Step 2) Load in instrument dictionary (optional)</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#running-pandexo">Running PandExo</a><ul>
+<li><a class="reference internal" href="#option-1-run-single-instrument-mode-single-planet">Option 1- Run single instrument mode, single planet</a></li>
+<li><a class="reference internal" href="#option-2-run-single-instrument-mode-with-user-dict-single-planet">Option 2- Run single instrument mode (with user dict), single planet</a></li>
+<li><a class="reference internal" href="#option-3-run-several-modes-single-planet">Option 3- Run several modes, single planet</a></li>
+<li><a class="reference internal" href="#option-4-run-single-mode-several-planet-cases">Option 4- Run single mode, several planet cases</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#analyzing-output">Analyzing Output</a><ul>
+<li><a class="reference internal" href="#plot-1d-data-with-errorbars">Plot 1D Data with Errorbars</a></li>
+<li><a class="reference internal" href="#plot-noise-more">Plot Noise &amp; More</a></li>
+<li><a class="reference internal" href="#plot-2d-detector-profile">Plot 2D Detector Profile</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
   <h4>Previous topic</h4>
   <p class="topless"><a href="installation.html"
                         title="previous chapter">Installation</a></p>
@@ -89,6 +119,237 @@
             
   <div class="section" id="jwst-tutorial">
 <h1>JWST Tutorial<a class="headerlink" href="#jwst-tutorial" title="Permalink to this headline">¶</a></h1>
+<p>This tutorial can be downloaded as a iPython notebook on the PandExo Github.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">warnings</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">pandexo.engine.justdoit</span> <span class="k">as</span> <span class="nn">jdi</span> <span class="c1"># THIS IS THE HOLY GRAIL OF PANDEXO</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">os</span>
+</pre></div>
+</div>
+<div class="section" id="editting-inputs">
+<h2>Editting Inputs<a class="headerlink" href="#editting-inputs" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="step-1-load-in-a-blank-exoplanet-dictionary">
+<h3>Step 1) Load in a blank exoplanet dictionary<a class="headerlink" href="#step-1-load-in-a-blank-exoplanet-dictionary" title="Permalink to this headline">¶</a></h3>
+<p>To start, load in a blank exoplanet dictionary with empty keys. You will
+fill these out for yourself in the next step.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">exo_dict</span> <span class="o">=</span> <span class="n">jdi</span><span class="o">.</span><span class="n">load_exo_dict</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="section" id="edit-exoplanet-observation-inputs">
+<h4>Edit exoplanet observation inputs<a class="headerlink" href="#edit-exoplanet-observation-inputs" title="Permalink to this headline">¶</a></h4>
+<p>Editting each keys are annoying. But, do this carefully or it could
+result in nonsense runs</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;observation&#39;</span><span class="p">][</span><span class="s1">&#39;sat_level&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">80</span> <span class="c1">#saturation level in percent of full well</span>
+<span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;observation&#39;</span><span class="p">][</span><span class="s1">&#39;noccultations&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span> <span class="c1">#number of transits</span>
+<span class="c1">#fixed binning. I usually suggest ZERO binning.. you can always bin later</span>
+<span class="c1">#without having to redo the calcualtion</span>
+<span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;observation&#39;</span><span class="p">][</span><span class="s1">&#39;fraction&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="c1">#fraction of time in transit versus out = in/out</span>
+<span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;observation&#39;</span><span class="p">][</span><span class="s1">&#39;noise_floor&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1">#this can be a fixed level or it can be a filepath</span>
+<span class="c1">#to a wavelength dependent noise floor solution (units are ppm)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="edit-exoplanet-star-inputs">
+<h4>Edit exoplanet star inputs<a class="headerlink" href="#edit-exoplanet-star-inputs" title="Permalink to this headline">¶</a></h4>
+<p>Note… If you select ‘phoenix’ you <strong>do not</strong> have to provide a starpath,
+w_unit or f_unit, but you <strong>do</strong> have to provide a temp, metal and
+logg. If you select ‘user’ you <strong>do not</strong> need to provide a temp, metal
+and logg, but you <strong>do</strong> need to provide units and starpath.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;star&#39;</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;phoenix&#39;</span> <span class="c1">#phoenix or user (if you have your own)</span>
+<span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;star&#39;</span><span class="p">][</span><span class="s1">&#39;mag&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">8.0</span> <span class="c1">#magnitude of the system</span>
+<span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;star&#39;</span><span class="p">][</span><span class="s1">&#39;ref_wave&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.25</span> <span class="c1">#always add this in micron</span>
+<span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;star&#39;</span><span class="p">][</span><span class="s1">&#39;temp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">5500</span> <span class="c1">#in K</span>
+<span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;star&#39;</span><span class="p">][</span><span class="s1">&#39;metal&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span> <span class="c1"># as log Fe/H</span>
+<span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;star&#39;</span><span class="p">][</span><span class="s1">&#39;logg&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">4.0</span> <span class="c1">#log surface gravity cgs</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="edit-exoplanet-planet-inputs">
+<h4>Edit exoplanet planet inputs<a class="headerlink" href="#edit-exoplanet-planet-inputs" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;exopath&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;/Users/nbatalh1/Desktop/Simulations/wasp12b.txt&#39;</span>
+<span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;w_unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;cm&#39;</span> <span class="c1">#other options include &quot;um&quot;, &quot;Angs&quot;, &quot;secs&quot; (for phase curves)</span>
+<span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;f_unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;rp^2/r*^2&#39;</span> <span class="c1">#other options are &#39;fp/f*&#39;</span>
+<span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;transit_duration&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.0</span><span class="o">*</span><span class="mf">60.0</span><span class="o">*</span><span class="mf">60.0</span> <span class="c1">#transit duration in seconds</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="step-2-load-in-instrument-dictionary-optional">
+<h3>Step 2) Load in instrument dictionary (optional)<a class="headerlink" href="#step-2-load-in-instrument-dictionary-optional" title="Permalink to this headline">¶</a></h3>
+<p>Step 2 is optional because PandExo has the functionality to
+automatically load in instrument dictionaries. Skip this if you plan on
+observing with one of the following:</p>
+<blockquote>
+<div><ul class="simple">
+<li>NIRCam F444W</li>
+<li>NIRSpec Prism</li>
+<li>NIRSpec G395M</li>
+<li>NIRSpec G395H</li>
+<li>NIRSpec G235H</li>
+<li>NIRSpec G235M</li>
+<li>NIRCam F322W</li>
+<li>NIRSpec G140M</li>
+<li>NIRSpec G140H</li>
+<li>MIRI LRS</li>
+<li>NIRISS SOSS_Or1</li>
+<li>NIRISS SOSS_Or2</li>
+</ul>
+</div></blockquote>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">jdi</span><span class="o">.</span><span class="n">print_instruments</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Choose</span> <span class="kn">from</span> <span class="nn">the</span> <span class="n">following</span><span class="p">:</span>
+<span class="p">[</span><span class="s1">&#39;NIRCam F444W&#39;</span><span class="p">,</span> <span class="s1">&#39;NIRSpec Prism&#39;</span><span class="p">,</span> <span class="s1">&#39;NIRSpec G395M&#39;</span><span class="p">,</span> <span class="s1">&#39;NIRCam F322W2&#39;</span><span class="p">,</span> <span class="s1">&#39;NIRSpec G395H&#39;</span><span class="p">,</span> <span class="s1">&#39;NIRSpec G235H&#39;</span><span class="p">,</span> <span class="s1">&#39;NIRSpec G235M&#39;</span><span class="p">,</span> <span class="s1">&#39;NIRSpec G140M&#39;</span><span class="p">,</span> <span class="s1">&#39;NIRSpec G140H&#39;</span><span class="p">,</span> <span class="s1">&#39;MIRI LRS&#39;</span><span class="p">,</span> <span class="s1">&#39;NIRISS SOSS_Or1&#39;</span><span class="p">,</span> <span class="s1">&#39;NIRISS SOSS_Or2&#39;</span><span class="p">,</span> <span class="s1">&#39;WFC3 G141&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">inst_dict</span> <span class="o">=</span> <span class="n">jdi</span><span class="o">.</span><span class="n">load_mode_dict</span><span class="p">(</span><span class="s1">&#39;NIRCam F444W&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="running-pandexo">
+<h2>Running PandExo<a class="headerlink" href="#running-pandexo" title="Permalink to this headline">¶</a></h2>
+<p>You have <strong>four options</strong> for running PandExo. All of them are accessed
+through attribute <strong>jdi.run_pandexo</strong>. See examples below.</p>
+<p><code class="docutils literal"><span class="pre">jdi.run_pandexo(exo,</span> <span class="pre">inst,</span> <span class="pre">param_space</span> <span class="pre">=</span> <span class="pre">0,</span> <span class="pre">param_range</span> <span class="pre">=</span> <span class="pre">0,save_file</span> <span class="pre">=</span> <span class="pre">True,</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">output_path=os.getcwd(),</span> <span class="pre">output_file</span> <span class="pre">=</span> <span class="pre">'')</span></code></p>
+<div class="section" id="option-1-run-single-instrument-mode-single-planet">
+<h3>Option 1- Run single instrument mode, single planet<a class="headerlink" href="#option-1-run-single-instrument-mode-single-planet" title="Permalink to this headline">¶</a></h3>
+<p>If you forget which instruments are available run
+<strong>jdi.print_isntruments()</strong> and pick one</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">jdi</span><span class="o">.</span><span class="n">print_instruments</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Choose</span> <span class="kn">from</span> <span class="nn">the</span> <span class="n">following</span><span class="p">:</span>
+<span class="p">[</span><span class="s1">&#39;NIRCam F444W&#39;</span><span class="p">,</span> <span class="s1">&#39;NIRSpec Prism&#39;</span><span class="p">,</span> <span class="s1">&#39;NIRSpec G395M&#39;</span><span class="p">,</span> <span class="s1">&#39;NIRCam F322W2&#39;</span><span class="p">,</span> <span class="s1">&#39;NIRSpec G395H&#39;</span><span class="p">,</span> <span class="s1">&#39;NIRSpec G235H&#39;</span><span class="p">,</span> <span class="s1">&#39;NIRSpec G235M&#39;</span><span class="p">,</span> <span class="s1">&#39;NIRSpec G140M&#39;</span><span class="p">,</span> <span class="s1">&#39;NIRSpec G140H&#39;</span><span class="p">,</span> <span class="s1">&#39;MIRI LRS&#39;</span><span class="p">,</span> <span class="s1">&#39;NIRISS SOSS_Or1&#39;</span><span class="p">,</span> <span class="s1">&#39;NIRISS SOSS_Or2&#39;</span><span class="p">,</span> <span class="s1">&#39;WFC3 G141&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">result</span> <span class="o">=</span> <span class="n">jdi</span><span class="o">.</span><span class="n">run_pandexo</span><span class="p">(</span><span class="n">exo_dict</span><span class="p">,[</span><span class="s1">&#39;NIRCam F322W2&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Running</span> <span class="n">Single</span> <span class="n">Case</span> <span class="k">for</span><span class="p">:</span> <span class="n">NIRCam</span> <span class="n">F322W2</span>
+<span class="n">Computing</span> <span class="n">Duty</span> <span class="n">Cycle</span>
+<span class="n">Finished</span> <span class="n">Duty</span> <span class="n">Cucle</span> <span class="n">Calc</span>
+<span class="n">Starting</span> <span class="n">Out</span> <span class="n">of</span> <span class="n">Transit</span> <span class="n">Simulation</span>
+<span class="n">End</span> <span class="n">out</span> <span class="n">of</span> <span class="n">Transit</span>
+<span class="n">Starting</span> <span class="n">In</span> <span class="n">Transit</span> <span class="n">Simulation</span>
+<span class="n">End</span> <span class="n">In</span> <span class="n">Transit</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="option-2-run-single-instrument-mode-with-user-dict-single-planet">
+<h3>Option 2- Run single instrument mode (with user dict), single planet<a class="headerlink" href="#option-2-run-single-instrument-mode-with-user-dict-single-planet" title="Permalink to this headline">¶</a></h3>
+<p>This is the same thing as option 1 but instead of feeding it a list of
+keys, you can feed it a instrument dictionary (this is for users who
+wanted to simulate something NOT pre defined within pandexo)</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">inst_dict</span> <span class="o">=</span> <span class="n">jdi</span><span class="o">.</span><span class="n">load_mode_dict</span><span class="p">(</span><span class="s1">&#39;NIRSpec G140H&#39;</span><span class="p">)</span>
+<span class="c1">#personalize subarray</span>
+<span class="n">inst_dict</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">][</span><span class="s2">&quot;detector&quot;</span><span class="p">][</span><span class="s2">&quot;subarray&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;sub2048&#39;</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">jdi</span><span class="o">.</span><span class="n">run_pandexo</span><span class="p">(</span><span class="n">exo_dict</span><span class="p">,</span> <span class="n">inst_dict</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Running</span> <span class="n">Single</span> <span class="n">Case</span> <span class="n">w</span><span class="o">/</span> <span class="n">User</span> <span class="n">Instrument</span> <span class="n">Dict</span>
+<span class="n">Computing</span> <span class="n">Duty</span> <span class="n">Cycle</span>
+<span class="n">Finished</span> <span class="n">Duty</span> <span class="n">Cucle</span> <span class="n">Calc</span>
+<span class="n">Starting</span> <span class="n">Out</span> <span class="n">of</span> <span class="n">Transit</span> <span class="n">Simulation</span>
+<span class="n">End</span> <span class="n">out</span> <span class="n">of</span> <span class="n">Transit</span>
+<span class="n">Starting</span> <span class="n">In</span> <span class="n">Transit</span> <span class="n">Simulation</span>
+<span class="n">End</span> <span class="n">In</span> <span class="n">Transit</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="option-3-run-several-modes-single-planet">
+<h3>Option 3- Run several modes, single planet<a class="headerlink" href="#option-3-run-several-modes-single-planet" title="Permalink to this headline">¶</a></h3>
+<p>Use several modes from <strong>print_isntruments()</strong> options.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="c1">#choose select</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">jdi</span><span class="o">.</span><span class="n">run_pandexo</span><span class="p">(</span><span class="n">exo_dict</span><span class="p">,[</span><span class="s1">&#39;NIRCam F444W&#39;</span><span class="p">,</span><span class="s1">&#39;NIRCam F322W2&#39;</span><span class="p">,</span><span class="s1">&#39;MIRI LRS&#39;</span><span class="p">],</span>
+               <span class="n">output_path</span> <span class="o">=</span> <span class="s1">&#39;/Users/nbatalh1/Desktop/JWSTFUN&#39;</span><span class="p">)</span>
+<span class="c1">#run all</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">jdi</span><span class="o">.</span><span class="n">run_pandexo</span><span class="p">(</span><span class="n">exo_dict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;RUN ALL&#39;</span><span class="p">],</span> <span class="n">save_file</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="option-4-run-single-mode-several-planet-cases">
+<h3>Option 4- Run single mode, several planet cases<a class="headerlink" href="#option-4-run-single-mode-several-planet-cases" title="Permalink to this headline">¶</a></h3>
+<p>Use a single modes from <strong>print_instruments()</strong> options. But explore
+parameter space with respect to <strong>any</strong> parameter in the exo dict. The
+example below shows how to loop over several planet models</p>
+<p>You can loop through anything in the exoplanet dictionary. It will be
+planet, star or observation followed by whatever you want to loop
+through in that set.</p>
+<p>i.e. planet+exopath, star+temp, star+metal, star+logg,
+observation+sat_level.. etc</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="c1">#looping over different exoplanet models</span>
+<span class="n">jdi</span><span class="o">.</span><span class="n">run_pandexo</span><span class="p">(</span><span class="n">exo_dict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;NIRCam F444W&#39;</span><span class="p">],</span> <span class="n">param_space</span> <span class="o">=</span> <span class="s1">&#39;planet+exopath&#39;</span><span class="p">,</span>
+                <span class="n">param_range</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="s1">&#39;/Users/nbatalha1/all_my_models_here&#39;</span><span class="p">),</span>
+               <span class="n">output_path</span> <span class="o">=</span> <span class="s1">&#39;/Users/nbatalh1/Desktop/JWSTFUN&#39;</span><span class="p">)</span>
+
+<span class="c1">#looping over different stellar temperatures</span>
+<span class="n">jdi</span><span class="o">.</span><span class="n">run_pandexo</span><span class="p">(</span><span class="n">exo_dict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;NIRCam F444W&#39;</span><span class="p">],</span> <span class="n">param_space</span> <span class="o">=</span> <span class="s1">&#39;star+temp&#39;</span><span class="p">,</span>
+                <span class="n">param_range</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">5000</span><span class="p">,</span><span class="mi">8000</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span>
+               <span class="n">output_path</span> <span class="o">=</span> <span class="s1">&#39;/Users/nbatalh1/Desktop/JWSTFUN&#39;</span><span class="p">)</span>
+
+<span class="c1">#looping over different saturation levels</span>
+<span class="n">jdi</span><span class="o">.</span><span class="n">run_pandexo</span><span class="p">(</span><span class="n">exo_dict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;NIRCam F444W&#39;</span><span class="p">],</span> <span class="n">param_space</span> <span class="o">=</span> <span class="s1">&#39;observation+sat_level&#39;</span><span class="p">,</span>
+                <span class="n">param_range</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">.</span><span class="mi">5</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">),</span>
+               <span class="n">output_path</span> <span class="o">=</span> <span class="s1">&#39;/Users/nbatalh1/Desktop/JWSTFUN&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="analyzing-output">
+<h2>Analyzing Output<a class="headerlink" href="#analyzing-output" title="Permalink to this headline">¶</a></h2>
+<p>There are pre computed functions for analyzing most common outputs. You can also explore
+the dictionary structure yourself.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandexo.engine.justplotit</span> <span class="k">as</span> <span class="nn">jpi</span>
+<span class="kn">import</span> <span class="nn">pickle</span> <span class="k">as</span> <span class="nn">pk</span>
+</pre></div>
+</div>
+<div class="section" id="plot-1d-data-with-errorbars">
+<h3>Plot 1D Data with Errorbars<a class="headerlink" href="#plot-1d-data-with-errorbars" title="Permalink to this headline">¶</a></h3>
+<p>Multiple plotting options exist within <cite>jwst_1d_spec</cite></p>
+<ol class="arabic simple">
+<li>Plot a single run</li>
+</ol>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="c1">#load in output from run</span>
+<span class="n">out</span> <span class="o">=</span> <span class="n">pk</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="s1">&#39;singlerun.p&#39;</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">))</span>
+<span class="c1">#for a single run</span>
+<span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span> <span class="n">e</span> <span class="o">=</span> <span class="n">jpi</span><span class="o">.</span><span class="n">jwst_1d_spec</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">R</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">num_tran</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">x_range</span><span class="o">=</span><span class="p">[</span><span class="o">.</span><span class="mi">8</span><span class="p">,</span><span class="mf">1.28</span><span class="p">])</span>
+</pre></div>
+</div>
+<img alt="_images/jwst_1d_spec.png" src="_images/jwst_1d_spec.png" />
+<ol class="arabic simple" start="2">
+<li>Plot several runs from parameters space run</li>
+</ol>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="c1">#load in output from multiple runs</span>
+<span class="n">multi</span> <span class="o">=</span> <span class="n">pk</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="s1">&#39;three_nirspec_modes.p&#39;</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">))</span>
+
+<span class="c1">#get into list format</span>
+<span class="n">list_multi</span> <span class="o">=</span> <span class="p">[</span><span class="n">multi</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;NIRSpec G140M&#39;</span><span class="p">],</span> <span class="n">multi</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;NIRSpec G235M&#39;</span><span class="p">],</span> <span class="n">multi</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="s1">&#39;NIRSpec G395M&#39;</span><span class="p">]]</span>
+
+<span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">e</span> <span class="o">=</span> <span class="n">jpi</span><span class="o">.</span><span class="n">jwst_1d_spec</span><span class="p">(</span><span class="n">list_multi</span><span class="p">,</span> <span class="n">R</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">x_range</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">])</span>
+</pre></div>
+</div>
+<img alt="_images/jwst_1d_spec_multi.png" src="_images/jwst_1d_spec_multi.png" />
+</div>
+<div class="section" id="plot-noise-more">
+<h3>Plot Noise &amp; More<a class="headerlink" href="#plot-noise-more" title="Permalink to this headline">¶</a></h3>
+<p>Several functions exist to plot various outputs.</p>
+<p>See also <strong>jwst_1d_bkg</strong>, <strong>jwst_1d_snr</strong>, <strong>jwst_1d_flux</strong>,</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span><span class="p">,</span><span class="n">y</span> <span class="o">=</span> <span class="n">jpi</span><span class="o">.</span><span class="n">jwst_noise</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/jwst_noise.png" src="_images/jwst_noise.png" />
+</div>
+<div class="section" id="plot-2d-detector-profile">
+<h3>Plot 2D Detector Profile<a class="headerlink" href="#plot-2d-detector-profile" title="Permalink to this headline">¶</a></h3>
+<p>See also <strong>jwst_2d_sat</strong> to plot saturation profile</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">jpi</span><span class="o">.</span><span class="n">jwst_2d_det</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/jwst_1d_det.png" src="_images/jwst_1d_det.png" />
+</div>
+</div>
 </div>
 
 

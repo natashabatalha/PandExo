@@ -13,7 +13,7 @@ PandExo is an online tool for generation instrument simulations of JWST's NIRSpe
 Contents:
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
    
    installation
    tutorialjwst

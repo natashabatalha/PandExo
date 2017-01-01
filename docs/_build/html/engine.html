@@ -28,7 +28,6 @@
     <script type="text/javascript" src="_static/bizstyle.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="engine.utils package" href="engine.utils.html" />
     <link rel="prev" title="HST Tutorial" href="tutorialhst.html" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <!--[if lt IE 9]>
@@ -46,9 +45,6 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="engine.utils.html" title="engine.utils package"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
           <a href="tutorialhst.html" title="HST Tutorial"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">PandExo  documentation</a> &#187;</li> 
@@ -59,24 +55,21 @@
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">The Code</a><ul>
-<li><a class="reference internal" href="#subpackages">Subpackages</a></li>
-<li><a class="reference internal" href="#modules">Modules</a></li>
-<li><a class="reference internal" href="#module-engine.ComputeZ">engine.ComputeZ module</a></li>
-<li><a class="reference internal" href="#module-engine.HST_TExoNS">engine.HST_TExoNS module</a></li>
-<li><a class="reference internal" href="#module-engine.compute_noise">engine.compute_noise module</a></li>
-<li><a class="reference internal" href="#module-engine.create_input">engine.create_input module</a></li>
-<li><a class="reference internal" href="#module-engine.elements">engine.elements module</a><ul>
+<li><a class="reference internal" href="#module-engine.ComputeZ">engine.ComputeZ</a></li>
+<li><a class="reference internal" href="#module-engine.compute_noise">engine.compute_noise</a></li>
+<li><a class="reference internal" href="#module-engine.create_input">engine.create_input</a></li>
+<li><a class="reference internal" href="#module-engine.elements">engine.elements</a><ul>
 <li><a class="reference internal" href="#requirements">Requirements</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#module-engine.hst">engine.hst module</a></li>
-<li><a class="reference internal" href="#module-engine.hst_smooth">engine.hst_smooth module</a></li>
-<li><a class="reference internal" href="#module-engine.justdoit">engine.justdoit module</a></li>
-<li><a class="reference internal" href="#module-engine.justplotit">engine.justplotit module</a></li>
-<li><a class="reference internal" href="#module-engine.jwst">engine.jwst module</a></li>
-<li><a class="reference internal" href="#module-engine.load_modes">engine.load_modes module</a></li>
-<li><a class="reference internal" href="#module-engine.pandexo">engine.pandexo module</a></li>
-<li><a class="reference internal" href="#module-engine.run_online">engine.run_online module</a></li>
+<li><a class="reference internal" href="#module-engine.hst">engine.hst</a></li>
+<li><a class="reference internal" href="#module-engine.hst_smooth">engine.hst_smooth</a></li>
+<li><a class="reference internal" href="#module-engine.justdoit">engine.justdoit</a></li>
+<li><a class="reference internal" href="#module-engine.justplotit">engine.justplotit</a></li>
+<li><a class="reference internal" href="#module-engine.jwst">engine.jwst</a></li>
+<li><a class="reference internal" href="#module-engine.load_modes">engine.load_modes</a></li>
+<li><a class="reference internal" href="#module-engine.pandexo">engine.pandexo</a></li>
+<li><a class="reference internal" href="#module-engine.run_online">engine.run_online</a></li>
 <li><a class="reference internal" href="#module-engine">Module contents</a></li>
 </ul>
 </li>
@@ -85,9 +78,6 @@
   <h4>Previous topic</h4>
   <p class="topless"><a href="tutorialhst.html"
                         title="previous chapter">HST Tutorial</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="engine.utils.html"
-                        title="next chapter">engine.utils package</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -115,24 +105,8 @@
             
   <div class="section" id="the-code">
 <h1>The Code<a class="headerlink" href="#the-code" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="subpackages">
-<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="engine.utils.html">engine.utils package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="engine.utils.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="engine.utils.html#module-engine.utils.plotters">engine.utils.plotters module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="engine.utils.html#module-engine.utils">Module contents</a></li>
-</ul>
-</li>
-</ul>
-</div>
-</div>
-<div class="section" id="modules">
-<h2>Modules<a class="headerlink" href="#modules" title="Permalink to this headline">¶</a></h2>
-</div>
 <div class="section" id="module-engine.ComputeZ">
-<span id="engine-computez-module"></span><h2>engine.ComputeZ module<a class="headerlink" href="#module-engine.ComputeZ" title="Permalink to this headline">¶</a></h2>
+<span id="engine-computez"></span><h2>engine.ComputeZ<a class="headerlink" href="#module-engine.ComputeZ" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="engine.ComputeZ.addBackground">
 <code class="descclassname">engine.ComputeZ.</code><code class="descname">addBackground</code><span class="sig-paren">(</span><em>molDict</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/ComputeZ.html#addBackground"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.ComputeZ.addBackground" title="Permalink to this definition">¶</a></dt>
@@ -185,111 +159,8 @@ i.e. {&#8220;H2O&#8221;: 0.98, &#8220;H2&#8221;:0.2}</dd>
 <dd></dd></dl>
 
 </div>
-<div class="section" id="module-engine.HST_TExoNS">
-<span id="engine-hst-texons-module"></span><h2>engine.HST_TExoNS module<a class="headerlink" href="#module-engine.HST_TExoNS" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
-<dt id="engine.HST_TExoNS.calc_StartWindow">
-<code class="descclassname">engine.HST_TExoNS.</code><code class="descname">calc_StartWindow</code><span class="sig-paren">(</span><em>rms</em>, <em>ptsOrbit</em>, <em>numorbits</em>, <em>depth</em>, <em>inc</em>, <em>aRs</em>, <em>period</em>, <em>tunc</em>, <em>duration=None</em>, <em>offset=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/HST_TExoNS.html#calc_StartWindow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.HST_TExoNS.calc_StartWindow" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plot earliest and latest possible spectroscopic light curves for given start window size</p>
-<p>offset in minutes</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="engine.HST_TExoNS.plot_PlanSpec">
-<code class="descclassname">engine.HST_TExoNS.</code><code class="descname">plot_PlanSpec</code><span class="sig-paren">(</span><em>specfile</em>, <em>w_unit</em>, <em>disperser</em>, <em>deptherr</em>, <em>nchan</em>, <em>smooth=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/HST_TExoNS.html#plot_PlanSpec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.HST_TExoNS.plot_PlanSpec" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plot exoplanet transmission/emission spectrum</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="engine.HST_TExoNS.wfc3_GuessNOrbits">
-<code class="descclassname">engine.HST_TExoNS.</code><code class="descname">wfc3_GuessNOrbits</code><span class="sig-paren">(</span><em>trdur</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/HST_TExoNS.html#wfc3_GuessNOrbits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.HST_TExoNS.wfc3_GuessNOrbits" title="Permalink to this definition">¶</a></dt>
-<dd><p>Predict number of HST orbits for transit observation when not provided by the user.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>trdur</strong> (<em>array</em><em>, </em><em>transit duration in seconds</em>) &#8211; </li>
-<li><strong>OUTPUT</strong> &#8211; </li>
-<li><strong>------</strong> &#8211; </li>
-<li><strong>norbits</strong> (<em>float</em><em>, </em><em>number of requested orbits per transit</em><em> (</em><em>including discarded thermal-settling orbit</em><em>)</em><em></em>) &#8211; </li>
-<li><strong>HISTORY</strong> &#8211; </li>
-<li><strong>-------</strong> &#8211; </li>
-<li><strong>by Kevin Stevenson      October 2016</strong> (<em>Written</em>) &#8211; </li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="engine.HST_TExoNS.wfc3_GuessParams">
-<code class="descclassname">engine.HST_TExoNS.</code><code class="descname">wfc3_GuessParams</code><span class="sig-paren">(</span><em>hmag</em>, <em>disperser</em>, <em>scanDirection</em>, <em>subarray</em>, <em>obsTime</em>, <em>maxScanHeight=180.0</em>, <em>maxExptime=150.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/HST_TExoNS.html#wfc3_GuessParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.HST_TExoNS.wfc3_GuessParams" title="Permalink to this definition">¶</a></dt>
-<dd><p>Predict nsamp and samp_seq when values not provided by the user.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>hmag</strong> (<em>float</em><em>, </em><em>H-band magnitude</em>) &#8211; </li>
-<li><strong>maxScanHeight</strong> (<em></em><em>(</em><em>optional</em><em>) </em><em>float</em><em>, </em><em>maximum scan height in pixels</em>) &#8211; </li>
-<li><strong>OUTPUT</strong> &#8211; </li>
-<li><strong>------</strong> &#8211; </li>
-<li><strong>nsamp</strong> (<em>float</em><em>, </em><em>number of up-the-ramp samples</em><em> (</em><em>1..15</em><em>)</em><em></em>) &#8211; </li>
-<li><strong>samp_seq</strong> (<em>string</em><em>, </em><em>time between non-destructive reads</em>) &#8211; </li>
-<li><strong>HISTORY</strong> &#8211; </li>
-<li><strong>-------</strong> &#8211; </li>
-<li><strong>by Kevin Stevenson      October 2016</strong> (<em>Written</em>) &#8211; </li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="engine.HST_TExoNS.wfc3_TExoNS">
-<code class="descclassname">engine.HST_TExoNS.</code><code class="descname">wfc3_TExoNS</code><span class="sig-paren">(</span><em>hmag</em>, <em>trdur</em>, <em>numTr</em>, <em>nchan</em>, <em>disperser</em>, <em>scanDirection='Forward'</em>, <em>subarray='grism256'</em>, <em>nsamp=0</em>, <em>samp_seq=None</em>, <em>norbits=None</em>, <em>schedulability='100'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/HST_TExoNS.html#wfc3_TExoNS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.HST_TExoNS.wfc3_TExoNS" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute the transit depth uncertainty for a defined system and number of spectrophotometric channels.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>hmag</strong> (<em>float</em><em>, </em><em>H-band magnitude</em>) &#8211; </li>
-<li><strong>trdur</strong> (<em>array</em><em>, </em><em>transit duration in seconds</em>) &#8211; </li>
-<li><strong>numTr</strong> (<em>array</em><em>, </em><em>number of observed transits/eclipses</em>) &#8211; </li>
-<li><strong>nchan</strong> (<em>float</em><em>, </em><em>number of spectrophotometric channels</em>) &#8211; </li>
-<li><strong>disperser</strong> (<em>string</em><em>, </em><em>grism</em><em> (</em><em>g102</em><em> or </em><em>g141</em><em>)</em><em></em>) &#8211; </li>
-<li><strong>scanDirection</strong> (<em>string</em><em>, </em><em>spatial scan direction</em><em> (</em><em>Forward</em><em> or </em><em>Round Trip</em><em>)</em><em></em>) &#8211; </li>
-<li><strong>subarray</strong> (<em>string</em><em>, </em><em>subarray aperture</em><em> (</em><em>grism256</em><em> or </em><em>grism512</em><em>)</em><em></em>) &#8211; </li>
-<li><strong>nsamp</strong> (<em>float</em><em>, </em><em>number of up-the-ramp samples</em><em> (</em><em>1..15</em><em>)</em><em></em>) &#8211; </li>
-<li><strong>samp_seq</strong> (<em>string</em><em>, </em><em>time between non-destructive reads</em>) &#8211; </li>
-<li><strong>norbits</strong> (<em>float</em><em>, </em><em>number of requested orbits per transit</em><em> (</em><em>including discarded thermal-settling orbit</em><em>)</em><em></em>) &#8211; </li>
-<li><strong>schedulability</strong> (<em>string</em><em>, </em><em>% time HST can observe target</em><em> (</em><em>30</em><em> or </em><em>100</em><em>)</em><em></em>) &#8211; </li>
-<li><strong>OUTPUT</strong> &#8211; </li>
-<li><strong>------</strong> &#8211; </li>
-<li><strong>deptherr</strong> (<em>float</em><em>, </em><em>transit depth uncertainty per spectrophotometric channel</em>) &#8211; </li>
-<li><strong>HISTORY</strong> &#8211; </li>
-<li><strong>-------</strong> &#8211; </li>
-<li><strong>by Kevin Stevenson      October 2016</strong> (<em>Written</em>) &#8211; </li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="engine.HST_TExoNS.wfc3_obs">
-<code class="descclassname">engine.HST_TExoNS.</code><code class="descname">wfc3_obs</code><span class="sig-paren">(</span><em>hmag</em>, <em>disperser</em>, <em>scanDirection</em>, <em>subarray</em>, <em>nsamp</em>, <em>samp_seq</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/HST_TExoNS.html#wfc3_obs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.HST_TExoNS.wfc3_obs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Determine the recommended exposure time, scan rate, scan height, and overheads.</p>
-</dd></dl>
-
-</div>
 <div class="section" id="module-engine.compute_noise">
-<span id="engine-compute-noise-module"></span><h2>engine.compute_noise module<a class="headerlink" href="#module-engine.compute_noise" title="Permalink to this headline">¶</a></h2>
+<span id="engine-compute-noise"></span><h2>engine.compute_noise<a class="headerlink" href="#module-engine.compute_noise" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="engine.compute_noise.ExtractSpec">
 <em class="property">class </em><code class="descclassname">engine.compute_noise.</code><code class="descname">ExtractSpec</code><span class="sig-paren">(</span><em>inn</em>, <em>out</em>, <em>rn</em>, <em>extraction_area</em>, <em>timing</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/compute_noise.html#ExtractSpec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.compute_noise.ExtractSpec" title="Permalink to this definition">¶</a></dt>
@@ -543,7 +414,7 @@ taking into account integrations and number of transits</p>
 
 </div>
 <div class="section" id="module-engine.create_input">
-<span id="engine-create-input-module"></span><h2>engine.create_input module<a class="headerlink" href="#module-engine.create_input" title="Permalink to this headline">¶</a></h2>
+<span id="engine-create-input"></span><h2>engine.create_input<a class="headerlink" href="#module-engine.create_input" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="engine.create_input.binning">
 <code class="descclassname">engine.create_input.</code><code class="descname">binning</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>R=2000.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/create_input.html#binning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.create_input.binning" title="Permalink to this definition">¶</a></dt>
@@ -625,7 +496,7 @@ filename which points to a stellar spectrum</td>
 
 </div>
 <div class="section" id="module-engine.elements">
-<span id="engine-elements-module"></span><h2>engine.elements module<a class="headerlink" href="#module-engine.elements" title="Permalink to this headline">¶</a></h2>
+<span id="engine-elements"></span><h2>engine.elements<a class="headerlink" href="#module-engine.elements" title="Permalink to this headline">¶</a></h2>
 <p>Properties of the chemical elements.</p>
 <p>Each chemical element is represented as an object instance. Physicochemical
 and descriptive properties of the elements are stored as instance attributes.</p>
@@ -672,10 +543,10 @@ and descriptive properties of the elements are stored as instance attributes.</p
 </div>
 </div>
 <div class="section" id="module-engine.hst">
-<span id="engine-hst-module"></span><h2>engine.hst module<a class="headerlink" href="#module-engine.hst" title="Permalink to this headline">¶</a></h2>
+<span id="engine-hst"></span><h2>engine.hst<a class="headerlink" href="#module-engine.hst" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="engine.hst.calc_start_window">
-<code class="descclassname">engine.hst.</code><code class="descname">calc_start_window</code><span class="sig-paren">(</span><em>rms</em>, <em>ptsOrbit</em>, <em>numOrbits</em>, <em>depth</em>, <em>inc</em>, <em>aRs</em>, <em>period</em>, <em>tunc</em>, <em>duration=None</em>, <em>offset=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/hst.html#calc_start_window"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.hst.calc_start_window" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">engine.hst.</code><code class="descname">calc_start_window</code><span class="sig-paren">(</span><em>eventType</em>, <em>rms</em>, <em>ptsOrbit</em>, <em>numOrbits</em>, <em>depth</em>, <em>inc</em>, <em>aRs</em>, <em>period</em>, <em>windowSize</em>, <em>ecc=0</em>, <em>w=90.0</em>, <em>duration=None</em>, <em>offset=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/hst.html#calc_start_window"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.hst.calc_start_window" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate earliest and latest start times</p>
 <p>Plot earliest and latest possible spectroscopic light curves for given start window size</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -683,6 +554,7 @@ and descriptive properties of the elements are stored as instance attributes.</p
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>eventType</strong> (<em>str</em>) &#8211; &#8216;transit&#8217; or &#8216;eclipse&#8217;</li>
 <li><strong>rms</strong> (<em>float</em>) &#8211; light curve root-mean-square</li>
 <li><strong>ptsOrbit</strong> (<em>float</em>) &#8211; number of frames per HST orbit</li>
 <li><strong>numOrbits</strong> (<em>float</em>) &#8211; number of HST orbits per visit</li>
@@ -690,8 +562,10 @@ and descriptive properties of the elements are stored as instance attributes.</p
 <li><strong>inc</strong> (<em>float</em>) &#8211; orbital inclination in degrees</li>
 <li><strong>aRs</strong> (<em>float</em>) &#8211; Semi-major axis in units of stellar radii (a/R*)</li>
 <li><strong>period</strong> (<em>float</em>) &#8211; orbital period in days</li>
-<li><strong>tunc</strong> (<em>float</em>) &#8211; +/- start time range in minutes</li>
-<li><strong>duration</strong> (<em>float</em>) &#8211; (Optional) full transit/eclipse duration in seconds</li>
+<li><strong>windowSize</strong> (<em>float</em>) &#8211; observation start window size in minutes</li>
+<li><strong>ecc</strong> (<em>float</em>) &#8211; (Optional) eccentricity</li>
+<li><strong>w</strong> (<em>float</em>) &#8211; (Optional) longitude of periastron</li>
+<li><strong>duration</strong> (<em>float</em>) &#8211; (Optional) full transit/eclipse duration in days</li>
 <li><strong>offset</strong> (<em>float</em>) &#8211; (Optional) manual offset in observation start time, in minutes</li>
 </ul>
 </td>
@@ -788,7 +662,7 @@ compute simulated spectrum.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>trdur</strong> (<em>float</em>) &#8211; transit duration in seconds</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>trdur</strong> (<em>float</em>) &#8211; transit duration in days</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">number of requested orbits per transit (including discarded thermal-settling orbit)</td>
 </tr>
@@ -884,7 +758,7 @@ Written by Kevin Stevenson      October 2016</p>
 
 </div>
 <div class="section" id="module-engine.hst_smooth">
-<span id="engine-hst-smooth-module"></span><h2>engine.hst_smooth module<a class="headerlink" href="#module-engine.hst_smooth" title="Permalink to this headline">¶</a></h2>
+<span id="engine-hst-smooth"></span><h2>engine.hst_smooth<a class="headerlink" href="#module-engine.hst_smooth" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="engine.hst_smooth.medfilt">
 <code class="descclassname">engine.hst_smooth.</code><code class="descname">medfilt</code><span class="sig-paren">(</span><em>x</em>, <em>window_len</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/hst_smooth.html#medfilt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.hst_smooth.medfilt" title="Permalink to this definition">¶</a></dt>
@@ -938,7 +812,7 @@ flat window will produce a moving average smoothing.</li>
 
 </div>
 <div class="section" id="module-engine.justdoit">
-<span id="engine-justdoit-module"></span><h2>engine.justdoit module<a class="headerlink" href="#module-engine.justdoit" title="Permalink to this headline">¶</a></h2>
+<span id="engine-justdoit"></span><h2>engine.justdoit<a class="headerlink" href="#module-engine.justdoit" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="engine.justdoit.get_thruput">
 <code class="descclassname">engine.justdoit.</code><code class="descname">get_thruput</code><span class="sig-paren">(</span><em>inst</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/justdoit.html#get_thruput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.justdoit.get_thruput" title="Permalink to this definition">¶</a></dt>
@@ -1137,7 +1011,7 @@ looped through.</p>
 
 </div>
 <div class="section" id="module-engine.justplotit">
-<span id="engine-justplotit-module"></span><h2>engine.justplotit module<a class="headerlink" href="#module-engine.justplotit" title="Permalink to this headline">¶</a></h2>
+<span id="engine-justplotit"></span><h2>engine.justplotit<a class="headerlink" href="#module-engine.justplotit" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="engine.justplotit.bin_wave_to_R">
 <code class="descclassname">engine.justplotit.</code><code class="descname">bin_wave_to_R</code><span class="sig-paren">(</span><em>w</em>, <em>R</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/justplotit.html#bin_wave_to_R"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.justplotit.bin_wave_to_R" title="Permalink to this definition">¶</a></dt>
@@ -1165,6 +1039,102 @@ looped through.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="nb">len</span><span class="p">(</span><span class="n">newwave</span><span class="p">)</span>
 <span class="go">11</span>
 </pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="engine.justplotit.jwst_1d_bkg">
+<code class="descclassname">engine.justplotit.</code><code class="descname">jwst_1d_bkg</code><span class="sig-paren">(</span><em>result_dict</em>, <em>plot=True</em>, <em>output_file='bkg.html'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/justplotit.html#jwst_1d_bkg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.justplotit.jwst_1d_bkg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot background</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>result_dict</strong> (<em>dict</em>) &#8211; Dictionary from pandexo output. If parameter space was run in run_pandexo
+make sure to restructure the input as a list of dictionaries without they key words
+that run_pandexo assigns.</li>
+<li><strong>plot</strong> (<em>bool</em>) &#8211; (Optional) True renders plot, Flase does not. Default=True</li>
+<li><strong>output_file</strong> (<em>str</em>) &#8211; (Optional) Default = bkt.html</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><strong>x</strong> (<em>numpy array</em>) &#8211; micron</li>
+<li><strong>y</strong> (<em>numpy array</em>) &#8211; 1D bakground e/s</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#engine.justplotit.jwst_1d_spec" title="engine.justplotit.jwst_1d_spec"><code class="xref py py-func docutils literal"><span class="pre">jwst_1d_spec()</span></code></a>, <a class="reference internal" href="#engine.justplotit.jwst_noise" title="engine.justplotit.jwst_noise"><code class="xref py py-func docutils literal"><span class="pre">jwst_noise()</span></code></a>, <a class="reference internal" href="#engine.justplotit.jwst_1d_flux" title="engine.justplotit.jwst_1d_flux"><code class="xref py py-func docutils literal"><span class="pre">jwst_1d_flux()</span></code></a>, <a class="reference internal" href="#engine.justplotit.jwst_1d_snr" title="engine.justplotit.jwst_1d_snr"><code class="xref py py-func docutils literal"><span class="pre">jwst_1d_snr()</span></code></a>, <a class="reference internal" href="#engine.justplotit.jwst_2d_det" title="engine.justplotit.jwst_2d_det"><code class="xref py py-func docutils literal"><span class="pre">jwst_2d_det()</span></code></a>, <a class="reference internal" href="#engine.justplotit.jwst_2d_sat" title="engine.justplotit.jwst_2d_sat"><code class="xref py py-func docutils literal"><span class="pre">jwst_2d_sat()</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="engine.justplotit.jwst_1d_flux">
+<code class="descclassname">engine.justplotit.</code><code class="descname">jwst_1d_flux</code><span class="sig-paren">(</span><em>result_dict</em>, <em>plot=True</em>, <em>output_file='flux.html'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/justplotit.html#jwst_1d_flux"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.justplotit.jwst_1d_flux" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot flux rate in e/s</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>result_dict</strong> (<em>dict</em>) &#8211; Dictionary from pandexo output. If parameter space was run in run_pandexo
+make sure to restructure the input as a list of dictionaries without they key words
+that run_pandexo assigns.</li>
+<li><strong>plot</strong> (<em>bool</em>) &#8211; (Optional) True renders plot, Flase does not. Default=True</li>
+<li><strong>output_file</strong> (<em>str</em>) &#8211; (Optional) Default = &#8216;flux.html&#8217;</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><strong>x</strong> (<em>numpy array</em>) &#8211; micron</li>
+<li><strong>y</strong> (<em>numpy array</em>) &#8211; 1D flux rate in electrons/s</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#engine.justplotit.jwst_1d_spec" title="engine.justplotit.jwst_1d_spec"><code class="xref py py-func docutils literal"><span class="pre">jwst_1d_spec()</span></code></a>, <a class="reference internal" href="#engine.justplotit.jwst_1d_bkg" title="engine.justplotit.jwst_1d_bkg"><code class="xref py py-func docutils literal"><span class="pre">jwst_1d_bkg()</span></code></a>, <a class="reference internal" href="#engine.justplotit.jwst_noise" title="engine.justplotit.jwst_noise"><code class="xref py py-func docutils literal"><span class="pre">jwst_noise()</span></code></a>, <a class="reference internal" href="#engine.justplotit.jwst_1d_snr" title="engine.justplotit.jwst_1d_snr"><code class="xref py py-func docutils literal"><span class="pre">jwst_1d_snr()</span></code></a>, <a class="reference internal" href="#engine.justplotit.jwst_2d_det" title="engine.justplotit.jwst_2d_det"><code class="xref py py-func docutils literal"><span class="pre">jwst_2d_det()</span></code></a>, <a class="reference internal" href="#engine.justplotit.jwst_2d_sat" title="engine.justplotit.jwst_2d_sat"><code class="xref py py-func docutils literal"><span class="pre">jwst_2d_sat()</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="engine.justplotit.jwst_1d_snr">
+<code class="descclassname">engine.justplotit.</code><code class="descname">jwst_1d_snr</code><span class="sig-paren">(</span><em>result_dict</em>, <em>plot=True</em>, <em>output_file='snr.html'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/justplotit.html#jwst_1d_snr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.justplotit.jwst_1d_snr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot SNR</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>result_dict</strong> (<em>dict</em>) &#8211; Dictionary from pandexo output. If parameter space was run in run_pandexo
+make sure to restructure the input as a list of dictionaries without they key words
+that run_pandexo assigns.</li>
+<li><strong>plot</strong> (<em>bool</em>) &#8211; (Optional) True renders plot, Flase does not. Default=True</li>
+<li><strong>output_file</strong> (<em>str</em>) &#8211; (Optional) Default = &#8216;snr.html&#8217;</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><strong>x</strong> (<em>numpy array</em>) &#8211; micron</li>
+<li><strong>y</strong> (<em>numpy array</em>) &#8211; 1D SNR</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#engine.justplotit.jwst_1d_bkg" title="engine.justplotit.jwst_1d_bkg"><code class="xref py py-func docutils literal"><span class="pre">jwst_1d_bkg()</span></code></a>, <a class="reference internal" href="#engine.justplotit.jwst_noise" title="engine.justplotit.jwst_noise"><code class="xref py py-func docutils literal"><span class="pre">jwst_noise()</span></code></a>, <a class="reference internal" href="#engine.justplotit.jwst_1d_flux" title="engine.justplotit.jwst_1d_flux"><code class="xref py py-func docutils literal"><span class="pre">jwst_1d_flux()</span></code></a>, <a class="reference internal" href="#engine.justplotit.jwst_1d_spec" title="engine.justplotit.jwst_1d_spec"><code class="xref py py-func docutils literal"><span class="pre">jwst_1d_spec()</span></code></a>, <a class="reference internal" href="#engine.justplotit.jwst_2d_det" title="engine.justplotit.jwst_2d_det"><code class="xref py py-func docutils literal"><span class="pre">jwst_2d_det()</span></code></a>, <a class="reference internal" href="#engine.justplotit.jwst_2d_sat" title="engine.justplotit.jwst_2d_sat"><code class="xref py py-func docutils literal"><span class="pre">jwst_2d_sat()</span></code></a></p>
 </div>
 </dd></dl>
 
@@ -1206,12 +1176,110 @@ to the first dictionary input, x[1] to the second, etc.</p>
 </tbody>
 </table>
 <p class="rubric">Examples</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">jwst_1d_data</span><span class="p">(</span><span class="n">result_dict</span><span class="p">,</span> <span class="n">num_tran</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="n">R</span> <span class="o">=</span> <span class="mi">35</span><span class="p">)</span> <span class="c1">#for a single plot</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">jwst_1d_spec</span><span class="p">(</span><span class="n">result_dict</span><span class="p">,</span> <span class="n">num_tran</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="n">R</span> <span class="o">=</span> <span class="mi">35</span><span class="p">)</span> <span class="c1">#for a single plot</span>
 </pre></div>
 </div>
 <p>If you wanted to save each of the axis that were being plotted:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">e</span> <span class="o">=</span> <span class="n">jwst_1d_data</span><span class="p">([</span><span class="n">result_dict1</span><span class="p">,</span> <span class="n">result_dict2</span><span class="p">],</span> <span class="n">model</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">num_tran</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="n">R</span> <span class="o">=</span> <span class="mi">100</span><span class="p">)</span> <span class="c1">#for multiple</span>
 </pre></div>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#engine.justplotit.jwst_noise" title="engine.justplotit.jwst_noise"><code class="xref py py-func docutils literal"><span class="pre">jwst_noise()</span></code></a>, <a class="reference internal" href="#engine.justplotit.jwst_1d_bkg" title="engine.justplotit.jwst_1d_bkg"><code class="xref py py-func docutils literal"><span class="pre">jwst_1d_bkg()</span></code></a>, <a class="reference internal" href="#engine.justplotit.jwst_1d_flux" title="engine.justplotit.jwst_1d_flux"><code class="xref py py-func docutils literal"><span class="pre">jwst_1d_flux()</span></code></a>, <a class="reference internal" href="#engine.justplotit.jwst_1d_snr" title="engine.justplotit.jwst_1d_snr"><code class="xref py py-func docutils literal"><span class="pre">jwst_1d_snr()</span></code></a>, <a class="reference internal" href="#engine.justplotit.jwst_2d_det" title="engine.justplotit.jwst_2d_det"><code class="xref py py-func docutils literal"><span class="pre">jwst_2d_det()</span></code></a>, <a class="reference internal" href="#engine.justplotit.jwst_2d_sat" title="engine.justplotit.jwst_2d_sat"><code class="xref py py-func docutils literal"><span class="pre">jwst_2d_sat()</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="engine.justplotit.jwst_2d_det">
+<code class="descclassname">engine.justplotit.</code><code class="descname">jwst_2d_det</code><span class="sig-paren">(</span><em>result_dict</em>, <em>plot=True</em>, <em>output_file='det2d.html'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/justplotit.html#jwst_2d_det"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.justplotit.jwst_2d_det" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot 2d detector image</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>result_dict</strong> (<em>dict</em>) &#8211; Dictionary from pandexo output. If parameter space was run in run_pandexo
+make sure to restructure the input as a list of dictionaries without they key words
+that run_pandexo assigns.</li>
+<li><strong>plot</strong> (<em>bool</em>) &#8211; (Optional) True renders plot, Flase does not. Default=True</li>
+<li><strong>output_file</strong> (<em>str</em>) &#8211; (Optional) Default = &#8216;det2d.html&#8217;</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">2D array of out of transit detector simulation</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">numpy array</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#engine.justplotit.jwst_1d_spec" title="engine.justplotit.jwst_1d_spec"><code class="xref py py-func docutils literal"><span class="pre">jwst_1d_spec()</span></code></a>, <a class="reference internal" href="#engine.justplotit.jwst_1d_bkg" title="engine.justplotit.jwst_1d_bkg"><code class="xref py py-func docutils literal"><span class="pre">jwst_1d_bkg()</span></code></a>, <a class="reference internal" href="#engine.justplotit.jwst_1d_flux" title="engine.justplotit.jwst_1d_flux"><code class="xref py py-func docutils literal"><span class="pre">jwst_1d_flux()</span></code></a>, <a class="reference internal" href="#engine.justplotit.jwst_1d_snr" title="engine.justplotit.jwst_1d_snr"><code class="xref py py-func docutils literal"><span class="pre">jwst_1d_snr()</span></code></a>, <a class="reference internal" href="#engine.justplotit.jwst_noise" title="engine.justplotit.jwst_noise"><code class="xref py py-func docutils literal"><span class="pre">jwst_noise()</span></code></a>, <a class="reference internal" href="#engine.justplotit.jwst_2d_sat" title="engine.justplotit.jwst_2d_sat"><code class="xref py py-func docutils literal"><span class="pre">jwst_2d_sat()</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="engine.justplotit.jwst_2d_sat">
+<code class="descclassname">engine.justplotit.</code><code class="descname">jwst_2d_sat</code><span class="sig-paren">(</span><em>result_dict</em>, <em>plot=True</em>, <em>output_file='sat2d.html'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/justplotit.html#jwst_2d_sat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.justplotit.jwst_2d_sat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot 2d saturation profile</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>result_dict</strong> (<em>dict</em>) &#8211; Dictionary from pandexo output. If parameter space was run in run_pandexo
+make sure to restructure the input as a list of dictionaries without they key words
+that run_pandexo assigns.</li>
+<li><strong>plot</strong> (<em>bool</em>) &#8211; (Optional) True renders plot, Flase does not. Default=True</li>
+<li><strong>output_file</strong> (<em>str</em>) &#8211; (Optional) Default = &#8216;sat2d.html&#8217;</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">2D array of out of transit detector simulation</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">numpy array</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#engine.justplotit.jwst_1d_spec" title="engine.justplotit.jwst_1d_spec"><code class="xref py py-func docutils literal"><span class="pre">jwst_1d_spec()</span></code></a>, <a class="reference internal" href="#engine.justplotit.jwst_1d_bkg" title="engine.justplotit.jwst_1d_bkg"><code class="xref py py-func docutils literal"><span class="pre">jwst_1d_bkg()</span></code></a>, <a class="reference internal" href="#engine.justplotit.jwst_1d_flux" title="engine.justplotit.jwst_1d_flux"><code class="xref py py-func docutils literal"><span class="pre">jwst_1d_flux()</span></code></a>, <a class="reference internal" href="#engine.justplotit.jwst_1d_snr" title="engine.justplotit.jwst_1d_snr"><code class="xref py py-func docutils literal"><span class="pre">jwst_1d_snr()</span></code></a>, <a class="reference internal" href="#engine.justplotit.jwst_2d_det" title="engine.justplotit.jwst_2d_det"><code class="xref py py-func docutils literal"><span class="pre">jwst_2d_det()</span></code></a>, <a class="reference internal" href="#engine.justplotit.jwst_noise" title="engine.justplotit.jwst_noise"><code class="xref py py-func docutils literal"><span class="pre">jwst_noise()</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="engine.justplotit.jwst_noise">
+<code class="descclassname">engine.justplotit.</code><code class="descname">jwst_noise</code><span class="sig-paren">(</span><em>result_dict</em>, <em>plot=True</em>, <em>output_file='noise.html'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/justplotit.html#jwst_noise"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.justplotit.jwst_noise" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot background</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>result_dict</strong> (<em>dict</em>) &#8211; Dictionary from pandexo output. If parameter space was run in run_pandexo
+make sure to restructure the input as a list of dictionaries without they key words
+that run_pandexo assigns.</li>
+<li><strong>plot</strong> (<em>bool</em>) &#8211; (Optional) True renders plot, Flase does not. Default=True</li>
+<li><strong>output_file</strong> (<em>str</em>) &#8211; (Optional) Default = &#8216;noise.html&#8217;</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><strong>x</strong> (<em>numpy array</em>) &#8211; micron</li>
+<li><strong>y</strong> (<em>numpy array</em>) &#8211; 1D noise (ppm)</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#engine.justplotit.jwst_1d_spec" title="engine.justplotit.jwst_1d_spec"><code class="xref py py-func docutils literal"><span class="pre">jwst_1d_spec()</span></code></a>, <a class="reference internal" href="#engine.justplotit.jwst_1d_bkg" title="engine.justplotit.jwst_1d_bkg"><code class="xref py py-func docutils literal"><span class="pre">jwst_1d_bkg()</span></code></a>, <a class="reference internal" href="#engine.justplotit.jwst_1d_flux" title="engine.justplotit.jwst_1d_flux"><code class="xref py py-func docutils literal"><span class="pre">jwst_1d_flux()</span></code></a>, <a class="reference internal" href="#engine.justplotit.jwst_1d_snr" title="engine.justplotit.jwst_1d_snr"><code class="xref py py-func docutils literal"><span class="pre">jwst_1d_snr()</span></code></a>, <a class="reference internal" href="#engine.justplotit.jwst_2d_det" title="engine.justplotit.jwst_2d_det"><code class="xref py py-func docutils literal"><span class="pre">jwst_2d_det()</span></code></a>, <a class="reference internal" href="#engine.justplotit.jwst_2d_sat" title="engine.justplotit.jwst_2d_sat"><code class="xref py py-func docutils literal"><span class="pre">jwst_2d_sat()</span></code></a></p>
 </div>
 </dd></dl>
 
@@ -1251,7 +1319,7 @@ to the first dictionary input, x[1] to the second, etc.</p>
 
 <dl class="function">
 <dt id="engine.justplotit.uniform_tophat_sum">
-<code class="descclassname">engine.justplotit.</code><code class="descname">uniform_tophat_sum</code><span class="sig-paren">(</span><em>xnew</em>, <em>x</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/justplotit.html#uniform_tophat_sum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.justplotit.uniform_tophat_sum" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">engine.justplotit.</code><code class="descname">uniform_tophat_sum</code><span class="sig-paren">(</span><em>newx</em>, <em>x</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/justplotit.html#uniform_tophat_sum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.justplotit.uniform_tophat_sum" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adapted from Mike R. Line to rebin spectra</p>
 <p>Takes sum of group of points in bin of wave points
 :param xnew: New wavelength grid to rebin to
@@ -1282,7 +1350,7 @@ to the first dictionary input, x[1] to the second, etc.</p>
 
 </div>
 <div class="section" id="module-engine.jwst">
-<span id="engine-jwst-module"></span><h2>engine.jwst module<a class="headerlink" href="#module-engine.jwst" title="Permalink to this headline">¶</a></h2>
+<span id="engine-jwst"></span><h2>engine.jwst<a class="headerlink" href="#module-engine.jwst" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="engine.jwst.add_noise_floor">
 <code class="descclassname">engine.jwst.</code><code class="descname">add_noise_floor</code><span class="sig-paren">(</span><em>noise_floor</em>, <em>wave_bin</em>, <em>error_spec</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/jwst.html#add_noise_floor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.jwst.add_noise_floor" title="Permalink to this definition">¶</a></dt>
@@ -1639,7 +1707,7 @@ Recommended for transit transmisstion spectra = fml</li>
 
 </div>
 <div class="section" id="module-engine.load_modes">
-<span id="engine-load-modes-module"></span><h2>engine.load_modes module<a class="headerlink" href="#module-engine.load_modes" title="Permalink to this headline">¶</a></h2>
+<span id="engine-load-modes"></span><h2>engine.load_modes<a class="headerlink" href="#module-engine.load_modes" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="engine.load_modes.SetDefaultModes">
 <em class="property">class </em><code class="descclassname">engine.load_modes.</code><code class="descname">SetDefaultModes</code><span class="sig-paren">(</span><em>inst</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/load_modes.html#SetDefaultModes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.load_modes.SetDefaultModes" title="Permalink to this definition">¶</a></dt>
@@ -1662,7 +1730,7 @@ they should load in the dictionary and then edit individual keys.</p>
 <li>&#8220;NIRSpec G395M&#8221;</li>
 <li>&#8220;NIRSpec G395H&#8221;</li>
 <li>&#8220;NIRSpec Prism&#8221;</li>
-<li>&#8220;NIRCam F322W&#8221;</li>
+<li>&#8220;NIRCam F322W2&#8221;</li>
 <li>&#8220;NIRCam F444W&#8221;</li>
 <li>&#8220;WFC3 G102&#8221;</li>
 <li>&#8220;WFC3 G141&#8221;</li>
@@ -1717,7 +1785,7 @@ they should load in the dictionary and then edit individual keys.</p>
 
 </div>
 <div class="section" id="module-engine.pandexo">
-<span id="engine-pandexo-module"></span><h2>engine.pandexo module<a class="headerlink" href="#module-engine.pandexo" title="Permalink to this headline">¶</a></h2>
+<span id="engine-pandexo"></span><h2>engine.pandexo<a class="headerlink" href="#module-engine.pandexo" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="engine.pandexo.wrapper">
 <code class="descclassname">engine.pandexo.</code><code class="descname">wrapper</code><span class="sig-paren">(</span><em>dictinput</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/pandexo.html#wrapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.pandexo.wrapper" title="Permalink to this definition">¶</a></dt>
@@ -1753,7 +1821,7 @@ to create input dictionaries and <strong>run_online</strong> contains web forms 
 
 </div>
 <div class="section" id="module-engine.run_online">
-<span id="engine-run-online-module"></span><h2>engine.run_online module<a class="headerlink" href="#module-engine.run_online" title="Permalink to this headline">¶</a></h2>
+<span id="engine-run-online"></span><h2>engine.run_online<a class="headerlink" href="#module-engine.run_online" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="engine.run_online.AboutHandler">
 <em class="property">class </em><code class="descclassname">engine.run_online.</code><code class="descname">AboutHandler</code><span class="sig-paren">(</span><em>application</em>, <em>request</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/run_online.html#AboutHandler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.run_online.AboutHandler" title="Permalink to this definition">¶</a></dt>
@@ -2114,9 +2182,6 @@ implemented, this must be changed to a secure cookie.</p>
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="right" >
-          <a href="engine.utils.html" title="engine.utils package"
-             >next</a> |</li>
         <li class="right" >
           <a href="tutorialhst.html" title="HST Tutorial"
              >previous</a> |</li>

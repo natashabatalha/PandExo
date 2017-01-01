@@ -61,8 +61,8 @@
 <li><a class="reference internal" href="#">Installation</a><ul>
 <li><a class="reference internal" href="#installation-procedure">Installation Procedure</a></li>
 <li><a class="reference internal" href="#troubleshooting-pandeia">Troubleshooting Pandeia</a><ul>
-<li><a class="reference internal" href="#pyfftw">PYFFTW</a></li>
-<li><a class="reference internal" href="#pandeia-reference-data">Pandeia Reference Data</a></li>
+<li><a class="reference internal" href="#problems-with-pyfftw">Problems with PYFFTW?</a></li>
+<li><a class="reference internal" href="#can-t-find-pandeia-reference-data">Can&#8217;t find Pandeia Reference Data</a></li>
 </ul>
 </li>
 </ul>
@@ -104,7 +104,7 @@
 <h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
 <div class="admonition warning">
 <p class="first admonition-title">Warning</p>
-<p class="last">Before reading further, if you do not wish to install <cite>PandExo</cite>,there is an online version of the code at PSU Science and NASA GSFC</p>
+<p class="last">Before reading further, if you do not wish to install <cite>PandExo</cite>,there is an online version of the code at PSU Science and NASA GSFC.</p>
 </div>
 <div class="section" id="installation-procedure">
 <h2>Installation Procedure<a class="headerlink" href="#installation-procedure" title="Permalink to this headline">¶</a></h2>
@@ -118,7 +118,7 @@ python setup.py install
 </div>
 <p>2. Download the <a class="reference external" href="ftp://ftp.stsci.edu/cdbs/tarfiles/synphot5.tar.gz">Phoenix Stellar Atlas</a>
 in order to easily pull Stellar SED&#8217;s from phoenix database.</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>mkdir stellar_data
+<div class="highlight-bash"><div class="highlight"><pre><span></span>mkdir pysynphot_data
 mv synphot5.tar.gz pysynphot_data
 tar -xvf synphot5.tar.gz
 <span class="nb">export</span> <span class="nv">PYSYN_CDBS</span><span class="o">=</span>USRDIR/pysynphot_data
@@ -127,8 +127,8 @@ tar -xvf synphot5.tar.gz
 </div>
 <div class="section" id="troubleshooting-pandeia">
 <h2>Troubleshooting Pandeia<a class="headerlink" href="#troubleshooting-pandeia" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="pyfftw">
-<h3>PYFFTW<a class="headerlink" href="#pyfftw" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="problems-with-pyfftw">
+<h3>Problems with PYFFTW?<a class="headerlink" href="#problems-with-pyfftw" title="Permalink to this headline">¶</a></h3>
 <p>Many users experience issues when downloading Pandeia because of it&#8217;s dependency on <cite>pyfftw</cite>. If you experience this problem try these steps:</p>
 <ul class="simple">
 <li>If you do not have a non-LLVM based GCC installation on your system, you can obtain one from here but gcc 5.1 does not produce a usable FFTW installation so make sure you download <strong>gcc 4.9 or below</strong></li>
@@ -141,8 +141,8 @@ chmod +x build_fftw.sh
 </pre></div>
 </div>
 </div>
-<div class="section" id="pandeia-reference-data">
-<h3>Pandeia Reference Data<a class="headerlink" href="#pandeia-reference-data" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="can-t-find-pandeia-reference-data">
+<h3>Can&#8217;t find Pandeia Reference Data<a class="headerlink" href="#can-t-find-pandeia-reference-data" title="Permalink to this headline">¶</a></h3>
 <p>Did you forget to point to Pandeia&#8217;s reference data??</p>
 <ul class="simple">
 <li>Make sure PandExo knows where the Pandeia reference data is:</li>

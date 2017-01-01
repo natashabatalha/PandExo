@@ -68,7 +68,7 @@
           <div class="body" role="main">
             
   <h1>Source code for engine.justplotit</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">bokeh.plotting</span> <span class="k">import</span> <span class="n">show</span><span class="p">,</span> <span class="n">figure</span>
+<span></span><span class="kn">from</span> <span class="nn">bokeh.plotting</span> <span class="k">import</span> <span class="n">show</span><span class="p">,</span> <span class="n">Figure</span>
 <span class="kn">from</span> <span class="nn">bokeh.io</span> <span class="k">import</span> <span class="n">output_file</span> <span class="k">as</span> <span class="n">outputfile</span>
 <span class="kn">import</span> <span class="nn">pickle</span> <span class="k">as</span> <span class="nn">pk</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -116,11 +116,16 @@
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 <span class="sd">    </span>
-<span class="sd">    &gt;&gt;&gt; jwst_1d_data(result_dict, num_tran = 3, R = 35) #for a single plot </span>
+<span class="sd">    &gt;&gt;&gt; jwst_1d_spec(result_dict, num_tran = 3, R = 35) #for a single plot </span>
 <span class="sd">    </span>
 <span class="sd">    If you wanted to save each of the axis that were being plotted: </span>
 <span class="sd">    </span>
 <span class="sd">    &gt;&gt;&gt; x,y,e = jwst_1d_data([result_dict1, result_dict2], model=False, num_tran = 5, R = 100) #for multiple </span>
+<span class="sd">    </span>
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    jwst_noise, jwst_1d_bkg, jwst_1d_flux, jwst_1d_snr, jwst_2d_det, jwst_2d_sat</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">outx</span><span class="o">=</span><span class="p">[]</span>
     <span class="n">outy</span><span class="o">=</span><span class="p">[]</span>
@@ -152,7 +157,7 @@
             <span class="n">x</span><span class="o">=</span><span class="n">x</span> 
             <span class="n">y</span><span class="o">=</span><span class="n">y</span> 
         <span class="k">elif</span> <span class="p">(</span><span class="n">R</span> <span class="o">!=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">num_tran</span> <span class="o">!=</span> <span class="kc">False</span><span class="p">):</span>     
-            <span class="n">new_wave</span> <span class="o">=</span> <span class="n">Rspec</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">R</span><span class="p">)</span>
+            <span class="n">new_wave</span> <span class="o">=</span> <span class="n">bin_wave_to_R</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">R</span><span class="p">)</span>
             <span class="n">out</span> <span class="o">=</span> <span class="n">uniform_tophat_sum</span><span class="p">(</span><span class="n">new_wave</span><span class="p">,</span><span class="n">x</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;RawData&#39;</span><span class="p">][</span><span class="s1">&#39;flux_out&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">num_tran</span><span class="o">/</span><span class="n">ntran_old</span><span class="p">)</span>
             <span class="n">inn</span> <span class="o">=</span> <span class="n">uniform_tophat_sum</span><span class="p">(</span><span class="n">new_wave</span><span class="p">,</span><span class="n">x</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;RawData&#39;</span><span class="p">][</span><span class="s1">&#39;flux_in&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">num_tran</span><span class="o">/</span><span class="n">ntran_old</span><span class="p">)</span>
             <span class="n">vout</span> <span class="o">=</span> <span class="n">uniform_tophat_sum</span><span class="p">(</span><span class="n">new_wave</span><span class="p">,</span><span class="n">x</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;RawData&#39;</span><span class="p">][</span><span class="s1">&#39;var_out&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">num_tran</span><span class="o">/</span><span class="n">ntran_old</span><span class="p">)</span>
@@ -181,7 +186,7 @@
             <span class="n">y</span> <span class="o">=</span> <span class="n">sim_spec</span>
             <span class="n">err</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">vout</span><span class="o">+</span><span class="n">vin</span><span class="p">)</span><span class="o">/</span><span class="n">out</span>
         <span class="k">elif</span> <span class="p">(</span><span class="n">R</span> <span class="o">!=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">num_tran</span> <span class="o">==</span> <span class="kc">False</span><span class="p">):</span>     
-            <span class="n">new_wave</span> <span class="o">=</span> <span class="n">Rspec</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">R</span><span class="p">)</span>
+            <span class="n">new_wave</span> <span class="o">=</span> <span class="n">bin_wave_to_R</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">R</span><span class="p">)</span>
             <span class="n">out</span> <span class="o">=</span> <span class="n">uniform_tophat_sum</span><span class="p">(</span><span class="n">new_wave</span><span class="p">,</span><span class="n">x</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;RawData&#39;</span><span class="p">][</span><span class="s1">&#39;flux_out&#39;</span><span class="p">])</span>
             <span class="n">inn</span> <span class="o">=</span> <span class="n">uniform_tophat_sum</span><span class="p">(</span><span class="n">new_wave</span><span class="p">,</span><span class="n">x</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;RawData&#39;</span><span class="p">][</span><span class="s1">&#39;flux_in&#39;</span><span class="p">])</span>
             <span class="n">vout</span> <span class="o">=</span> <span class="n">uniform_tophat_sum</span><span class="p">(</span><span class="n">new_wave</span><span class="p">,</span><span class="n">x</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;RawData&#39;</span><span class="p">][</span><span class="s1">&#39;var_out&#39;</span><span class="p">])</span>
@@ -205,7 +210,7 @@
         <span class="k">for</span> <span class="n">px</span><span class="p">,</span> <span class="n">py</span><span class="p">,</span> <span class="n">yerr</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">err</span><span class="p">):</span>
             <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x_err</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">px</span><span class="p">,</span> <span class="n">px</span><span class="p">)))</span>
             <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y_err</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">py</span> <span class="o">-</span> <span class="n">yerr</span><span class="p">,</span> <span class="n">py</span> <span class="o">+</span> <span class="n">yerr</span><span class="p">)))</span>
-        <span class="c1">#initialize figure</span>
+        <span class="c1">#initialize Figure</span>
         <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> 
             <span class="c1">#Define units for x and y axis</span>
             <span class="n">y_axis_label</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;Primary/Secondary&#39;</span><span class="p">]</span>
@@ -222,7 +227,7 @@
                  <span class="mf">0.1</span><span class="o">*</span><span class="nb">max</span><span class="p">(</span><span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;OriginalInput&#39;</span><span class="p">][</span><span class="s1">&#39;model_spec&#39;</span><span class="p">])</span><span class="o">+</span><span class="nb">max</span><span class="p">(</span><span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;OriginalInput&#39;</span><span class="p">][</span><span class="s1">&#39;model_spec&#39;</span><span class="p">])]</span>
             <span class="n">xlims</span> <span class="o">=</span> <span class="p">[</span><span class="nb">min</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">x</span><span class="p">)]</span>
          
-            <span class="n">fig1d</span> <span class="o">=</span> <span class="n">figure</span><span class="p">(</span><span class="n">x_range</span><span class="o">=</span><span class="n">x_range</span><span class="p">,</span> <span class="n">y_range</span> <span class="o">=</span> <span class="n">ylims</span><span class="p">,</span> 
+            <span class="n">fig1d</span> <span class="o">=</span> <span class="n">Figure</span><span class="p">(</span><span class="n">x_range</span><span class="o">=</span><span class="n">x_range</span><span class="p">,</span> <span class="n">y_range</span> <span class="o">=</span> <span class="n">ylims</span><span class="p">,</span> 
                <span class="n">plot_width</span> <span class="o">=</span> <span class="n">plot_width</span><span class="p">,</span> <span class="n">plot_height</span> <span class="o">=</span><span class="n">plot_height</span><span class="p">,</span><span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span><span class="n">x_axis_label</span><span class="o">=</span><span class="n">x_axis_label</span><span class="p">,</span>
               <span class="n">y_axis_label</span> <span class="o">=</span> <span class="n">y_axis_label</span><span class="p">,</span> <span class="n">tools</span><span class="o">=</span><span class="n">TOOLS</span><span class="p">,</span> <span class="n">background_fill_color</span> <span class="o">=</span> <span class="s1">&#39;white&#39;</span><span class="p">)</span>
         
@@ -289,7 +294,7 @@
             <span class="n">tracker</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">wave</span></div>
 
-<div class="viewcode-block" id="uniform_tophat_sum"><a class="viewcode-back" href="../../engine.html#engine.justplotit.uniform_tophat_sum">[docs]</a><span class="k">def</span> <span class="nf">uniform_tophat_sum</span><span class="p">(</span><span class="n">xnew</span><span class="p">,</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+<div class="viewcode-block" id="uniform_tophat_sum"><a class="viewcode-back" href="../../engine.html#engine.justplotit.uniform_tophat_sum">[docs]</a><span class="k">def</span> <span class="nf">uniform_tophat_sum</span><span class="p">(</span><span class="n">newx</span><span class="p">,</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Adapted from Mike R. Line to rebin spectra</span>
 <span class="sd">    </span>
 <span class="sd">    Takes sum of group of points in bin of wave points </span>
@@ -316,7 +321,7 @@
 <span class="sd">    &gt;&gt;&gt; newy</span>
 <span class="sd">    array([ 240.,  250.,  130.])</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">xnew</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">newx</span><span class="p">)</span>
+    <span class="n">newx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">newx</span><span class="p">)</span>
     <span class="n">szmod</span><span class="o">=</span><span class="n">newx</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">delta</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">szmod</span><span class="p">)</span>
     <span class="n">ynew</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">szmod</span><span class="p">)</span>
@@ -351,8 +356,7 @@
 <span class="sd">        new y axis </span>
 
 <span class="sd">    Examples </span>
-<span class="sd">    --------</span>
-<span class="sd">        </span>
+<span class="sd">    -------- </span>
 <span class="sd">    &gt;&gt;&gt; oldgrid = np.linspace(1,3,100)</span>
 <span class="sd">    &gt;&gt;&gt; y = np.zeros(100)+10.0</span>
 <span class="sd">    &gt;&gt;&gt; newy = uniform_tophat_sum(np.linspace(2,3,3), oldgrid, y)</span>
@@ -373,6 +377,262 @@
     <span class="n">loc</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">((</span><span class="n">x</span> <span class="o">&gt;</span> <span class="n">newx</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mf">0.5</span><span class="o">*</span><span class="n">delta</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">x</span> <span class="o">&lt;</span> <span class="n">newx</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="mf">0.5</span><span class="o">*</span><span class="n">delta</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
     <span class="n">ynew</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">loc</span><span class="p">])</span>
     <span class="k">return</span> <span class="n">ynew</span></div>
+
+<div class="viewcode-block" id="jwst_1d_flux"><a class="viewcode-back" href="../../engine.html#engine.justplotit.jwst_1d_flux">[docs]</a><span class="k">def</span> <span class="nf">jwst_1d_flux</span><span class="p">(</span><span class="n">result_dict</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">output_file</span><span class="o">=</span> <span class="s1">&#39;flux.html&#39;</span><span class="p">):</span> 
+    <span class="sd">&quot;&quot;&quot;Plot flux rate in e/s</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    result_dict : dict</span>
+<span class="sd">        Dictionary from pandexo output. If parameter space was run in run_pandexo </span>
+<span class="sd">        make sure to restructure the input as a list of dictionaries without they key words </span>
+<span class="sd">        that run_pandexo assigns. </span>
+<span class="sd">    plot : bool </span>
+<span class="sd">        (Optional) True renders plot, Flase does not. Default=True</span>
+<span class="sd">    output_file : str</span>
+<span class="sd">        (Optional) Default = &#39;flux.html&#39;    </span>
+<span class="sd">    Return</span>
+<span class="sd">    ------</span>
+<span class="sd">    x : numpy array</span>
+<span class="sd">        micron</span>
+<span class="sd">    y : numpy array</span>
+<span class="sd">        1D flux rate in electrons/s</span>
+<span class="sd">        </span>
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    jwst_1d_spec, jwst_1d_bkg, jwst_noise, jwst_1d_snr, jwst_2d_det, jwst_2d_sat</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">TOOLS</span> <span class="o">=</span> <span class="s2">&quot;pan,wheel_zoom,box_zoom,resize,reset,save&quot;</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">result_dict</span><span class="p">[</span><span class="s1">&#39;PandeiaOutTrans&#39;</span><span class="p">]</span>
+    
+    <span class="c1"># Flux 1d</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;1d&#39;</span><span class="p">][</span><span class="s1">&#39;extracted_flux&#39;</span><span class="p">]</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">y</span><span class="p">)]</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">y</span><span class="p">)]</span>
+
+    <span class="n">plot_flux_1d1</span> <span class="o">=</span> <span class="n">Figure</span><span class="p">(</span><span class="n">tools</span><span class="o">=</span><span class="n">TOOLS</span><span class="p">,</span>
+                         <span class="n">x_axis_label</span><span class="o">=</span><span class="s1">&#39;Wavelength [microns]&#39;</span><span class="p">,</span>
+                         <span class="n">y_axis_label</span><span class="o">=</span><span class="s1">&#39;Flux (e/s)&#39;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Out of Transit Flux Rate&quot;</span><span class="p">,</span>
+                         <span class="n">plot_width</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span> <span class="n">plot_height</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+    <span class="n">plot_flux_1d1</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">line_width</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="o">.</span><span class="mi">7</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">plot</span><span class="p">:</span> 
+        <span class="n">outputfile</span><span class="p">(</span><span class="n">output_file</span><span class="p">)</span>
+        <span class="n">show</span><span class="p">(</span><span class="n">plot_flux_1d1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span></div>
+    
+<div class="viewcode-block" id="jwst_1d_snr"><a class="viewcode-back" href="../../engine.html#engine.justplotit.jwst_1d_snr">[docs]</a><span class="k">def</span> <span class="nf">jwst_1d_snr</span><span class="p">(</span><span class="n">result_dict</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">output_file</span><span class="o">=</span><span class="s1">&#39;snr.html&#39;</span><span class="p">):</span> 
+    <span class="sd">&quot;&quot;&quot;Plot SNR</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    result_dict : dict</span>
+<span class="sd">        Dictionary from pandexo output. If parameter space was run in run_pandexo </span>
+<span class="sd">        make sure to restructure the input as a list of dictionaries without they key words </span>
+<span class="sd">        that run_pandexo assigns. </span>
+<span class="sd">    plot : bool </span>
+<span class="sd">        (Optional) True renders plot, Flase does not. Default=True</span>
+<span class="sd">    output_file : str</span>
+<span class="sd">        (Optional) Default = &#39;snr.html&#39;   </span>
+<span class="sd">                </span>
+<span class="sd">    Return</span>
+<span class="sd">    ------</span>
+<span class="sd">    x : numpy array</span>
+<span class="sd">        micron</span>
+<span class="sd">    y : numpy array</span>
+<span class="sd">        1D SNR</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    jwst_1d_bkg, jwst_noise, jwst_1d_flux, jwst_1d_spec, jwst_2d_det, jwst_2d_sat</span>
+<span class="sd">    &quot;&quot;&quot;</span>    
+    <span class="n">TOOLS</span> <span class="o">=</span> <span class="s2">&quot;pan,wheel_zoom,box_zoom,resize,reset,save&quot;</span>
+    <span class="c1"># Flux 1d</span>
+    <span class="n">x</span><span class="o">=</span> <span class="n">result_dict</span><span class="p">[</span><span class="s1">&#39;RawData&#39;</span><span class="p">][</span><span class="s1">&#39;wave&#39;</span><span class="p">]</span>
+    <span class="n">flux_out</span> <span class="o">=</span> <span class="n">result_dict</span><span class="p">[</span><span class="s1">&#39;RawData&#39;</span><span class="p">][</span><span class="s1">&#39;flux_out&#39;</span><span class="p">]</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">flux_out</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">result_dict</span><span class="p">[</span><span class="s1">&#39;RawData&#39;</span><span class="p">][</span><span class="s1">&#39;var_out&#39;</span><span class="p">])</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">y</span><span class="p">)]</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">y</span><span class="p">)]</span>
+    <span class="n">plot_snr_1d1</span> <span class="o">=</span> <span class="n">Figure</span><span class="p">(</span><span class="n">tools</span><span class="o">=</span><span class="n">TOOLS</span><span class="p">,</span>
+                         <span class="n">x_axis_label</span><span class="o">=</span><span class="s1">&#39;Wavelength (micron)&#39;</span><span class="p">,</span>
+                         <span class="n">y_axis_label</span><span class="o">=</span><span class="s1">&#39;SNR&#39;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;SNR Out of Trans&quot;</span><span class="p">,</span>
+                         <span class="n">plot_width</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span> <span class="n">plot_height</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+    <span class="n">plot_snr_1d1</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">line_width</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="o">.</span><span class="mi">7</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">plot</span><span class="p">:</span> 
+        <span class="n">outputfile</span><span class="p">(</span><span class="n">output_file</span><span class="p">)</span>
+        <span class="n">show</span><span class="p">(</span><span class="n">plot_snr_1d1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span></div>
+
+<div class="viewcode-block" id="jwst_1d_bkg"><a class="viewcode-back" href="../../engine.html#engine.justplotit.jwst_1d_bkg">[docs]</a><span class="k">def</span> <span class="nf">jwst_1d_bkg</span><span class="p">(</span><span class="n">result_dict</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">output_file</span><span class="o">=</span><span class="s1">&#39;bkg.html&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Plot background</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    result_dict : dict</span>
+<span class="sd">        Dictionary from pandexo output. If parameter space was run in run_pandexo </span>
+<span class="sd">        make sure to restructure the input as a list of dictionaries without they key words </span>
+<span class="sd">        that run_pandexo assigns. </span>
+<span class="sd">    plot : bool </span>
+<span class="sd">        (Optional) True renders plot, Flase does not. Default=True</span>
+<span class="sd">    output_file : str</span>
+<span class="sd">        (Optional) Default = bkt.html</span>
+<span class="sd">    </span>
+<span class="sd">    Return</span>
+<span class="sd">    ------</span>
+<span class="sd">    x : numpy array</span>
+<span class="sd">        micron</span>
+<span class="sd">    y : numpy array</span>
+<span class="sd">        1D bakground e/s</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    jwst_1d_spec, jwst_noise, jwst_1d_flux, jwst_1d_snr, jwst_2d_det, jwst_2d_sat</span>
+<span class="sd">    &quot;&quot;&quot;</span>    
+    <span class="n">TOOLS</span> <span class="o">=</span> <span class="s2">&quot;pan,wheel_zoom,box_zoom,resize,reset,save&quot;</span>
+    <span class="c1"># BG 1d</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">result_dict</span><span class="p">[</span><span class="s1">&#39;PandeiaOutTrans&#39;</span><span class="p">]</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;1d&#39;</span><span class="p">][</span><span class="s1">&#39;bg&#39;</span><span class="p">]</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">y</span><span class="p">)]</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">y</span><span class="p">)]</span>
+    <span class="n">plot_bg_1d1</span> <span class="o">=</span> <span class="n">Figure</span><span class="p">(</span><span class="n">tools</span><span class="o">=</span><span class="n">TOOLS</span><span class="p">,</span>
+                         <span class="n">x_axis_label</span><span class="o">=</span><span class="s1">&#39;Wavelength [microns]&#39;</span><span class="p">,</span>
+                         <span class="n">y_axis_label</span><span class="o">=</span><span class="s1">&#39;Flux (e/s)&#39;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Background&quot;</span><span class="p">,</span>
+                         <span class="n">plot_width</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span> <span class="n">plot_height</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+    <span class="n">plot_bg_1d1</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">line_width</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="o">.</span><span class="mi">7</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">plot</span><span class="p">:</span> 
+        <span class="n">outputfile</span><span class="p">(</span><span class="n">output_file</span><span class="p">)</span>
+        <span class="n">show</span><span class="p">(</span><span class="n">plot_bg_1d1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span></div>
+    
+<div class="viewcode-block" id="jwst_noise"><a class="viewcode-back" href="../../engine.html#engine.justplotit.jwst_noise">[docs]</a><span class="k">def</span> <span class="nf">jwst_noise</span><span class="p">(</span><span class="n">result_dict</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">output_file</span><span class="o">=</span> <span class="s1">&#39;noise.html&#39;</span><span class="p">):</span> 
+    <span class="sd">&quot;&quot;&quot;Plot background</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    result_dict : dict</span>
+<span class="sd">        Dictionary from pandexo output. If parameter space was run in run_pandexo </span>
+<span class="sd">        make sure to restructure the input as a list of dictionaries without they key words </span>
+<span class="sd">        that run_pandexo assigns. </span>
+<span class="sd">    plot : bool </span>
+<span class="sd">        (Optional) True renders plot, Flase does not. Default=True</span>
+<span class="sd">    output_file : str</span>
+<span class="sd">        (Optional) Default = &#39;noise.html&#39;</span>
+<span class="sd">    Return</span>
+<span class="sd">    ------</span>
+<span class="sd">    x : numpy array</span>
+<span class="sd">        micron</span>
+<span class="sd">    y : numpy array</span>
+<span class="sd">        1D noise (ppm)</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    jwst_1d_spec, jwst_1d_bkg, jwst_1d_flux, jwst_1d_snr, jwst_2d_det, jwst_2d_sat</span>
+<span class="sd">    &quot;&quot;&quot;</span>  
+    <span class="n">TOOLS</span> <span class="o">=</span> <span class="s2">&quot;pan,wheel_zoom,box_zoom,resize,reset,save&quot;</span>    <span class="c1">#saturation</span>
+
+    <span class="n">x</span> <span class="o">=</span> <span class="n">result_dict</span><span class="p">[</span><span class="s1">&#39;FinalSpectrum&#39;</span><span class="p">][</span><span class="s1">&#39;wave&#39;</span><span class="p">]</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">result_dict</span><span class="p">[</span><span class="s1">&#39;FinalSpectrum&#39;</span><span class="p">][</span><span class="s1">&#39;error_w_floor&#39;</span><span class="p">]</span><span class="o">*</span><span class="mi">1</span><span class="n">e6</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">y</span><span class="p">)]</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">y</span><span class="p">)]</span>    
+    <span class="n">ymed</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+
+
+    <span class="n">plot_noise_1d1</span> <span class="o">=</span> <span class="n">Figure</span><span class="p">(</span><span class="n">tools</span><span class="o">=</span><span class="n">TOOLS</span><span class="p">,</span><span class="c1">#responsive=True,</span>
+                         <span class="n">x_axis_label</span><span class="o">=</span><span class="s1">&#39;Wavelength (micron)&#39;</span><span class="p">,</span>
+                         <span class="n">y_axis_label</span><span class="o">=</span><span class="s1">&#39;Error on Spectrum (PPM)&#39;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Error Curve&quot;</span><span class="p">,</span>
+                         <span class="n">plot_width</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span> <span class="n">plot_height</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">y_range</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mf">2.0</span><span class="o">*</span><span class="n">ymed</span><span class="p">])</span>
+    <span class="n">ymed</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+    <span class="n">plot_noise_1d1</span><span class="o">.</span><span class="n">circle</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">line_width</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="o">.</span><span class="mi">7</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">plot</span><span class="p">:</span> 
+        <span class="n">outputfile</span><span class="p">(</span><span class="n">output_file</span><span class="p">)</span>
+        <span class="n">show</span><span class="p">(</span><span class="n">plot_noise_1d1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span></div>
+    
+<div class="viewcode-block" id="jwst_2d_det"><a class="viewcode-back" href="../../engine.html#engine.justplotit.jwst_2d_det">[docs]</a><span class="k">def</span> <span class="nf">jwst_2d_det</span><span class="p">(</span><span class="n">result_dict</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">output_file</span><span class="o">=</span><span class="s1">&#39;det2d.html&#39;</span><span class="p">):</span> 
+    <span class="sd">&quot;&quot;&quot;Plot 2d detector image</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    result_dict : dict</span>
+<span class="sd">        Dictionary from pandexo output. If parameter space was run in run_pandexo </span>
+<span class="sd">        make sure to restructure the input as a list of dictionaries without they key words </span>
+<span class="sd">        that run_pandexo assigns. </span>
+<span class="sd">    </span>
+<span class="sd">    plot : bool </span>
+<span class="sd">        (Optional) True renders plot, Flase does not. Default=True</span>
+<span class="sd">    output_file : str</span>
+<span class="sd">        (Optional) Default = &#39;det2d.html&#39;    </span>
+<span class="sd">    </span>
+<span class="sd">    Return</span>
+<span class="sd">    ------</span>
+<span class="sd">    numpy array</span>
+<span class="sd">        2D array of out of transit detector simulation</span>
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    jwst_1d_spec, jwst_1d_bkg, jwst_1d_flux, jwst_1d_snr, jwst_noise, jwst_2d_sat</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">TOOLS</span> <span class="o">=</span> <span class="s2">&quot;pan,wheel_zoom,box_zoom,resize,reset,save&quot;</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">result_dict</span><span class="p">[</span><span class="s1">&#39;PandeiaOutTrans&#39;</span><span class="p">]</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;2d&#39;</span><span class="p">][</span><span class="s1">&#39;detector&#39;</span><span class="p">]</span>
+
+    
+    <span class="n">xr</span><span class="p">,</span> <span class="n">yr</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span>
+    
+    <span class="n">plot_detector_2d</span> <span class="o">=</span> <span class="n">Figure</span><span class="p">(</span><span class="n">tools</span><span class="o">=</span><span class="s2">&quot;pan,wheel_zoom,box_zoom,resize,reset,hover,save&quot;</span><span class="p">,</span>
+                         <span class="n">x_range</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">yr</span><span class="p">],</span> <span class="n">y_range</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">xr</span><span class="p">],</span>
+                         <span class="n">x_axis_label</span><span class="o">=</span><span class="s1">&#39;Pixel&#39;</span><span class="p">,</span> <span class="n">y_axis_label</span><span class="o">=</span><span class="s1">&#39;Spatial&#39;</span><span class="p">,</span>
+                         <span class="n">title</span><span class="o">=</span><span class="s2">&quot;2D Detector Image&quot;</span><span class="p">,</span>
+                        <span class="n">plot_width</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span> <span class="n">plot_height</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+    
+    <span class="n">plot_detector_2d</span><span class="o">.</span><span class="n">image</span><span class="p">(</span><span class="n">image</span><span class="o">=</span><span class="p">[</span><span class="n">data</span><span class="p">],</span> <span class="n">x</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dh</span><span class="o">=</span><span class="p">[</span><span class="n">xr</span><span class="p">],</span> <span class="n">dw</span><span class="o">=</span><span class="p">[</span><span class="n">yr</span><span class="p">],</span>
+                      <span class="n">palette</span><span class="o">=</span><span class="s2">&quot;Spectral11&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">plot</span><span class="p">:</span>
+        <span class="n">outputfile</span><span class="p">(</span><span class="n">output_file</span><span class="p">)</span>
+        <span class="n">show</span><span class="p">(</span><span class="n">plot_detector_2d</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">data</span></div>
+
+
+<div class="viewcode-block" id="jwst_2d_sat"><a class="viewcode-back" href="../../engine.html#engine.justplotit.jwst_2d_sat">[docs]</a><span class="k">def</span> <span class="nf">jwst_2d_sat</span><span class="p">(</span><span class="n">result_dict</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">output_file</span><span class="o">=</span><span class="s1">&#39;sat2d.html&#39;</span><span class="p">):</span> 
+    <span class="sd">&quot;&quot;&quot;Plot 2d saturation profile</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    result_dict : dict </span>
+<span class="sd">        Dictionary from pandexo output. If parameter space was run in run_pandexo </span>
+<span class="sd">        make sure to restructure the input as a list of dictionaries without they key words </span>
+<span class="sd">        that run_pandexo assigns. </span>
+<span class="sd">    </span>
+<span class="sd">    plot : bool </span>
+<span class="sd">        (Optional) True renders plot, Flase does not. Default=True</span>
+<span class="sd">    output_file : str</span>
+<span class="sd">        (Optional) Default = &#39;sat2d.html&#39;    </span>
+<span class="sd">    </span>
+<span class="sd">    Return</span>
+<span class="sd">    ------</span>
+<span class="sd">    numpy array</span>
+<span class="sd">        2D array of out of transit detector simulation</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    jwst_1d_spec, jwst_1d_bkg, jwst_1d_flux, jwst_1d_snr, jwst_2d_det, jwst_noise</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">TOOLS</span> <span class="o">=</span> <span class="s2">&quot;pan,wheel_zoom,box_zoom,resize,reset,save&quot;</span>    <span class="c1">#saturation</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">result_dict</span><span class="p">[</span><span class="s1">&#39;PandeiaOutTrans&#39;</span><span class="p">]</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;2d&#39;</span><span class="p">][</span><span class="s1">&#39;saturation&#39;</span><span class="p">]</span>
+    <span class="n">xr</span><span class="p">,</span> <span class="n">yr</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">plot_sat_2d</span> <span class="o">=</span> <span class="n">Figure</span><span class="p">(</span><span class="n">tools</span><span class="o">=</span><span class="n">TOOLS</span><span class="p">,</span>
+                         <span class="n">x_range</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">yr</span><span class="p">],</span> <span class="n">y_range</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">xr</span><span class="p">],</span>
+                         <span class="n">x_axis_label</span><span class="o">=</span><span class="s1">&#39;Pixel&#39;</span><span class="p">,</span> <span class="n">y_axis_label</span><span class="o">=</span><span class="s1">&#39;Spatial&#39;</span><span class="p">,</span>
+                         <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Saturation&quot;</span><span class="p">,</span>
+                        <span class="n">plot_width</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span> <span class="n">plot_height</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+    
+    <span class="n">plot_sat_2d</span><span class="o">.</span><span class="n">image</span><span class="p">(</span><span class="n">image</span><span class="o">=</span><span class="p">[</span><span class="n">data</span><span class="p">],</span> <span class="n">x</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dh</span><span class="o">=</span><span class="p">[</span><span class="n">xr</span><span class="p">],</span> <span class="n">dw</span><span class="o">=</span><span class="p">[</span><span class="n">yr</span><span class="p">],</span>
+                      <span class="n">palette</span><span class="o">=</span><span class="s2">&quot;Spectral11&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">plot</span><span class="p">:</span>
+        <span class="n">outputfile</span><span class="p">(</span><span class="n">output_file</span><span class="p">)</span>
+        <span class="n">show</span><span class="p">(</span><span class="n">plot_sat_2d</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">data</span></div>
 </pre></div>
 
           </div>
