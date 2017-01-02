@@ -81,11 +81,10 @@
             
             
                 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="includeme.html">PandExo</a></li>
-<li class="toctree-l1"><a class="reference internal" href="includeme.html#running-pandexo-gui">Running PandExo GUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="includeme.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">JWST Tutorial</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#editting-inputs">Editting Inputs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#editting-input-dictionaries">Editting Input Dictionaries</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#step-1-load-in-a-blank-exoplanet-dictionary">Step 1) Load in a blank exoplanet dictionary</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#edit-exoplanet-observation-inputs">Edit exoplanet observation inputs</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#edit-exoplanet-star-inputs">Edit exoplanet star inputs</a></li>
@@ -95,13 +94,14 @@
 <li class="toctree-l3"><a class="reference internal" href="#step-2-load-in-instrument-dictionary-optional">Step 2) Load in instrument dictionary (optional)</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#running-pandexo">Running PandExo</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#running-pandexo-command-line">Running PandExo Command Line</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#option-1-run-single-instrument-mode-single-planet">Option 1- Run single instrument mode, single planet</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#option-2-run-single-instrument-mode-with-user-dict-single-planet">Option 2- Run single instrument mode (with user dict), single planet</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#option-3-run-several-modes-single-planet">Option 3- Run several modes, single planet</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#option-4-run-single-mode-several-planet-cases">Option 4- Run single mode, several planet cases</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#running-pandexo-gui">Running PandExo GUI</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#analyzing-output">Analyzing Output</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#plot-1d-data-with-errorbars">Plot 1D Data with Errorbars</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#plot-noise-more">Plot Noise &amp; More</a></li>
@@ -159,15 +159,11 @@
   <div class="section" id="jwst-tutorial">
 <h1>JWST Tutorial<a class="headerlink" href="#jwst-tutorial" title="Permalink to this headline">¶</a></h1>
 <p>This tutorial can be downloaded as a iPython notebook on the PandExo Github.</p>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">warnings</span>
-<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
-<span class="kn">import</span> <span class="nn">pandexo.engine.justdoit</span> <span class="k">as</span> <span class="nn">jdi</span> <span class="c1"># THIS IS THE HOLY GRAIL OF PANDEXO</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">os</span>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandexo.engine.justdoit</span> <span class="k">as</span> <span class="nn">jdi</span> <span class="c1"># THIS IS THE HOLY GRAIL OF PANDEXO</span>
 </pre></div>
 </div>
-<div class="section" id="editting-inputs">
-<h2>Editting Inputs<a class="headerlink" href="#editting-inputs" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="editting-input-dictionaries">
+<h2>Editting Input Dictionaries<a class="headerlink" href="#editting-input-dictionaries" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="step-1-load-in-a-blank-exoplanet-dictionary">
 <h3>Step 1) Load in a blank exoplanet dictionary<a class="headerlink" href="#step-1-load-in-a-blank-exoplanet-dictionary" title="Permalink to this headline">¶</a></h3>
 <p>To start, load in a blank exoplanet dictionary with empty keys. You will
@@ -251,8 +247,8 @@ As a first pass, I&#8217;d suggest skipping this for now. Then come back and fin
 </div>
 </div>
 </div>
-<div class="section" id="running-pandexo">
-<h2>Running PandExo<a class="headerlink" href="#running-pandexo" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="running-pandexo-command-line">
+<h2>Running PandExo Command Line<a class="headerlink" href="#running-pandexo-command-line" title="Permalink to this headline">¶</a></h2>
 <p>You have <strong>four options</strong> for running PandExo. All of them are accessed
 through attribute <strong>jdi.run_pandexo</strong>. See examples below.</p>
 <p><code class="docutils literal"><span class="pre">jdi.run_pandexo(exo,</span> <span class="pre">inst,</span> <span class="pre">param_space</span> <span class="pre">=</span> <span class="pre">0,</span> <span class="pre">param_range</span> <span class="pre">=</span> <span class="pre">0,save_file</span> <span class="pre">=</span> <span class="pre">True,</span> <span class="pre">output_path=os.getcwd(),</span> <span class="pre">output_file</span> <span class="pre">=</span> <span class="pre">'')</span></code></p>
@@ -338,6 +334,21 @@ observation+sat_level.. etc</p>
                <span class="n">output_path</span> <span class="o">=</span> <span class="s1">&#39;/Users/nbatalh1/Desktop/JWSTFUN&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
+</div>
+</div>
+<div class="section" id="running-pandexo-gui">
+<h2>Running PandExo GUI<a class="headerlink" href="#running-pandexo-gui" title="Permalink to this headline">¶</a></h2>
+<p>The same interface that is available online is also available for use on your machine.
+Using the GUI is very simple and good alternative if editing the input dictionaries is
+confusing.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandexo.engine.run_online</span> <span class="k">as</span> <span class="nn">ro</span>
+<span class="n">ro</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Then open up your favorite internet browser and go to: <a class="reference external" href="http://localhost:1111">http://localhost:1111</a></p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Some WebApp functions may not be available. For example, noise simulations and transmission and emission modeling are only available online.</p>
 </div>
 </div>
 <div class="section" id="analyzing-output">
