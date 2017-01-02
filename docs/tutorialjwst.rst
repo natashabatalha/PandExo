@@ -71,8 +71,10 @@ Step 2) Load in instrument dictionary (optional)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Step 2 is optional because PandExo has the functionality to
-automatically load in instrument dictionaries. Skip this if you plan on
-observing with one of the following: 
+automatically load in the most popular instrument dictionaries (see Option 1 below). There is additional 
+fine tuning that can be done within each of these observing modes. For example, subarrays and 
+readmodes will be the most common thing to change if you want to do some fine tuning. 
+As a first pass, I'd suggest skipping this for now. Then come back and fine tune after your first run. 
 
     - NIRCam F444W 
     - NIRSpec Prism 
@@ -80,7 +82,7 @@ observing with one of the following:
     - NIRSpec G395H 
     - NIRSpec G235H 
     - NIRSpec G235M 
-    - NIRCam F322W 
+    - NIRCam F322W2 
     - NIRSpec G140M 
     - NIRSpec G140H 
     - MIRI LRS 
@@ -90,15 +92,18 @@ observing with one of the following:
 .. code:: python
 
     jdi.print_instruments()
-
-::
-
     Choose from the following:
     ['NIRCam F444W', 'NIRSpec Prism', 'NIRSpec G395M', 'NIRCam F322W2', 'NIRSpec G395H', 'NIRSpec G235H', 'NIRSpec G235M', 'NIRSpec G140M', 'NIRSpec G140H', 'MIRI LRS', 'NIRISS SOSS_Or1', 'NIRISS SOSS_Or2', 'WFC3 G141']
 
 .. code:: python
 
-    inst_dict = jdi.load_mode_dict('NIRCam F444W')
+    inst_dict = jdi.load_mode_dict('NIRSpec G140M')
+
+Change subarray: 
+
+.. code:: python
+
+    inst_dict["configuration"]["detector"]["subarray"] = "sub2048"
 
 Running PandExo
 ---------------
@@ -106,7 +111,7 @@ Running PandExo
 You have **four options** for running PandExo. All of them are accessed
 through attribute **jdi.run\_pandexo**. See examples below.
 
-``jdi.run_pandexo(exo, inst, param_space = 0, param_range = 0,save_file = True,                             output_path=os.getcwd(), output_file = '')``
+``jdi.run_pandexo(exo, inst, param_space = 0, param_range = 0,save_file = True, output_path=os.getcwd(), output_file = '')``
 
 Option 1- Run single instrument mode, single planet
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
