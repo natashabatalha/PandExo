@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>PandExo &mdash; PandExo  documentation</title>
+  <title>Getting Started &mdash; PandExo  documentation</title>
   
 
   
@@ -81,8 +81,11 @@
             
             
                 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">PandExo</a></li>
-<li class="toctree-l1"><a class="reference internal" href="#running-pandexo-gui">Running PandExo GUI</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#should-i-install-pandexo-or-use-the-online-interface">Should I install PandExo or use the online interface?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#requires">Requires</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorialjwst.html">JWST Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorialhst.html">HST Tutorial</a></li>
@@ -117,7 +120,7 @@
   <ul class="wy-breadcrumbs">
     <li><a href="index.html">Docs</a> &raquo;</li>
       
-    <li>PandExo</li>
+    <li>Getting Started</li>
       <li class="wy-breadcrumbs-aside">
         
           
@@ -131,30 +134,30 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="pandexo">
-<h1>PandExo<a class="headerlink" href="#pandexo" title="Permalink to this headline">¶</a></h1>
-<p>A Community Tool for Transiting Exoplanet Science with the JWST</p>
-<p># Dependencies
-For complete description of how to install the following dependencies, please see wiki Installation page.</p>
+  <div class="section" id="getting-started">
+<h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="should-i-install-pandexo-or-use-the-online-interface">
+<h2>Should I install PandExo or use the online interface?<a class="headerlink" href="#should-i-install-pandexo-or-use-the-online-interface" title="Permalink to this headline">¶</a></h2>
+<p>Install if...</p>
 <ul class="simple">
-<li>Bokeh</li>
-<li>Pysynphot</li>
-<li>Pandeia</li>
+<li>I will be using PandExo for more than 10 runs</li>
+<li>I want to submit bash runs</li>
+<li>I want to use the online GUI but don&#8217;t want to be subject to any slow downs because of high user frequency</li>
+<li>I want to be able to use plotting functions to analyze my output</li>
+</ul>
+<p>Install EVEN if...
+- I am scared of Python</p>
+<p>Do not install if...
+- I will only be using PandExo fewer than 10 times
+- I have a student who can install it for me</p>
+</div>
+<div class="section" id="requires">
+<h2>Requires<a class="headerlink" href="#requires" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Python &gt;2.7, that&#8217;s it</li>
+<li>Pandeia (hopefully we will not have to install this manually)</li>
 </ul>
 </div>
-<div class="section" id="running-pandexo-gui">
-<h1>Running PandExo GUI<a class="headerlink" href="#running-pandexo-gui" title="Permalink to this headline">¶</a></h1>
-<ul class="simple">
-<li>To run PandExo in your local broswer simply type in the terminal:</li>
-</ul>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandexo.engine.run_online</span> <span class="k">as</span> <span class="nn">ro</span>
- <span class="n">ro</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
-</pre></div>
-</div>
-<ul class="simple">
-<li>Open up an internet brower and go to:</li>
-</ul>
-<p>localhost:1111</p>
 </div>
 
 

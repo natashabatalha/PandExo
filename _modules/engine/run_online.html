@@ -80,8 +80,7 @@
             
             
                 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../includeme.html">PandExo</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../includeme.html#running-pandexo-gui">Running PandExo GUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../includeme.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorialjwst.html">JWST Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorialhst.html">HST Tutorial</a></li>
@@ -151,7 +150,6 @@
 
 <span class="c1">#define location of temp files</span>
 <span class="n">__TEMP__</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s2">&quot;temp&quot;</span><span class="p">)</span>
-<span class="n">__DOCS__</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">)[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]),</span><span class="s2">&quot;pandexo&quot;</span><span class="p">,</span><span class="s2">&quot;docs&quot;</span><span class="p">,</span><span class="s2">&quot;_build&quot;</span><span class="p">,</span><span class="s2">&quot;html&quot;</span><span class="p">)</span>
 
 <span class="n">define</span><span class="p">(</span><span class="s2">&quot;port&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">1111</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;run on the given port&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
 
@@ -175,7 +173,6 @@
             <span class="p">(</span><span class="s2">r&quot;/dashboardhst&quot;</span><span class="p">,</span> <span class="n">DashboardHSTHandler</span><span class="p">),</span>
             <span class="p">(</span><span class="s2">r&quot;/tables&quot;</span><span class="p">,</span> <span class="n">TablesHandler</span><span class="p">),</span>
             <span class="p">(</span><span class="s2">r&quot;/helpfulplots&quot;</span><span class="p">,</span> <span class="n">HelpfulPlotsHandler</span><span class="p">),</span>
-            <span class="p">(</span><span class="s2">r&quot;/docs&quot;</span><span class="p">,</span> <span class="n">DocsHandler</span><span class="p">),</span>
             <span class="p">(</span><span class="s2">r&quot;/calculation/new&quot;</span><span class="p">,</span> <span class="n">CalculationNewHandler</span><span class="p">),</span>
             <span class="p">(</span><span class="s2">r&quot;/calculation/newHST&quot;</span><span class="p">,</span> <span class="n">CalculationNewHSTHandler</span><span class="p">),</span>
             <span class="p">(</span><span class="s2">r&quot;/calculation/newspec&quot;</span><span class="p">,</span> <span class="n">CalculationNewSpecHandler</span><span class="p">),</span>
@@ -343,13 +340,6 @@
 <span class="sd">        Render tables with confirmed candidates</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">&quot;tables.html&quot;</span><span class="p">)</span></div></div>
-
-<div class="viewcode-block" id="DocsHandler"><a class="viewcode-back" href="../../engine.html#engine.run_online.DocsHandler">[docs]</a><span class="k">class</span> <span class="nc">DocsHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
-<div class="viewcode-block" id="DocsHandler.get"><a class="viewcode-back" href="../../engine.html#engine.run_online.DocsHandler.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Render documentation</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">__DOCS__</span><span class="p">,</span><span class="s2">&quot;index.html&quot;</span><span class="p">))</span></div></div>
 
 <div class="viewcode-block" id="HelpfulPlotsHandler"><a class="viewcode-back" href="../../engine.html#engine.run_online.HelpfulPlotsHandler">[docs]</a><span class="k">class</span> <span class="nc">HelpfulPlotsHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
 <div class="viewcode-block" id="HelpfulPlotsHandler.get"><a class="viewcode-back" href="../../engine.html#engine.run_online.HelpfulPlotsHandler.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

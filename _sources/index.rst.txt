@@ -8,7 +8,7 @@ PandExo: An Exoplanet ETC
 
 Tools to help the community with planning exoplanet observations.
 
-PandExo is an online tool for generation instrument simulations of JWST's NIRSpec, NIRCam, NIRISS and NIRCam. It is based on STScI's Exposure Time Calculator, Pandeia: Pandeia + Exoplanets = PandExo. This wiki contains information on how to download, install and analyze PandExo output. Before reading further, if you do not wish to install PandExo, there is an online version of the code at PSU Science and NASA GSFC.
+PandExo is an both online tool and python package for generating instrument simulations of JWST's NIRSpec, NIRCam, NIRISS and NIRCam and HST WFC3. It uses throughput calculations from STScI's Exposure Time Calculator, Pandeia: Pandeia + Exoplanets = PandExo. This documentation contains information on how to download, install and analyze PandExo output.
 
 Contents:
 
