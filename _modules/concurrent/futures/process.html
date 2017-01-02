@@ -1,0 +1,553 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>concurrent.futures.process &mdash; PandExo  documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
+    <link rel="top" title="PandExo  documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> PandExo
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../includeme.html">PandExo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../includeme.html#running-pandexo-gui">Running PandExo GUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorialjwst.html">JWST Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorialhst.html">HST Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../engine.html">The Code</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../index.html">PandExo</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>concurrent.futures.process</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for concurrent.futures.process</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2009 Brian Quinlan. All Rights Reserved.</span>
+<span class="c1"># Licensed to PSF under a Contributor Agreement.</span>
+
+<span class="sd">&quot;&quot;&quot;Implements ProcessPoolExecutor.</span>
+
+<span class="sd">The follow diagram and text describe the data-flow through the system:</span>
+
+<span class="sd">|======================= In-process =====================|== Out-of-process ==|</span>
+
+<span class="sd">+----------+     +----------+       +--------+     +-----------+    +---------+</span>
+<span class="sd">|          |  =&gt; | Work Ids |    =&gt; |        |  =&gt; | Call Q    | =&gt; |         |</span>
+<span class="sd">|          |     +----------+       |        |     +-----------+    |         |</span>
+<span class="sd">|          |     | ...      |       |        |     | ...       |    |         |</span>
+<span class="sd">|          |     | 6        |       |        |     | 5, call() |    |         |</span>
+<span class="sd">|          |     | 7        |       |        |     | ...       |    |         |</span>
+<span class="sd">| Process  |     | ...      |       | Local  |     +-----------+    | Process |</span>
+<span class="sd">|  Pool    |     +----------+       | Worker |                      |  #1..n  |</span>
+<span class="sd">| Executor |                        | Thread |                      |         |</span>
+<span class="sd">|          |     +----------- +     |        |     +-----------+    |         |</span>
+<span class="sd">|          | &lt;=&gt; | Work Items | &lt;=&gt; |        | &lt;=  | Result Q  | &lt;= |         |</span>
+<span class="sd">|          |     +------------+     |        |     +-----------+    |         |</span>
+<span class="sd">|          |     | 6: call()  |     |        |     | ...       |    |         |</span>
+<span class="sd">|          |     |    future  |     |        |     | 4, result |    |         |</span>
+<span class="sd">|          |     | ...        |     |        |     | 3, except |    |         |</span>
+<span class="sd">+----------+     +------------+     +--------+     +-----------+    +---------+</span>
+
+<span class="sd">Executor.submit() called:</span>
+<span class="sd">- creates a uniquely numbered _WorkItem and adds it to the &quot;Work Items&quot; dict</span>
+<span class="sd">- adds the id of the _WorkItem to the &quot;Work Ids&quot; queue</span>
+
+<span class="sd">Local worker thread:</span>
+<span class="sd">- reads work ids from the &quot;Work Ids&quot; queue and looks up the corresponding</span>
+<span class="sd">  WorkItem from the &quot;Work Items&quot; dict: if the work item has been cancelled then</span>
+<span class="sd">  it is simply removed from the dict, otherwise it is repackaged as a</span>
+<span class="sd">  _CallItem and put in the &quot;Call Q&quot;. New _CallItems are put in the &quot;Call Q&quot;</span>
+<span class="sd">  until &quot;Call Q&quot; is full. NOTE: the size of the &quot;Call Q&quot; is kept small because</span>
+<span class="sd">  calls placed in the &quot;Call Q&quot; can no longer be cancelled with Future.cancel().</span>
+<span class="sd">- reads _ResultItems from &quot;Result Q&quot;, updates the future stored in the</span>
+<span class="sd">  &quot;Work Items&quot; dict and deletes the dict entry</span>
+
+<span class="sd">Process #1..n:</span>
+<span class="sd">- reads _CallItems from &quot;Call Q&quot;, executes the calls, and puts the resulting</span>
+<span class="sd">  _ResultItems in &quot;Request Q&quot;</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">atexit</span>
+<span class="kn">from</span> <span class="nn">concurrent.futures</span> <span class="k">import</span> <span class="n">_base</span>
+<span class="kn">import</span> <span class="nn">Queue</span> <span class="k">as</span> <span class="nn">queue</span>
+<span class="kn">import</span> <span class="nn">multiprocessing</span>
+<span class="kn">import</span> <span class="nn">threading</span>
+<span class="kn">import</span> <span class="nn">weakref</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s1">&#39;Brian Quinlan (brian@sweetapp.com)&#39;</span>
+
+<span class="c1"># Workers are created as daemon threads and processes. This is done to allow the</span>
+<span class="c1"># interpreter to exit when there are still idle processes in a</span>
+<span class="c1"># ProcessPoolExecutor&#39;s process pool (i.e. shutdown() was not called). However,</span>
+<span class="c1"># allowing workers to die with the interpreter has two undesirable properties:</span>
+<span class="c1">#   - The workers would still be running during interpretor shutdown,</span>
+<span class="c1">#     meaning that they would fail in unpredictable ways.</span>
+<span class="c1">#   - The workers could be killed while evaluating a work item, which could</span>
+<span class="c1">#     be bad if the callable being evaluated has external side-effects e.g.</span>
+<span class="c1">#     writing to a file.</span>
+<span class="c1">#</span>
+<span class="c1"># To work around this problem, an exit handler is installed which tells the</span>
+<span class="c1"># workers to exit when their work queues are empty and then waits until the</span>
+<span class="c1"># threads/processes finish.</span>
+
+<span class="n">_threads_queues</span> <span class="o">=</span> <span class="n">weakref</span><span class="o">.</span><span class="n">WeakKeyDictionary</span><span class="p">()</span>
+<span class="n">_shutdown</span> <span class="o">=</span> <span class="kc">False</span>
+
+<span class="k">def</span> <span class="nf">_python_exit</span><span class="p">():</span>
+    <span class="k">global</span> <span class="n">_shutdown</span>
+    <span class="n">_shutdown</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">items</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">_threads_queues</span><span class="o">.</span><span class="n">items</span><span class="p">())</span> <span class="k">if</span> <span class="n">_threads_queues</span> <span class="k">else</span> <span class="p">()</span>
+    <span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">items</span><span class="p">:</span>
+        <span class="n">q</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">items</span><span class="p">:</span>
+        <span class="n">t</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">maxint</span><span class="p">)</span>
+
+<span class="c1"># Controls how many more calls than processes will be queued in the call queue.</span>
+<span class="c1"># A smaller number will mean that processes spend more time idle waiting for</span>
+<span class="c1"># work while a larger number will make Future.cancel() succeed less frequently</span>
+<span class="c1"># (Futures in the call queue cannot be cancelled).</span>
+<span class="n">EXTRA_QUEUED_CALLS</span> <span class="o">=</span> <span class="mi">1</span>
+
+<span class="k">class</span> <span class="nc">_WorkItem</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">future</span><span class="p">,</span> <span class="n">fn</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">future</span> <span class="o">=</span> <span class="n">future</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fn</span> <span class="o">=</span> <span class="n">fn</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="n">args</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span> <span class="o">=</span> <span class="n">kwargs</span>
+
+<span class="k">class</span> <span class="nc">_ResultItem</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">work_id</span><span class="p">,</span> <span class="n">exception</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">result</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">work_id</span> <span class="o">=</span> <span class="n">work_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exception</span> <span class="o">=</span> <span class="n">exception</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">result</span> <span class="o">=</span> <span class="n">result</span>
+
+<span class="k">class</span> <span class="nc">_CallItem</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">work_id</span><span class="p">,</span> <span class="n">fn</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">work_id</span> <span class="o">=</span> <span class="n">work_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fn</span> <span class="o">=</span> <span class="n">fn</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="n">args</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span> <span class="o">=</span> <span class="n">kwargs</span>
+
+<span class="k">def</span> <span class="nf">_process_worker</span><span class="p">(</span><span class="n">call_queue</span><span class="p">,</span> <span class="n">result_queue</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Evaluates calls from call_queue and places the results in result_queue.</span>
+
+<span class="sd">    This worker is run in a separate process.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        call_queue: A multiprocessing.Queue of _CallItems that will be read and</span>
+<span class="sd">            evaluated by the worker.</span>
+<span class="sd">        result_queue: A multiprocessing.Queue of _ResultItems that will written</span>
+<span class="sd">            to by the worker.</span>
+<span class="sd">        shutdown: A multiprocessing.Event that will be set as a signal to the</span>
+<span class="sd">            worker that it should exit when call_queue is empty.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">call_item</span> <span class="o">=</span> <span class="n">call_queue</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">block</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">call_item</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Wake up queue management thread</span>
+            <span class="n">result_queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">call_item</span><span class="o">.</span><span class="n">fn</span><span class="p">(</span><span class="o">*</span><span class="n">call_item</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">call_item</span><span class="o">.</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
+            <span class="n">e</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">result_queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">_ResultItem</span><span class="p">(</span><span class="n">call_item</span><span class="o">.</span><span class="n">work_id</span><span class="p">,</span>
+                                         <span class="n">exception</span><span class="o">=</span><span class="n">e</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">result_queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">_ResultItem</span><span class="p">(</span><span class="n">call_item</span><span class="o">.</span><span class="n">work_id</span><span class="p">,</span>
+                                         <span class="n">result</span><span class="o">=</span><span class="n">r</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">_add_call_item_to_queue</span><span class="p">(</span><span class="n">pending_work_items</span><span class="p">,</span>
+                            <span class="n">work_ids</span><span class="p">,</span>
+                            <span class="n">call_queue</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Fills call_queue with _WorkItems from pending_work_items.</span>
+
+<span class="sd">    This function never blocks.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        pending_work_items: A dict mapping work ids to _WorkItems e.g.</span>
+<span class="sd">            {5: &lt;_WorkItem...&gt;, 6: &lt;_WorkItem...&gt;, ...}</span>
+<span class="sd">        work_ids: A queue.Queue of work ids e.g. Queue([5, 6, ...]). Work ids</span>
+<span class="sd">            are consumed and the corresponding _WorkItems from</span>
+<span class="sd">            pending_work_items are transformed into _CallItems and put in</span>
+<span class="sd">            call_queue.</span>
+<span class="sd">        call_queue: A multiprocessing.Queue that will be filled with _CallItems</span>
+<span class="sd">            derived from _WorkItems.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">call_queue</span><span class="o">.</span><span class="n">full</span><span class="p">():</span>
+            <span class="k">return</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">work_id</span> <span class="o">=</span> <span class="n">work_ids</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">block</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">queue</span><span class="o">.</span><span class="n">Empty</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">work_item</span> <span class="o">=</span> <span class="n">pending_work_items</span><span class="p">[</span><span class="n">work_id</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">work_item</span><span class="o">.</span><span class="n">future</span><span class="o">.</span><span class="n">set_running_or_notify_cancel</span><span class="p">():</span>
+                <span class="n">call_queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">_CallItem</span><span class="p">(</span><span class="n">work_id</span><span class="p">,</span>
+                                         <span class="n">work_item</span><span class="o">.</span><span class="n">fn</span><span class="p">,</span>
+                                         <span class="n">work_item</span><span class="o">.</span><span class="n">args</span><span class="p">,</span>
+                                         <span class="n">work_item</span><span class="o">.</span><span class="n">kwargs</span><span class="p">),</span>
+                               <span class="n">block</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">del</span> <span class="n">pending_work_items</span><span class="p">[</span><span class="n">work_id</span><span class="p">]</span>
+                <span class="k">continue</span>
+
+<span class="k">def</span> <span class="nf">_queue_management_worker</span><span class="p">(</span><span class="n">executor_reference</span><span class="p">,</span>
+                             <span class="n">processes</span><span class="p">,</span>
+                             <span class="n">pending_work_items</span><span class="p">,</span>
+                             <span class="n">work_ids_queue</span><span class="p">,</span>
+                             <span class="n">call_queue</span><span class="p">,</span>
+                             <span class="n">result_queue</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Manages the communication between this process and the worker processes.</span>
+
+<span class="sd">    This function is run in a local thread.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        executor_reference: A weakref.ref to the ProcessPoolExecutor that owns</span>
+<span class="sd">            this thread. Used to determine if the ProcessPoolExecutor has been</span>
+<span class="sd">            garbage collected and that this function can exit.</span>
+<span class="sd">        process: A list of the multiprocessing.Process instances used as</span>
+<span class="sd">            workers.</span>
+<span class="sd">        pending_work_items: A dict mapping work ids to _WorkItems e.g.</span>
+<span class="sd">            {5: &lt;_WorkItem...&gt;, 6: &lt;_WorkItem...&gt;, ...}</span>
+<span class="sd">        work_ids_queue: A queue.Queue of work ids e.g. Queue([5, 6, ...]).</span>
+<span class="sd">        call_queue: A multiprocessing.Queue that will be filled with _CallItems</span>
+<span class="sd">            derived from _WorkItems for processing by the process workers.</span>
+<span class="sd">        result_queue: A multiprocessing.Queue of _ResultItems generated by the</span>
+<span class="sd">            process workers.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">nb_shutdown_processes</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">def</span> <span class="nf">shutdown_one_process</span><span class="p">():</span>
+        <span class="sd">&quot;&quot;&quot;Tell a worker to terminate, which will in turn wake us again&quot;&quot;&quot;</span>
+        <span class="n">call_queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+        <span class="n">nb_shutdown_processes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">_add_call_item_to_queue</span><span class="p">(</span><span class="n">pending_work_items</span><span class="p">,</span>
+                                <span class="n">work_ids_queue</span><span class="p">,</span>
+                                <span class="n">call_queue</span><span class="p">)</span>
+
+        <span class="n">result_item</span> <span class="o">=</span> <span class="n">result_queue</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">block</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">result_item</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">work_item</span> <span class="o">=</span> <span class="n">pending_work_items</span><span class="p">[</span><span class="n">result_item</span><span class="o">.</span><span class="n">work_id</span><span class="p">]</span>
+            <span class="k">del</span> <span class="n">pending_work_items</span><span class="p">[</span><span class="n">result_item</span><span class="o">.</span><span class="n">work_id</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">result_item</span><span class="o">.</span><span class="n">exception</span><span class="p">:</span>
+                <span class="n">work_item</span><span class="o">.</span><span class="n">future</span><span class="o">.</span><span class="n">set_exception</span><span class="p">(</span><span class="n">result_item</span><span class="o">.</span><span class="n">exception</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">work_item</span><span class="o">.</span><span class="n">future</span><span class="o">.</span><span class="n">set_result</span><span class="p">(</span><span class="n">result_item</span><span class="o">.</span><span class="n">result</span><span class="p">)</span>
+            <span class="c1"># Delete references to object. See issue16284</span>
+            <span class="k">del</span> <span class="n">work_item</span>
+        <span class="c1"># Check whether we should start shutting down.</span>
+        <span class="n">executor</span> <span class="o">=</span> <span class="n">executor_reference</span><span class="p">()</span>
+        <span class="c1"># No more work items can be added if:</span>
+        <span class="c1">#   - The interpreter is shutting down OR</span>
+        <span class="c1">#   - The executor that owns this worker has been collected OR</span>
+        <span class="c1">#   - The executor that owns this worker has been shutdown.</span>
+        <span class="k">if</span> <span class="n">_shutdown</span> <span class="ow">or</span> <span class="n">executor</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">executor</span><span class="o">.</span><span class="n">_shutdown_thread</span><span class="p">:</span>
+            <span class="c1"># Since no new work items can be added, it is safe to shutdown</span>
+            <span class="c1"># this thread if there are no pending work items.</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">pending_work_items</span><span class="p">:</span>
+                <span class="k">while</span> <span class="n">nb_shutdown_processes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">processes</span><span class="p">):</span>
+                    <span class="n">shutdown_one_process</span><span class="p">()</span>
+                <span class="c1"># If .join() is not called on the created processes then</span>
+                <span class="c1"># some multiprocessing.Queue methods may deadlock on Mac OS</span>
+                <span class="c1"># X.</span>
+                <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">processes</span><span class="p">:</span>
+                    <span class="n">p</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+                <span class="n">call_queue</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="k">return</span>
+        <span class="k">del</span> <span class="n">executor</span>
+
+<span class="n">_system_limits_checked</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">_system_limited</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="k">def</span> <span class="nf">_check_system_limits</span><span class="p">():</span>
+    <span class="k">global</span> <span class="n">_system_limits_checked</span><span class="p">,</span> <span class="n">_system_limited</span>
+    <span class="k">if</span> <span class="n">_system_limits_checked</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">_system_limited</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">_system_limited</span><span class="p">)</span>
+    <span class="n">_system_limits_checked</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span> <span class="nn">os</span>
+        <span class="n">nsems_max</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">sysconf</span><span class="p">(</span><span class="s2">&quot;SC_SEM_NSEMS_MAX&quot;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">AttributeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+        <span class="c1"># sysconf not available or setting not available</span>
+        <span class="k">return</span>
+    <span class="k">if</span> <span class="n">nsems_max</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="c1"># indetermine limit, assume that limit is determined</span>
+        <span class="c1"># by available memory only</span>
+        <span class="k">return</span>
+    <span class="k">if</span> <span class="n">nsems_max</span> <span class="o">&gt;=</span> <span class="mi">256</span><span class="p">:</span>
+        <span class="c1"># minimum number of semaphores available</span>
+        <span class="c1"># according to POSIX</span>
+        <span class="k">return</span>
+    <span class="n">_system_limited</span> <span class="o">=</span> <span class="s2">&quot;system provides too few semaphores (</span><span class="si">%d</span><span class="s2"> available, 256 necessary)&quot;</span> <span class="o">%</span> <span class="n">nsems_max</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">_system_limited</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">ProcessPoolExecutor</span><span class="p">(</span><span class="n">_base</span><span class="o">.</span><span class="n">Executor</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_workers</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initializes a new ProcessPoolExecutor instance.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            max_workers: The maximum number of processes that can be used to</span>
+<span class="sd">                execute the given calls. If None or not given then as many</span>
+<span class="sd">                worker processes will be created as the machine has processors.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_check_system_limits</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">max_workers</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_max_workers</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_max_workers</span> <span class="o">=</span> <span class="n">max_workers</span>
+
+        <span class="c1"># Make the call queue slightly larger than the number of processes to</span>
+        <span class="c1"># prevent the worker processes from idling. But don&#39;t make it too big</span>
+        <span class="c1"># because futures in the call queue cannot be cancelled.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_call_queue</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">Queue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_max_workers</span> <span class="o">+</span>
+                                                 <span class="n">EXTRA_QUEUED_CALLS</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_result_queue</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">Queue</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_work_ids</span> <span class="o">=</span> <span class="n">queue</span><span class="o">.</span><span class="n">Queue</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_queue_management_thread</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_processes</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+        <span class="c1"># Shutdown is a two-step process.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_shutdown_thread</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_shutdown_lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_queue_count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pending_work_items</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span> <span class="nf">_start_queue_management_thread</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># When the executor gets lost, the weakref callback will wake up</span>
+        <span class="c1"># the queue management thread.</span>
+        <span class="k">def</span> <span class="nf">weakref_cb</span><span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_result_queue</span><span class="p">):</span>
+            <span class="n">q</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_queue_management_thread</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_queue_management_thread</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span>
+                    <span class="n">target</span><span class="o">=</span><span class="n">_queue_management_worker</span><span class="p">,</span>
+                    <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">weakref</span><span class="o">.</span><span class="n">ref</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weakref_cb</span><span class="p">),</span>
+                          <span class="bp">self</span><span class="o">.</span><span class="n">_processes</span><span class="p">,</span>
+                          <span class="bp">self</span><span class="o">.</span><span class="n">_pending_work_items</span><span class="p">,</span>
+                          <span class="bp">self</span><span class="o">.</span><span class="n">_work_ids</span><span class="p">,</span>
+                          <span class="bp">self</span><span class="o">.</span><span class="n">_call_queue</span><span class="p">,</span>
+                          <span class="bp">self</span><span class="o">.</span><span class="n">_result_queue</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_queue_management_thread</span><span class="o">.</span><span class="n">daemon</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_queue_management_thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+            <span class="n">_threads_queues</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_queue_management_thread</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_result_queue</span>
+
+    <span class="k">def</span> <span class="nf">_adjust_process_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_processes</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_workers</span><span class="p">):</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">Process</span><span class="p">(</span>
+                    <span class="n">target</span><span class="o">=</span><span class="n">_process_worker</span><span class="p">,</span>
+                    <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_call_queue</span><span class="p">,</span>
+                          <span class="bp">self</span><span class="o">.</span><span class="n">_result_queue</span><span class="p">))</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_processes</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">submit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fn</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shutdown_lock</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shutdown_thread</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;cannot schedule new futures after shutdown&#39;</span><span class="p">)</span>
+
+            <span class="n">f</span> <span class="o">=</span> <span class="n">_base</span><span class="o">.</span><span class="n">Future</span><span class="p">()</span>
+            <span class="n">w</span> <span class="o">=</span> <span class="n">_WorkItem</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">fn</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pending_work_items</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_queue_count</span><span class="p">]</span> <span class="o">=</span> <span class="n">w</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_work_ids</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_queue_count</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_queue_count</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="c1"># Wake up queue management thread</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_result_queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_start_queue_management_thread</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_adjust_process_count</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">f</span>
+    <span class="n">submit</span><span class="o">.</span><span class="n">__doc__</span> <span class="o">=</span> <span class="n">_base</span><span class="o">.</span><span class="n">Executor</span><span class="o">.</span><span class="n">submit</span><span class="o">.</span><span class="n">__doc__</span>
+
+    <span class="k">def</span> <span class="nf">shutdown</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shutdown_lock</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_shutdown_thread</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_queue_management_thread</span><span class="p">:</span>
+            <span class="c1"># Wake up queue management thread</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_result_queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">wait</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_queue_management_thread</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">maxint</span><span class="p">)</span>
+        <span class="c1"># To reduce the risk of openning too many files, remove references to</span>
+        <span class="c1"># objects that use file descriptors.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_queue_management_thread</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_call_queue</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_result_queue</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_processes</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">shutdown</span><span class="o">.</span><span class="n">__doc__</span> <span class="o">=</span> <span class="n">_base</span><span class="o">.</span><span class="n">Executor</span><span class="o">.</span><span class="n">shutdown</span><span class="o">.</span><span class="n">__doc__</span>
+
+<span class="n">atexit</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">_python_exit</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Natasha Batalha;Kevin Stevenson.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

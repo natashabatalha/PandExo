@@ -1,0 +1,234 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>engine.pandexo &mdash; PandExo  documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="PandExo  documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> PandExo
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../includeme.html">PandExo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../includeme.html#running-pandexo-gui">Running PandExo GUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorialjwst.html">JWST Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorialhst.html">HST Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../engine.html">The Code</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../index.html">PandExo</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      
+    <li>engine.pandexo</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for engine.pandexo</h1><div class="highlight"><pre>
+<div class="viewcode-block" id="wrapper"><a class="viewcode-back" href="../../engine.html#engine.pandexo.wrapper">[docs]</a><span></span><span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="n">dictinput</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Tpo level function to call either jwst, hst, wfirst</span>
+<span class="sd">    </span>
+<span class="sd">    Top level function which calls either jwst, hst or wfirst noise simulation. </span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    dictinput : </span>
+<span class="sd">        dictionary containing instrument parameters and exoplanet </span>
+<span class="sd">        specific parameters. {&quot;pandeia_input&quot;:dict1, &quot;pandexo_input&quot;:dict1}</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict </span>
+<span class="sd">        output specific to observatory requested</span>
+<span class="sd">    </span>
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    You should not run simulations through this. It is much easier to run simulations through </span>
+<span class="sd">    either **run_online** or **justdoit**. **justdoit** contains functions </span>
+<span class="sd">    to create input dictionaries and **run_online** contains web forms to create input dictionaries.</span>
+<span class="sd">    </span>
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    pandexo.engine.justdoit : gives ability to simply submit runs </span>
+<span class="sd">    pandexo.engine.run_online : submit runs through user interface </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pandeia_input</span> <span class="o">=</span> <span class="n">dictinput</span><span class="p">[</span><span class="s1">&#39;pandeia_input&#39;</span><span class="p">]</span>    	
+    <span class="n">telescope</span> <span class="o">=</span> <span class="n">pandeia_input</span><span class="p">[</span><span class="s1">&#39;telescope&#39;</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">telescope</span><span class="o">==</span><span class="s1">&#39;jwst&#39;</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">jwst</span> <span class="k">import</span> <span class="n">compute_full_sim</span>
+        <span class="k">return</span> <span class="n">compute_full_sim</span><span class="p">(</span><span class="n">dictinput</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">telescope</span><span class="o">==</span><span class="s1">&#39;hst&#39;</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">hst</span> <span class="k">import</span> <span class="n">compute_sim_hst</span> 
+        <span class="k">return</span> <span class="n">compute_sim_hst</span><span class="p">(</span><span class="n">dictinput</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">telescope</span><span class="o">==</span><span class="s1">&#39;wfirst&#39;</span><span class="p">:</span>
+        <span class="k">return</span>     
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span> <span class="s2">&quot;INVALID TELESCOPE. PandExo only accepts: jwst, hst, wfirst&quot;</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Natasha Batalha;Kevin Stevenson.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

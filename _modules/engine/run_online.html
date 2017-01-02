@@ -1,0 +1,977 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>engine.run_online &mdash; PandExo  documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="PandExo  documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> PandExo
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../includeme.html">PandExo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../includeme.html#running-pandexo-gui">Running PandExo GUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorialjwst.html">JWST Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorialhst.html">HST Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../engine.html">The Code</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../index.html">PandExo</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      
+    <li>engine.run_online</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for engine.run_online</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">uuid</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">namedtuple</span><span class="p">,</span> <span class="n">OrderedDict</span>
+<span class="kn">import</span> <span class="nn">tornado.escape</span>
+<span class="kn">import</span> <span class="nn">tornado.httpserver</span>
+<span class="kn">import</span> <span class="nn">tornado.ioloop</span>
+<span class="kn">import</span> <span class="nn">tornado.options</span>
+<span class="kn">import</span> <span class="nn">tornado.web</span>
+<span class="kn">from</span> <span class="nn">concurrent.futures</span> <span class="k">import</span> <span class="n">ProcessPoolExecutor</span>
+<span class="kn">from</span> <span class="nn">pandexo</span> <span class="k">import</span> <span class="n">wrapper</span>
+<span class="kn">from</span> <span class="nn">tornado.options</span> <span class="k">import</span> <span class="n">define</span><span class="p">,</span> <span class="n">options</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">from</span> <span class="nn">ComputeZ</span> <span class="k">import</span> <span class="n">computeAlpha</span>
+<span class="kn">from</span> <span class="nn">utils.plotters</span> <span class="k">import</span> <span class="n">create_component_jwst</span><span class="p">,</span> <span class="n">create_component_spec</span><span class="p">,</span> <span class="n">create_component_hst</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span> 
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="c1">#define location of temp files</span>
+<span class="n">__TEMP__</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s2">&quot;temp&quot;</span><span class="p">)</span>
+<span class="n">__DOCS__</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">)[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]),</span><span class="s2">&quot;pandexo&quot;</span><span class="p">,</span><span class="s2">&quot;docs&quot;</span><span class="p">,</span><span class="s2">&quot;_build&quot;</span><span class="p">,</span><span class="s2">&quot;html&quot;</span><span class="p">)</span>
+
+<span class="n">define</span><span class="p">(</span><span class="s2">&quot;port&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">1111</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;run on the given port&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+
+<span class="c1"># Define a simple named tuple to keep track for submitted calculations</span>
+<span class="n">CalculationTask</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;CalculationTask&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;task&#39;</span><span class="p">,</span>
+                                                 <span class="s1">&#39;cookie&#39;</span><span class="p">,</span> <span class="s1">&#39;count&#39;</span><span class="p">])</span>
+
+
+<div class="viewcode-block" id="Application"><a class="viewcode-back" href="../../engine.html#engine.run_online.Application">[docs]</a><span class="k">class</span> <span class="nc">Application</span><span class="p">(</span><span class="n">tornado</span><span class="o">.</span><span class="n">web</span><span class="o">.</span><span class="n">Application</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Gobal settings of the server</span>
+<span class="sd">    This defines the global settings of the server. This parses out the</span>
+<span class="sd">    handlers, and includes settings for if ever we want to tie this to a</span>
+<span class="sd">    database.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">handlers</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="s2">r&quot;/&quot;</span><span class="p">,</span> <span class="n">HomeHandler</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">r&quot;/about&quot;</span><span class="p">,</span> <span class="n">AboutHandler</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">r&quot;/dashboard&quot;</span><span class="p">,</span> <span class="n">DashboardHandler</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">r&quot;/dashboardspec&quot;</span><span class="p">,</span> <span class="n">DashboardSpecHandler</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">r&quot;/dashboardhst&quot;</span><span class="p">,</span> <span class="n">DashboardHSTHandler</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">r&quot;/tables&quot;</span><span class="p">,</span> <span class="n">TablesHandler</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">r&quot;/helpfulplots&quot;</span><span class="p">,</span> <span class="n">HelpfulPlotsHandler</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">r&quot;/docs&quot;</span><span class="p">,</span> <span class="n">DocsHandler</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">r&quot;/calculation/new&quot;</span><span class="p">,</span> <span class="n">CalculationNewHandler</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">r&quot;/calculation/newHST&quot;</span><span class="p">,</span> <span class="n">CalculationNewHSTHandler</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">r&quot;/calculation/newspec&quot;</span><span class="p">,</span> <span class="n">CalculationNewSpecHandler</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">r&quot;/calculation/status/([^/]+)&quot;</span><span class="p">,</span> <span class="n">CalculationStatusHandler</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">r&quot;/calculation/statushst/([^/]+)&quot;</span><span class="p">,</span> <span class="n">CalculationStatusHSTHandler</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">r&quot;/calculation/statusspec/([^/]+)&quot;</span><span class="p">,</span> <span class="n">CalculationStatusSpecHandler</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">r&quot;/calculation/view/([^/]+)&quot;</span><span class="p">,</span> <span class="n">CalculationViewHandler</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">r&quot;/calculation/viewhst/([^/]+)&quot;</span><span class="p">,</span> <span class="n">CalculationViewHSTHandler</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">r&quot;/calculation/viewspec/([^/]+)&quot;</span><span class="p">,</span> <span class="n">CalculationViewSpecHandler</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">r&quot;/calculation/download/([^/]+)&quot;</span><span class="p">,</span> <span class="n">CalculationDownloadHandler</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">r&quot;/calculation/downloadspec/([^/]+)&quot;</span><span class="p">,</span> <span class="n">CalculationDownloadSpecHandler</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">r&quot;/calculation/downloadpandin/([^/]+)&quot;</span><span class="p">,</span> <span class="n">CalculationDownloadPandInHandler</span><span class="p">)</span>
+        <span class="p">]</span>
+        <span class="n">settings</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">blog_title</span><span class="o">=</span><span class="s2">u&quot;Pandexo&quot;</span><span class="p">,</span>
+            <span class="n">template_path</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s2">&quot;templates&quot;</span><span class="p">),</span>
+            <span class="n">static_path</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s2">&quot;static&quot;</span><span class="p">),</span>
+            <span class="n">xsrf_cookies</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">cookie_secret</span><span class="o">=</span><span class="s2">&quot;__TODO:_GENERATE_YOUR_OWN_RANDOM_VALUE_HERE__&quot;</span><span class="p">,</span>
+            <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Application</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">handlers</span><span class="p">,</span> <span class="o">**</span><span class="n">settings</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="BaseHandler"><a class="viewcode-back" href="../../engine.html#engine.run_online.BaseHandler">[docs]</a><span class="k">class</span> <span class="nc">BaseHandler</span><span class="p">(</span><span class="n">tornado</span><span class="o">.</span><span class="n">web</span><span class="o">.</span><span class="n">RequestHandler</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Logic to handle user information and database access might go here.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">executor</span> <span class="o">=</span> <span class="n">ProcessPoolExecutor</span><span class="p">(</span><span class="n">max_workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+    <span class="n">buffer</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_get_task_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Simple function to grab a calculation that&#39;s stored in the buffer,</span>
+<span class="sd">        and return a dictionary/json-like response to the front-end.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">calc_task</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+        <span class="n">task</span> <span class="o">=</span> <span class="n">calc_task</span><span class="o">.</span><span class="n">task</span>
+
+        <span class="n">response</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="nb">id</span><span class="p">,</span>
+                    <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">calc_task</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                    <span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="n">calc_task</span><span class="o">.</span><span class="n">count</span><span class="p">}</span>
+
+        <span class="k">if</span> <span class="n">task</span><span class="o">.</span><span class="n">running</span><span class="p">():</span>
+            <span class="n">response</span><span class="p">[</span><span class="s1">&#39;state&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;running&#39;</span>
+            <span class="n">response</span><span class="p">[</span><span class="s1">&#39;code&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">202</span>
+        <span class="k">elif</span> <span class="n">task</span><span class="o">.</span><span class="n">done</span><span class="p">():</span>
+            <span class="n">response</span><span class="p">[</span><span class="s1">&#39;state&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;finished&#39;</span>
+        <span class="k">elif</span> <span class="n">task</span><span class="o">.</span><span class="n">cancelled</span><span class="p">():</span>
+            <span class="n">response</span><span class="p">[</span><span class="s1">&#39;state&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;cancelled&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">response</span><span class="p">[</span><span class="s1">&#39;state&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;pending&#39;</span>
+
+        <span class="n">response</span><span class="p">[</span><span class="s1">&#39;html&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tornado</span><span class="o">.</span><span class="n">escape</span><span class="o">.</span><span class="n">to_basestring</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">render_string</span><span class="p">(</span><span class="s2">&quot;calc_row.html&quot;</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="n">response</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">response</span>
+
+    <span class="k">def</span> <span class="nf">_get_task_response_spec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Simple function to grab a calculation that&#39;s stored in the buffer,</span>
+<span class="sd">        and return a dictionary/json-like response to the front-end.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">calc_task</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+        <span class="n">task</span> <span class="o">=</span> <span class="n">calc_task</span><span class="o">.</span><span class="n">task</span>
+
+        <span class="n">response</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="nb">id</span><span class="p">,</span>
+                    <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">calc_task</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                    <span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="n">calc_task</span><span class="o">.</span><span class="n">count</span><span class="p">}</span>
+
+        <span class="k">if</span> <span class="n">task</span><span class="o">.</span><span class="n">running</span><span class="p">():</span>
+            <span class="n">response</span><span class="p">[</span><span class="s1">&#39;state&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;running&#39;</span>
+            <span class="n">response</span><span class="p">[</span><span class="s1">&#39;code&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">202</span>
+        <span class="k">elif</span> <span class="n">task</span><span class="o">.</span><span class="n">done</span><span class="p">():</span>
+            <span class="n">response</span><span class="p">[</span><span class="s1">&#39;state&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;finished&#39;</span>
+        <span class="k">elif</span> <span class="n">task</span><span class="o">.</span><span class="n">cancelled</span><span class="p">():</span>
+            <span class="n">response</span><span class="p">[</span><span class="s1">&#39;state&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;cancelled&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">response</span><span class="p">[</span><span class="s1">&#39;state&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;pending&#39;</span>
+
+        <span class="n">response</span><span class="p">[</span><span class="s1">&#39;html&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tornado</span><span class="o">.</span><span class="n">escape</span><span class="o">.</span><span class="n">to_basestring</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">render_string</span><span class="p">(</span><span class="s2">&quot;calc_rowspec.html&quot;</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="n">response</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">response</span>
+
+    <span class="k">def</span> <span class="nf">_get_task_response_hst</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Simple function to grab a calculation that&#39;s stored in the buffer,</span>
+<span class="sd">        and return a dictionary/json-like response to the front-end.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">calc_task</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+        <span class="n">task</span> <span class="o">=</span> <span class="n">calc_task</span><span class="o">.</span><span class="n">task</span>
+
+        <span class="n">response</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="nb">id</span><span class="p">,</span>
+                    <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">calc_task</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                    <span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="n">calc_task</span><span class="o">.</span><span class="n">count</span><span class="p">}</span>
+
+        <span class="k">if</span> <span class="n">task</span><span class="o">.</span><span class="n">running</span><span class="p">():</span>
+            <span class="n">response</span><span class="p">[</span><span class="s1">&#39;state&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;running&#39;</span>
+            <span class="n">response</span><span class="p">[</span><span class="s1">&#39;code&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">202</span>
+        <span class="k">elif</span> <span class="n">task</span><span class="o">.</span><span class="n">done</span><span class="p">():</span>
+            <span class="n">response</span><span class="p">[</span><span class="s1">&#39;state&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;finished&#39;</span>
+        <span class="k">elif</span> <span class="n">task</span><span class="o">.</span><span class="n">cancelled</span><span class="p">():</span>
+            <span class="n">response</span><span class="p">[</span><span class="s1">&#39;state&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;cancelled&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">response</span><span class="p">[</span><span class="s1">&#39;state&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;pending&#39;</span>
+
+        <span class="n">response</span><span class="p">[</span><span class="s1">&#39;html&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tornado</span><span class="o">.</span><span class="n">escape</span><span class="o">.</span><span class="n">to_basestring</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">render_string</span><span class="p">(</span><span class="s2">&quot;calc_rowhst.html&quot;</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="n">response</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">response</span>
+        
+<div class="viewcode-block" id="BaseHandler.write_error"><a class="viewcode-back" href="../../engine.html#engine.run_online.BaseHandler.write_error">[docs]</a>    <span class="k">def</span> <span class="nf">write_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">status_code</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This renders a customized error page</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s1">&#39;errors.html&#39;</span><span class="p">,</span><span class="n">page</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></div>
+
+
+
+    <span class="k">def</span> <span class="nf">_get_task_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method grabs only the result returned from the python `Future`</span>
+<span class="sd">        object. This contains the stuff that Pandeia returns.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">calc_task</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+        <span class="n">task</span> <span class="o">=</span> <span class="n">calc_task</span><span class="o">.</span><span class="n">task</span>
+
+        <span class="k">return</span> <span class="n">task</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_add_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">task</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This creates the task and adds it to the buffer.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">CalculationTask</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">task</span><span class="o">=</span><span class="n">task</span><span class="p">,</span>
+                                          <span class="n">count</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span>
+                                          <span class="n">cookie</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_cookie</span><span class="p">(</span><span class="s2">&quot;pandexo_user&quot;</span><span class="p">))</span>
+
+        <span class="c1"># Only allow 100 tasks **globally**. This will delete old tasks first.</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">15</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="o">.</span><span class="n">popitem</span><span class="p">(</span><span class="n">last</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+            
+
+
+<div class="viewcode-block" id="HomeHandler"><a class="viewcode-back" href="../../engine.html#engine.run_online.HomeHandler">[docs]</a><span class="k">class</span> <span class="nc">HomeHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
+<div class="viewcode-block" id="HomeHandler.get"><a class="viewcode-back" href="../../engine.html#engine.run_online.HomeHandler.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This sets an **unsecured** cookie. If user accounts gets</span>
+<span class="sd">        implemented, this must be changed to a secure cookie.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cookie</span><span class="p">(</span><span class="s2">&quot;pandexo_user&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_cookie</span><span class="p">(</span><span class="s2">&quot;pandexo_user&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">&quot;home.html&quot;</span><span class="p">)</span></div></div>
+        
+<div class="viewcode-block" id="AboutHandler"><a class="viewcode-back" href="../../engine.html#engine.run_online.AboutHandler">[docs]</a><span class="k">class</span> <span class="nc">AboutHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
+<div class="viewcode-block" id="AboutHandler.get"><a class="viewcode-back" href="../../engine.html#engine.run_online.AboutHandler.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Render about PandExo Page</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">&quot;about.html&quot;</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="TablesHandler"><a class="viewcode-back" href="../../engine.html#engine.run_online.TablesHandler">[docs]</a><span class="k">class</span> <span class="nc">TablesHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
+<div class="viewcode-block" id="TablesHandler.get"><a class="viewcode-back" href="../../engine.html#engine.run_online.TablesHandler.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Render tables with confirmed candidates</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">&quot;tables.html&quot;</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="DocsHandler"><a class="viewcode-back" href="../../engine.html#engine.run_online.DocsHandler">[docs]</a><span class="k">class</span> <span class="nc">DocsHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
+<div class="viewcode-block" id="DocsHandler.get"><a class="viewcode-back" href="../../engine.html#engine.run_online.DocsHandler.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Render documentation</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">__DOCS__</span><span class="p">,</span><span class="s2">&quot;index.html&quot;</span><span class="p">))</span></div></div>
+
+<div class="viewcode-block" id="HelpfulPlotsHandler"><a class="viewcode-back" href="../../engine.html#engine.run_online.HelpfulPlotsHandler">[docs]</a><span class="k">class</span> <span class="nc">HelpfulPlotsHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
+<div class="viewcode-block" id="HelpfulPlotsHandler.get"><a class="viewcode-back" href="../../engine.html#engine.run_online.HelpfulPlotsHandler.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Renders helpful bokeh plots</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">&quot;helpfulplots.html&quot;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="DashboardHandler"><a class="viewcode-back" href="../../engine.html#engine.run_online.DashboardHandler">[docs]</a><span class="k">class</span> <span class="nc">DashboardHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Request handler for the dashboard page. This will retrieve and render</span>
+<span class="sd">    the html template, along with the list of current task objects.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="DashboardHandler.get"><a class="viewcode-back" href="../../engine.html#engine.run_online.DashboardHandler.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">task_responses</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_task_response</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span> <span class="k">for</span> <span class="nb">id</span><span class="p">,</span> <span class="n">nt</span> <span class="ow">in</span>
+                          <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                          <span class="k">if</span> <span class="p">((</span><span class="n">nt</span><span class="o">.</span><span class="n">cookie</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cookie</span><span class="p">(</span><span class="s2">&quot;pandexo_user&quot;</span><span class="p">))</span>
+                          <span class="o">&amp;</span> <span class="p">(</span><span class="nb">id</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;e&#39;</span><span class="p">))]</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">&quot;dashboard.html&quot;</span><span class="p">,</span> <span class="n">calculations</span><span class="o">=</span><span class="n">task_responses</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span></div></div>
+
+<div class="viewcode-block" id="DashboardHSTHandler"><a class="viewcode-back" href="../../engine.html#engine.run_online.DashboardHSTHandler">[docs]</a><span class="k">class</span> <span class="nc">DashboardHSTHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Request handler for the dashboard page. This will retrieve and render</span>
+<span class="sd">    the html template, along with the list of current task objects.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="DashboardHSTHandler.get"><a class="viewcode-back" href="../../engine.html#engine.run_online.DashboardHSTHandler.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">task_responses</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_task_response_hst</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span> <span class="k">for</span> <span class="nb">id</span><span class="p">,</span> <span class="n">nt</span> <span class="ow">in</span>
+                          <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                          <span class="k">if</span> <span class="p">((</span><span class="n">nt</span><span class="o">.</span><span class="n">cookie</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cookie</span><span class="p">(</span><span class="s2">&quot;pandexo_user&quot;</span><span class="p">))</span>
+                          <span class="o">&amp;</span> <span class="p">(</span><span class="nb">id</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;h&#39;</span><span class="p">))]</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">&quot;dashboardhst.html&quot;</span><span class="p">,</span> <span class="n">calculations</span><span class="o">=</span><span class="n">task_responses</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span></div></div>
+
+
+
+<div class="viewcode-block" id="DashboardSpecHandler"><a class="viewcode-back" href="../../engine.html#engine.run_online.DashboardSpecHandler">[docs]</a><span class="k">class</span> <span class="nc">DashboardSpecHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Request handler for the dashboard page. This will retrieve and render</span>
+<span class="sd">    the html template, along with the list of current task objects.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="DashboardSpecHandler.get"><a class="viewcode-back" href="../../engine.html#engine.run_online.DashboardSpecHandler.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">task_responses</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_task_response_spec</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span> <span class="k">for</span> <span class="nb">id</span><span class="p">,</span> <span class="n">nt</span> <span class="ow">in</span>
+                          <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                          <span class="k">if</span> <span class="p">((</span><span class="n">nt</span><span class="o">.</span><span class="n">cookie</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cookie</span><span class="p">(</span><span class="s2">&quot;pandexo_user&quot;</span><span class="p">))</span>
+                          <span class="o">&amp;</span> <span class="p">(</span><span class="nb">id</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;s&#39;</span><span class="p">))]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">&quot;dashboardspec.html&quot;</span><span class="p">,</span> <span class="n">calculations</span><span class="o">=</span><span class="n">task_responses</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span></div></div>
+
+
+<div class="viewcode-block" id="CalculationNewHandler"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationNewHandler">[docs]</a><span class="k">class</span> <span class="nc">CalculationNewHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This request handler deals with processing the form data and submitting</span>
+<span class="sd">    a new calculation task to the parallelized workers.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="CalculationNewHandler.get"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationNewHandler.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">&quot;new.html&quot;</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CalculationNewHandler.post"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationNewHandler.post">[docs]</a>    <span class="k">def</span> <span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The post method contains the retured data from the form data (</span>
+<span class="sd">        accessed by using `self.get_argument(...)` for specific arguments,</span>
+<span class="sd">        or `self.request.body` to grab the entire returned object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="c1">#print(self.request.body)</span>
+        
+        <span class="nb">id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span><span class="o">+</span><span class="s1">&#39;e&#39;</span>
+                
+        <span class="c1">#upload planet file</span>
+        <span class="n">fileinfo_plan</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="s1">&#39;planFile&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">fname_plan</span> <span class="o">=</span> <span class="n">fileinfo_plan</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">]</span>
+        <span class="n">extn_plan</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">fname_plan</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">cname_plan</span> <span class="o">=</span> <span class="nb">id</span><span class="o">+</span><span class="s1">&#39;planet&#39;</span> <span class="o">+</span> <span class="n">extn_plan</span>
+        <span class="n">fh_plan</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">__TEMP__</span><span class="p">,</span> <span class="n">cname_plan</span><span class="p">),</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+        <span class="n">fh_plan</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fileinfo_plan</span><span class="p">[</span><span class="s1">&#39;body&#39;</span><span class="p">])</span>
+        
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s2">&quot;reference&quot;</span><span class="p">,</span>
+                               <span class="s2">&quot;exo_input.json&quot;</span><span class="p">))</span> <span class="k">as</span> <span class="n">data_file</span><span class="p">:</span>
+
+            <span class="n">exodata</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">data_file</span><span class="p">)</span>
+            <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;telescope&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;jwst&#39;</span>
+            <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;calculation&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;fml&#39;</span> <span class="c1">#always for online form</span>
+            <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;star&quot;</span><span class="p">][</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;star&quot;</span><span class="p">][</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;user&quot;</span><span class="p">:</span>     
+                <span class="n">fileinfo_star</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="s1">&#39;starFile&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">fname_star</span> <span class="o">=</span> <span class="n">fileinfo_star</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">]</span>
+                <span class="n">extn_star</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">fname_star</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">cname_star</span> <span class="o">=</span> <span class="nb">id</span><span class="o">+</span><span class="s1">&#39;star&#39;</span> <span class="o">+</span> <span class="n">extn_star</span>
+                <span class="n">fh_star</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">__TEMP__</span><span class="p">,</span> <span class="n">cname_star</span><span class="p">),</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+                <span class="n">fh_star</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fileinfo_star</span><span class="p">[</span><span class="s1">&#39;body&#39;</span><span class="p">])</span>
+                <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;star&quot;</span><span class="p">][</span><span class="s2">&quot;starpath&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">__TEMP__</span><span class="p">,</span> <span class="n">cname_star</span><span class="p">)</span>
+                <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;star&quot;</span><span class="p">][</span><span class="s2">&quot;f_unit&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;starfunits&quot;</span><span class="p">)</span>
+                <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;star&quot;</span><span class="p">][</span><span class="s2">&quot;w_unit&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;starwunits&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span> 
+                <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;star&quot;</span><span class="p">][</span><span class="s2">&quot;temp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;temp&quot;</span><span class="p">))</span>
+                <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;star&quot;</span><span class="p">][</span><span class="s2">&quot;logg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;logg&quot;</span><span class="p">))</span>
+                <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;star&quot;</span><span class="p">][</span><span class="s2">&quot;metal&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;metal&quot;</span><span class="p">))</span>
+            <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;star&quot;</span><span class="p">][</span><span class="s2">&quot;mag&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mag&quot;</span><span class="p">))</span>
+            <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;star&quot;</span><span class="p">][</span><span class="s2">&quot;ref_wave&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;ref_wave&quot;</span><span class="p">))</span>
+            <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;planet&quot;</span><span class="p">][</span><span class="s2">&quot;exopath&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">__TEMP__</span><span class="p">,</span> <span class="n">cname_plan</span><span class="p">)</span>
+            <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;planet&quot;</span><span class="p">][</span><span class="s2">&quot;w_unit&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;planwunits&quot;</span><span class="p">)</span>
+            <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;planet&quot;</span><span class="p">][</span><span class="s2">&quot;f_unit&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;planfunits&quot;</span><span class="p">)</span>
+            <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;observation&quot;</span><span class="p">][</span><span class="s2">&quot;fraction&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;fraction&quot;</span><span class="p">))</span>
+            <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;observation&quot;</span><span class="p">][</span><span class="s2">&quot;noccultations&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;numtrans&quot;</span><span class="p">))</span>
+            <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;observation&quot;</span><span class="p">][</span><span class="s2">&quot;sat_level&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;satlevel&quot;</span><span class="p">))</span>
+            
+            <span class="c1">#for phase curves user doen&#39;t necessarily have to input a transit duration </span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;planet&quot;</span><span class="p">][</span><span class="s2">&quot;transit_duration&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;transit_duration&quot;</span><span class="p">))</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="c1">#but if they dont.. make sure that the planet units are in seconds... </span>
+                <span class="k">if</span> <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;planet&quot;</span><span class="p">][</span><span class="s2">&quot;w_unit&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;sec&#39;</span><span class="p">:</span>
+                    <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;planet&quot;</span><span class="p">][</span><span class="s2">&quot;transit_duration&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+                <span class="k">else</span><span class="p">:</span> 
+                    <span class="nb">print</span> <span class="s2">&quot;Need to give transit duration&quot;</span>
+                    <span class="k">raise</span> 
+                
+            <span class="c1">#noise floor, set to 0.0 of no values are input        </span>
+            <span class="k">try</span><span class="p">:</span> 
+                <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;observation&quot;</span><span class="p">][</span><span class="s2">&quot;noise_floor&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;noisefloor&quot;</span><span class="p">))</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;observation&quot;</span><span class="p">][</span><span class="s2">&quot;noise_floor&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="k">try</span><span class="p">:</span> 
+                <span class="n">fileinfo_noise</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="s1">&#39;noisefile&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">fname_noise</span> <span class="o">=</span> <span class="n">fileinfo_noise</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">]</span>
+                <span class="n">extn_noise</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">fname_noise</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">cname_noise</span> <span class="o">=</span> <span class="nb">id</span><span class="o">+</span><span class="s1">&#39;noise&#39;</span> <span class="o">+</span> <span class="n">extn_noise</span>
+                <span class="n">fh_noise</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">__TEMP__</span><span class="p">,</span> <span class="n">cname_noise</span><span class="p">),</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+                <span class="n">fh_noise</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fileinfo_star</span><span class="p">[</span><span class="s1">&#39;body&#39;</span><span class="p">])</span>
+                <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;observation&quot;</span><span class="p">][</span><span class="s2">&quot;noise_floor&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">__TEMP__</span><span class="p">,</span> <span class="n">cname_noise</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;observation&quot;</span><span class="p">][</span><span class="s2">&quot;noise_floor&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+                
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;instrument&quot;</span><span class="p">)</span><span class="o">==</span><span class="s2">&quot;MIRI&quot;</span><span class="p">):</span> 
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s2">&quot;reference&quot;</span><span class="p">,</span>
+                               <span class="s2">&quot;miri_input.json&quot;</span><span class="p">))</span> <span class="k">as</span> <span class="n">data_file</span><span class="p">:</span>   
+                <span class="n">pandata</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">data_file</span><span class="p">)</span>       
+                <span class="n">mirimode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mirimode&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">mirimode</span> <span class="o">==</span> <span class="s2">&quot;lrsslit&quot;</span><span class="p">):</span>
+                    <span class="n">pandata</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">][</span><span class="s2">&quot;mode&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mirimode</span>
+                    <span class="n">pandata</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">][</span><span class="s2">&quot;instrument&quot;</span><span class="p">][</span><span class="s2">&quot;aperture&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;lrsslit&quot;</span>
+                    
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;instrument&quot;</span><span class="p">)</span><span class="o">==</span><span class="s2">&quot;NIRSpec&quot;</span><span class="p">):</span> 
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s2">&quot;reference&quot;</span><span class="p">,</span>
+                               <span class="s2">&quot;nirspec_input.json&quot;</span><span class="p">))</span> <span class="k">as</span> <span class="n">data_file</span><span class="p">:</span>
+                <span class="n">pandata</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">data_file</span><span class="p">)</span>  
+                <span class="n">nirspecmode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;nirspecmode&quot;</span><span class="p">)</span>
+                <span class="n">pandata</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">][</span><span class="s2">&quot;instrument&quot;</span><span class="p">][</span><span class="s2">&quot;disperser&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nirspecmode</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">5</span><span class="p">]</span>
+                <span class="n">pandata</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">][</span><span class="s2">&quot;instrument&quot;</span><span class="p">][</span><span class="s2">&quot;filter&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nirspecmode</span><span class="p">[</span><span class="mi">5</span><span class="p">:</span><span class="mi">11</span><span class="p">]</span>
+                <span class="n">pandata</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">][</span><span class="s2">&quot;detector&quot;</span><span class="p">][</span><span class="s2">&quot;subarray&quot;</span><span class="p">]</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;nirspecsubarray&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;instrument&quot;</span><span class="p">)</span><span class="o">==</span><span class="s2">&quot;NIRCam&quot;</span><span class="p">):</span> 
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s2">&quot;reference&quot;</span><span class="p">,</span>
+                               <span class="s2">&quot;nircam_input.json&quot;</span><span class="p">))</span> <span class="k">as</span> <span class="n">data_file</span><span class="p">:</span>
+                <span class="n">pandata</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">data_file</span><span class="p">)</span> 
+                <span class="n">pandata</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">][</span><span class="s2">&quot;instrument&quot;</span><span class="p">][</span><span class="s2">&quot;filter&quot;</span><span class="p">]</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;nircammode&quot;</span><span class="p">)</span>
+                <span class="n">pandata</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">][</span><span class="s2">&quot;detector&quot;</span><span class="p">][</span><span class="s2">&quot;subarray&quot;</span><span class="p">]</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;nircamsubarray&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;instrument&quot;</span><span class="p">)</span><span class="o">==</span><span class="s2">&quot;NIRISS&quot;</span><span class="p">):</span> 
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s2">&quot;reference&quot;</span><span class="p">,</span>
+                               <span class="s2">&quot;niriss_input.json&quot;</span><span class="p">))</span> <span class="k">as</span> <span class="n">data_file</span><span class="p">:</span>
+                <span class="n">pandata</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">data_file</span><span class="p">)</span> 
+                <span class="n">nirissmode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;nirissmode&quot;</span><span class="p">)</span>
+                <span class="n">pandata</span><span class="p">[</span><span class="s2">&quot;strategy&quot;</span><span class="p">][</span><span class="s2">&quot;order&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">nirissmode</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">pandata</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">][</span><span class="s2">&quot;detector&quot;</span><span class="p">][</span><span class="s2">&quot;subarray&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nirissmode</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">13</span><span class="p">]</span>
+
+        <span class="n">finaldata</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;pandeia_input&quot;</span><span class="p">:</span> <span class="n">pandata</span> <span class="p">,</span> <span class="s2">&quot;pandexo_input&quot;</span><span class="p">:</span><span class="n">exodata</span><span class="p">}</span>
+
+        <span class="n">task</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">executor</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">wrapper</span><span class="p">,</span> <span class="n">finaldata</span><span class="p">)</span>
+
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_add_task</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;calcName&quot;</span><span class="p">),</span> <span class="n">task</span><span class="p">)</span>
+
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_task_response</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+        <span class="n">response</span><span class="p">[</span><span class="s1">&#39;info&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">response</span><span class="p">[</span><span class="s1">&#39;location&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;/calculation/status/</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+        
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">response</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;/dashboard&quot;</span><span class="p">)</span></div></div>
+        
+    
+<div class="viewcode-block" id="CalculationNewHSTHandler"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationNewHSTHandler">[docs]</a><span class="k">class</span> <span class="nc">CalculationNewHSTHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This request handler deals with processing the form data and submitting</span>
+<span class="sd">    a new HST calculation task to the parallelized workers.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="CalculationNewHSTHandler.get"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationNewHSTHandler.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">&quot;newHST.html&quot;</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CalculationNewHSTHandler.post"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationNewHSTHandler.post">[docs]</a>    <span class="k">def</span> <span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The post method contains the retured data from the form data (</span>
+<span class="sd">        accessed by using `self.get_argument(...)` for specific arguments,</span>
+<span class="sd">        or `self.request.body` to grab the entire returned object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="c1">#print(self.request.body)</span>
+        
+        <span class="nb">id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span><span class="o">+</span><span class="s1">&#39;h&#39;</span>
+                
+        <span class="c1">#upload planet file</span>
+        <span class="n">fileinfo_plan</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="s1">&#39;planFile&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">fname_plan</span> <span class="o">=</span> <span class="n">fileinfo_plan</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">]</span>
+        <span class="n">extn_plan</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">fname_plan</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">cname_plan</span> <span class="o">=</span> <span class="nb">id</span><span class="o">+</span><span class="s1">&#39;planet&#39;</span> <span class="o">+</span> <span class="n">extn_plan</span>
+        <span class="n">fh_plan</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">__TEMP__</span><span class="p">,</span> <span class="n">cname_plan</span><span class="p">),</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+        <span class="n">fh_plan</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fileinfo_plan</span><span class="p">[</span><span class="s1">&#39;body&#39;</span><span class="p">])</span>
+        
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s2">&quot;reference&quot;</span><span class="p">,</span>
+                               <span class="s2">&quot;exo_input.json&quot;</span><span class="p">))</span> <span class="k">as</span> <span class="n">data_file</span><span class="p">:</span>
+            <span class="n">exodata</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">data_file</span><span class="p">)</span>
+            <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;telescope&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;hst&#39;</span>
+            <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;star&quot;</span><span class="p">][</span><span class="s2">&quot;mag&quot;</span><span class="p">]</span>         <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mag&quot;</span><span class="p">))</span>
+            <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;star&quot;</span><span class="p">][</span><span class="s2">&quot;ref_wave&quot;</span><span class="p">]</span>     <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;ref_wave&quot;</span><span class="p">))</span>
+            <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;planet&quot;</span><span class="p">][</span><span class="s2">&quot;exopath&quot;</span><span class="p">]</span>    <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">__TEMP__</span><span class="p">,</span> <span class="n">cname_plan</span><span class="p">)</span>
+            <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;planet&quot;</span><span class="p">][</span><span class="s2">&quot;w_unit&quot;</span><span class="p">]</span>     <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;planwunits&quot;</span><span class="p">)</span>
+            <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;planet&quot;</span><span class="p">][</span><span class="s2">&quot;f_unit&quot;</span><span class="p">]</span>     <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;planfunits&quot;</span><span class="p">)</span>
+            <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;planet&quot;</span><span class="p">][</span><span class="s2">&quot;depth&quot;</span><span class="p">]</span>      <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;depth&quot;</span><span class="p">))</span>
+            <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;planet&quot;</span><span class="p">][</span><span class="s2">&quot;i&quot;</span><span class="p">]</span>          <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;i&quot;</span><span class="p">))</span>
+            <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;planet&quot;</span><span class="p">][</span><span class="s2">&quot;ars&quot;</span><span class="p">]</span>        <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;ars&quot;</span><span class="p">))</span>
+            <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;planet&quot;</span><span class="p">][</span><span class="s2">&quot;period&quot;</span><span class="p">]</span>     <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;period&quot;</span><span class="p">))</span>
+            <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;planet&quot;</span><span class="p">][</span><span class="s2">&quot;ecc&quot;</span><span class="p">]</span>        <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;ecc&quot;</span><span class="p">))</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;planet&quot;</span><span class="p">][</span><span class="s2">&quot;w&quot;</span><span class="p">]</span>      <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;w&quot;</span><span class="p">))</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;planet&quot;</span><span class="p">][</span><span class="s2">&quot;w&quot;</span><span class="p">]</span>      <span class="o">=</span> <span class="mf">90.</span>
+            <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;planet&quot;</span><span class="p">][</span><span class="s2">&quot;transit_duration&quot;</span><span class="p">]</span>   <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;transit_duration&quot;</span><span class="p">))</span>
+            <span class="k">try</span><span class="p">:</span> 
+                <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;observation&quot;</span><span class="p">][</span><span class="s2">&quot;norbits&quot;</span><span class="p">]</span>           <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;norbits&quot;</span><span class="p">))</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;observation&quot;</span><span class="p">][</span><span class="s2">&quot;norbits&quot;</span><span class="p">]</span>           <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;observation&quot;</span><span class="p">][</span><span class="s2">&quot;noccultations&quot;</span><span class="p">]</span>         <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;noccultations&quot;</span><span class="p">))</span>
+            <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;observation&quot;</span><span class="p">][</span><span class="s2">&quot;nchan&quot;</span><span class="p">]</span>                 <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;nchan&quot;</span><span class="p">))</span>
+            <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;observation&quot;</span><span class="p">][</span><span class="s2">&quot;scanDirection&quot;</span><span class="p">]</span>         <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;scanDirection&quot;</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;observation&quot;</span><span class="p">][</span><span class="s2">&quot;windowSize&quot;</span><span class="p">]</span>        <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;windowSize&quot;</span><span class="p">))</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;observation&quot;</span><span class="p">][</span><span class="s2">&quot;windowSize&quot;</span><span class="p">]</span>        <span class="o">=</span> <span class="mf">20.</span>
+            <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;observation&quot;</span><span class="p">][</span><span class="s2">&quot;noise_floor&quot;</span><span class="p">]</span>           <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;calculation&quot;</span><span class="p">]</span>                          <span class="o">=</span> <span class="s1">&#39;scale&#39;</span>
+                
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;instrument&quot;</span><span class="p">)</span><span class="o">==</span><span class="s2">&quot;STIS&quot;</span><span class="p">):</span> 
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s2">&quot;reference&quot;</span><span class="p">,</span>
+                               <span class="s2">&quot;stis_input.json&quot;</span><span class="p">))</span> <span class="k">as</span> <span class="n">data_file</span><span class="p">:</span>   
+                <span class="n">pandata</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">data_file</span><span class="p">)</span>       
+                <span class="n">stismode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;stismode&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;instrument&quot;</span><span class="p">)</span><span class="o">==</span><span class="s2">&quot;WFC3&quot;</span><span class="p">):</span> 
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s2">&quot;reference&quot;</span><span class="p">,</span>
+                               <span class="s2">&quot;wfc3_input.json&quot;</span><span class="p">))</span> <span class="k">as</span> <span class="n">data_file</span><span class="p">:</span>
+                <span class="n">pandata</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">data_file</span><span class="p">)</span>  
+                <span class="n">pandata</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">][</span><span class="s1">&#39;detector&#39;</span><span class="p">][</span><span class="s1">&#39;subarray&#39;</span><span class="p">]</span>    <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;subarray&quot;</span><span class="p">)</span>
+                <span class="n">pandata</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">][</span><span class="s1">&#39;detector&#39;</span><span class="p">][</span><span class="s1">&#39;nsamp&#39;</span><span class="p">]</span>       <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;nsamp&quot;</span><span class="p">))</span>
+                <span class="n">pandata</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">][</span><span class="s1">&#39;detector&#39;</span><span class="p">][</span><span class="s1">&#39;samp_seq&#39;</span><span class="p">]</span>    <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;samp_seq&quot;</span><span class="p">)</span>
+                <span class="n">pandata</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">][</span><span class="s1">&#39;instrument&#39;</span><span class="p">][</span><span class="s1">&#39;disperser&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;wfc3mode&quot;</span><span class="p">)</span>
+
+        <span class="n">finaldata</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;pandeia_input&quot;</span><span class="p">:</span> <span class="n">pandata</span> <span class="p">,</span> <span class="s2">&quot;pandexo_input&quot;</span><span class="p">:</span><span class="n">exodata</span><span class="p">}</span>
+
+        <span class="n">task</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">executor</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">wrapper</span><span class="p">,</span> <span class="n">finaldata</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_add_task</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;calcName&quot;</span><span class="p">),</span> <span class="n">task</span><span class="p">)</span>
+
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_task_response_hst</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+        <span class="n">response</span><span class="p">[</span><span class="s1">&#39;info&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">response</span><span class="p">[</span><span class="s1">&#39;location&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;/calculation/statushst/</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+        
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">response</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;/dashboardhst&quot;</span><span class="p">)</span></div></div>
+        
+            
+<div class="viewcode-block" id="CalculationNewSpecHandler"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationNewSpecHandler">[docs]</a><span class="k">class</span> <span class="nc">CalculationNewSpecHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This request handler deals with processing the form data and submitting</span>
+<span class="sd">    a new calculation task to the parallelized workers.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="CalculationNewSpecHandler.get"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationNewSpecHandler.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">&quot;newspec.html&quot;</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CalculationNewSpecHandler.post"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationNewSpecHandler.post">[docs]</a>    <span class="k">def</span> <span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The post method contains the retured data from the form data (</span>
+<span class="sd">        accessed by using `self.get_argument(...)` for specific arguments,</span>
+<span class="sd">        or `self.request.body` to grab the entire returned object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="c1">#print(self.request.body)</span>
+        
+        <span class="nb">id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span><span class="o">+</span><span class="s1">&#39;s&#39;</span>
+        <span class="n">finaldata</span><span class="o">=</span> <span class="p">{}</span>      
+        <span class="n">mols</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">mols</span><span class="p">[</span><span class="s1">&#39;H2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">mols</span><span class="p">[</span><span class="s1">&#39;He&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">try</span><span class="p">:</span> 
+            <span class="n">mols</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol1&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol1_vmr&quot;</span><span class="p">))</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol1_vmr&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;bkg&#39;</span><span class="p">:</span> 
+                <span class="n">mols</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol1&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol1_vmr&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span> 
+            <span class="n">mols</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol2&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol2_vmr&quot;</span><span class="p">))</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol2_vmr&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;bkg&#39;</span><span class="p">:</span> 
+                <span class="n">mols</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol2&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol2_vmr&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span> 
+            <span class="n">mols</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol3&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol3_vmr&quot;</span><span class="p">))</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol3_vmr&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;bkg&#39;</span><span class="p">:</span> 
+                <span class="n">mols</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol3&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol3_vmr&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span> 
+            <span class="n">mols</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol4&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol4_vmr&quot;</span><span class="p">))</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol4_vmr&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;bkg&#39;</span><span class="p">:</span> 
+                <span class="n">mols</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol4&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol4_vmr&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span> 
+            <span class="n">mols</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol5&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol5_vmr&quot;</span><span class="p">))</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol5_vmr&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;bkg&#39;</span><span class="p">:</span> 
+                <span class="n">mols</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol5&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol5_vmr&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span> 
+            <span class="n">mols</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol6&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol6_vmr&quot;</span><span class="p">))</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol6_vmr&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;bkg&#39;</span><span class="p">:</span> 
+                <span class="n">mols</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol6&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol6_vmr&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span> 
+            <span class="n">mols</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol7&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol7_vmr&quot;</span><span class="p">))</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol7_vmr&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;bkg&#39;</span><span class="p">:</span> 
+                <span class="n">mols</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol7&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol7_vmr&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span> 
+            <span class="n">mols</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol8&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol8_vmr&quot;</span><span class="p">))</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol8_vmr&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;bkg&#39;</span><span class="p">:</span> 
+                <span class="n">mols</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol8&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol8_vmr&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span> 
+            <span class="n">mols</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol9&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol9_vmr&quot;</span><span class="p">))</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol9_vmr&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;bkg&#39;</span><span class="p">:</span> 
+                <span class="n">mols</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol9&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol9_vmr&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span> 
+            <span class="n">mols</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol10&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol10_vmr&quot;</span><span class="p">))</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol10_vmr&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;bkg&#39;</span><span class="p">:</span> 
+                <span class="n">mols</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol10&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol10_vmr&quot;</span><span class="p">)</span>
+        
+
+        <span class="n">finaldata</span><span class="p">[</span><span class="s2">&quot;mols&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mols</span>
+        <span class="n">finaldata</span><span class="p">[</span><span class="s1">&#39;T&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">))</span>
+        <span class="n">finaldata</span><span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;g&quot;</span><span class="p">))</span>
+        <span class="n">finaldata</span><span class="p">[</span><span class="s1">&#39;Rp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;Rp&quot;</span><span class="p">))</span>
+        <span class="n">finaldata</span><span class="p">[</span><span class="s1">&#39;R*&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;R*&quot;</span><span class="p">))</span>
+        <span class="n">finaldata</span><span class="p">[</span><span class="s1">&#39;P&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;P&quot;</span><span class="p">))</span>
+        <span class="n">finaldata</span><span class="p">[</span><span class="s1">&#39;P0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;P0&quot;</span><span class="p">))</span>
+        <span class="k">try</span><span class="p">:</span> 
+            <span class="n">finaldata</span><span class="p">[</span><span class="s1">&#39;fracH2He&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;fracH2He&quot;</span><span class="p">))</span>
+        <span class="k">except</span><span class="p">:</span> 
+            <span class="n">finaldata</span><span class="p">[</span><span class="s1">&#39;fracH2He&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">finaldata</span><span class="p">[</span><span class="s1">&#39;taueq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.56</span>
+        <span class="n">task</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">executor</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">computeAlpha</span><span class="p">,</span> <span class="n">finaldata</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_add_task</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;calcName&quot;</span><span class="p">),</span> <span class="n">task</span><span class="p">)</span>
+
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_task_response_spec</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+        <span class="n">response</span><span class="p">[</span><span class="s1">&#39;info&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">response</span><span class="p">[</span><span class="s1">&#39;location&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;/calculation/statusspec/</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+        
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">response</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;/dashboardspec&quot;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="CalculationStatusHandler"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationStatusHandler">[docs]</a><span class="k">class</span> <span class="nc">CalculationStatusHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Handlers returning the status of a particular JWST calculation task.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="CalculationStatusHandler.get"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationStatusHandler.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_task_response</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">closed</span><span class="p">():</span>
+            <span class="k">return</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">response</span><span class="p">))</span></div></div>
+
+<div class="viewcode-block" id="CalculationStatusSpecHandler"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationStatusSpecHandler">[docs]</a><span class="k">class</span> <span class="nc">CalculationStatusSpecHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Handlers returning the status of a particular Spec calculation task.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="CalculationStatusSpecHandler.get"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationStatusSpecHandler.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_task_response_spec</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">closed</span><span class="p">():</span>
+            <span class="k">return</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">response</span><span class="p">))</span> </div></div>
+        
+<div class="viewcode-block" id="CalculationStatusHSTHandler"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationStatusHSTHandler">[docs]</a><span class="k">class</span> <span class="nc">CalculationStatusHSTHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Handlers returning the status of a particular HST calculation task.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="CalculationStatusHSTHandler.get"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationStatusHSTHandler.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_task_response_hst</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">closed</span><span class="p">():</span>
+            <span class="k">return</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">response</span><span class="p">))</span>                </div></div>
+
+<div class="viewcode-block" id="CalculationDownloadHandler"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationDownloadHandler">[docs]</a><span class="k">class</span> <span class="nc">CalculationDownloadHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Handlers returning the downloaded data of a particular calculation task.</span>
+<span class="sd">    Handlers returning the status of a particular calculation task.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="CalculationDownloadHandler.get"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationDownloadHandler.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_task_result</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+  
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">closed</span><span class="p">():</span>
+            <span class="k">return</span>
+        <span class="n">file_name</span> <span class="o">=</span> <span class="s2">&quot;ETC-calculation&quot;</span> <span class="o">+</span><span class="nb">id</span><span class="o">+</span><span class="s2">&quot;.p&quot;</span>
+ 
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">__TEMP__</span><span class="p">,</span><span class="n">file_name</span><span class="p">),</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+ 
+        <span class="n">buf_size</span> <span class="o">=</span> <span class="mi">4096</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_header</span><span class="p">(</span><span class="s1">&#39;Content-Type&#39;</span><span class="p">,</span> <span class="s1">&#39;application/octet-stream&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_header</span><span class="p">(</span><span class="s1">&#39;Content-Disposition&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;attachment; filename=&#39;</span> <span class="o">+</span> <span class="n">file_name</span><span class="p">)</span>
+ 
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">__TEMP__</span><span class="p">,</span><span class="n">file_name</span><span class="p">),</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">buf_size</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="p">:</span>
+                    <span class="k">break</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        
+        <span class="n">allfiles</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">__TEMP__</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">allfiles</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">__TEMP__</span><span class="p">,</span><span class="n">i</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">finish</span><span class="p">()</span></div></div>
+
+<div class="viewcode-block" id="CalculationDownloadSpecHandler"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationDownloadSpecHandler">[docs]</a><span class="k">class</span> <span class="nc">CalculationDownloadSpecHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Handlers returning the downloaded data of a particular calculation task.</span>
+<span class="sd">    Handlers returning the status of a particular calculation task.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="CalculationDownloadSpecHandler.get"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationDownloadSpecHandler.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_task_result</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+  
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">closed</span><span class="p">():</span>
+            <span class="k">return</span>
+        <span class="n">file_name</span> <span class="o">=</span> <span class="s2">&quot;spec-calculation&quot;</span> <span class="o">+</span><span class="nb">id</span><span class="o">+</span><span class="s2">&quot;.p&quot;</span>
+ 
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">__TEMP__</span><span class="p">,</span><span class="n">file_name</span><span class="p">),</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+ 
+        <span class="n">buf_size</span> <span class="o">=</span> <span class="mi">4096</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_header</span><span class="p">(</span><span class="s1">&#39;Content-Type&#39;</span><span class="p">,</span> <span class="s1">&#39;application/octet-stream&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_header</span><span class="p">(</span><span class="s1">&#39;Content-Disposition&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;attachment; filename=&#39;</span> <span class="o">+</span> <span class="n">file_name</span><span class="p">)</span>
+ 
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">__TEMP__</span><span class="p">,</span><span class="n">file_name</span><span class="p">),</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">buf_size</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="p">:</span>
+                    <span class="k">break</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        
+        <span class="n">allfiles</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">__TEMP__</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">allfiles</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">__TEMP__</span><span class="p">,</span><span class="n">i</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">finish</span><span class="p">()</span></div></div>
+
+<div class="viewcode-block" id="CalculationDownloadPandInHandler"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationDownloadPandInHandler">[docs]</a><span class="k">class</span> <span class="nc">CalculationDownloadPandInHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Handlers returning the downloaded data of a particular calculation task.</span>
+<span class="sd">    Handlers returning the status of a particular calculation task.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="CalculationDownloadPandInHandler.get"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationDownloadPandInHandler.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_task_result</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+  
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">closed</span><span class="p">():</span>
+            <span class="k">return</span>
+        <span class="n">file_name</span> <span class="o">=</span> <span class="s2">&quot;PandExo-Input-file&quot;</span><span class="o">+</span><span class="nb">id</span><span class="o">+</span><span class="s2">&quot;.txt&quot;</span>
+ 
+        <span class="c1">#with open(os.path.join(__TEMP__,file_name), &quot;w&quot;) as f:</span>
+        <span class="c1">#    pickle.dump(result, f)</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">__TEMP__</span><span class="p">,</span><span class="n">file_name</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">([</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;w&#39;</span><span class="p">],</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;alpha&#39;</span><span class="p">]]))</span>
+        
+        <span class="n">buf_size</span> <span class="o">=</span> <span class="mi">4096</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_header</span><span class="p">(</span><span class="s1">&#39;Content-Type&#39;</span><span class="p">,</span> <span class="s1">&#39;application/octet-stream&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_header</span><span class="p">(</span><span class="s1">&#39;Content-Disposition&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;attachment; filename=&#39;</span> <span class="o">+</span> <span class="n">file_name</span><span class="p">)</span>
+ 
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">__TEMP__</span><span class="p">,</span><span class="n">file_name</span><span class="p">),</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">buf_size</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="p">:</span>
+                    <span class="k">break</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        
+        <span class="n">allfiles</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">__TEMP__</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">allfiles</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">__TEMP__</span><span class="p">,</span><span class="n">i</span><span class="p">))</span>
+
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">finish</span><span class="p">()</span></div></div>
+
+
+
+<div class="viewcode-block" id="CalculationViewHandler"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationViewHandler">[docs]</a><span class="k">class</span> <span class="nc">CalculationViewHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This handler deals with passing the results from Pandeia to the</span>
+<span class="sd">    `create_component_jwst` function which generates the Bokeh interative plots.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="CalculationViewHandler.get"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationViewHandler.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+        
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_task_result</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+        
+        <span class="n">script</span><span class="p">,</span> <span class="n">div</span> <span class="o">=</span> <span class="n">create_component_jwst</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+        <span class="n">div</span><span class="p">[</span><span class="s1">&#39;timing_div&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;timing_div&#39;</span><span class="p">]</span>
+        <span class="n">div</span><span class="p">[</span><span class="s1">&#39;input_div&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;input_div&#39;</span><span class="p">]</span> 
+        <span class="n">div</span><span class="p">[</span><span class="s1">&#39;warnings_div&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;warnings_div&#39;</span><span class="p">]</span>
+
+        <span class="c1">#delete files</span>
+        <span class="n">allfiles</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">__TEMP__</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">allfiles</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">__TEMP__</span><span class="p">,</span><span class="n">i</span><span class="p">))</span>
+
+        <span class="nb">print</span> <span class="nb">len</span><span class="p">(</span><span class="n">script</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">&quot;view.html&quot;</span><span class="p">,</span> <span class="n">script</span><span class="o">=</span><span class="n">script</span><span class="p">,</span> <span class="n">div</span><span class="o">=</span><span class="n">div</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="CalculationViewSpecHandler"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationViewSpecHandler">[docs]</a><span class="k">class</span> <span class="nc">CalculationViewSpecHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This handler deals with passing the results from Pandeia to the</span>
+<span class="sd">    `create_component_spec` function which generates the Bokeh interative plots.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="CalculationViewSpecHandler.get"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationViewSpecHandler.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_task_result</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+        <span class="n">script</span><span class="p">,</span> <span class="n">div</span> <span class="o">=</span> <span class="n">create_component_spec</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">&quot;viewspec.html&quot;</span><span class="p">,</span> <span class="n">script</span><span class="o">=</span><span class="n">script</span><span class="p">,</span> <span class="n">div</span><span class="o">=</span><span class="n">div</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="CalculationViewHSTHandler"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationViewHSTHandler">[docs]</a><span class="k">class</span> <span class="nc">CalculationViewHSTHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This handler deals with passing the results from Pandeia to the</span>
+<span class="sd">    `create_component_hst` function which generates the Bokeh interative plots.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="CalculationViewHSTHandler.get"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationViewHSTHandler.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_task_result</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+        <span class="n">script</span><span class="p">,</span> <span class="n">div</span> <span class="o">=</span> <span class="n">create_component_hst</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+        <span class="n">div</span><span class="p">[</span><span class="s1">&#39;info_div&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;info_div&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">&quot;viewhst.html&quot;</span><span class="p">,</span> <span class="n">script</span><span class="o">=</span><span class="n">script</span><span class="p">,</span> <span class="n">div</span><span class="o">=</span><span class="n">div</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../engine.html#engine.run_online.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">tornado</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">parse_command_line</span><span class="p">()</span>
+    <span class="n">http_server</span> <span class="o">=</span> <span class="n">tornado</span><span class="o">.</span><span class="n">httpserver</span><span class="o">.</span><span class="n">HTTPServer</span><span class="p">(</span><span class="n">Application</span><span class="p">())</span>
+    <span class="n">http_server</span><span class="o">.</span><span class="n">listen</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">port</span><span class="p">)</span>
+    <span class="n">tornado</span><span class="o">.</span><span class="n">ioloop</span><span class="o">.</span><span class="n">IOLoop</span><span class="o">.</span><span class="n">current</span><span class="p">()</span><span class="o">.</span><span class="n">start</span><span class="p">()</span></div>
+
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Natasha Batalha;Kevin Stevenson.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

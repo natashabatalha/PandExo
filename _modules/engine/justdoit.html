@@ -1,0 +1,489 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>engine.justdoit &mdash; PandExo  documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="PandExo  documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> PandExo
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../includeme.html">PandExo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../includeme.html#running-pandexo-gui">Running PandExo GUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorialjwst.html">JWST Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorialhst.html">HST Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../engine.html">The Code</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../index.html">PandExo</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      
+    <li>engine.justdoit</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for engine.justdoit</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">pandeia.engine.instrument_factory</span> <span class="k">import</span> <span class="n">InstrumentFactory</span>
+<span class="kn">from</span> <span class="nn">pandexo</span> <span class="k">import</span> <span class="n">wrapper</span>
+<span class="kn">import</span> <span class="nn">load_modes</span> <span class="k">as</span> <span class="nn">lm</span>
+<span class="kn">import</span> <span class="nn">os</span> 
+<span class="kn">import</span> <span class="nn">pickle</span> <span class="k">as</span> <span class="nn">pkl</span>
+<span class="kn">from</span> <span class="nn">joblib</span> <span class="k">import</span> <span class="n">Parallel</span><span class="p">,</span> <span class="n">delayed</span>
+<span class="kn">import</span> <span class="nn">multiprocessing</span>
+<span class="kn">import</span> <span class="nn">json</span> 
+
+<span class="n">num_cores</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">()</span>
+
+<span class="n">ALL</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;WFC3 G141&quot;</span><span class="p">:</span><span class="kc">False</span><span class="p">,</span>
+       <span class="s2">&quot;MIRI LRS&quot;</span><span class="p">:</span><span class="kc">False</span><span class="p">,</span>
+       <span class="s2">&quot;NIRISS SOSS_Or1&quot;</span><span class="p">:</span><span class="kc">False</span><span class="p">,</span>
+       <span class="s2">&quot;NIRISS SOSS_Or2&quot;</span><span class="p">:</span><span class="kc">False</span><span class="p">,</span>
+       <span class="s2">&quot;NIRSpec G140M&quot;</span><span class="p">:</span><span class="kc">False</span><span class="p">,</span>
+       <span class="s2">&quot;NIRSpec G140H&quot;</span><span class="p">:</span><span class="kc">False</span><span class="p">,</span>
+       <span class="s2">&quot;NIRSpec G235M&quot;</span><span class="p">:</span><span class="kc">False</span><span class="p">,</span>
+       <span class="s2">&quot;NIRSpec G235H&quot;</span><span class="p">:</span><span class="kc">False</span><span class="p">,</span>
+       <span class="s2">&quot;NIRSpec G395M&quot;</span><span class="p">:</span><span class="kc">False</span><span class="p">,</span>
+       <span class="s2">&quot;NIRSpec G395H&quot;</span><span class="p">:</span><span class="kc">False</span><span class="p">,</span>
+       <span class="s2">&quot;NIRSpec Prism&quot;</span><span class="p">:</span><span class="kc">False</span><span class="p">,</span>
+       <span class="s2">&quot;NIRCam F322W2&quot;</span><span class="p">:</span><span class="kc">False</span><span class="p">,</span>
+       <span class="s2">&quot;NIRCam F444W&quot;</span><span class="p">:</span><span class="kc">False</span><span class="p">}</span>
+
+
+<div class="viewcode-block" id="print_instruments"><a class="viewcode-back" href="../../engine.html#engine.justdoit.print_instruments">[docs]</a><span class="k">def</span> <span class="nf">print_instruments</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Prints a list of the possible instrument templates to load</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">print</span> <span class="s2">&quot;Choose from the following:&quot;</span>
+    <span class="nb">print</span> <span class="n">ALL</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+    <span class="k">return</span></div>
+
+<div class="viewcode-block" id="load_exo_dict"><a class="viewcode-back" href="../../engine.html#engine.justdoit.load_exo_dict">[docs]</a><span class="k">def</span> <span class="nf">load_exo_dict</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Loads in empty exoplanet dictionary for pandexo input</span>
+<span class="sd">    </span>
+<span class="sd">    Loads in empty exoplanet dictionary so that the user can manually edit different planet </span>
+<span class="sd">    parameters. Must be done for every bash run. User must edit each keys within the dictionary. </span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict </span>
+<span class="sd">        Empty dictionary to be filled out by the user before running PandExo</span>
+<span class="sd">    </span>
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    &gt;&gt;&gt; exo_dict = load_exo_dict()</span>
+<span class="sd">    &gt;&gt;&gt; exo_dict[&#39;planet&#39;][&#39;transit_duration&#39;] = 2*60*60 #2 hours</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s2">&quot;reference&quot;</span><span class="p">,</span>
+                               <span class="s2">&quot;exo_input.json&quot;</span><span class="p">))</span> <span class="k">as</span> <span class="n">data_file</span><span class="p">:</span>
+        <span class="n">pandexo_input</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">data_file</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">pandexo_input</span></div>
+    
+<div class="viewcode-block" id="load_mode_dict"><a class="viewcode-back" href="../../engine.html#engine.justdoit.load_mode_dict">[docs]</a><span class="k">def</span> <span class="nf">load_mode_dict</span><span class="p">(</span><span class="n">inst</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Function to pull in correct instrument dictionary </span>
+<span class="sd">    </span>
+<span class="sd">    This is the instrument counterpart to load_exo_dict. It loads in a template instrument </span>
+<span class="sd">    dictionary for a specific instrument mode. </span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    inst : str</span>
+<span class="sd">        One of the allowable instrument keys. To see which instrument modes are available </span>
+<span class="sd">        use `print_instruments()`</span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict </span>
+<span class="sd">        Filled out template of instrument dictionary, which can be editted before </span>
+<span class="sd">        running to PandExo (not required). </span>
+<span class="sd">    </span>
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    &gt;&gt;&gt; inst_dict = load_mode_dict(&#39;MIRI LRS&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; inst_dict[&#39;configuration&#39;][&#39;instrument&#39;][&#39;aperture&#39;] = &#39;lrsslit&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">lm</span><span class="o">.</span><span class="n">SetDefaultModes</span><span class="p">(</span><span class="n">inst</span><span class="p">)</span><span class="o">.</span><span class="n">pick</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="get_thruput"><a class="viewcode-back" href="../../engine.html#engine.justdoit.get_thruput">[docs]</a><span class="k">def</span> <span class="nf">get_thruput</span><span class="p">(</span><span class="n">inst</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns complete instrument photon to electron conversion efficiency</span>
+<span class="sd">    Pulls complete instrument photon to electron conversion efficiency </span>
+<span class="sd">    (PCE) based on instrument key input </span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    inst : str</span>
+<span class="sd">        One of the instrument keys in `print_instruments`</span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    ------- </span>
+<span class="sd">    dict </span>
+<span class="sd">        Dictionary with wave solution and PCE</span>
+<span class="sd">    </span>
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    &gt;&gt;&gt; thru_dict = get_thruput(&#39;NIRISS SOSS_Or1&#39;)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="c1">#pull correct dictionary</span>
+    <span class="n">input_dict</span> <span class="o">=</span> <span class="n">lm</span><span class="o">.</span><span class="n">SetDefaultModes</span><span class="p">(</span><span class="n">inst</span><span class="p">)</span><span class="o">.</span><span class="n">pick</span><span class="p">()</span>
+                             
+    <span class="n">conf</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;instrument&#39;</span><span class="p">:</span> <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;configuration&#39;</span><span class="p">][</span><span class="s1">&#39;instrument&#39;</span><span class="p">]}</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="n">InstrumentFactory</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">conf</span><span class="p">)</span>
+    <span class="n">wr</span> <span class="o">=</span> <span class="n">i</span><span class="o">.</span><span class="n">get_wave_range</span><span class="p">()</span>
+    <span class="n">wave</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">wr</span><span class="p">[</span><span class="s1">&#39;wmin&#39;</span><span class="p">],</span> <span class="n">wr</span><span class="p">[</span><span class="s1">&#39;wmax&#39;</span><span class="p">],</span> <span class="n">num</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+    <span class="n">pce</span> <span class="o">=</span> <span class="n">i</span><span class="o">.</span><span class="n">get_total_eff</span><span class="p">(</span><span class="n">wave</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;wave&#39;</span><span class="p">:</span><span class="n">wave</span><span class="p">,</span><span class="s1">&#39;pce&#39;</span><span class="p">:</span><span class="n">pce</span><span class="p">}</span></div>
+
+<div class="viewcode-block" id="run_param_space"><a class="viewcode-back" href="../../engine.html#engine.justdoit.run_param_space">[docs]</a><span class="k">def</span> <span class="nf">run_param_space</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">exo</span><span class="p">,</span><span class="n">inst</span><span class="p">,</span><span class="n">param_space</span><span class="p">):</span> 
+    <span class="sd">&quot;&quot;&quot;Changes exo dictionary and submits run  </span>
+<span class="sd">    </span>
+<span class="sd">    This function is used to reset the exo dictionary based on what parameter</span>
+<span class="sd">    is being looped over and submits run to `wrapper` so that all the jobs </span>
+<span class="sd">    are run in parallel </span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    i : str or float</span>
+<span class="sd">        Can be either a str or float based on what you are looping through (str for </span>
+<span class="sd">        filenames, float for stellar temps, float for magnitudes, etc)</span>
+<span class="sd">    exo : dict</span>
+<span class="sd">        Exoplanet dictionary which can be loaded in and editted through `load_exo_dict`</span>
+<span class="sd">    inst : str </span>
+<span class="sd">        Key which indicates with instrument </span>
+<span class="sd">    param_space : str </span>
+<span class="sd">        Set of keys within exo_dict to indicate which parameter to loop through. </span>
+<span class="sd">        Should be in the format of &quot;first level of dict&quot;+&quot;second level of dict&quot;. </span>
+<span class="sd">        For example, for stellar temp `param_space` would be &quot;star+temp&quot;</span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        Dictionary with output of pandexo. Key is the value of the parameter that was </span>
+<span class="sd">        looped through.  </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#break up parameter space to two separate dictionary keys</span>
+    <span class="n">key1</span> <span class="o">=</span> <span class="n">param_space</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">param_space</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;+&#39;</span><span class="p">)]</span>
+    <span class="n">key2</span> <span class="o">=</span> <span class="n">param_space</span><span class="p">[</span><span class="n">param_space</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;+&#39;</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="n">param_space</span><span class="p">)]</span>
+    <span class="n">exo</span><span class="p">[</span><span class="n">key1</span><span class="p">][</span><span class="n">key2</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span> 
+    <span class="c1">#load in correct dict format</span>
+    <span class="n">inst_dict</span> <span class="o">=</span> <span class="n">load_mode_dict</span><span class="p">(</span><span class="n">inst</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">))[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="n">wrapper</span><span class="p">({</span><span class="s2">&quot;pandeia_input&quot;</span><span class="p">:</span> <span class="n">inst_dict</span> <span class="p">,</span> <span class="s2">&quot;pandexo_input&quot;</span><span class="p">:</span><span class="n">exo</span><span class="p">})}</span></div>
+
+<div class="viewcode-block" id="run_inst_space"><a class="viewcode-back" href="../../engine.html#engine.justdoit.run_inst_space">[docs]</a><span class="k">def</span> <span class="nf">run_inst_space</span><span class="p">(</span><span class="n">inst</span><span class="p">,</span><span class="n">exo</span><span class="p">):</span> 
+    <span class="sd">&quot;&quot;&quot;Changes inst dictionary and submits run  </span>
+<span class="sd">    </span>
+<span class="sd">    This function is used to reset the instrument dictionary. </span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    exo : dict</span>
+<span class="sd">        Exoplanet dictionary which can be loaded in and editted through `load_exo_dict`</span>
+<span class="sd">    inst : str </span>
+<span class="sd">        Key which indicates with instrument </span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        Dictionary with output of pandexo. Key is the value of the parameter that was </span>
+<span class="sd">        looped through.  </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#load in correct dict format</span>
+    <span class="n">inst_dict</span> <span class="o">=</span> <span class="n">load_mode_dict</span><span class="p">(</span><span class="n">inst</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span><span class="n">inst</span><span class="p">:</span> <span class="n">wrapper</span><span class="p">({</span><span class="s2">&quot;pandeia_input&quot;</span><span class="p">:</span> <span class="n">inst_dict</span> <span class="p">,</span> <span class="s2">&quot;pandexo_input&quot;</span><span class="p">:</span><span class="n">exo</span><span class="p">})}</span></div>
+
+
+<div class="viewcode-block" id="run_pandexo"><a class="viewcode-back" href="../../engine.html#engine.justdoit.run_pandexo">[docs]</a><span class="k">def</span> <span class="nf">run_pandexo</span><span class="p">(</span><span class="n">exo</span><span class="p">,</span> <span class="n">inst</span><span class="p">,</span> <span class="n">param_space</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">param_range</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span><span class="n">save_file</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                            <span class="n">output_path</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="n">output_file</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">):</span>  
+    <span class="sd">&quot;&quot;&quot;Submits multiple runs of pandexo in parallel. </span>
+<span class="sd">    </span>
+<span class="sd">    Functionality: program contains functionality for running single or </span>
+<span class="sd">    multiple runs of PandExo </span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ---------- </span>
+<span class="sd">    exo : dict </span>
+<span class="sd">        exoplanet input dictionary </span>
+<span class="sd">    inst : dict or str or list of str</span>
+<span class="sd">        instrument input dictionary OR LIST of keys (for allowable keys see `print_instruments()`</span>
+<span class="sd">    param_space : str or 0 </span>
+<span class="sd">        (Optional) Default is 0 = no exoplanet parameter space. To run through a parameter </span>
+<span class="sd">        specify which one need to specify two keys from exo dict with + in between. </span>
+<span class="sd">        i.e. observation+fraction</span>
+<span class="sd">        star+temp</span>
+<span class="sd">        planet+exopath</span>
+<span class="sd">    param_range : list of str or list of float</span>
+<span class="sd">        (Optional) An array or list over which to run the parameters space.</span>
+<span class="sd">        i.e. array of temperatures if running through stellar temp or </span>
+<span class="sd">        array of files if running through planet models. Must specify param_space </span>
+<span class="sd">        if using this. </span>
+<span class="sd">    save_file : bool</span>
+<span class="sd">        (Optional) Default = True saves file, False does not </span>
+<span class="sd">    output_path : str</span>
+<span class="sd">        (Optional) Defaults to current working directory</span>
+<span class="sd">    output_file : str </span>
+<span class="sd">        (Optional) Default is &quot;singlerun.p&quot; for single runs, &quot;param_space.p&quot; for exo parameter runs </span>
+<span class="sd">        or &quot;instrument_run.p&quot; for instrument parameter space runs. </span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    ------- </span>
+<span class="sd">    dict </span>
+<span class="sd">        For single run output will just be a single PandExo output dictionary </span>
+<span class="sd">        https://github.com/natashabatalha/PandExo/wiki/PandExo-Output</span>
+<span class="sd">        For multiple runs the output will be organized into a list with each </span>
+<span class="sd">        a dictionary named by whatever you are looping through </span>
+<span class="sd">        i.e. [{&#39;First temp&#39;: PandExoDict}, {&#39;Second temp&#39;: PandExoDict}, etc..]</span>
+<span class="sd">    </span>
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    For single run: </span>
+<span class="sd">    </span>
+<span class="sd">    &gt;&gt;&gt; a = run_pandexo(exo_dict, [&#39;MIRI LRS&#39;])</span>
+<span class="sd">    </span>
+<span class="sd">    For multiple instruments:</span>
+<span class="sd">    </span>
+<span class="sd">    &gt;&gt;&gt; a = run_pandexo(exo_dict, [&#39;MIRI LRS&#39;,&#39;NIRSpec G395H&#39;]</span>
+<span class="sd">    </span>
+<span class="sd">    Loop through a exoplanet parameter (stellar magnitude): </span>
+<span class="sd">    </span>
+<span class="sd">    &gt;&gt;&gt; a = run_pandexo(exo_dict, [&#39;NIRSpec G395M&#39;], </span>
+<span class="sd">            param_space =&#39;star+mag&#39;,param_range = np.linspace(6,10,5))</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1">#single instrument mode with dictionary input OR single planet </span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">inst</span><span class="p">)</span> <span class="o">==</span> <span class="nb">dict</span><span class="p">:</span> 
+        <span class="nb">print</span> <span class="s2">&quot;Running Single Case w/ User Instrument Dict&quot;</span>
+        <span class="n">results</span> <span class="o">=</span><span class="n">wrapper</span><span class="p">({</span><span class="s2">&quot;pandeia_input&quot;</span><span class="p">:</span> <span class="n">inst</span> <span class="p">,</span> <span class="s2">&quot;pandexo_input&quot;</span><span class="p">:</span><span class="n">exo</span><span class="p">})</span>
+        <span class="k">if</span> <span class="n">output_file</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">output_file</span> <span class="o">=</span> <span class="s1">&#39;singlerun.p&#39;</span>
+        <span class="k">if</span> <span class="n">save_file</span><span class="p">:</span> <span class="n">pkl</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span><span class="n">output_file</span><span class="p">),</span><span class="s1">&#39;w&#39;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">results</span>
+
+    <span class="c1">#make sure inst is in list format.. makes my life so much easier</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">inst</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">list</span><span class="p">:</span> 
+            <span class="k">raise</span> <span class="ne">ValueError</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="nb">print</span> <span class="s1">&#39;Instrument input is not dict so must be list&#39;</span>
+        <span class="nb">print</span> <span class="s1">&#39;Enter in format [&quot;NIRSpec G140M&quot;] or [&quot;NIRISS SOSS&quot;,&quot;MIRI LRS&quot;]&#39;</span> 
+        <span class="k">return</span>    
+         
+    <span class="c1">#single instrument mode and single planet OR several planets  </span>
+     
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">inst</span><span class="p">)</span><span class="o">==</span><span class="mi">1</span> <span class="ow">and</span> <span class="n">inst</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;RUN ALL&#39;</span><span class="p">:</span> 
+        
+        <span class="c1">#start case of no parameter space run </span>
+        <span class="k">if</span> <span class="n">param_space</span><span class="o">==</span><span class="mi">0</span> <span class="ow">or</span> <span class="n">param_range</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span> <span class="s2">&quot;Running Single Case for: &quot;</span> <span class="o">+</span> <span class="n">inst</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">inst_dict</span> <span class="o">=</span> <span class="n">load_mode_dict</span><span class="p">(</span><span class="n">inst</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">results</span> <span class="o">=</span><span class="n">wrapper</span><span class="p">({</span><span class="s2">&quot;pandeia_input&quot;</span><span class="p">:</span> <span class="n">inst_dict</span> <span class="p">,</span> <span class="s2">&quot;pandexo_input&quot;</span><span class="p">:</span><span class="n">exo</span><span class="p">})</span>
+            <span class="k">if</span> <span class="n">output_file</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+                <span class="n">output_file</span> <span class="o">=</span> <span class="s1">&#39;singlerun.p&#39;</span>
+            <span class="k">if</span> <span class="n">save_file</span><span class="p">:</span> <span class="n">pkl</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span><span class="n">output_file</span><span class="p">),</span><span class="s1">&#39;w&#39;</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">results</span>
+         
+        <span class="c1">#if there are parameters to cycle through this will run</span>
+        <span class="nb">print</span> <span class="s2">&quot;Running through exo parameters in parallel: &quot;</span> <span class="o">+</span> <span class="n">param_space</span> 
+        <span class="c1">#run the above function in parallel </span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">Parallel</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="n">num_cores</span><span class="p">)(</span><span class="n">delayed</span><span class="p">(</span><span class="n">run_param_space</span><span class="p">)(</span><span class="n">i</span><span class="p">,</span><span class="n">exo</span><span class="p">,</span><span class="n">inst</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">param_space</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">param_range</span><span class="p">)</span>
+        
+        <span class="c1">#Default dump all results [an array of dictionaries] into single file</span>
+        <span class="c1">#and return results immediately to user</span>
+        <span class="k">if</span> <span class="n">output_file</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">output_file</span> <span class="o">=</span> <span class="n">param_space</span> <span class="o">+</span> <span class="s1">&#39;.p&#39;</span>
+
+        <span class="k">if</span> <span class="n">save_file</span><span class="p">:</span> <span class="n">pkl</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span><span class="n">output_file</span><span class="p">),</span><span class="s1">&#39;w&#39;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">results</span>
+        
+    <span class="c1">#run several different instrument modes and single planet</span>
+    <span class="nb">print</span> <span class="s2">&quot;Running select instruments&quot;</span> 
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">inst</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">:</span>
+        
+        <span class="n">results</span> <span class="o">=</span> <span class="n">Parallel</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="n">num_cores</span><span class="p">)(</span><span class="n">delayed</span><span class="p">(</span><span class="n">run_inst_space</span><span class="p">)(</span><span class="n">i</span><span class="p">,</span> <span class="n">exo</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">inst</span><span class="p">)</span>
+
+        <span class="c1">#Default dump all results [an array of dictionaries] into single file</span>
+        <span class="c1">#and return results immediately to user</span>
+        <span class="k">if</span> <span class="n">output_file</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">output_file</span> <span class="o">=</span>  <span class="s1">&#39;instrument_run.p&#39;</span>
+        <span class="k">if</span> <span class="n">save_file</span><span class="p">:</span> <span class="n">pkl</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span><span class="n">output_file</span><span class="p">),</span><span class="s1">&#39;w&#39;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">results</span>
+            
+    <span class="c1">#cycle through all options  </span>
+    <span class="k">elif</span> <span class="n">inst</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;run all&#39;</span><span class="p">:</span>
+        <span class="nb">print</span> <span class="s2">&quot;Running through all instruments&quot;</span>  
+        <span class="n">results</span> <span class="o">=</span> <span class="n">Parallel</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="n">num_cores</span><span class="p">)(</span><span class="n">delayed</span><span class="p">(</span><span class="n">run_inst_space</span><span class="p">)(</span><span class="n">i</span><span class="p">,</span> <span class="n">exo</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">ALL</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    
+        <span class="c1">#Default dump all results [an array of dictionaries] into single file</span>
+        <span class="c1">#and return results immediately to user</span>
+        <span class="k">if</span> <span class="n">output_file</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">output_file</span> <span class="o">=</span>  <span class="s1">&#39;instrument_run.p&#39;</span>
+        <span class="k">if</span> <span class="n">save_file</span><span class="p">:</span> <span class="n">pkl</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span><span class="n">output_file</span><span class="p">),</span><span class="s1">&#39;w&#39;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">results</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Natasha Batalha;Kevin Stevenson.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
