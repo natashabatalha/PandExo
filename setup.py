@@ -42,5 +42,13 @@ except ImportError:
 setup(
     setup_requires=['d2to1>=0.2.11', 'stsci.distutils>=0.3.7'],
     namespace_packages=['pandexo'], packages=['pandexo'],
-    d2to1=True
+    d2to1=True,
+    install_requires=[
+          'bokeh',
+          'tornado',
+          'pandas',
+          'multiprocessing',
+          'joblib',
+          ],
+    dependency_links=['https://github.com/spacetelescope/pysynphot.git@0.9.8.5']
 )

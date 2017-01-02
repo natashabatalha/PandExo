@@ -1,26 +1,24 @@
-PandExo
----------
-A Community Tool for Transiting Exoplanet Science with the JWST
+Getting Started
+---------------
 
-# Dependencies
-For complete description of how to install the following dependencies, please see wiki Installation page.
+Should I install PandExo or use the online interface? 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-- Bokeh
-- Pysynphot
-- Pandeia
+Install if... 
 
-Running PandExo GUI
-------------------- 
+- I will be using PandExo for more than 10 runs 
+- I want to submit bash runs 
+- I want to use the online GUI but don't want to be subject to any slow downs because of high user frequency 
+- I want to be able to use plotting functions to analyze my output 
 
-- To run PandExo in your local broswer simply type in the terminal: 
+Install EVEN if... 
+- I am scared of Python
 
-.. code:: python
+Do not install if...
+- I will only be using PandExo fewer than 10 times
+- I have a student who can install it for me
 
-    import pandexo.engine.run_online as ro
-     ro.main()
+Requires
+~~~~~~~~
 
-- Open up an internet brower and go to:
-localhost:1111 
-
-
-
+- Python >2.7
