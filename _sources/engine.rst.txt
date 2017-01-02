@@ -2,10 +2,26 @@ The Code
 ==============
 
 
-engine.ComputeZ
+engine.justdoit
 ---------------
 
-.. automodule:: engine.ComputeZ
+.. automodule:: engine.justdoit
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+engine.justplotit
+-----------------
+
+.. automodule:: engine.justplotit
+    :members:
+    :undoc-members:
+    :show-inheritance:
+    
+engine.run_online
+-----------------
+
+.. automodule:: engine.run_online
     :members:
     :undoc-members:
     :show-inheritance:
@@ -26,42 +42,10 @@ engine.create_input
     :undoc-members:
     :show-inheritance:
 
-engine.elements
----------------
-
-.. automodule:: engine.elements
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 engine.hst
 ----------
 
 .. automodule:: engine.hst
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-engine.hst_smooth
------------------
-
-.. automodule:: engine.hst_smooth
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-engine.justdoit
----------------
-
-.. automodule:: engine.justdoit
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-engine.justplotit
------------------
-
-.. automodule:: engine.justplotit
     :members:
     :undoc-members:
     :show-inheritance:
@@ -89,14 +73,31 @@ engine.pandexo
     :members:
     :undoc-members:
     :show-inheritance:
+    
+engine.ComputeZ
+---------------
 
-engine.run_online
------------------
-
-.. automodule:: engine.run_online
+.. automodule:: engine.ComputeZ
     :members:
     :undoc-members:
     :show-inheritance:
+
+engine.elements
+---------------
+
+.. automodule:: engine.elements
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+engine.hst_smooth
+-----------------
+
+.. automodule:: engine.hst_smooth
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 
 
 Module contents
