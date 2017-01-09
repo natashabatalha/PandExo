@@ -49,6 +49,7 @@ setup(
           'pandas',
           'multiprocessing',
           'joblib',
+          'pandeia.engine'
           ],
     dependency_links=['https://github.com/spacetelescope/pysynphot.git@0.9.8.5']
 )
