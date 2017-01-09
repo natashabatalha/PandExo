@@ -1,18 +1,15 @@
 JWST Tutorial 
-===============
+=============
 
 This tutorial can be downloaded as a iPython notebook on the PandExo Github. 
 
 .. code:: python
 
-    import warnings
-    warnings.filterwarnings('ignore')
     import pandexo.engine.justdoit as jdi # THIS IS THE HOLY GRAIL OF PANDEXO
-    import numpy as np
-    import os
 
-Editting Inputs
----------------
+
+Editting Input Dictionaries
+---------------------------
 
 Step 1) Load in a blank exoplanet dictionary
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -105,8 +102,8 @@ Change subarray:
 
     inst_dict["configuration"]["detector"]["subarray"] = "sub2048"
 
-Running PandExo
----------------
+Running PandExo Command Line
+----------------------------
 
 You have **four options** for running PandExo. All of them are accessed
 through attribute **jdi.run\_pandexo**. See examples below.
@@ -209,6 +206,21 @@ observation+sat\_level.. etc
     jdi.run_pandexo(exo_dict, ['NIRCam F444W'], param_space = 'observation+sat_level',
                     param_range = np.linspace(.5,1,5),
                    output_path = '/Users/nbatalh1/Desktop/JWSTFUN')
+
+Running PandExo GUI
+-------------------
+The same interface that is available online is also available for use on your machine. 
+Using the GUI is very simple and good alternative if editing the input dictionaries is 
+confusing. 
+
+.. code:: python 
+
+    import pandexo.engine.run_online as ro
+    ro.main()
+
+Then open up your favorite internet browser and go to: http://localhost:1111
+
+.. note:: Some WebApp functions may not be available. For example, noise simulations and transmission and emission modeling are only available online. 
                    
 Analyzing Output
 ----------------
