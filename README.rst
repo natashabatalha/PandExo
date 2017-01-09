@@ -21,4 +21,5 @@ Do not install if...
 Requires
 ~~~~~~~~
 
-- Python >2.7
+- Python >2.7, that's it
+- Pandeia (hopefully we will not have to install this manually) 
