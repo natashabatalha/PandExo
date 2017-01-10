@@ -2,7 +2,7 @@ from bokeh.plotting import show, Figure
 from bokeh.io import output_file as outputfile
 import pickle as pk
 import numpy as np
-
+from bokeh.layouts import row
 def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', output_file = 'data.html',legend = False, 
         R=False,  num_tran = False, plot_width=800, plot_height=400,x_range=[1,10]):
     """Plots 1d simulated spectrum and rebin or rescale for more transits
@@ -224,7 +224,7 @@ def bin_wave_to_R(w, R):
             tracker = max(w)
     return wave
 
-def uniform_tophat_sum(newx,x, y):
+def uniform_tophat_sum(xnew,x, y):
     """Adapted from Mike R. Line to rebin spectra
     
     Takes sum of group of points in bin of wave points 
@@ -251,18 +251,18 @@ def uniform_tophat_sum(newx,x, y):
     >>> newy
     array([ 240.,  250.,  130.])
     """
-    newx = np.array(newx)
-    szmod=newx.shape[0]
+    xnew = np.array(xnew)
+    szmod=xnew.shape[0]
     delta=np.zeros(szmod)
     ynew=np.zeros(szmod)
-    delta[0:-1]=newx[1:]-newx[:-1]  
+    delta[0:-1]=xnew[1:]-xnew[:-1]  
     delta[szmod-1]=delta[szmod-2] 
     #pdb.set_trace()
     for i in range(szmod-1):
         i=i+1
-        loc=np.where((x >= newx[i]-0.5*delta[i-1]) & (x < newx[i]+0.5*delta[i]))
+        loc=np.where((x >= xnew[i]-0.5*delta[i-1]) & (x < xnew[i]+0.5*delta[i]))
         ynew[i]=np.sum(y[loc])
-    loc=np.where((x > newx[0]-0.5*delta[0]) & (x < newx[0]+0.5*delta[0]))
+    loc=np.where((x > xnew[0]-0.5*delta[0]) & (x < xnew[0]+0.5*delta[0]))
     ynew[0]=np.sum(y[loc])
     return ynew
 
@@ -293,18 +293,18 @@ def uniform_tophat_mean(xnew,x, y):
     >>> newy
     array([ 240.,  250.,  130.])
     """
-    xnew = np.array(newx)
-    szmod=newx.shape[0]
+    xnew = np.array(xnew)
+    szmod=xnew.shape[0]
     delta=np.zeros(szmod)
     ynew=np.zeros(szmod)
-    delta[0:-1]=newx[1:]-newx[:-1]  
+    delta[0:-1]=xnew[1:]-xnew[:-1]  
     delta[szmod-1]=delta[szmod-2] 
     #pdb.set_trace()
     for i in range(szmod-1):
         i=i+1
-        loc=np.where((x >= newx[i]-0.5*delta[i-1]) & (x < newx[i]+0.5*delta[i]))
+        loc=np.where((x >= xnew[i]-0.5*delta[i-1]) & (x < xnew[i]+0.5*delta[i]))
         ynew[i]=np.mean(y[loc])
-    loc=np.where((x > newx[0]-0.5*delta[0]) & (x < newx[0]+0.5*delta[0]))
+    loc=np.where((x > xnew[0]-0.5*delta[0]) & (x < xnew[0]+0.5*delta[0]))
     ynew[0]=np.mean(y[loc])
     return ynew
 
@@ -565,7 +565,7 @@ def jwst_2d_sat(result_dict, plot=True, output_file='sat2d.html'):
     return data
     
 def hst_spec(result_dict, plot=True, output_file ='hstspec.html', model = True):
-    """Plot 1d spec with error bars
+    """Plot 1d spec with error bars for hst 
     
     Parameters
     ----------
@@ -573,7 +573,7 @@ def hst_spec(result_dict, plot=True, output_file ='hstspec.html', model = True):
         Dictionary from pandexo output.
     
     plot : bool 
-        (Optional) True renders plot, Flase does not. Default=True
+        (Optional) True renders plot, False does not. Default=True
     model : bool 
         (Optional) Plot model under data. Default=True
     output_file : str
@@ -587,7 +587,10 @@ def hst_spec(result_dict, plot=True, output_file ='hstspec.html', model = True):
         1D spec fp/f* or rp^2/r*^2
     e : numpy array
         1D rms noise
-        
+    modelx : numpy array
+        micron
+    modely : numpy array
+        1D spec fp/f* or rp^2/r*^2        
     See Also
     --------
     hst_time
@@ -626,3 +629,90 @@ def hst_spec(result_dict, plot=True, output_file ='hstspec.html', model = True):
         show(plot_spectrum)
 
     return binwave, binspec, error, mwave, mspec
+
+def hst_time(result_dict, plot=True, output_file ='hsttime.html', model = True):
+    """Plot earliest and latest start times for hst observation
+    
+    Parameters
+    ----------
+    result_dict : dict 
+        Dictionary from pandexo output.
+    
+    plot : bool 
+        (Optional) True renders plot, False does not. Default=True
+    model : bool 
+        (Optional) Plot model under data. Default=True
+    output_file : str
+        (Optional) Default = 'hsttime.html'    
+    
+    Return
+    ------
+    obsphase1 : numpy array
+        earliest start time
+    obstr1 : numpy array
+        white light curve
+    obsphase2 : numpy array
+        latest start time
+    obstr2 : numpy array
+        white light curve
+    rms : numpy array
+        1D rms noise
+
+    See Also
+    --------
+    hst_spec
+    """
+    TOOLS = "pan,wheel_zoom,box_zoom,resize,reset,save"
+    #earliest and latest start times 
+    obsphase1 = result_dict['calc_start_window']['obsphase1']
+    obstr1 = result_dict['calc_start_window']['obstr1']
+    rms = result_dict['calc_start_window']['light_curve_rms']
+    obsphase2 = result_dict['calc_start_window']['obsphase2']
+    obstr2 = result_dict['calc_start_window']['obstr2']
+    phase1 = result_dict['calc_start_window']['phase1']    
+    phase2 = result_dict['calc_start_window']['phase2']
+    trmodel1 = result_dict['calc_start_window']['trmodel1']
+    trmodel2 = result_dict['calc_start_window']['trmodel2']    
+    
+    if isinstance(rms, float):
+        rms = np.zeros(len(obsphase1))+rms
+    y_err1 = []
+    x_err1 = []
+    for px, py, yerr in zip(obsphase1, obstr1, rms):
+        np.array(x_err1.append((px, px)))
+        np.array(y_err1.append((py - yerr, py + yerr)))
+
+    y_err2 = []
+    x_err2 = []
+    for px, py, yerr in zip(obsphase2, obstr2, rms):
+        np.array(x_err2.append((px, px)))
+        np.array(y_err2.append((py - yerr, py + yerr)))
+
+    early = Figure(plot_width=400, plot_height=300,
+                               tools=TOOLS,#responsive=True,
+                                 x_axis_label='Orbital Phase',
+                                 y_axis_label='Flux', 
+                               title="Earliest Start Time")
+    
+    if model: early.line(phase1, trmodel1, color='black',alpha=0.5, line_width = 4)
+    early.circle(obsphase1, obstr1, line_width=3, line_alpha=0.6)
+    early.multi_line(x_err1, y_err1)
+     
+    late = Figure(plot_width=400, plot_height=300, 
+                                tools=TOOLS,#responsive=True,
+                                 x_axis_label='Orbital Phase',
+                                 y_axis_label='Flux', 
+                               title="Latest Start Time")
+    if model: late.line(phase2, trmodel2, color='black',alpha=0.5, line_width = 3)
+    late.circle(obsphase2, obstr2, line_width=3, line_alpha=0.6)
+    late.multi_line(x_err2, y_err2)
+
+    start_time = row(early, late)    
+    
+    if plot: 
+        outputfile(output_file)
+        show(start_time)
+    
+
+    
+    return obsphase1, obstr1, obsphase2, obstr2,rms

@@ -284,7 +284,7 @@ def wfc3_TExoNS(dictinput):
     # Compute number of HST orbits per transit
     # ~96 minutes per HST orbit
     orbitsTr    = trdur*24.*60/96
-    
+
     # Estimate number of good points during planet transit
     # First point in each HST orbit is flagged as bad; therefore, subtract from total
 
@@ -304,6 +304,7 @@ def wfc3_TExoNS(dictinput):
     # Estimate number of good points outside of transit
     # Discard first HST orbit
     ptsOutTr    = (ptsOrbit-1) * (norbits-1) - ptsInTr
+
     
     # Compute transit depth uncertainty per spectrophotometric channel
     ratio       = 10**((refmag - hmag)/2.5)
@@ -324,7 +325,8 @@ def wfc3_TExoNS(dictinput):
             "Maximum pixel fluence (electrons)":fluence,
             "Estimated duty cycle (outside of Earth occultation)": dutyCycle,
             "Transit depth uncertainty(ppm)":deptherr,
-            "Number of channels": nchan}
+            "Number of channels": nchan,
+            "Number of Transits": numTr}
     
     return {"spec_error": deptherr/1e6, "light_curve_rms":chanrms/1e6, "nframes_per_orb":ptsOrbit,"info":info}
 
@@ -454,7 +456,6 @@ def planet_spec(specfile, w_unit, disperser, deptherr, nchan, smooth=None):
         contains following keys {'model_wave','model_spec','binwave','binspec',
         'error','wmin','wmax'}
      '''
-    import matplotlib.pyplot as plt
     # Load model wavelengths and spectrum
     mwave, mspec = np.loadtxt(specfile, unpack=True)
     # Convert wavelength to microns
