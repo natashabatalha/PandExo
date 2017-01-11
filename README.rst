@@ -12,9 +12,11 @@ Install if...
 - I want to be able to use plotting functions to analyze my output 
 
 Install EVEN if... 
+
 - I am scared of Python
 
 Do not install if...
+
 - I will only be using PandExo fewer than 10 times
 - I have a student who can install it for me
 
