@@ -383,14 +383,14 @@ looped through.</p>
 <dl class="function">
 <dt id="engine.justplotit.hst_spec">
 <code class="descclassname">engine.justplotit.</code><code class="descname">hst_spec</code><span class="sig-paren">(</span><em>result_dict</em>, <em>plot=True</em>, <em>output_file='hstspec.html'</em>, <em>model=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/justplotit.html#hst_spec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.justplotit.hst_spec" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plot 1d spec with error bars</p>
+<dd><p>Plot 1d spec with error bars for hst</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>result_dict</strong> (<em>dict</em>) &#8211; Dictionary from pandexo output.</li>
-<li><strong>plot</strong> (<em>bool</em>) &#8211; (Optional) True renders plot, Flase does not. Default=True</li>
+<li><strong>plot</strong> (<em>bool</em>) &#8211; (Optional) True renders plot, False does not. Default=True</li>
 <li><strong>model</strong> (<em>bool</em>) &#8211; (Optional) Plot model under data. Default=True</li>
 <li><strong>output_file</strong> (<em>str</em>) &#8211; (Optional) Default = &#8216;hstspec.html&#8217;</li>
 </ul>
@@ -400,6 +400,8 @@ looped through.</p>
 <li><strong>x</strong> (<em>numpy array</em>) &#8211; micron</li>
 <li><strong>y</strong> (<em>numpy array</em>) &#8211; 1D spec fp/f* or rp^2/r*^2</li>
 <li><strong>e</strong> (<em>numpy array</em>) &#8211; 1D rms noise</li>
+<li><strong>modelx</strong> (<em>numpy array</em>) &#8211; micron</li>
+<li><strong>modely</strong> (<em>numpy array</em>) &#8211; 1D spec fp/f* or rp^2/r*^2</li>
 </ul>
 </p>
 </td>
@@ -408,7 +410,41 @@ looped through.</p>
 </table>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
-<p class="last"><code class="xref py py-func docutils literal"><span class="pre">hst_time()</span></code></p>
+<p class="last"><a class="reference internal" href="#engine.justplotit.hst_time" title="engine.justplotit.hst_time"><code class="xref py py-func docutils literal"><span class="pre">hst_time()</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="engine.justplotit.hst_time">
+<code class="descclassname">engine.justplotit.</code><code class="descname">hst_time</code><span class="sig-paren">(</span><em>result_dict</em>, <em>plot=True</em>, <em>output_file='hsttime.html'</em>, <em>model=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/justplotit.html#hst_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.justplotit.hst_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot earliest and latest start times for hst observation</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>result_dict</strong> (<em>dict</em>) &#8211; Dictionary from pandexo output.</li>
+<li><strong>plot</strong> (<em>bool</em>) &#8211; (Optional) True renders plot, False does not. Default=True</li>
+<li><strong>model</strong> (<em>bool</em>) &#8211; (Optional) Plot model under data. Default=True</li>
+<li><strong>output_file</strong> (<em>str</em>) &#8211; (Optional) Default = &#8216;hsttime.html&#8217;</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><strong>obsphase1</strong> (<em>numpy array</em>) &#8211; earliest start time</li>
+<li><strong>obstr1</strong> (<em>numpy array</em>) &#8211; white light curve</li>
+<li><strong>obsphase2</strong> (<em>numpy array</em>) &#8211; latest start time</li>
+<li><strong>obstr2</strong> (<em>numpy array</em>) &#8211; white light curve</li>
+<li><strong>rms</strong> (<em>numpy array</em>) &#8211; 1D rms noise</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#engine.justplotit.hst_spec" title="engine.justplotit.hst_spec"><code class="xref py py-func docutils literal"><span class="pre">hst_spec()</span></code></a></p>
 </div>
 </dd></dl>
 
@@ -689,7 +725,7 @@ that run_pandexo assigns.</li>
 
 <dl class="function">
 <dt id="engine.justplotit.uniform_tophat_sum">
-<code class="descclassname">engine.justplotit.</code><code class="descname">uniform_tophat_sum</code><span class="sig-paren">(</span><em>newx</em>, <em>x</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/justplotit.html#uniform_tophat_sum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.justplotit.uniform_tophat_sum" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">engine.justplotit.</code><code class="descname">uniform_tophat_sum</code><span class="sig-paren">(</span><em>xnew</em>, <em>x</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/justplotit.html#uniform_tophat_sum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.justplotit.uniform_tophat_sum" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adapted from Mike R. Line to rebin spectra</p>
 <p>Takes sum of group of points in bin of wave points
 :param xnew: New wavelength grid to rebin to

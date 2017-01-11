@@ -416,7 +416,7 @@
     <span class="c1"># Compute number of HST orbits per transit</span>
     <span class="c1"># ~96 minutes per HST orbit</span>
     <span class="n">orbitsTr</span>    <span class="o">=</span> <span class="n">trdur</span><span class="o">*</span><span class="mf">24.</span><span class="o">*</span><span class="mi">60</span><span class="o">/</span><span class="mi">96</span>
-    
+
     <span class="c1"># Estimate number of good points during planet transit</span>
     <span class="c1"># First point in each HST orbit is flagged as bad; therefore, subtract from total</span>
 
@@ -436,6 +436,7 @@
     <span class="c1"># Estimate number of good points outside of transit</span>
     <span class="c1"># Discard first HST orbit</span>
     <span class="n">ptsOutTr</span>    <span class="o">=</span> <span class="p">(</span><span class="n">ptsOrbit</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">norbits</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">ptsInTr</span>
+
     
     <span class="c1"># Compute transit depth uncertainty per spectrophotometric channel</span>
     <span class="n">ratio</span>       <span class="o">=</span> <span class="mi">10</span><span class="o">**</span><span class="p">((</span><span class="n">refmag</span> <span class="o">-</span> <span class="n">hmag</span><span class="p">)</span><span class="o">/</span><span class="mf">2.5</span><span class="p">)</span>
@@ -456,7 +457,8 @@
             <span class="s2">&quot;Maximum pixel fluence (electrons)&quot;</span><span class="p">:</span><span class="n">fluence</span><span class="p">,</span>
             <span class="s2">&quot;Estimated duty cycle (outside of Earth occultation)&quot;</span><span class="p">:</span> <span class="n">dutyCycle</span><span class="p">,</span>
             <span class="s2">&quot;Transit depth uncertainty(ppm)&quot;</span><span class="p">:</span><span class="n">deptherr</span><span class="p">,</span>
-            <span class="s2">&quot;Number of channels&quot;</span><span class="p">:</span> <span class="n">nchan</span><span class="p">}</span>
+            <span class="s2">&quot;Number of channels&quot;</span><span class="p">:</span> <span class="n">nchan</span><span class="p">,</span>
+            <span class="s2">&quot;Number of Transits&quot;</span><span class="p">:</span> <span class="n">numTr</span><span class="p">}</span>
     
     <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;spec_error&quot;</span><span class="p">:</span> <span class="n">deptherr</span><span class="o">/</span><span class="mi">1</span><span class="n">e6</span><span class="p">,</span> <span class="s2">&quot;light_curve_rms&quot;</span><span class="p">:</span><span class="n">chanrms</span><span class="o">/</span><span class="mi">1</span><span class="n">e6</span><span class="p">,</span> <span class="s2">&quot;nframes_per_orb&quot;</span><span class="p">:</span><span class="n">ptsOrbit</span><span class="p">,</span><span class="s2">&quot;info&quot;</span><span class="p">:</span><span class="n">info</span><span class="p">}</span></div>
 
@@ -586,7 +588,6 @@
 <span class="sd">        contains following keys {&#39;model_wave&#39;,&#39;model_spec&#39;,&#39;binwave&#39;,&#39;binspec&#39;,</span>
 <span class="sd">        &#39;error&#39;,&#39;wmin&#39;,&#39;wmax&#39;}</span>
 <span class="sd">     &#39;&#39;&#39;</span>
-    <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
     <span class="c1"># Load model wavelengths and spectrum</span>
     <span class="n">mwave</span><span class="p">,</span> <span class="n">mspec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">specfile</span><span class="p">,</span> <span class="n">unpack</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="c1"># Convert wavelength to microns</span>
