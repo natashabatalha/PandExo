@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Python Module Index &mdash; PandExo  documentation</title>
+  <title>Possible Instrument Input Params &mdash; PandExo  documentation</title>
   
 
   
@@ -34,9 +34,8 @@
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
     <link rel="top" title="PandExo  documentation" href="index.html"/>
- 
-
-
+        <link rel="next" title="Py Dict Structure of JWST Output" href="jwstdict.html"/>
+        <link rel="prev" title="JWST Tutorial" href="tutorialjwst.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -81,11 +80,21 @@
           
             
             
-                <ul>
+                <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="includeme.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorialjwst.html">JWST Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="jwstinput.html">Possible Instrument Input Params</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Possible Instrument Input Params</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#nirspec">NIRSpec</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#grisms-filter-combinations">Grisms/Filter combinations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#subarrays">Subarrays</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#niriss">NIRISS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#nircam">NIRCam</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#miri">MIRI</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="jwstdict.html">Py Dict Structure of JWST Output</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorialhst.html">HST Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="engine.html">The Code</a></li>
@@ -111,7 +120,7 @@
         <div class="rst-content">
           
 
-
+ 
 
 
 
@@ -119,9 +128,11 @@
   <ul class="wy-breadcrumbs">
     <li><a href="index.html">Docs</a> &raquo;</li>
       
-    <li></li>
+    <li>Possible Instrument Input Params</li>
       <li class="wy-breadcrumbs-aside">
         
+          
+            <a href="_sources/jwstinput.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -131,89 +142,43 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-
-   <h1>Python Module Index</h1>
-
-   <div class="modindex-jumpbox">
-   <a href="#cap-e"><strong>e</strong></a>
-   </div>
-
-   <table class="indextable modindextable">
-     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
-     <tr class="cap" id="cap-e"><td></td><td>
-       <strong>e</strong></td><td></td></tr>
-     <tr>
-       <td><img src="_static/minus.png" class="toggler"
-              id="toggle-1" style="display: none" alt="-" /></td>
-       <td>
-       <a href="engine.html#module-engine"><code class="xref">engine</code></a></td><td>
-       <em></em></td></tr>
-     <tr class="cg-1">
-       <td></td>
-       <td>&#160;&#160;&#160;
-       <a href="engine.html#module-engine.compute_noise"><code class="xref">engine.compute_noise</code></a></td><td>
-       <em></em></td></tr>
-     <tr class="cg-1">
-       <td></td>
-       <td>&#160;&#160;&#160;
-       <a href="engine.html#module-engine.ComputeZ"><code class="xref">engine.ComputeZ</code></a></td><td>
-       <em></em></td></tr>
-     <tr class="cg-1">
-       <td></td>
-       <td>&#160;&#160;&#160;
-       <a href="engine.html#module-engine.create_input"><code class="xref">engine.create_input</code></a></td><td>
-       <em></em></td></tr>
-     <tr class="cg-1">
-       <td></td>
-       <td>&#160;&#160;&#160;
-       <a href="engine.html#module-engine.elements"><code class="xref">engine.elements</code></a></td><td>
-       <em></em></td></tr>
-     <tr class="cg-1">
-       <td></td>
-       <td>&#160;&#160;&#160;
-       <a href="engine.html#module-engine.hst"><code class="xref">engine.hst</code></a></td><td>
-       <em></em></td></tr>
-     <tr class="cg-1">
-       <td></td>
-       <td>&#160;&#160;&#160;
-       <a href="engine.html#module-engine.hst_smooth"><code class="xref">engine.hst_smooth</code></a></td><td>
-       <em></em></td></tr>
-     <tr class="cg-1">
-       <td></td>
-       <td>&#160;&#160;&#160;
-       <a href="engine.html#module-engine.justdoit"><code class="xref">engine.justdoit</code></a></td><td>
-       <em></em></td></tr>
-     <tr class="cg-1">
-       <td></td>
-       <td>&#160;&#160;&#160;
-       <a href="engine.html#module-engine.justplotit"><code class="xref">engine.justplotit</code></a></td><td>
-       <em></em></td></tr>
-     <tr class="cg-1">
-       <td></td>
-       <td>&#160;&#160;&#160;
-       <a href="engine.html#module-engine.jwst"><code class="xref">engine.jwst</code></a></td><td>
-       <em></em></td></tr>
-     <tr class="cg-1">
-       <td></td>
-       <td>&#160;&#160;&#160;
-       <a href="engine.html#module-engine.load_modes"><code class="xref">engine.load_modes</code></a></td><td>
-       <em></em></td></tr>
-     <tr class="cg-1">
-       <td></td>
-       <td>&#160;&#160;&#160;
-       <a href="engine.html#module-engine.pandexo"><code class="xref">engine.pandexo</code></a></td><td>
-       <em></em></td></tr>
-     <tr class="cg-1">
-       <td></td>
-       <td>&#160;&#160;&#160;
-       <a href="engine.html#module-engine.run_online"><code class="xref">engine.run_online</code></a></td><td>
-       <em></em></td></tr>
-   </table>
+  <div class="section" id="possible-instrument-input-params">
+<h1>Possible Instrument Input Params<a class="headerlink" href="#possible-instrument-input-params" title="Permalink to this headline">¶</a></h1>
+<p>Below are all the possible instrument input parameters, which match
+the JWST APT (downloadable here).</p>
+<div class="section" id="nirspec">
+<h2>NIRSpec<a class="headerlink" href="#nirspec" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="grisms-filter-combinations">
+<h3>Grisms/Filter combinations<a class="headerlink" href="#grisms-filter-combinations" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="subarrays">
+<h3>Subarrays<a class="headerlink" href="#subarrays" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="section" id="niriss">
+<h2>NIRISS<a class="headerlink" href="#niriss" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="nircam">
+<h2>NIRCam<a class="headerlink" href="#nircam" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="miri">
+<h2>MIRI<a class="headerlink" href="#miri" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
 
 
            </div>
           </div>
           <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="jwstdict.html" class="btn btn-neutral float-right" title="Py Dict Structure of JWST Output" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="tutorialjwst.html" class="btn btn-neutral" title="JWST Tutorial" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
   
 
   <hr/>

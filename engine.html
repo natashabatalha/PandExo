@@ -83,6 +83,8 @@
 <li class="toctree-l1"><a class="reference internal" href="includeme.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorialjwst.html">JWST Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="jwstinput.html">Possible Instrument Input Params</a></li>
+<li class="toctree-l1"><a class="reference internal" href="jwstdict.html">Py Dict Structure of JWST Output</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorialhst.html">HST Tutorial</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">The Code</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#module-engine.justdoit">engine.justdoit</a></li>
@@ -1849,10 +1851,10 @@ error if saturation occurs. This routine assumes that min ngroups is 2.</p>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Maximum exposure time per integration, nframes, nskip, frame time</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Maximum exposure time per integration before specified saturation level</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">dict</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">float</p>
 </td>
 </tr>
 </tbody>
@@ -1860,7 +1862,7 @@ error if saturation occurs. This routine assumes that min ngroups is 2.</p>
 <p class="rubric">Examples</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">max_time</span> <span class="o">=</span> <span class="n">compute_maxexptime_per_int</span><span class="p">(</span><span class="n">pandeia_input</span><span class="p">,</span> <span class="mf">50000.0</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">max_time</span>
-<span class="go">{&#39;maxexptime_per_int&#39;:12.0, &#39;nframe&#39;:1, &#39;nskip&#39;:0, &#39;exptime_per_frame&#39;: 0.55}</span>
+<span class="go">12.0</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -1904,9 +1906,9 @@ JWST terminology:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">timing</span><span class="p">,</span> <span class="n">flags</span> <span class="o">=</span> <span class="n">compute_timing</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="mf">60.0</span><span class="o">*</span><span class="mf">60.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">timing</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
 <span class="go">[&#39;Number of Transits&#39;, &#39;Num Integrations Out of Transit&#39;, &#39;Num Integrations In Transit&#39;,</span>
-<span class="go">&#39;Num Groups per Integration&#39;, &#39;Seconds per Frame&#39;, &#39;Observing Efficiency (%)&#39;, &#39;On Source Time(sec)&#39;,</span>
+<span class="go">&#39;APT: Num Groups per Integration&#39;, &#39;Seconds per Frame&#39;, &#39;Observing Efficiency (%)&#39;, &#39;On Source Time(sec)&#39;,</span>
 <span class="go">&#39;Exposure Time Per Integration (secs)&#39;, &#39;Reset time Plus 30 min TA time (hrs)&#39;,</span>
-<span class="go">&#39;Num Integrations per Occultation&#39;, &#39;Transit Duration&#39;]</span>
+<span class="go">&#39;APT: Num Integrations per Occultation&#39;, &#39;Transit Duration&#39;]</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -2020,8 +2022,7 @@ they should load in the dictionary and then edit individual keys.</p>
 <dt>Included modes are:</dt>
 <dd><ul class="first last simple">
 <li>&#8220;MIRI LRS&#8221;</li>
-<li>&#8220;NIRISS SOSS_Or1&#8221;</li>
-<li>&#8220;NIRISS SOSS_Or2&#8221;</li>
+<li>&#8220;NIRISS SOSS&#8221;</li>
 <li>&#8220;NIRSpec G140M&#8221;</li>
 <li>&#8220;NIRSpec G140H&#8221;</li>
 <li>&#8220;NIRSpec G235M&#8221;</li>

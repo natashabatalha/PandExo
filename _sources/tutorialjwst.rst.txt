@@ -29,13 +29,13 @@ result in nonsense runs
 
 .. code:: python
 
-    exo_dict['observation']['sat_level'] = 80 #saturation level in percent of full well 
+    exo_dict['observation']['sat_level'] = 80    #saturation level in percent of full well 
     exo_dict['observation']['noccultations'] = 2 #number of transits 
-    #fixed binning. I usually suggest ZERO binning.. you can always bin later 
-    #without having to redo the calcualtion
-    exo_dict['observation']['fraction'] = 1.0 #fraction of time in transit versus out = in/out
-    exo_dict['observation']['noise_floor'] = 0 #this can be a fixed level or it can be a filepath 
-    #to a wavelength dependent noise floor solution (units are ppm)
+    exo_dict['observation']['R'] = None          #fixed binning. I usually suggest ZERO binning.. you can always bin later 
+                                                 #without having to redo the calcualtion
+    exo_dict['observation']['fraction'] = 1.0    #fraction of time in transit versus out = in/out
+    exo_dict['observation']['noise_floor'] = 0   #this can be a fixed level or it can be a filepath 
+                                                 #to a wavelength dependent noise floor solution (units are ppm)
 
 Edit exoplanet star inputs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -47,12 +47,12 @@ and logg, but you **do** need to provide units and starpath.
 
 .. code:: python
 
-    exo_dict['star']['type'] = 'phoenix' #phoenix or user (if you have your own)
-    exo_dict['star']['mag'] = 8.0 #magnitude of the system
-    exo_dict['star']['ref_wave'] = 1.25 #always add this in micron
-    exo_dict['star']['temp'] = 5500 #in K 
-    exo_dict['star']['metal'] = 0.0 # as log Fe/H
-    exo_dict['star']['logg'] = 4.0 #log surface gravity cgs
+    exo_dict['star']['type'] = 'phoenix'        #phoenix or user (if you have your own)
+    exo_dict['star']['mag'] = 8.0               #magnitude of the system
+    exo_dict['star']['ref_wave'] = 1.25         #For J mag = 1.25, H = 1.6, K =2.22.. etc (all in micron)
+    exo_dict['star']['temp'] = 5500             #in K 
+    exo_dict['star']['metal'] = 0.0             # as log Fe/H
+    exo_dict['star']['logg'] = 4.0              #log surface gravity cgs
 
 Edit exoplanet planet inputs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -60,17 +60,18 @@ Edit exoplanet planet inputs
 .. code:: python
 
     exo_dict['planet']['exopath'] = '/Users/nbatalh1/Desktop/Simulations/wasp12b.txt'
-    exo_dict['planet']['w_unit'] = 'cm' #other options include "um", "Angs", "secs" (for phase curves)
-    exo_dict['planet']['f_unit'] = 'rp^2/r*^2' #other options are 'fp/f*' 
-    exo_dict['planet']['transit_duration'] = 2.0*60.0*60.0 #transit duration in seconds
+    exo_dict['planet']['w_unit'] = 'cm'                      #other options include "um", "Angs", "secs" (for phase curves)
+    exo_dict['planet']['f_unit'] = 'rp^2/r*^2'               #other options are 'fp/f*' 
+    exo_dict['planet']['transit_duration'] = 2.0*60.0*60.0   #transit duration in seconds
 
 Step 2) Load in instrument dictionary (optional)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Step 2 is optional because PandExo has the functionality to
-automatically load in the most popular instrument dictionaries (see Option 1 below). There is additional 
-fine tuning that can be done within each of these observing modes. For example, subarrays and 
-readmodes will be the most common thing to change if you want to do some fine tuning. 
+Step 2 is optional because PandExo has templates for the most 
+common modes. Within those templates the subarrays selected are the ones 
+with the lowest frame times, and the read modes selected are the ones with one frame
+per 1 group (standard). If this suits you see Option 1 below. There is additional 
+fine tuning that can be done within each of these observing modes.  
 As a first pass, I'd suggest skipping this for now. Then come back and fine tune after your first run. 
 
     - NIRCam F444W 
@@ -83,24 +84,40 @@ As a first pass, I'd suggest skipping this for now. Then come back and fine tune
     - NIRSpec G140M 
     - NIRSpec G140H 
     - MIRI LRS 
-    - NIRISS SOSS\_Or1 
-    - NIRISS SOSS\_Or2
+    - NIRISS SOSS
 
 .. code:: python
 
     jdi.print_instruments()
+
+::
+
     Choose from the following:
-    ['NIRCam F444W', 'NIRSpec Prism', 'NIRSpec G395M', 'NIRCam F322W2', 'NIRSpec G395H', 'NIRSpec G235H', 'NIRSpec G235M', 'NIRSpec G140M', 'NIRSpec G140H', 'MIRI LRS', 'NIRISS SOSS_Or1', 'NIRISS SOSS_Or2', 'WFC3 G141']
+    ['NIRCam F444W', 'NIRSpec Prism', 'NIRSpec G395M', 'NIRCam F322W2', 'NIRSpec G395H', 'NIRSpec G235H', 'NIRSpec G235M', 'NIRSpec G140M', 'NIRSpec G140H', 'MIRI LRS', 'NIRISS SOSS', 'WFC3 G141']
 
 .. code:: python
 
-    inst_dict = jdi.load_mode_dict('NIRSpec G140M')
+    inst_dict = jdi.load_mode_dict('NIRSpec Prism')
 
 Change subarray: 
 
 .. code:: python
 
-    inst_dict["configuration"]["detector"]["subarray"] = "sub2048"
+    inst_dict["configuration"]["detector"]["subarray"] = 'sub512'
+
+Change the read mode 
+
+.. code:: python 
+    
+    inst_dict["configuration"]["detector"]["readmode"] = 'nrs' 
+
+The last thing to note is that PandExo (by Default) optimizes the amount of groups 
+that can fit into an integration. If you want to set your own number of groups you can 
+change that too. 
+
+..code:: python 
+
+    inst_dict["configuration"]["detector"]["ngroup"] = 5
 
 Running PandExo Command Line
 ----------------------------
@@ -114,7 +131,7 @@ Option 1- Run single instrument mode, single planet
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If you forget which instruments are available run
-**jdi.print\_isntruments()** and pick one
+**jdi.print\_instruments()** and pick one
 
 .. code:: python
 
@@ -220,7 +237,7 @@ confusing.
 
 Then open up your favorite internet browser and go to: http://localhost:1111
 
-.. note:: Some WebApp functions may not be available. For example, noise simulations and transmission and emission modeling are only available online. 
+.. note:: Some WebApp functions may not be available. For example, the precomputed noise simulations and transmission and emission modeling are only available online. 
                    
 Analyzing Output
 ----------------

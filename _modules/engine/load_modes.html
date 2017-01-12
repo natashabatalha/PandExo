@@ -83,6 +83,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../../includeme.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorialjwst.html">JWST Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../jwstinput.html">Possible Instrument Input Params</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../jwstdict.html">Py Dict Structure of JWST Output</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorialhst.html">HST Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../engine.html">The Code</a></li>
 </ul>
@@ -146,8 +148,7 @@
 <span class="sd">    </span>
 <span class="sd">    Included modes are: </span>
 <span class="sd">       - &quot;MIRI LRS&quot;</span>
-<span class="sd">       - &quot;NIRISS SOSS_Or1&quot;</span>
-<span class="sd">       - &quot;NIRISS SOSS_Or2&quot;</span>
+<span class="sd">       - &quot;NIRISS SOSS&quot;</span>
 <span class="sd">       - &quot;NIRSpec G140M&quot;</span>
 <span class="sd">       - &quot;NIRSpec G140H&quot;</span>
 <span class="sd">       - &quot;NIRSpec G235M&quot;</span>
@@ -193,15 +194,10 @@
         <span class="sd">&quot;&quot;&quot;Handles NIRISS template</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1">#need to add in functionality for two orders, right now you only have option to do sub80</span>
-        <span class="n">order</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="mi">7</span><span class="p">])</span>
         
-        <span class="n">subarray</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;2&#39;</span><span class="p">:</span><span class="s1">&#39;substrip80&#39;</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span><span class="s1">&#39;substrip80&#39;</span><span class="p">}</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s2">&quot;reference&quot;</span><span class="p">,</span>
                                <span class="s2">&quot;niriss_input.json&quot;</span><span class="p">))</span> <span class="k">as</span> <span class="n">data_file</span><span class="p">:</span>
             <span class="n">pandeia_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">data_file</span><span class="p">)</span>
-            <span class="n">pandeia_data</span><span class="p">[</span><span class="s2">&quot;strategy&quot;</span><span class="p">][</span><span class="s2">&quot;order&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">order</span>
-            <span class="n">pandeia_data</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">][</span><span class="s2">&quot;detector&quot;</span><span class="p">][</span><span class="s2">&quot;subarray&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">subarray</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">order</span><span class="p">)]</span>
-            <span class="n">pandeia_data</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">][</span><span class="s2">&quot;instrument&quot;</span><span class="p">][</span><span class="s2">&quot;disperser&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pandeia_data</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">][</span><span class="s2">&quot;instrument&quot;</span><span class="p">][</span><span class="s2">&quot;disperser&quot;</span><span class="p">]</span> <span class="c1">#+&#39;_&#39;+str(order) </span>
         <span class="k">return</span> <span class="n">pandeia_data</span></div>
         
 <div class="viewcode-block" id="SetDefaultModes.nirspec"><a class="viewcode-back" href="../../engine.html#engine.load_modes.SetDefaultModes.nirspec">[docs]</a>    <span class="k">def</span> <span class="nf">nirspec</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

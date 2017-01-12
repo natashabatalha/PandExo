@@ -83,6 +83,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../../includeme.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorialjwst.html">JWST Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../jwstinput.html">Possible Instrument Input Params</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../jwstdict.html">Py Dict Structure of JWST Output</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorialhst.html">HST Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../engine.html">The Code</a></li>
 </ul>
@@ -185,7 +187,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">inn</span> <span class="o">=</span> <span class="n">inn</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">out</span> <span class="o">=</span> <span class="n">out</span> 
         <span class="bp">self</span><span class="o">.</span><span class="n">exptime_per_int</span> <span class="o">=</span> <span class="n">timing</span><span class="p">[</span><span class="s2">&quot;Exposure Time Per Integration (secs)&quot;</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ngroups_per_int</span> <span class="o">=</span> <span class="n">timing</span><span class="p">[</span><span class="s2">&quot;Num Groups per Integration&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ngroups_per_int</span> <span class="o">=</span> <span class="n">timing</span><span class="p">[</span><span class="s2">&quot;APT: Num Groups per Integration&quot;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nocc</span> <span class="o">=</span> <span class="n">timing</span><span class="p">[</span><span class="s2">&quot;Number of Transits&quot;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nint_out</span> <span class="o">=</span> <span class="n">timing</span><span class="p">[</span><span class="s2">&quot;Num Integrations Out of Transit&quot;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nint_in</span> <span class="o">=</span> <span class="n">timing</span><span class="p">[</span><span class="s2">&quot;Num Integrations In Transit&quot;</span><span class="p">]</span>

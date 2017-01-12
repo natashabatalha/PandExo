@@ -18,6 +18,8 @@ Contents:
    includeme 
    installation
    tutorialjwst
+   jwstinput
+   jwstdict
    tutorialhst
    engine
 

@@ -83,6 +83,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../../includeme.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorialjwst.html">JWST Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../jwstinput.html">Possible Instrument Input Params</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../jwstdict.html">Py Dict Structure of JWST Output</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorialhst.html">HST Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../engine.html">The Code</a></li>
 </ul>
@@ -194,13 +196,32 @@
 
     <span class="c1">#which instrument </span>
     <span class="n">instrument</span> <span class="o">=</span> <span class="n">pandeia_input</span><span class="p">[</span><span class="s1">&#39;configuration&#39;</span><span class="p">][</span><span class="s1">&#39;instrument&#39;</span><span class="p">][</span><span class="s1">&#39;instrument&#39;</span><span class="p">]</span>
-    <span class="n">conf</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;instrument&#39;</span><span class="p">:</span> <span class="n">pandeia_input</span><span class="p">[</span><span class="s1">&#39;configuration&#39;</span><span class="p">][</span><span class="s1">&#39;instrument&#39;</span><span class="p">]}</span>
-    <span class="n">i</span> <span class="o">=</span> <span class="n">InstrumentFactory</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">conf</span><span class="p">)</span>
-    <span class="n">det_pars</span> <span class="o">=</span> <span class="n">i</span><span class="o">.</span><span class="n">get_detector_pars</span><span class="p">()</span>
+    <span class="n">conf</span> <span class="o">=</span> <span class="n">pandeia_input</span><span class="p">[</span><span class="s1">&#39;configuration&#39;</span><span class="p">]</span>
+    
+    <span class="c1">#if optimize is in the ngroups section, this will throw an error </span>
+    <span class="c1">#so create temp conf with 2 groups </span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">InstrumentFactory</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">conf</span><span class="p">)</span>
+        <span class="n">det_pars</span> <span class="o">=</span> <span class="n">i</span><span class="o">.</span><span class="n">get_detector_pars</span><span class="p">()</span>
+        <span class="n">exp_pars</span> <span class="o">=</span> <span class="n">i</span><span class="o">.</span><span class="n">get_exposure_pars</span><span class="p">()</span>
+    <span class="k">except</span><span class="p">:</span> 
+        <span class="n">conf_temp</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span> 
+        <span class="n">conf_temp</span><span class="p">[</span><span class="s1">&#39;detector&#39;</span><span class="p">][</span><span class="s1">&#39;ngroup&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span> 
+        <span class="n">i</span> <span class="o">=</span> <span class="n">InstrumentFactory</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">conf_temp</span><span class="p">)</span>
+        <span class="n">det_pars</span> <span class="o">=</span> <span class="n">i</span><span class="o">.</span><span class="n">get_detector_pars</span><span class="p">()</span>
+        <span class="n">exp_pars</span> <span class="o">=</span> <span class="n">i</span><span class="o">.</span><span class="n">get_exposure_pars</span><span class="p">()</span>
+        
+    <span class="c1">#detector parameters</span>
     <span class="n">fullwell</span> <span class="o">=</span> <span class="n">det_pars</span><span class="p">[</span><span class="s1">&#39;fullwell&#39;</span><span class="p">]</span>
     <span class="n">rn</span> <span class="o">=</span> <span class="n">det_pars</span><span class="p">[</span><span class="s1">&#39;rn&#39;</span><span class="p">]</span>
     <span class="n">sat_level</span> <span class="o">=</span> <span class="n">pandexo_input</span><span class="p">[</span><span class="s1">&#39;observation&#39;</span><span class="p">][</span><span class="s1">&#39;sat_level&#39;</span><span class="p">]</span><span class="o">/</span><span class="mf">100.0</span><span class="o">*</span><span class="n">fullwell</span>
-
+    <span class="n">mingroups</span> <span class="o">=</span> <span class="n">det_pars</span><span class="p">[</span><span class="s1">&#39;mingroups&#39;</span><span class="p">]</span>
+    
+    <span class="c1">#exposure parameters </span>
+    <span class="n">tframe</span> <span class="o">=</span> <span class="n">exp_pars</span><span class="o">.</span><span class="n">tframe</span>
+    <span class="n">nframe</span> <span class="o">=</span> <span class="n">exp_pars</span><span class="o">.</span><span class="n">nframe</span>
+    <span class="n">nskip</span> <span class="o">=</span> <span class="n">exp_pars</span><span class="o">.</span><span class="n">nskip</span>
+    
     <span class="c1">#parameteres needed from exo_input</span>
     <span class="n">mag</span> <span class="o">=</span> <span class="n">pandexo_input</span><span class="p">[</span><span class="s1">&#39;star&#39;</span><span class="p">][</span><span class="s1">&#39;mag&#39;</span><span class="p">]</span>
     
@@ -226,11 +247,15 @@
     <span class="c1">#add to pandeia input </span>
     <span class="n">pandeia_input</span><span class="p">[</span><span class="s1">&#39;scene&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;spectrum&#39;</span><span class="p">][</span><span class="s1">&#39;sed&#39;</span><span class="p">][</span><span class="s1">&#39;spectrum&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">out_spectrum</span>
     
-    <span class="c1">#run pandeia once to determine max exposure time per int and get exposure params</span>
-    <span class="nb">print</span> <span class="s2">&quot;Computing Duty Cycle&quot;</span>
-    <span class="n">m</span> <span class="o">=</span> <span class="n">compute_maxexptime_per_int</span><span class="p">(</span><span class="n">pandeia_input</span><span class="p">,</span> <span class="n">sat_level</span><span class="p">)</span> 
-    <span class="n">extraction_area</span> <span class="o">=</span> <span class="n">m</span><span class="p">[</span><span class="s1">&#39;extraction_area&#39;</span><span class="p">]</span>
-    <span class="nb">print</span> <span class="s2">&quot;Finished Duty Cucle Calc&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pandeia_input</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">][</span><span class="s2">&quot;detector&quot;</span><span class="p">][</span><span class="s2">&quot;ngroup&quot;</span><span class="p">],</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span><span class="nb">int</span><span class="p">)):</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;ngroup&quot;</span><span class="p">:</span><span class="n">pandeia_input</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">][</span><span class="s2">&quot;detector&quot;</span><span class="p">][</span><span class="s2">&quot;ngroup&quot;</span><span class="p">],</span> <span class="s2">&quot;tframe&quot;</span><span class="p">:</span><span class="n">tframe</span><span class="p">,</span>
+            <span class="s2">&quot;nframe&quot;</span><span class="p">:</span><span class="n">nframe</span><span class="p">,</span><span class="s2">&quot;mingroups&quot;</span><span class="p">:</span><span class="n">mingroups</span><span class="p">,</span><span class="s2">&quot;nskip&quot;</span><span class="p">:</span><span class="n">nskip</span><span class="p">}</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1">#run pandeia once to determine max exposure time per int and get exposure params</span>
+        <span class="nb">print</span> <span class="s2">&quot;Optimization Reqested: Computing Duty Cycle&quot;</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;maxexptime_per_int&quot;</span><span class="p">:</span><span class="n">compute_maxexptime_per_int</span><span class="p">(</span><span class="n">pandeia_input</span><span class="p">,</span> <span class="n">sat_level</span><span class="p">)</span> <span class="p">,</span> 
+            <span class="s2">&quot;tframe&quot;</span><span class="p">:</span><span class="n">tframe</span><span class="p">,</span><span class="s2">&quot;nframe&quot;</span><span class="p">:</span><span class="n">nframe</span><span class="p">,</span><span class="s2">&quot;mingroups&quot;</span><span class="p">:</span><span class="n">mingroups</span><span class="p">,</span><span class="s2">&quot;nskip&quot;</span><span class="p">:</span><span class="n">nskip</span><span class="p">}</span>
+        <span class="nb">print</span> <span class="s2">&quot;Finished Duty Cycle Calc&quot;</span>
 
     <span class="c1">#calculate all timing info</span>
     <span class="n">timing</span><span class="p">,</span> <span class="n">flags</span> <span class="o">=</span> <span class="n">compute_timing</span><span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="n">transit_duration</span><span class="p">,</span><span class="n">expfact_out</span><span class="p">,</span><span class="n">noccultations</span><span class="p">)</span>
@@ -238,6 +263,11 @@
     <span class="c1">#Simulate out trans and in transit</span>
     <span class="nb">print</span> <span class="s2">&quot;Starting Out of Transit Simulation&quot;</span>
     <span class="n">out</span> <span class="o">=</span> <span class="n">perform_out</span><span class="p">(</span><span class="n">pandeia_input</span><span class="p">,</span> <span class="n">pandexo_input</span><span class="p">,</span><span class="n">timing</span><span class="p">,</span> <span class="n">both_spec</span><span class="p">)</span>
+    
+    <span class="c1">#extract extraction area before dict conversion</span>
+    <span class="n">extraction_area</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">extraction_area</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span>
+    <span class="n">out</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;3d&#39;</span><span class="p">)</span>
     <span class="nb">print</span> <span class="s2">&quot;End out of Transit&quot;</span>
 
     <span class="c1">#this kind of redundant going to compute inn from out instead </span>
@@ -364,15 +394,15 @@
 <span class="sd">    </span>
 <span class="sd">    Returns</span>
 <span class="sd">    ------- </span>
-<span class="sd">    dict </span>
-<span class="sd">        Maximum exposure time per integration, nframes, nskip, frame time</span>
+<span class="sd">    float </span>
+<span class="sd">        Maximum exposure time per integration before specified saturation level</span>
 <span class="sd">    </span>
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 <span class="sd">    </span>
 <span class="sd">    &gt;&gt;&gt; max_time = compute_maxexptime_per_int(pandeia_input, 50000.0)</span>
 <span class="sd">    &gt;&gt;&gt; print max_time </span>
-<span class="sd">    {&#39;maxexptime_per_int&#39;:12.0, &#39;nframe&#39;:1, &#39;nskip&#39;:0, &#39;exptime_per_frame&#39;: 0.55}</span>
+<span class="sd">    12.0</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     
     <span class="c1">#run once to get 2d rate image </span>
@@ -381,14 +411,8 @@
     <span class="n">pandeia_input</span><span class="p">[</span><span class="s1">&#39;configuration&#39;</span><span class="p">][</span><span class="s1">&#39;detector&#39;</span><span class="p">][</span><span class="s1">&#39;nexp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
     
     <span class="n">report</span> <span class="o">=</span> <span class="n">perform_calculation</span><span class="p">(</span><span class="n">pandeia_input</span><span class="p">,</span> <span class="n">dict_report</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="n">extraction_area</span> <span class="o">=</span> <span class="n">report</span><span class="o">.</span><span class="n">extraction_area</span>
     <span class="n">report_dict</span> <span class="o">=</span> <span class="n">report</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span> 
 
-            
-    <span class="c1">#check for hard saturation </span>
-    <span class="k">if</span> <span class="s1">&#39;saturated&#39;</span> <span class="ow">in</span> <span class="n">report_dict</span><span class="p">[</span><span class="s1">&#39;warnings&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span> 
-        <span class="k">if</span> <span class="n">report_dict</span><span class="p">[</span><span class="s1">&#39;warnings&#39;</span><span class="p">][</span><span class="s1">&#39;saturated&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Hard&#39;</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Hard saturation with minimum number of groups&#39;</span><span class="p">)</span>
     
     <span class="c1"># count rate on the detector in e-/second </span>
     <span class="n">det</span> <span class="o">=</span> <span class="n">report_dict</span><span class="p">[</span><span class="s1">&#39;2d&#39;</span><span class="p">][</span><span class="s1">&#39;detector&#39;</span><span class="p">]</span>
@@ -403,13 +427,9 @@
         <span class="n">maxexptime_per_int</span> <span class="o">=</span> <span class="n">sat_level</span><span class="o">/</span><span class="n">maxdetvalue</span>
     <span class="k">except</span><span class="p">:</span> 
         <span class="n">maxexptime_per_int</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
-        
-    <span class="n">exptime_per_frame</span> <span class="o">=</span> <span class="n">report_dict</span><span class="p">[</span><span class="s1">&#39;information&#39;</span><span class="p">][</span><span class="s1">&#39;exposure_specification&#39;</span><span class="p">][</span><span class="s1">&#39;tframe&#39;</span><span class="p">]</span>
-    <span class="n">nframe</span> <span class="o">=</span> <span class="n">report_dict</span><span class="p">[</span><span class="s1">&#39;information&#39;</span><span class="p">][</span><span class="s1">&#39;exposure_specification&#39;</span><span class="p">][</span><span class="s1">&#39;nframe&#39;</span><span class="p">]</span>
-    <span class="n">nskip</span> <span class="o">=</span> <span class="n">report_dict</span><span class="p">[</span><span class="s1">&#39;information&#39;</span><span class="p">][</span><span class="s1">&#39;exposure_specification&#39;</span><span class="p">][</span><span class="s1">&#39;nskip&#39;</span><span class="p">]</span>
-    <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;maxexptime_per_int&#39;</span><span class="p">:</span><span class="n">maxexptime_per_int</span><span class="p">,</span> <span class="s1">&#39;nframe&#39;</span><span class="p">:</span><span class="n">nframe</span><span class="p">,</span> <span class="s1">&#39;nskip&#39;</span><span class="p">:</span><span class="n">nskip</span><span class="p">,</span> 
-            <span class="s1">&#39;exptime_per_frame&#39;</span><span class="p">:</span> <span class="n">exptime_per_frame</span><span class="p">,</span>
-            <span class="s1">&#39;extraction_area&#39;</span><span class="p">:</span><span class="n">extraction_area</span><span class="p">}</span></div>
+    <span class="nb">print</span> <span class="n">maxexptime_per_int</span>
+    
+    <span class="k">return</span> <span class="n">maxexptime_per_int</span></div>
         
 <div class="viewcode-block" id="compute_timing"><a class="viewcode-back" href="../../engine.html#engine.jwst.compute_timing">[docs]</a><span class="k">def</span> <span class="nf">compute_timing</span><span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="n">transit_duration</span><span class="p">,</span><span class="n">expfact_out</span><span class="p">,</span><span class="n">noccultations</span><span class="p">):</span> 
     <span class="sd">&quot;&quot;&quot;Computes all timing info for observation</span>
@@ -445,26 +465,34 @@
 <span class="sd">    &gt;&gt;&gt; timing, flags = compute_timing(m, 2*60.0*60.0, 1.0, 1.0)</span>
 <span class="sd">    &gt;&gt;&gt; print timing.keys()</span>
 <span class="sd">    [&#39;Number of Transits&#39;, &#39;Num Integrations Out of Transit&#39;, &#39;Num Integrations In Transit&#39;, </span>
-<span class="sd">    &#39;Num Groups per Integration&#39;, &#39;Seconds per Frame&#39;, &#39;Observing Efficiency (%)&#39;, &#39;On Source Time(sec)&#39;, </span>
+<span class="sd">    &#39;APT: Num Groups per Integration&#39;, &#39;Seconds per Frame&#39;, &#39;Observing Efficiency (%)&#39;, &#39;On Source Time(sec)&#39;, </span>
 <span class="sd">    &#39;Exposure Time Per Integration (secs)&#39;, &#39;Reset time Plus 30 min TA time (hrs)&#39;,</span>
-<span class="sd">    &#39;Num Integrations per Occultation&#39;, &#39;Transit Duration&#39;]</span>
+<span class="sd">    &#39;APT: Num Integrations per Occultation&#39;, &#39;Transit Duration&#39;]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">exptime_per_frame</span> <span class="o">=</span> <span class="n">m</span><span class="p">[</span><span class="s1">&#39;exptime_per_frame&#39;</span><span class="p">]</span>
+    <span class="n">tframe</span> <span class="o">=</span> <span class="n">m</span><span class="p">[</span><span class="s1">&#39;tframe&#39;</span><span class="p">]</span>
     <span class="n">nframe</span> <span class="o">=</span> <span class="n">m</span><span class="p">[</span><span class="s1">&#39;nframe&#39;</span><span class="p">]</span>
     <span class="n">nskip</span> <span class="o">=</span> <span class="n">m</span><span class="p">[</span><span class="s1">&#39;nskip&#39;</span><span class="p">]</span>
-    <span class="n">overhead_per_int</span> <span class="o">=</span> <span class="n">exptime_per_frame</span> <span class="c1">#overhead time added per integration </span>
-    <span class="n">maxexptime_per_int</span> <span class="o">=</span> <span class="n">m</span><span class="p">[</span><span class="s1">&#39;maxexptime_per_int&#39;</span><span class="p">]</span>
-
+    <span class="n">mingroups</span> <span class="o">=</span> <span class="n">m</span><span class="p">[</span><span class="s1">&#39;mingroups&#39;</span><span class="p">]</span>
+    <span class="n">overhead_per_int</span> <span class="o">=</span> <span class="n">tframe</span> <span class="c1">#overhead time added per integration </span>
+    <span class="k">try</span><span class="p">:</span> 
+        <span class="c1">#are we starting with a exposure time ?</span>
+        <span class="n">maxexptime_per_int</span> <span class="o">=</span> <span class="n">m</span><span class="p">[</span><span class="s1">&#39;maxexptime_per_int&#39;</span><span class="p">]</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="c1">#or a pre defined number of groups specified by user</span>
+        <span class="n">ngroups_per_int</span> <span class="o">=</span> <span class="n">m</span><span class="p">[</span><span class="s1">&#39;ngroup&#39;</span><span class="p">]</span>
+        
     <span class="n">flag_default</span> <span class="o">=</span> <span class="s2">&quot;All good&quot;</span>
     <span class="n">flag_high</span> <span class="o">=</span> <span class="s2">&quot;All good&quot;</span>
-    <span class="k">try</span><span class="p">:</span>
+    <span class="k">if</span> <span class="s1">&#39;maxexptime_per_int&#39;</span> <span class="ow">in</span> <span class="nb">locals</span><span class="p">():</span>
+        <span class="c1">#Frist, if maxexptime_per_int has been defined (from above), compute ngroups_per_int</span>
+        
         <span class="c1">#number of frames in one integration is the maximum time beofre exposure </span>
         <span class="c1">#divided by the time it takes for one frame. Note this does not include </span>
         <span class="c1">#reset frames </span>
 
-        <span class="n">nframes_per_int</span> <span class="o">=</span> <span class="n">long</span><span class="p">(</span><span class="n">maxexptime_per_int</span><span class="o">/</span><span class="n">exptime_per_frame</span><span class="p">)</span>
+        <span class="n">nframes_per_int</span> <span class="o">=</span> <span class="n">long</span><span class="p">(</span><span class="n">maxexptime_per_int</span><span class="o">/</span><span class="n">tframe</span><span class="p">)</span>
     
-        <span class="c1">#for exoplanets nframe =1 an nskip always = 1 so ngroups_per_int </span>
+        <span class="c1">#for exoplanets nframe =1 an nskip always = 0 so ngroups_per_int </span>
         <span class="c1">#and nframes_per_int area always the same </span>
         <span class="n">ngroups_per_int</span> <span class="o">=</span> <span class="n">long</span><span class="p">(</span><span class="n">nframes_per_int</span><span class="o">/</span><span class="p">(</span><span class="n">nframe</span> <span class="o">+</span> <span class="n">nskip</span><span class="p">))</span> 
     
@@ -475,34 +503,36 @@
     
         <span class="k">if</span> <span class="n">ngroups_per_int</span> <span class="o">&gt;</span> <span class="n">max_ngroup</span><span class="p">:</span>
             <span class="n">ngroups_per_int</span> <span class="o">=</span> <span class="n">max_ngroup</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Num of groups per int exceeded max num of allowed groups&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">ngroups_per_int</span><span class="p">))</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Setting number of groups to max value = 65536.0&quot;</span><span class="p">)</span>
             <span class="n">flag_high</span> <span class="o">=</span> <span class="s2">&quot;Groups/int &gt; max num of allowed groups&quot;</span>
  
-        <span class="k">if</span> <span class="n">ngroups_per_int</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="n">ngroups_per_int</span> <span class="o">=</span> <span class="mf">2.0</span>  
-            <span class="n">nframes_per_int</span> <span class="o">=</span> <span class="mi">2</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Hard saturation during first group. Check Pandeia Warnings.&quot;</span><span class="p">)</span>
-            <span class="n">flag_default</span> <span class="o">=</span> <span class="s2">&quot;NGROUPS&lt;2, SET TO NGROUPS=2 BY DEFAULT&quot;</span>
-    <span class="k">except</span><span class="p">:</span> 
+        <span class="k">if</span> <span class="p">(</span><span class="n">ngroups_per_int</span> <span class="o">&lt;</span> <span class="n">mingroups</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">ngroups_per_int</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">):</span>
+            <span class="n">ngroups_per_int</span> <span class="o">=</span> <span class="n">mingroups</span>  
+            <span class="n">nframes_per_int</span> <span class="o">=</span> <span class="n">mingroups</span>
+            <span class="n">flag_default</span> <span class="o">=</span> <span class="s2">&quot;NGROUPS&lt;&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">mingroups</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;SET TO NGROUPS=&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">mingroups</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="s1">&#39;ngroups_per_int&#39;</span> <span class="ow">in</span> <span class="nb">locals</span><span class="p">():</span> 
+        <span class="c1">#if it maxexptime_per_int been defined then set nframes per int </span>
+        <span class="n">nframes_per_int</span> <span class="o">=</span> <span class="n">ngroups_per_int</span><span class="o">*</span><span class="p">(</span><span class="n">nframe</span><span class="o">+</span><span class="n">nskip</span><span class="p">)</span>
+        
+        <span class="c1">#if that didn&#39;t work its because maxexptime_per_int is nan .. run calc with mingroups</span>
+    <span class="k">else</span><span class="p">:</span>
         <span class="c1">#if maxexptime_per_int is nan then just ngroups and nframe to 2 </span>
         <span class="c1">#for the sake of not returning error</span>
-        <span class="n">nframes_per_int</span> <span class="o">=</span> <span class="mi">2</span>
-        <span class="n">ngroups_per_int</span> <span class="o">=</span> <span class="mi">2</span>
-        <span class="n">flag_default</span> <span class="o">=</span> <span class="s2">&quot;NGROUPS&lt;2, SET TO NGROUPS=2 BY DEFAULT&quot;</span>
+        <span class="n">ngroups_per_int</span> <span class="o">=</span> <span class="n">mingroups</span>
+        <span class="n">nframes_per_int</span> <span class="o">=</span> <span class="n">mingroups</span>
+        <span class="n">flag_default</span> <span class="o">=</span> <span class="s2">&quot;Something went wrong. SET TO NGROUPS=&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">mingroups</span><span class="p">)</span>
                 
     <span class="c1">#the integration time is related to the number of groups and the time of each </span>
     <span class="c1">#group </span>
-    <span class="n">exptime_per_int</span> <span class="o">=</span> <span class="n">ngroups_per_int</span><span class="o">*</span><span class="n">exptime_per_frame</span>
+    <span class="n">exptime_per_int</span> <span class="o">=</span> <span class="n">ngroups_per_int</span><span class="o">*</span><span class="n">tframe</span>
     
     <span class="c1">#clock time includes the reset frame </span>
-    <span class="n">clocktime_per_int</span> <span class="o">=</span> <span class="n">ngroups_per_int</span><span class="o">*</span><span class="n">exptime_per_frame</span>
+    <span class="n">clocktime_per_int</span> <span class="o">=</span> <span class="n">ngroups_per_int</span><span class="o">*</span><span class="n">tframe</span>
     
     <span class="c1">#observing efficiency (i.e. what percentage of total time is spent on soure)</span>
     <span class="n">eff</span> <span class="o">=</span> <span class="p">(</span><span class="n">ngroups_per_int</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">ngroups_per_int</span> <span class="o">+</span> <span class="mf">1.0</span><span class="p">)</span>
     
     <span class="c1">#this says &quot;per occultation&quot; but this is just the in transit frames.. See below</span>
-    <span class="c1">#nframes_per_occultation = long(transit_duration/exptime_per_frame)</span>
+    <span class="c1">#nframes_per_occultation = long(transit_duration/tframe)</span>
     <span class="c1">#ngroups_per_occultation = long(nframes_per_occultation/(nframe + nskip))</span>
     <span class="n">nint_per_occultation</span> <span class="o">=</span>  <span class="n">transit_duration</span><span class="o">*</span><span class="n">eff</span><span class="o">/</span><span class="n">exptime_per_int</span>
     
@@ -515,8 +545,8 @@
     <span class="c1">#3 integrations in transit </span>
     <span class="k">if</span> <span class="n">nint_in</span> <span class="o">&lt;</span> <span class="n">min_nint_trans</span><span class="p">:</span>
         <span class="n">ngroups_per_int</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">ngroups_per_int</span><span class="o">/</span><span class="mf">3.0</span><span class="p">)</span>
-        <span class="n">exptime_per_int</span> <span class="o">=</span> <span class="p">(</span><span class="n">ngroups_per_int</span><span class="o">-</span><span class="mf">1.</span><span class="p">)</span><span class="o">*</span><span class="n">exptime_per_frame</span>
-        <span class="n">clocktime_per_int</span> <span class="o">=</span> <span class="n">ngroups_per_int</span><span class="o">*</span><span class="n">exptime_per_frame</span>
+        <span class="n">exptime_per_int</span> <span class="o">=</span> <span class="p">(</span><span class="n">ngroups_per_int</span><span class="o">-</span><span class="mf">1.</span><span class="p">)</span><span class="o">*</span><span class="n">tframe</span>
+        <span class="n">clocktime_per_int</span> <span class="o">=</span> <span class="n">ngroups_per_int</span><span class="o">*</span><span class="n">tframe</span>
         <span class="n">eff</span> <span class="o">=</span> <span class="p">(</span><span class="n">ngroups_per_int</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">ngroups_per_int</span> <span class="o">+</span> <span class="mf">1.0</span><span class="p">)</span>
         <span class="n">nint_per_occultation</span> <span class="o">=</span>  <span class="n">transit_duration</span><span class="o">*</span><span class="n">eff</span><span class="o">/</span><span class="n">exptime_per_int</span>
         <span class="n">nint_in</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">nint_per_occultation</span><span class="p">)</span>
@@ -527,12 +557,12 @@
    
     <span class="n">timing</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;Transit Duration&quot;</span> <span class="p">:</span> <span class="n">transit_duration</span><span class="o">/</span><span class="mf">60.0</span><span class="o">/</span><span class="mf">60.0</span><span class="p">,</span>
-        <span class="s2">&quot;Seconds per Frame&quot;</span> <span class="p">:</span> <span class="n">exptime_per_frame</span><span class="p">,</span>
+        <span class="s2">&quot;Seconds per Frame&quot;</span> <span class="p">:</span> <span class="n">tframe</span><span class="p">,</span>
         <span class="s2">&quot;Exposure Time Per Integration (secs)&quot;</span><span class="p">:</span><span class="n">exptime_per_int</span><span class="p">,</span>
-        <span class="s2">&quot;Num Groups per Integration&quot;</span> <span class="p">:</span><span class="n">ngroups_per_int</span><span class="p">,</span> 
+        <span class="s2">&quot;APT: Num Groups per Integration&quot;</span> <span class="p">:</span><span class="n">ngroups_per_int</span><span class="p">,</span> 
         <span class="s2">&quot;Num Integrations Out of Transit&quot;</span><span class="p">:</span><span class="n">nint_out</span><span class="p">,</span>
         <span class="s2">&quot;Num Integrations In Transit&quot;</span><span class="p">:</span><span class="n">nint_in</span><span class="p">,</span>
-        <span class="s2">&quot;Num Integrations per Occultation&quot;</span><span class="p">:</span><span class="n">nint_out</span><span class="o">+</span><span class="n">nint_in</span><span class="p">,</span>
+        <span class="s2">&quot;APT: Num Integrations per Occultation&quot;</span><span class="p">:</span><span class="n">nint_out</span><span class="o">+</span><span class="n">nint_in</span><span class="p">,</span>
         <span class="s2">&quot;On Source Time(sec)&quot;</span><span class="p">:</span> <span class="n">noccultations</span><span class="o">*</span><span class="n">clocktime_per_int</span><span class="o">*</span><span class="p">(</span><span class="n">nint_out</span><span class="o">+</span><span class="n">nint_in</span><span class="p">),</span>
         <span class="s2">&quot;Reset time Plus 30 min TA time (hrs)&quot;</span><span class="p">:</span> <span class="n">overhead_per_int</span><span class="o">*</span><span class="p">(</span><span class="n">nint_in</span> <span class="o">+</span> <span class="n">nint_out</span><span class="p">)</span><span class="o">/</span><span class="mf">60.0</span><span class="o">/</span><span class="mf">60.0</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">,</span>
         <span class="s2">&quot;Observing Efficiency (%)&quot;</span><span class="p">:</span> <span class="n">eff</span><span class="o">*</span><span class="mf">100.0</span><span class="p">,</span>
@@ -561,12 +591,11 @@
 <span class="sd">        pandeia output dictionary for out of transit data </span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1">#pandeia inputs, simulate one integration at a time </span>
-    <span class="n">pandeia_input</span><span class="p">[</span><span class="s1">&#39;configuration&#39;</span><span class="p">][</span><span class="s1">&#39;detector&#39;</span><span class="p">][</span><span class="s1">&#39;ngroup&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">timing</span><span class="p">[</span><span class="s1">&#39;Num Groups per Integration&#39;</span><span class="p">]</span>
+    <span class="n">pandeia_input</span><span class="p">[</span><span class="s1">&#39;configuration&#39;</span><span class="p">][</span><span class="s1">&#39;detector&#39;</span><span class="p">][</span><span class="s1">&#39;ngroup&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">timing</span><span class="p">[</span><span class="s1">&#39;APT: Num Groups per Integration&#39;</span><span class="p">]</span>
     <span class="n">pandeia_input</span><span class="p">[</span><span class="s1">&#39;configuration&#39;</span><span class="p">][</span><span class="s1">&#39;detector&#39;</span><span class="p">][</span><span class="s1">&#39;nint&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">timing</span><span class="p">[</span><span class="s1">&#39;Num Integrations Out of Transit&#39;</span><span class="p">]</span>
     <span class="n">pandeia_input</span><span class="p">[</span><span class="s1">&#39;configuration&#39;</span><span class="p">][</span><span class="s1">&#39;detector&#39;</span><span class="p">][</span><span class="s1">&#39;nexp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> 
 
-    <span class="n">report_out</span> <span class="o">=</span> <span class="n">perform_calculation</span><span class="p">(</span><span class="n">pandeia_input</span><span class="p">,</span> <span class="n">dict_report</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">report_out</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;3d&#39;</span><span class="p">)</span>
+    <span class="n">report_out</span> <span class="o">=</span> <span class="n">perform_calculation</span><span class="p">(</span><span class="n">pandeia_input</span><span class="p">,</span> <span class="n">dict_report</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">report_out</span></div>
 
@@ -615,7 +644,7 @@
     <span class="k">else</span><span class="p">:</span> 
         <span class="c1">#only run pandeia a third time if doing slope method and need accurate run for the </span>
         <span class="c1">#nint and timing</span>
-        <span class="n">pandeia_input</span><span class="p">[</span><span class="s1">&#39;configuration&#39;</span><span class="p">][</span><span class="s1">&#39;detector&#39;</span><span class="p">][</span><span class="s1">&#39;ngroup&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">timing</span><span class="p">[</span><span class="s1">&#39;Num Groups per Integration&#39;</span><span class="p">]</span>
+        <span class="n">pandeia_input</span><span class="p">[</span><span class="s1">&#39;configuration&#39;</span><span class="p">][</span><span class="s1">&#39;detector&#39;</span><span class="p">][</span><span class="s1">&#39;ngroup&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">timing</span><span class="p">[</span><span class="s1">&#39;APT: Num Groups per Integration&#39;</span><span class="p">]</span>
         <span class="n">pandeia_input</span><span class="p">[</span><span class="s1">&#39;configuration&#39;</span><span class="p">][</span><span class="s1">&#39;detector&#39;</span><span class="p">][</span><span class="s1">&#39;nint&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">timing</span><span class="p">[</span><span class="s1">&#39;Num Integrations In Transit&#39;</span><span class="p">]</span>
         <span class="n">pandeia_input</span><span class="p">[</span><span class="s1">&#39;configuration&#39;</span><span class="p">][</span><span class="s1">&#39;detector&#39;</span><span class="p">][</span><span class="s1">&#39;nexp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
   
@@ -660,7 +689,7 @@
 <span class="sd">    These are warnings are just suggestions and are not yet required.   </span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">ngroups_per_int</span> <span class="o">=</span> <span class="n">timing</span><span class="p">[</span><span class="s1">&#39;Num Groups per Integration&#39;</span><span class="p">]</span>
+    <span class="n">ngroups_per_int</span> <span class="o">=</span> <span class="n">timing</span><span class="p">[</span><span class="s1">&#39;APT: Num Groups per Integration&#39;</span><span class="p">]</span>
   
     <span class="c1">#check for saturation </span>
     <span class="k">try</span><span class="p">:</span>  
