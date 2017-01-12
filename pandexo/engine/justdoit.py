@@ -186,7 +186,7 @@ def run_pandexo(exo, inst, param_space = 0, param_range = 0,save_file = True,
         star+temp
         planet+exopath
     param_range : list of str or list of float
-        (Optional) An array or list over which to run the parameters space.
+        (Optional) Default = 0 An array or list over which to run the parameters space.
         i.e. array of temperatures if running through stellar temp or 
         array of files if running through planet models. Must specify param_space 
         if using this. 
@@ -246,7 +246,7 @@ def run_pandexo(exo, inst, param_space = 0, param_range = 0,save_file = True,
     if len(inst)==1 and inst[0] != 'RUN ALL': 
         
         #start case of no parameter space run 
-        if param_space==0 or param_range==0:
+        if isinstance(param_space, (float, int)) or isinstance(param_range, (float, int)):
             print "Running Single Case for: " + inst[0]
             inst_dict = load_mode_dict(inst[0])
             results =wrapper({"pandeia_input": inst_dict , "pandexo_input":exo})
