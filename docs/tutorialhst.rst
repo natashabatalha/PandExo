@@ -5,30 +5,15 @@ This file demonstrates how to use TExoNS to predict the: 1.
 Transmission/emission spectrum S/N ratio 2. Observation start window for
 any system observed with WFC3/IR.
 
-Background information
-^^^^^^^^^^^^^^^^^^^^^^
-
-::
-
-    Pandeia: ETC for JWST
-    PandExo: Exoplanet noise simulator for JWST
-
 .. code:: python
-
-    %matplotlib inline
-    import matplotlib.pyplot as plt
-    import numpy as np
-    import warnings
-    warnings.filterwarnings('ignore')
-    import os, sys
-    sys.path.append('..')
+    
     import pandexo.engine.justdoit as jdi
 
-Edit Inputs
------------
+Editting Input Dictionaries
+---------------------------
 
-Load in a blank exoplanet dictionary
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Step 1) Load in a blank exoplanet dictionary
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: python
 
@@ -43,7 +28,7 @@ Edit stellar and planet inputs
     exo_dict['star']['mag']      = 9.397                # H magnitude of the system
     #WASP-43b
     exo_dict['planet']['type']    = 'user'               # user specified inputs
-    exo_dict['planet']['exopath'] = '/Users/nbatalh1/Desktop/JWST/pandexo/notebooks/WASP43b-Eclipse_Spectrum.txt' # filename for model spectrum
+    exo_dict['planet']['exopath'] = 'WASP43b-Eclipse_Spectrum.txt' # filename for model spectrum
     exo_dict['planet']['w_unit']  = 'um'                 # wavelength unit
     exo_dict['planet']['f_unit']  = 'fp/f*'              # flux ratio unit (can also put "rp^2/r*^2")
     exo_dict['planet']['depth']   = 4.0e-3               # flux ratio
@@ -80,8 +65,8 @@ Edit HST/WFC3 detector and observation inputs
     exo_dict['observation']['windowSize']                  = 20           # (optional) Observation start window size in minutes. Default is 20 minutes.
 
 
-Run PandExo
------------
+Run PandExo Command Line
+------------------------
 
 ``jdi.run_pandexo(exo, inst, param_space = 0, param_range = 0,save_file = True,                             output_path=os.getcwd(), output_file = '')``
 
@@ -110,7 +95,7 @@ Plot Results
 ------------
 
 Plot simulated spectrum using specified file
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: python
 
@@ -122,7 +107,8 @@ Plot simulated spectrum using specified file
 .. image:: hst_spec.png
 
 Compute earliest and latest start times for given start window size
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 .. code:: python
 
     #using foo from above
@@ -132,6 +118,7 @@ Compute earliest and latest start times for given start window size
     :width: 49 %  
 .. image:: hst_time2.png
     :width: 49 %
+
 Print important info for observation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -149,5 +136,3 @@ Print important info for observation
      'Transit depth uncertainty(ppm)': 62.433045276228441,
      'WFC3 parameters: NSAMP': 10,
      'WFC3 parameters: SAMP_SEQ': 'SPARS5'}
-
-
