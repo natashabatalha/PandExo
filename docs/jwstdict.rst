@@ -27,6 +27,7 @@ OriginalInput (contains 2 keys)
 -  **model\_spec**: original spectrum input by user
 
 .. code:: python 
+
     print dict['OriginalInput']['model_wave']
 
 Warning (contains 6 keys)
