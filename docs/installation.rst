@@ -34,7 +34,7 @@ in order to easily pull Stellar SED's from phoenix database.
 
 3. Download the `JWST Reference Data <http://ssb.stsci.edu/pandeia/engine/1.0/pandeia_data-1.0.tar.gz>`_ . 
 This is a big file (6 gigs) so think carefully about where you want to store it. Don't accidentally download 
-it on your Mac Air then wonder why you can save a 32 Kb doc file. 
+it on your Mac Air then wonder why you can't save a 32 Kb doc file. 
 
 Then make sure you untar and point to the file so PandExo knows where it is. 
 
