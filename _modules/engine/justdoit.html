@@ -320,7 +320,7 @@
 <span class="sd">        star+temp</span>
 <span class="sd">        planet+exopath</span>
 <span class="sd">    param_range : list of str or list of float</span>
-<span class="sd">        (Optional) An array or list over which to run the parameters space.</span>
+<span class="sd">        (Optional) Default = 0 An array or list over which to run the parameters space.</span>
 <span class="sd">        i.e. array of temperatures if running through stellar temp or </span>
 <span class="sd">        array of files if running through planet models. Must specify param_space </span>
 <span class="sd">        if using this. </span>
@@ -380,7 +380,7 @@
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">inst</span><span class="p">)</span><span class="o">==</span><span class="mi">1</span> <span class="ow">and</span> <span class="n">inst</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;RUN ALL&#39;</span><span class="p">:</span> 
         
         <span class="c1">#start case of no parameter space run </span>
-        <span class="k">if</span> <span class="n">param_space</span><span class="o">==</span><span class="mi">0</span> <span class="ow">or</span> <span class="n">param_range</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">param_space</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">))</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">param_range</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">)):</span>
             <span class="nb">print</span> <span class="s2">&quot;Running Single Case for: &quot;</span> <span class="o">+</span> <span class="n">inst</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">inst_dict</span> <span class="o">=</span> <span class="n">load_mode_dict</span><span class="p">(</span><span class="n">inst</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
             <span class="n">results</span> <span class="o">=</span><span class="n">wrapper</span><span class="p">({</span><span class="s2">&quot;pandeia_input&quot;</span><span class="p">:</span> <span class="n">inst_dict</span> <span class="p">,</span> <span class="s2">&quot;pandexo_input&quot;</span><span class="p">:</span><span class="n">exo</span><span class="p">})</span>
