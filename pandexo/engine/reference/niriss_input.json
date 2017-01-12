@@ -43,16 +43,14 @@
             "disperser": "gr700xd"
         },
     "detector": {
-            "subarray": "substrip80",
+            "subarray": "substrip96",
             "readmode": "nisrapid",
-            "ngroup": 10,
+            "ngroup": 'optimize',
             "nint": 1,
             "nexp": 10
         }
     },
     "strategy": {
-            "method": "soss",
-            "order": 1,
-            "background_subtraction": true
+            "method": "soss"
             }
 }

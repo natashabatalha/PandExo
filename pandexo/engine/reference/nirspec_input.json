@@ -45,7 +45,7 @@
     "detector": {
             "subarray": "s1600a1",
             "readmode": "nrsrapid",
-            "ngroup": 10,
+            "ngroup": 'optimize',
             "nint": 1,
             "nexp": 10
         }

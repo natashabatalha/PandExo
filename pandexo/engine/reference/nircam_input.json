@@ -45,7 +45,7 @@
     "detector": {
             "subarray": "subgrism64",
             "readmode": "rapid",
-            "ngroup": 10,
+            "ngroup": 'optimize',
             "nint": 1,
             "nexp": 10
         }

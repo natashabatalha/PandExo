@@ -62,13 +62,32 @@ def compute_full_sim(dictinput):
 
     #which instrument 
     instrument = pandeia_input['configuration']['instrument']['instrument']
-    conf = {'instrument': pandeia_input['configuration']['instrument']}
-    i = InstrumentFactory(config=conf)
-    det_pars = i.get_detector_pars()
+    conf = pandeia_input['configuration']
+    
+    #if optimize is in the ngroups section, this will throw an error 
+    #so create temp conf with 2 groups 
+    try:
+        i = InstrumentFactory(config=conf)
+        det_pars = i.get_detector_pars()
+        exp_pars = i.get_exposure_pars()
+    except: 
+        conf_temp = deepcopy(conf) 
+        conf_temp['detector']['ngroup'] = 2 
+        i = InstrumentFactory(config=conf_temp)
+        det_pars = i.get_detector_pars()
+        exp_pars = i.get_exposure_pars()
+        
+    #detector parameters
     fullwell = det_pars['fullwell']
     rn = det_pars['rn']
     sat_level = pandexo_input['observation']['sat_level']/100.0*fullwell
-
+    mingroups = det_pars['mingroups']
+    
+    #exposure parameters 
+    tframe = exp_pars.tframe
+    nframe = exp_pars.nframe
+    nskip = exp_pars.nskip
+    
     #parameteres needed from exo_input
     mag = pandexo_input['star']['mag']
     
@@ -94,11 +113,15 @@ def compute_full_sim(dictinput):
     #add to pandeia input 
     pandeia_input['scene'][0]['spectrum']['sed']['spectrum'] = out_spectrum
     
-    #run pandeia once to determine max exposure time per int and get exposure params
-    print "Computing Duty Cycle"
-    m = compute_maxexptime_per_int(pandeia_input, sat_level) 
-    extraction_area = m['extraction_area']
-    print "Finished Duty Cucle Calc"
+    if isinstance(pandeia_input["configuration"]["detector"]["ngroup"], (float,int)):
+        m = {"ngroup":pandeia_input["configuration"]["detector"]["ngroup"], "tframe":tframe,
+            "nframe":nframe,"mingroups":mingroups,"nskip":nskip}
+    else:
+        #run pandeia once to determine max exposure time per int and get exposure params
+        print "Optimization Reqested: Computing Duty Cycle"
+        m = {"maxexptime_per_int":compute_maxexptime_per_int(pandeia_input, sat_level) , 
+            "tframe":tframe,"nframe":nframe,"mingroups":mingroups,"nskip":nskip}
+        print "Finished Duty Cycle Calc"
 
     #calculate all timing info
     timing, flags = compute_timing(m,transit_duration,expfact_out,noccultations)
@@ -106,6 +129,11 @@ def compute_full_sim(dictinput):
     #Simulate out trans and in transit
     print "Starting Out of Transit Simulation"
     out = perform_out(pandeia_input, pandexo_input,timing, both_spec)
+    
+    #extract extraction area before dict conversion
+    extraction_area = out.extraction_area
+    out = out.as_dict()
+    out.pop('3d')
     print "End out of Transit"
 
     #this kind of redundant going to compute inn from out instead 
@@ -232,15 +260,15 @@ def compute_maxexptime_per_int(pandeia_input, sat_level):
     
     Returns
     ------- 
-    dict 
-        Maximum exposure time per integration, nframes, nskip, frame time
+    float 
+        Maximum exposure time per integration before specified saturation level
     
     Examples
     --------
     
     >>> max_time = compute_maxexptime_per_int(pandeia_input, 50000.0)
     >>> print max_time 
-    {'maxexptime_per_int':12.0, 'nframe':1, 'nskip':0, 'exptime_per_frame': 0.55}
+    12.0
     """
     
     #run once to get 2d rate image 
@@ -249,14 +277,8 @@ def compute_maxexptime_per_int(pandeia_input, sat_level):
     pandeia_input['configuration']['detector']['nexp'] = 1
     
     report = perform_calculation(pandeia_input, dict_report=False)
-    extraction_area = report.extraction_area
     report_dict = report.as_dict() 
 
-            
-    #check for hard saturation 
-    if 'saturated' in report_dict['warnings'].keys(): 
-        if report_dict['warnings']['saturated'][0:4] == 'Hard':
-            print('Hard saturation with minimum number of groups')
     
     # count rate on the detector in e-/second 
     det = report_dict['2d']['detector']
@@ -271,13 +293,9 @@ def compute_maxexptime_per_int(pandeia_input, sat_level):
         maxexptime_per_int = sat_level/maxdetvalue
     except: 
         maxexptime_per_int = np.nan
-        
-    exptime_per_frame = report_dict['information']['exposure_specification']['tframe']
-    nframe = report_dict['information']['exposure_specification']['nframe']
-    nskip = report_dict['information']['exposure_specification']['nskip']
-    return {'maxexptime_per_int':maxexptime_per_int, 'nframe':nframe, 'nskip':nskip, 
-            'exptime_per_frame': exptime_per_frame,
-            'extraction_area':extraction_area}
+    print maxexptime_per_int
+    
+    return maxexptime_per_int
         
 def compute_timing(m,transit_duration,expfact_out,noccultations): 
     """Computes all timing info for observation
@@ -313,26 +331,34 @@ def compute_timing(m,transit_duration,expfact_out,noccultations):
     >>> timing, flags = compute_timing(m, 2*60.0*60.0, 1.0, 1.0)
     >>> print timing.keys()
     ['Number of Transits', 'Num Integrations Out of Transit', 'Num Integrations In Transit', 
-    'Num Groups per Integration', 'Seconds per Frame', 'Observing Efficiency (%)', 'On Source Time(sec)', 
+    'APT: Num Groups per Integration', 'Seconds per Frame', 'Observing Efficiency (%)', 'On Source Time(sec)', 
     'Exposure Time Per Integration (secs)', 'Reset time Plus 30 min TA time (hrs)',
-    'Num Integrations per Occultation', 'Transit Duration']
+    'APT: Num Integrations per Occultation', 'Transit Duration']
     """
-    exptime_per_frame = m['exptime_per_frame']
+    tframe = m['tframe']
     nframe = m['nframe']
     nskip = m['nskip']
-    overhead_per_int = exptime_per_frame #overhead time added per integration 
-    maxexptime_per_int = m['maxexptime_per_int']
-
+    mingroups = m['mingroups']
+    overhead_per_int = tframe #overhead time added per integration 
+    try: 
+        #are we starting with a exposure time ?
+        maxexptime_per_int = m['maxexptime_per_int']
+    except:
+        #or a pre defined number of groups specified by user
+        ngroups_per_int = m['ngroup']
+        
     flag_default = "All good"
     flag_high = "All good"
-    try:
+    if 'maxexptime_per_int' in locals():
+        #Frist, if maxexptime_per_int has been defined (from above), compute ngroups_per_int
+        
         #number of frames in one integration is the maximum time beofre exposure 
         #divided by the time it takes for one frame. Note this does not include 
         #reset frames 
 
-        nframes_per_int = long(maxexptime_per_int/exptime_per_frame)
+        nframes_per_int = long(maxexptime_per_int/tframe)
     
-        #for exoplanets nframe =1 an nskip always = 1 so ngroups_per_int 
+        #for exoplanets nframe =1 an nskip always = 0 so ngroups_per_int 
         #and nframes_per_int area always the same 
         ngroups_per_int = long(nframes_per_int/(nframe + nskip)) 
     
@@ -343,34 +369,36 @@ def compute_timing(m,transit_duration,expfact_out,noccultations):
     
         if ngroups_per_int > max_ngroup:
             ngroups_per_int = max_ngroup
-            print("Num of groups per int exceeded max num of allowed groups"+str(ngroups_per_int))
-            print("Setting number of groups to max value = 65536.0")
             flag_high = "Groups/int > max num of allowed groups"
  
-        if ngroups_per_int < 2:
-            ngroups_per_int = 2.0  
-            nframes_per_int = 2
-            print("Hard saturation during first group. Check Pandeia Warnings.")
-            flag_default = "NGROUPS<2, SET TO NGROUPS=2 BY DEFAULT"
-    except: 
+        if (ngroups_per_int < mingroups) or (ngroups_per_int != np.nan):
+            ngroups_per_int = mingroups  
+            nframes_per_int = mingroups
+            flag_default = "NGROUPS<"+str(mingroups)+"SET TO NGROUPS="+str(mingroups)
+    elif 'ngroups_per_int' in locals(): 
+        #if it maxexptime_per_int been defined then set nframes per int 
+        nframes_per_int = ngroups_per_int*(nframe+nskip)
+        
+        #if that didn't work its because maxexptime_per_int is nan .. run calc with mingroups
+    else:
         #if maxexptime_per_int is nan then just ngroups and nframe to 2 
         #for the sake of not returning error
-        nframes_per_int = 2
-        ngroups_per_int = 2
-        flag_default = "NGROUPS<2, SET TO NGROUPS=2 BY DEFAULT"
+        ngroups_per_int = mingroups
+        nframes_per_int = mingroups
+        flag_default = "Something went wrong. SET TO NGROUPS="+str(mingroups)
                 
     #the integration time is related to the number of groups and the time of each 
     #group 
-    exptime_per_int = ngroups_per_int*exptime_per_frame
+    exptime_per_int = ngroups_per_int*tframe
     
     #clock time includes the reset frame 
-    clocktime_per_int = ngroups_per_int*exptime_per_frame
+    clocktime_per_int = ngroups_per_int*tframe
     
     #observing efficiency (i.e. what percentage of total time is spent on soure)
     eff = (ngroups_per_int - 1.0)/(ngroups_per_int + 1.0)
     
     #this says "per occultation" but this is just the in transit frames.. See below
-    #nframes_per_occultation = long(transit_duration/exptime_per_frame)
+    #nframes_per_occultation = long(transit_duration/tframe)
     #ngroups_per_occultation = long(nframes_per_occultation/(nframe + nskip))
     nint_per_occultation =  transit_duration*eff/exptime_per_int
     
@@ -383,8 +411,8 @@ def compute_timing(m,transit_duration,expfact_out,noccultations):
     #3 integrations in transit 
     if nint_in < min_nint_trans:
         ngroups_per_int = np.floor(ngroups_per_int/3.0)
-        exptime_per_int = (ngroups_per_int-1.)*exptime_per_frame
-        clocktime_per_int = ngroups_per_int*exptime_per_frame
+        exptime_per_int = (ngroups_per_int-1.)*tframe
+        clocktime_per_int = ngroups_per_int*tframe
         eff = (ngroups_per_int - 1.0)/(ngroups_per_int + 1.0)
         nint_per_occultation =  transit_duration*eff/exptime_per_int
         nint_in = np.ceil(nint_per_occultation)
@@ -395,12 +423,12 @@ def compute_timing(m,transit_duration,expfact_out,noccultations):
    
     timing = {
         "Transit Duration" : transit_duration/60.0/60.0,
-        "Seconds per Frame" : exptime_per_frame,
+        "Seconds per Frame" : tframe,
         "Exposure Time Per Integration (secs)":exptime_per_int,
-        "Num Groups per Integration" :ngroups_per_int, 
+        "APT: Num Groups per Integration" :ngroups_per_int, 
         "Num Integrations Out of Transit":nint_out,
         "Num Integrations In Transit":nint_in,
-        "Num Integrations per Occultation":nint_out+nint_in,
+        "APT: Num Integrations per Occultation":nint_out+nint_in,
         "On Source Time(sec)": noccultations*clocktime_per_int*(nint_out+nint_in),
         "Reset time Plus 30 min TA time (hrs)": overhead_per_int*(nint_in + nint_out)/60.0/60.0 + 0.5,
         "Observing Efficiency (%)": eff*100.0,
@@ -429,12 +457,11 @@ def perform_out(pandeia_input, pandexo_input,timing, both_spec):
         pandeia output dictionary for out of transit data 
     """
     #pandeia inputs, simulate one integration at a time 
-    pandeia_input['configuration']['detector']['ngroup'] = timing['Num Groups per Integration']
+    pandeia_input['configuration']['detector']['ngroup'] = timing['APT: Num Groups per Integration']
     pandeia_input['configuration']['detector']['nint'] = timing['Num Integrations Out of Transit']
     pandeia_input['configuration']['detector']['nexp'] = 1 
 
-    report_out = perform_calculation(pandeia_input, dict_report=True)
-    report_out.pop('3d')
+    report_out = perform_calculation(pandeia_input, dict_report=False)
 
     return report_out
 
@@ -483,7 +510,7 @@ def perform_in(pandeia_input, pandexo_input,timing, both_spec, out, calculation)
     else: 
         #only run pandeia a third time if doing slope method and need accurate run for the 
         #nint and timing
-        pandeia_input['configuration']['detector']['ngroup'] = timing['Num Groups per Integration']
+        pandeia_input['configuration']['detector']['ngroup'] = timing['APT: Num Groups per Integration']
         pandeia_input['configuration']['detector']['nint'] = timing['Num Integrations In Transit']
         pandeia_input['configuration']['detector']['nexp'] = 1
   
@@ -528,7 +555,7 @@ def add_warnings(pand_dict, timing, sat_level, flags,instrument):
     These are warnings are just suggestions and are not yet required.   
     """
 
-    ngroups_per_int = timing['Num Groups per Integration']
+    ngroups_per_int = timing['APT: Num Groups per Integration']
   
     #check for saturation 
     try:  

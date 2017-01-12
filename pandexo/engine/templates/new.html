@@ -141,6 +141,14 @@
             <p class="help-block">Or number of phase observations</p>
         </div>
     </div>
+    
+    <div class="form-group">
+        <label class="col-md-3 control-label" for="optimize">Number of Groups per Integration</label>
+        <div class="col-md-3">
+            <input type="text" class="form-control" id="optimize" name="optimize" value="optimize" >
+            <p class="help-block">Recommended to compute optimal groups per integration first (type "optimize"). But, you can also input any number from 2-65536. </p>
+        </div>
+    </div>
 
     <div class="form-group">
         <label class="col-md-3 control-label" for="eff">Photon-Electron Conv. Eff.</label>
@@ -154,10 +162,10 @@
         <div class="col-md-9">
             <select id="instrument" name="instrument" class="form-control" onchange ="showForm()">
                 <option value="0">Select Instrument</option>
-                <option value="MIRI">MIRI</option>
-                <option value="NIRSpec">NIRSpec</option>
-                <option value="NIRCam">NIRCam</option>
-                <option value="NIRISS">NIRISS</option>
+                <option value="MIRI">MIRI Low Resolution Spectroscopy</option>
+                <option value="NIRSpec">NIRSpec Bright Object Time Series</option>
+                <option value="NIRCam">NIRCam Grism Time Series</option>
+                <option value="NIRISS">NIRISS Single Object Slitless Spectroscopy</option>
             </select>
         </div>
     </div>
@@ -188,12 +196,10 @@
             </select>
             <select id="nirspecsubarray" name="nirspecsubarray" onchange="showForm()" class="form-control">
                 <option value="0">Select NIRSpec Subarray</option>
-                <option value="sub1024a">S1600 A1 SUB1024A</option>
-                <option value="sub1024b">S1600 A1 SUB1024B</option>
-                <option value="sub2048">S1600 A1 SUB2048</option>
-                <option value="sub32">S1600 A1 SUB32</option>
-                <option value="sub512">S1600 A1 SUB512</option>
-                <option value="sub512s">S1600 A1 SUB512S</option>
+                <option value="sub1024a">S1600A1 SUB1024A</option>
+                <option value="sub1024b">S1600A1 SUB1024B</option>
+                <option value="sub2048">S1600A1 SUB2048</option>
+                <option value="sub512">S1600A1 SUB512</option>
             </select>
 
         </div>
@@ -202,10 +208,8 @@
         <div class="col-md-6" id="NIRISS" style="display:none">
             <select id="nirissmode" name="nirissmode" onchange="showForm()" class="form-control">
                 <option value="0">Select NIRISS Mode</option>
-                <option value="1substrip80">Substrip 96 [1-2.8 um]</option>
-                <option value="2substrip80">Substrip 96 [.6-1 um]</option>
-                <option value="1substrip256">Substrip 256 [1-2.8 um]</option>
-                <option value="2substrip256">Substrip 256 [.6-1 um]</option>
+                <option value="substrip96">Substrip 96</option>
+                <option value="substrip256">Substrip 256</option>
             </select>
         </div>
 
@@ -218,9 +222,12 @@
             </select>
             <select id="nircamsubarray" name="nircamsubarray" onchange="showForm()" class="form-control">
                 <option value="0">Select NIRCam Subarray</option>
-                <option value="subgrism64">SUBGRISM64(tframe=0.341)</option>
-                <option value="subgrism128">SUBGRISM128(tframe=0.676)</option>
-                <option value="subgrism256">SUBGRISM258(tframe=1.347)</option>
+                <option value="subgrism64">SUBGRISM64, 4 outs(tframe=0.34)</option>
+                <option value="subgrism128">SUBGRISM128, 4 outs(tframe=0.67)</option>
+                <option value="subgrism256">SUBGRISM258, 4 outs(tframe=1.34)</option>
+                <option value="subgrism64 (noutputs=1)">SUBGRISM64, 1 out(tframe=1.3)</option>
+                <option value="subgrism128 (noutputs=1)">SUBGRISM128, 1 out(tframe=2.6)</option>
+                <option value="subgrism256 (noutputs=1)">SUBGRISM258, 1 out(tframe=5.2)</option>
             </select>
         </div>
     </div>

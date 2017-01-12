@@ -46,7 +46,7 @@
     "detector": {
               "subarray": "slitlessprism",
               "readmode": "fast",
-              "ngroup": 10,
+              "ngroup": 'optimize',
               "nint": 1,
               "nexp": 10
          }

@@ -12,8 +12,7 @@ num_cores = multiprocessing.cpu_count()
 
 ALL = {"WFC3 G141":False,
        "MIRI LRS":False,
-       "NIRISS SOSS_Or1":False,
-       "NIRISS SOSS_Or2":False,
+       "NIRISS SOSS":False,
        "NIRSpec G140M":False,
        "NIRSpec G140H":False,
        "NIRSpec G235M":False,

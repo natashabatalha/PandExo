@@ -53,7 +53,7 @@ class ExtractSpec():
         self.inn = inn
         self.out = out 
         self.exptime_per_int = timing["Exposure Time Per Integration (secs)"]
-        self.ngroups_per_int = timing["Num Groups per Integration"]
+        self.ngroups_per_int = timing["APT: Num Groups per Integration"]
         self.nocc = timing["Number of Transits"]
         self.nint_out = timing["Num Integrations Out of Transit"]
         self.nint_in = timing["Num Integrations In Transit"]

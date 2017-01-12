@@ -370,9 +370,14 @@ class CalculationNewHandler(BaseHandler):
                                "niriss_input.json")) as data_file:
                 pandata = json.load(data_file) 
                 nirissmode = self.get_argument("nirissmode")
-                pandata["strategy"]["order"] = int(nirissmode[0])
-                pandata["configuration"]["detector"]["subarray"] = nirissmode[1:13]
-
+                pandata["configuration"]["detector"]["subarray"] = nirissmode
+        
+        #write in optimal groups or set a number 
+        try:
+            pandata["configuration"]["detector"]["ngroup"] = int(self.get_argument("optimize"))
+        except: 
+            pandata["configuration"]["detector"]["ngroup"] = self.get_argument("optimize")
+        
         finaldata = {"pandeia_input": pandata , "pandexo_input":exodata}
 
         task = self.executor.submit(wrapper, finaldata)
@@ -737,7 +742,6 @@ class CalculationViewHandler(BaseHandler):
             if i.find(id) != -1:
                 os.remove(os.path.join(__TEMP__,i))
 
-        print len(script)
         self.render("view.html", script=script, div=div, id=id)
 
 class CalculationViewSpecHandler(BaseHandler):
