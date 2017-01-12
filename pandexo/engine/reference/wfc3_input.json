@@ -10,5 +10,13 @@
             "nsamp": "0",
             "samp_seq": "None"
         }
+    }, 
+    "strategy":{
+        "norbits":"number of HST orbits",
+        "nchan": "number of spec channels",
+        "scanDirection": "Forward or Round Trip",
+        "schedulability":"30 or 100",
+        "windowSize": 20
+
     }
 }

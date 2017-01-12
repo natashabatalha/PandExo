@@ -440,17 +440,6 @@ class CalculationNewHSTHandler(BaseHandler):
             except:
                 exodata["planet"]["w"]      = 90.
             exodata["planet"]["transit_duration"]   = float(self.get_argument("transit_duration"))
-            try: 
-                exodata["observation"]["norbits"]           = int(self.get_argument("norbits"))
-            except:
-                exodata["observation"]["norbits"]           = None
-            exodata["observation"]["noccultations"]         = int(self.get_argument("noccultations"))
-            exodata["observation"]["nchan"]                 = int(self.get_argument("nchan"))
-            exodata["observation"]["scanDirection"]         = self.get_argument("scanDirection")
-            try:
-                exodata["observation"]["windowSize"]        = float(self.get_argument("windowSize"))
-            except:
-                exodata["observation"]["windowSize"]        = 20.
             exodata["observation"]["noise_floor"]           = 0.0
             exodata["calculation"]                          = 'scale'
                 
@@ -467,6 +456,18 @@ class CalculationNewHSTHandler(BaseHandler):
                 pandata["configuration"]['detector']['nsamp']       = int(self.get_argument("nsamp"))
                 pandata["configuration"]['detector']['samp_seq']    = self.get_argument("samp_seq")
                 pandata["configuration"]['instrument']['disperser'] = self.get_argument("wfc3mode")
+            try: 
+                pandata["strategy"]["norbits"]           = int(self.get_argument("norbits"))
+            except:
+                pandata["strategy"]["norbits"]           = None
+            exodata["observation"]["noccultations"]         = int(self.get_argument("noccultations"))
+            pandata["strategy"]["nchan"]                 = int(self.get_argument("nchan"))
+            pandata["strategy"]["scanDirection"]         = self.get_argument("scanDirection")
+            try:
+                pandata["strategy"]["windowSize"]        = float(self.get_argument("windowSize"))
+            except:
+                pandata["strategy"]["windowSize"]        = 20.
+            pandata["strategy"]["schedulability"]           = self.get_argument("schedulability")
 
         finaldata = {"pandeia_input": pandata , "pandexo_input":exodata}
 

@@ -44,7 +44,8 @@ setup(
     namespace_packages=['pandexo'], packages=['pandexo'],
     d2to1=True,
     install_requires=[
-          'bokeh',
+          'numpy>=1.11.3',
+          'bokeh==0.12.4',
           'tornado',
           'pandas',
           'multiprocessing',

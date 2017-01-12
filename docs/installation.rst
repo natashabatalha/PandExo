@@ -32,6 +32,15 @@ in order to easily pull Stellar SED's from phoenix database.
     tar -xvf synphot5.tar.gz
     export PYSYN_CDBS=USRDIR/pysynphot_data
 
+Once you do this your untarred file should automatically have this structure. If you use wget you might 
+get something different. So double check this. 
+
+.. code-block:: bash
+
+    ls pysynphot_data/grid/phoenix/
+    .DS_Store     catalog.fits  phoenixm05/   phoenixm15/   phoenixm25/   phoenixm35/   phoenixp03/   
+    AA_README     phoenixm00/   phoenixm10/   phoenixm20/   phoenixm30/   phoenixm40/   phoenixp05/
+
 3. Download the `JWST Reference Data <http://ssb.stsci.edu/pandeia/engine/1.0/pandeia_data-1.0.tar.gz>`_ . 
 This is a big file (6 gigs) so think carefully about where you want to store it. Don't accidentally download 
 it on your Mac Air then wonder why you can't save a 32 Kb doc file. 
@@ -43,8 +52,16 @@ Then make sure you untar and point to the file so PandExo knows where it is.
     tar xf pandeia_data-1.0.tar.gz 
     export pandeia_refdata=USRDIR/pandeia_data
 
-Troubleshooting Pandeia
------------------------
+Your Pandeia data reference file should look like this: 
+
+.. code-block:: bash 
+
+    ls pandeia_data/
+    .DS_Store      README.md      background/    extinction/    jwst/          sed/           strategy/      
+    .git/          VERSION_PSF    devtools/      hst/           normalization/ source/        wfirst/ 
+    
+Troubleshooting
+---------------
 
 Problems with PYFFTW?
 `````````````````````
@@ -64,7 +81,7 @@ on `pyfftw`. If you experience this problem try these steps:
 
 Can't find Pandeia Reference Data
 `````````````````````````````````
-Did you forget to point to Pandeia's reference data?? 
+This usually looks like NoneType errors. 
 
 - Make sure PandExo knows where the Pandeia reference data is: 
 

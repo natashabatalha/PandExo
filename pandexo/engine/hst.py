@@ -195,10 +195,11 @@ def wfc3_TExoNS(dictinput):
     hmag            = pandexo_input['star']['mag']
     trdur           = pandexo_input['planet']['transit_duration']
     numTr           = pandexo_input['observation']['noccultations']
-    nchan           = pandexo_input['observation']['nchan']
-    scanDirection   = pandexo_input['observation']['scanDirection']
-    norbits         = pandexo_input['observation']['norbits']
-    schedulability  = pandexo_input['observation']['schedulability']
+
+    schedulability  = pandeia_input['strategy']['schedulability']
+    scanDirection   = pandeia_input['strategy']['scanDirection']
+    nchan           = pandeia_input['strategy']['nchan']
+    norbits         = pandeia_input['strategy']['norbits']
     disperser       = pandeia_input['configuration']['instrument']['disperser'].lower()
     subarray        = pandeia_input['configuration']['detector']['subarray'].lower()
     nsamp           = pandeia_input['configuration']['detector']['nsamp']
@@ -519,13 +520,14 @@ def compute_sim_hst(dictinput):
     pandeia_input   = dictinput['pandeia_input']
     
     disperser       = pandeia_input['configuration']['instrument']['disperser'].lower()
+    numorbits       = pandeia_input['strategy']['norbits']
+    nchan           = pandeia_input['strategy']['nchan']
+    windowSize      = pandeia_input['strategy']['windowSize']
+
     hmag            = pandexo_input['star']['mag']
-    nchan           = pandexo_input['observation']['nchan']
     specfile        = pandexo_input['planet']['exopath']
     w_unit          = pandexo_input['planet']['w_unit']
     f_unit          = pandexo_input['planet']['f_unit']
-    numorbits       = pandexo_input['observation']['norbits']
-    windowSize      = pandexo_input['observation']['windowSize']
     depth           = pandexo_input['planet']['depth']
     inc             = pandexo_input['planet']['i']
     aRs             = pandexo_input['planet']['ars']

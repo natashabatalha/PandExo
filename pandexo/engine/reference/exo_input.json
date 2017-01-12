@@ -31,11 +31,6 @@
         "noccultations": 1,
         "R": null,
         "fraction": 1, 
-        "noise_floor":0.0,
-        "norbits":"HST specific:number of HST orbits",
-        "nchan": "HST specific: number of spec channels",
-        "scanDirection": "HST specific:Forward or Round Trip",
-        "schedulability":"HST specific: 30 or 100",
-        "windowSize": 20
+        "noise_floor":0.0
         }
 }
