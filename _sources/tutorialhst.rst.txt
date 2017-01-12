@@ -54,16 +54,15 @@ Edit HST/WFC3 detector and observation inputs
 
 .. code:: python
 
+    exo_dict['observation']['noccultations']               = 5            # Number of transits/eclipses
     inst_dict['configuration']['detector']['subarray']     = 'GRISM256'   # GRISM256 or GRISM512
     inst_dict['configuration']['detector']['nsamp']        = 10           # WFC3 N_SAMP, 1..15
     inst_dict['configuration']['detector']['samp_seq']     = 'SPARS5'     # WFC3 SAMP_SEQ, SPARS5 or SPARS10
-    exo_dict['observation']['norbits']                     = 4            # Number of HST orbits
-    exo_dict['observation']['noccultations']               = 5            # Number of transits/eclipses
-    exo_dict['observation']['nchan']                       = 15           # Number of spectrophotometric channels
-    exo_dict['observation']['scanDirection']               = 'Forward'    # Spatial scan direction, Forward or Round Trip
-    exo_dict['observation']['schedulability']              = 30           # 30 for small/medium program, 100 for large program
-    exo_dict['observation']['windowSize']                  = 20           # (optional) Observation start window size in minutes. Default is 20 minutes.
-
+    inst_dict['strategy']['norbits']                       = 4            # Number of HST orbits
+    inst_dict['strategy']['nchan']                       = 15           # Number of spectrophotometric channels
+    inst_dict['strategy']['scanDirection']               = 'Forward'    # Spatial scan direction, Forward or Round Trip
+    inst_dict['strategy']['schedulability']              = 30           # 30 for small/medium program, 100 for large program
+    inst_dict['strategy']['windowSize']                  = 20           # (optional) Observation start window size in minutes. Default is 20 minutes.
 
 Run PandExo Command Line
 ------------------------

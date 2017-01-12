@@ -84,7 +84,7 @@
 <li class="toctree-l1"><a class="reference internal" href="includeme.html">Getting Started</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#installation-procedure">Installation Procedure</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#troubleshooting-pandeia">Troubleshooting Pandeia</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#troubleshooting">Troubleshooting</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#problems-with-pyfftw">Problems with PYFFTW?</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#can-t-find-pandeia-reference-data">Can&#8217;t find Pandeia Reference Data</a></li>
 </ul>
@@ -168,6 +168,13 @@ tar -xvf synphot5.tar.gz
 <span class="nb">export</span> <span class="nv">PYSYN_CDBS</span><span class="o">=</span>USRDIR/pysynphot_data
 </pre></div>
 </div>
+<p>Once you do this your untarred file should automatically have this structure. If you use wget you might
+get something different. So double check this.</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>ls pysynphot_data/grid/phoenix/
+.DS_Store     catalog.fits  phoenixm05/   phoenixm15/   phoenixm25/   phoenixm35/   phoenixp03/
+AA_README     phoenixm00/   phoenixm10/   phoenixm20/   phoenixm30/   phoenixm40/   phoenixp05/
+</pre></div>
+</div>
 <p>3. Download the <a class="reference external" href="http://ssb.stsci.edu/pandeia/engine/1.0/pandeia_data-1.0.tar.gz">JWST Reference Data</a> .
 This is a big file (6 gigs) so think carefully about where you want to store it. Don&#8217;t accidentally download
 it on your Mac Air then wonder why you can&#8217;t save a 32 Kb doc file.</p>
@@ -176,9 +183,15 @@ it on your Mac Air then wonder why you can&#8217;t save a 32 Kb doc file.</p>
 <span class="nb">export</span> <span class="nv">pandeia_refdata</span><span class="o">=</span>USRDIR/pandeia_data
 </pre></div>
 </div>
+<p>Your Pandeia data reference file should look like this:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>ls pandeia_data/
+.DS_Store      README.md      background/    extinction/    jwst/          sed/           strategy/
+.git/          VERSION_PSF    devtools/      hst/           normalization/ source/        wfirst/
+</pre></div>
 </div>
-<div class="section" id="troubleshooting-pandeia">
-<h2>Troubleshooting Pandeia<a class="headerlink" href="#troubleshooting-pandeia" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="troubleshooting">
+<h2>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="problems-with-pyfftw">
 <h3>Problems with PYFFTW?<a class="headerlink" href="#problems-with-pyfftw" title="Permalink to this headline">¶</a></h3>
 <p>Many users experience issues when downloading Pandeia because of it&#8217;s dependency on <cite>pyfftw</cite>. If you experience this problem try these steps:</p>
@@ -195,7 +208,7 @@ chmod +x build_fftw.sh
 </div>
 <div class="section" id="can-t-find-pandeia-reference-data">
 <h3>Can&#8217;t find Pandeia Reference Data<a class="headerlink" href="#can-t-find-pandeia-reference-data" title="Permalink to this headline">¶</a></h3>
-<p>Did you forget to point to Pandeia&#8217;s reference data??</p>
+<p>This usually looks like NoneType errors.</p>
 <ul class="simple">
 <li>Make sure PandExo knows where the Pandeia reference data is:</li>
 </ul>

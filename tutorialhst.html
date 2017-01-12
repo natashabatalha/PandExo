@@ -35,7 +35,7 @@
         <link rel="search" title="Search" href="search.html"/>
     <link rel="top" title="PandExo  documentation" href="index.html"/>
         <link rel="next" title="The Code" href="engine.html"/>
-        <link rel="prev" title="JWST Tutorial" href="tutorialjwst.html"/> 
+        <link rel="prev" title="Py Dict Structure of JWST Output" href="jwstdict.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -84,6 +84,8 @@
 <li class="toctree-l1"><a class="reference internal" href="includeme.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorialjwst.html">JWST Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="jwstinput.html">Possible Instrument Input Params</a></li>
+<li class="toctree-l1"><a class="reference internal" href="jwstdict.html">Py Dict Structure of JWST Output</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">HST Tutorial</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#editting-input-dictionaries">Editting Input Dictionaries</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#step-1-load-in-a-blank-exoplanet-dictionary">Step 1) Load in a blank exoplanet dictionary</a><ul>
@@ -198,15 +200,15 @@ any system observed with WFC3/IR.</p>
 </div>
 <div class="section" id="edit-hst-wfc3-detector-and-observation-inputs">
 <h4>Edit HST/WFC3 detector and observation inputs<a class="headerlink" href="#edit-hst-wfc3-detector-and-observation-inputs" title="Permalink to this headline">¶</a></h4>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">inst_dict</span><span class="p">[</span><span class="s1">&#39;configuration&#39;</span><span class="p">][</span><span class="s1">&#39;detector&#39;</span><span class="p">][</span><span class="s1">&#39;subarray&#39;</span><span class="p">]</span>     <span class="o">=</span> <span class="s1">&#39;GRISM256&#39;</span>   <span class="c1"># GRISM256 or GRISM512</span>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;observation&#39;</span><span class="p">][</span><span class="s1">&#39;noccultations&#39;</span><span class="p">]</span>               <span class="o">=</span> <span class="mi">5</span>            <span class="c1"># Number of transits/eclipses</span>
+<span class="n">inst_dict</span><span class="p">[</span><span class="s1">&#39;configuration&#39;</span><span class="p">][</span><span class="s1">&#39;detector&#39;</span><span class="p">][</span><span class="s1">&#39;subarray&#39;</span><span class="p">]</span>     <span class="o">=</span> <span class="s1">&#39;GRISM256&#39;</span>   <span class="c1"># GRISM256 or GRISM512</span>
 <span class="n">inst_dict</span><span class="p">[</span><span class="s1">&#39;configuration&#39;</span><span class="p">][</span><span class="s1">&#39;detector&#39;</span><span class="p">][</span><span class="s1">&#39;nsamp&#39;</span><span class="p">]</span>        <span class="o">=</span> <span class="mi">10</span>           <span class="c1"># WFC3 N_SAMP, 1..15</span>
 <span class="n">inst_dict</span><span class="p">[</span><span class="s1">&#39;configuration&#39;</span><span class="p">][</span><span class="s1">&#39;detector&#39;</span><span class="p">][</span><span class="s1">&#39;samp_seq&#39;</span><span class="p">]</span>     <span class="o">=</span> <span class="s1">&#39;SPARS5&#39;</span>     <span class="c1"># WFC3 SAMP_SEQ, SPARS5 or SPARS10</span>
-<span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;observation&#39;</span><span class="p">][</span><span class="s1">&#39;norbits&#39;</span><span class="p">]</span>                     <span class="o">=</span> <span class="mi">4</span>            <span class="c1"># Number of HST orbits</span>
-<span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;observation&#39;</span><span class="p">][</span><span class="s1">&#39;noccultations&#39;</span><span class="p">]</span>               <span class="o">=</span> <span class="mi">5</span>            <span class="c1"># Number of transits/eclipses</span>
-<span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;observation&#39;</span><span class="p">][</span><span class="s1">&#39;nchan&#39;</span><span class="p">]</span>                       <span class="o">=</span> <span class="mi">15</span>           <span class="c1"># Number of spectrophotometric channels</span>
-<span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;observation&#39;</span><span class="p">][</span><span class="s1">&#39;scanDirection&#39;</span><span class="p">]</span>               <span class="o">=</span> <span class="s1">&#39;Forward&#39;</span>    <span class="c1"># Spatial scan direction, Forward or Round Trip</span>
-<span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;observation&#39;</span><span class="p">][</span><span class="s1">&#39;schedulability&#39;</span><span class="p">]</span>              <span class="o">=</span> <span class="mi">30</span>           <span class="c1"># 30 for small/medium program, 100 for large program</span>
-<span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;observation&#39;</span><span class="p">][</span><span class="s1">&#39;windowSize&#39;</span><span class="p">]</span>                  <span class="o">=</span> <span class="mi">20</span>           <span class="c1"># (optional) Observation start window size in minutes. Default is 20 minutes.</span>
+<span class="n">inst_dict</span><span class="p">[</span><span class="s1">&#39;strategy&#39;</span><span class="p">][</span><span class="s1">&#39;norbits&#39;</span><span class="p">]</span>                       <span class="o">=</span> <span class="mi">4</span>            <span class="c1"># Number of HST orbits</span>
+<span class="n">inst_dict</span><span class="p">[</span><span class="s1">&#39;strategy&#39;</span><span class="p">][</span><span class="s1">&#39;nchan&#39;</span><span class="p">]</span>                       <span class="o">=</span> <span class="mi">15</span>           <span class="c1"># Number of spectrophotometric channels</span>
+<span class="n">inst_dict</span><span class="p">[</span><span class="s1">&#39;strategy&#39;</span><span class="p">][</span><span class="s1">&#39;scanDirection&#39;</span><span class="p">]</span>               <span class="o">=</span> <span class="s1">&#39;Forward&#39;</span>    <span class="c1"># Spatial scan direction, Forward or Round Trip</span>
+<span class="n">inst_dict</span><span class="p">[</span><span class="s1">&#39;strategy&#39;</span><span class="p">][</span><span class="s1">&#39;schedulability&#39;</span><span class="p">]</span>              <span class="o">=</span> <span class="mi">30</span>           <span class="c1"># 30 for small/medium program, 100 for large program</span>
+<span class="n">inst_dict</span><span class="p">[</span><span class="s1">&#39;strategy&#39;</span><span class="p">][</span><span class="s1">&#39;windowSize&#39;</span><span class="p">]</span>                  <span class="o">=</span> <span class="mi">20</span>           <span class="c1"># (optional) Observation start window size in minutes. Default is 20 minutes.</span>
 </pre></div>
 </div>
 </div>
@@ -284,7 +286,7 @@ any system observed with WFC3/IR.</p>
         <a href="engine.html" class="btn btn-neutral float-right" title="The Code" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="tutorialjwst.html" class="btn btn-neutral" title="JWST Tutorial" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="jwstdict.html" class="btn btn-neutral" title="Py Dict Structure of JWST Output" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
