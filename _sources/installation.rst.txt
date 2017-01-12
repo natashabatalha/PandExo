@@ -8,7 +8,13 @@ Installation
 Installation Procedure 
 ----------------------
 
-1. Download PandExo's repository: 
+1. Easiest way to Install: 
+
+.. code-block:: bash
+    
+    pip install pandexo.engine
+
+OR Download PandExo's repository: 
 
 .. code-block:: bash
 
@@ -25,6 +31,17 @@ in order to easily pull Stellar SED's from phoenix database.
     mv synphot5.tar.gz pysynphot_data
     tar -xvf synphot5.tar.gz
     export PYSYN_CDBS=USRDIR/pysynphot_data
+
+3. Download the `JWST Reference Data <http://ssb.stsci.edu/pandeia/engine/1.0/pandeia_data-1.0.tar.gz>`_ . 
+This is a big file (6 gigs) so think carefully about where you want to store it. Don't accidentally download 
+it on your Mac Air then wonder why you can save a 32 Kb doc file. 
+
+Then make sure you untar and point to the file so PandExo knows where it is. 
+
+.. code-block:: bash
+
+    tar xf pandeia_data-1.0.tar.gz 
+    export pandeia_refdata=USRDIR/pandeia_data
 
 Troubleshooting Pandeia
 -----------------------
