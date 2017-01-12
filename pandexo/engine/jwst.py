@@ -293,7 +293,6 @@ def compute_maxexptime_per_int(pandeia_input, sat_level):
         maxexptime_per_int = sat_level/maxdetvalue
     except: 
         maxexptime_per_int = np.nan
-    print maxexptime_per_int
     
     return maxexptime_per_int
         
