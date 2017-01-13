@@ -102,7 +102,7 @@ Problems Installing Pysynphot
 `````````````````````````````
 
 If you are having problems with this 
-you can use the astroconda distribution located `here <http://astroconda.readthedocs.io/en/latest/installation.html#install-astroconda`_. 
+you can use the astroconda distribution located `here <http://astroconda.readthedocs.io/en/latest/installation.html#install-astroconda>`_. 
 
 Problems with Multiprocessing
 `````````````````````````````
