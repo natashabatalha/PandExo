@@ -52,7 +52,7 @@ be helpful to put this in your ~/.bashrc file.
 .. code-block:: bash
 
     tar xf pandeia_data-1.0.tar.gz 
-    export pandeia_refdata=USRDIR/pandeia_data
+    export pandeia_refdata=USRDIR/pandeia_data-1.0
 
 Your Pandeia data reference file should look like this: 
 
@@ -81,6 +81,13 @@ on `pyfftw`. If you experience this problem try these steps:
     chmod +x build_fftw.sh
     ./build_fftw
 
+If that doesn't work Zach Berta-Thompson pointed out that this worked for him: 
+
+.. code-block:: bash 
+
+    brew install fftw
+    pip install pyfftw
+
 Can't find Pandeia Reference Data
 `````````````````````````````````
 This usually looks like NoneType errors. 
@@ -90,4 +97,16 @@ This usually looks like NoneType errors.
 .. code-block:: bash
 
     export pandeia_refdata=USRDIR/pandeia_data
+    
+Problems Installing Pysynphot
+`````````````````````````````
+
+If you are having problems with this 
+you can use the astroconda distribution located `here <http://astroconda.readthedocs.io/en/latest/installation.html#install-astroconda`_. 
+
+Problems with Multiprocessing
+`````````````````````````````
+
+Multiprocessing seems to throw errors if you are using Python 3. No immediate solutions yet... Other than, don't use Python 3. 
+
 
