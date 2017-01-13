@@ -370,7 +370,7 @@ def compute_timing(m,transit_duration,expfact_out,noccultations):
             ngroups_per_int = max_ngroup
             flag_high = "Groups/int > max num of allowed groups"
  
-        if (ngroups_per_int < mingroups) or (ngroups_per_int != np.nan):
+        if (ngroups_per_int < mingroups) or (ngroups_per_int == np.nan):
             ngroups_per_int = mingroups  
             nframes_per_int = mingroups
             flag_default = "NGROUPS<"+str(mingroups)+"SET TO NGROUPS="+str(mingroups)
