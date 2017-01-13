@@ -504,7 +504,7 @@
             <span class="n">ngroups_per_int</span> <span class="o">=</span> <span class="n">max_ngroup</span>
             <span class="n">flag_high</span> <span class="o">=</span> <span class="s2">&quot;Groups/int &gt; max num of allowed groups&quot;</span>
  
-        <span class="k">if</span> <span class="p">(</span><span class="n">ngroups_per_int</span> <span class="o">&lt;</span> <span class="n">mingroups</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">ngroups_per_int</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">ngroups_per_int</span> <span class="o">&lt;</span> <span class="n">mingroups</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">ngroups_per_int</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">):</span>
             <span class="n">ngroups_per_int</span> <span class="o">=</span> <span class="n">mingroups</span>  
             <span class="n">nframes_per_int</span> <span class="o">=</span> <span class="n">mingroups</span>
             <span class="n">flag_default</span> <span class="o">=</span> <span class="s2">&quot;NGROUPS&lt;&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">mingroups</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;SET TO NGROUPS=&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">mingroups</span><span class="p">)</span>
