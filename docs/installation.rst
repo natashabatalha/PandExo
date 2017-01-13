@@ -109,4 +109,9 @@ Problems with Multiprocessing
 
 Multiprocessing seems to throw errors if you are using Python 3. No immediate solutions yet... Other than, don't use Python 3. 
 
+To-Do
+-----
 
+Below are a list of task items. Please check below for your request before notifying me. 
+
+1. Add error messages to the pandas output page 
