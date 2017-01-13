@@ -1,9 +1,9 @@
 Installation
 ==============
 .. warning::
-    Before reading further, if you do not wish to install `PandExo`,\
-    there is an online version of the code at \
-    PSU Science and NASA GSFC. 
+    Before reading further, if you do not wish to install PandExo,\
+    there is an online version of the code here here at \
+    `PSU Science <http://pandexo.science.psu.edu:1111>`_ or here at NASA GSFC. 
 
 Installation Procedure 
 ----------------------
@@ -23,7 +23,7 @@ OR Download PandExo's repository:
     python setup.py install
 
 2. Download the Phoenix Stellar Atlas `FROM THIS LINK <ftp://ftp.stsci.edu/cdbs/tarfiles/synphot5.tar.gz>`_
-in order to easily pull Stellar SED's from phoenix database. Then type in the following bash commands. 
+in order to easily pull Stellar SED's from the phoenix database. Then type the following commands. 
 It might be helpful to add the export command to your ~/.bashrc file. 
 
 .. code-block:: bash
