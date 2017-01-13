@@ -1356,36 +1356,6 @@ taking into account integrations and number of transits</p>
 <div class="section" id="module-engine.create_input">
 <span id="engine-create-input"></span><h2>engine.create_input<a class="headerlink" href="#module-engine.create_input" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
-<dt id="engine.create_input.binning">
-<code class="descclassname">engine.create_input.</code><code class="descname">binning</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>R=2000.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/create_input.html#binning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.create_input.binning" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bins spectra at fixed dlambda</p>
-<p>Takes 2 arrays x and y and bins them into groups of blength.
-Uses uniform top hat to bin. This is necessary because really high resolution
-spectra cannot go through pandeia without crashing it. User is advised to bin spectra
-before running it through pandexo.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>x</strong> (<em>list</em><em> or </em><em>numpy array of float</em>) &#8211; x (micron)</li>
-<li><strong>y</strong> (<em>list</em><em> or </em><em>numpy array of float</em>) &#8211; (any unit)</li>
-<li><strong>R</strong> (<em>int</em><em> or </em><em>float</em>) &#8211; (optional) Default is 2000.0 at micron which is approximately max resolution pandeia can handle.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
-<li><strong>xout</strong> (<em>numpy array of flaot</em>) &#8211; 1D numpy arrays at new resolution</li>
-<li><strong>yout</strong> (<em>numpy array of flaot</em>) &#8211; 1D numpy arrays at new resolution</li>
-</ul>
-</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
 <dt id="engine.create_input.bothTrans">
 <code class="descclassname">engine.create_input.</code><code class="descname">bothTrans</code><span class="sig-paren">(</span><em>out_trans</em>, <em>planet</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/create_input.html#bothTrans"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.create_input.bothTrans" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates in transit flux</p>

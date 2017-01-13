@@ -135,54 +135,6 @@
 <span></span><span class="kn">import</span> <span class="nn">pysynphot</span> <span class="k">as</span> <span class="nn">psyn</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span> 
 <span class="kn">import</span> <span class="nn">pickle</span>
-
-<div class="viewcode-block" id="binning"><a class="viewcode-back" href="../../engine.html#engine.create_input.binning">[docs]</a><span class="k">def</span> <span class="nf">binning</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">R</span><span class="o">=</span><span class="mf">2000.0</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Bins spectra at fixed dlambda </span>
-<span class="sd">    </span>
-<span class="sd">    Takes 2 arrays x and y and bins them into groups of blength.</span>
-<span class="sd">    Uses uniform top hat to bin. This is necessary because really high resolution </span>
-<span class="sd">    spectra cannot go through pandeia without crashing it. User is advised to bin spectra </span>
-<span class="sd">    before running it through pandexo. </span>
-<span class="sd">    </span>
-<span class="sd">    Parameters </span>
-<span class="sd">    ----------</span>
-<span class="sd">	x : list or numpy array of float</span>
-<span class="sd">	    x (micron) </span>
-<span class="sd">	y : list or numpy array of float</span>
-<span class="sd">	    (any unit)</span>
-<span class="sd">	R : int or float </span>
-<span class="sd">	    (optional) Default is 2000.0 at micron which is approximately max resolution pandeia can handle.</span>
-<span class="sd">    </span>
-<span class="sd">    Returns</span>
-<span class="sd">    -------  </span>
-<span class="sd">    xout : numpy array of flaot</span>
-<span class="sd">        1D numpy arrays at new resolution </span>
-<span class="sd">    yout : numpy array of flaot</span>
-<span class="sd">        1D numpy arrays at new resolution </span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">wlength</span> <span class="o">=</span> <span class="mf">1.0</span><span class="o">/</span><span class="n">R</span>
-    <span class="n">ii</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">start</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">ind</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="p">[</span><span class="n">start</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">wlength</span><span class="p">:</span>
-            <span class="n">ind</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
-            <span class="n">start</span> <span class="o">=</span> <span class="n">i</span> 
-    
-    <span class="k">if</span> <span class="n">ind</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">ind</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)):</span>
-        <span class="n">ind</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
-    
-    <span class="c1"># convert to arrays if necessary</span>
-    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-
-    <span class="n">xout</span><span class="p">,</span><span class="n">yout</span><span class="o">=</span> <span class="p">[],[]</span>
-    <span class="n">first</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">ind</span><span class="p">:</span>
-        <span class="n">xout</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">first</span><span class="p">:</span><span class="n">i</span><span class="p">])</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">first</span><span class="p">:</span><span class="n">i</span><span class="p">]))</span>
-        <span class="n">yout</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">first</span><span class="p">:</span><span class="n">i</span><span class="p">])</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">first</span><span class="p">:</span><span class="n">i</span><span class="p">]))</span>
-        <span class="n">first</span> <span class="o">=</span> <span class="n">i</span> 
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">xout</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">yout</span><span class="p">)</span></div>
        
 <div class="viewcode-block" id="outTrans"><a class="viewcode-back" href="../../engine.html#engine.create_input.outTrans">[docs]</a><span class="k">def</span> <span class="nf">outTrans</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span> <span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Compute out of transit spectra</span>
@@ -340,7 +292,7 @@
         <span class="k">if</span> <span class="n">planet</span><span class="p">[</span><span class="s1">&#39;f_unit&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;fp/f*&#39;</span> <span class="p">:</span>
             <span class="n">flux_planet</span> <span class="o">=</span> <span class="n">flux_planet</span> 
         <span class="k">else</span><span class="p">:</span> 
-            <span class="nb">print</span> <span class="s2">&quot;Seconds with rp^2/r*^2 units not an option. Switch to Fp/F*&quot;</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Seconds with rp^2/r*^2 units not an option. Switch to Fp/F*&quot;</span><span class="p">)</span>
             <span class="k">return</span> 
         
         <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;time&#39;</span><span class="p">:</span><span class="n">time</span><span class="p">,</span> <span class="s1">&#39;wave&#39;</span><span class="p">:</span><span class="n">wave_star</span><span class="p">,</span><span class="s1">&#39;flux_out_trans&#39;</span><span class="p">:</span><span class="n">flux_star</span><span class="p">,</span> <span class="s1">&#39;planet_phase&#39;</span><span class="p">:</span><span class="n">flux_planet</span><span class="p">,</span>
@@ -350,31 +302,29 @@
         <span class="c1">#star flux to calc transit depth</span>
         <span class="n">flux_star</span> <span class="o">=</span> <span class="n">out_trans</span><span class="p">[</span><span class="s1">&#39;flux_out_trans&#39;</span><span class="p">]</span>
         <span class="n">wave_star</span> <span class="o">=</span> <span class="n">out_trans</span><span class="p">[</span><span class="s1">&#39;wave&#39;</span><span class="p">]</span>
-    
-        <span class="c1">#bin planet to R=3000 at 0.7 microns  </span>
-        <span class="n">wave_pR</span><span class="p">,</span> <span class="n">flux_planet_R</span> <span class="o">=</span> <span class="n">binning</span><span class="p">(</span><span class="n">wave_planet</span><span class="p">,</span> <span class="n">flux_planet</span><span class="p">)</span>
+
     
         <span class="c1">#give them same wave min and wave max </span>
-        <span class="n">wavemin</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="nb">min</span><span class="p">(</span><span class="n">wave_pR</span><span class="p">),</span> <span class="nb">min</span><span class="p">(</span><span class="n">wave_star</span><span class="p">),</span><span class="mf">0.5</span><span class="p">])</span>
-        <span class="n">wavemax</span> <span class="o">=</span> <span class="nb">min</span><span class="p">([</span><span class="nb">max</span><span class="p">(</span><span class="n">wave_pR</span><span class="p">),</span><span class="nb">max</span><span class="p">(</span><span class="n">wave_star</span><span class="p">),</span><span class="mi">15</span><span class="p">])</span>
+        <span class="n">wavemin</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="nb">min</span><span class="p">(</span><span class="n">wave_planet</span><span class="p">),</span> <span class="nb">min</span><span class="p">(</span><span class="n">wave_star</span><span class="p">),</span><span class="mf">0.5</span><span class="p">])</span>
+        <span class="n">wavemax</span> <span class="o">=</span> <span class="nb">min</span><span class="p">([</span><span class="nb">max</span><span class="p">(</span><span class="n">wave_planet</span><span class="p">),</span><span class="nb">max</span><span class="p">(</span><span class="n">wave_star</span><span class="p">),</span><span class="mi">15</span><span class="p">])</span>
     
-        <span class="n">flux_planet_R</span> <span class="o">=</span> <span class="n">flux_planet_R</span><span class="p">[(</span><span class="n">wave_pR</span><span class="o">&gt;</span><span class="n">wavemin</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">wave_pR</span><span class="o">&lt;</span><span class="n">wavemax</span><span class="p">)]</span>
-        <span class="n">wave_pR</span> <span class="o">=</span> <span class="n">wave_pR</span><span class="p">[(</span><span class="n">wave_pR</span><span class="o">&gt;</span><span class="n">wavemin</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">wave_pR</span><span class="o">&lt;</span><span class="n">wavemax</span><span class="p">)]</span>
+        <span class="n">flux_planet</span> <span class="o">=</span> <span class="n">flux_planet</span><span class="p">[(</span><span class="n">wave_planet</span><span class="o">&gt;</span><span class="n">wavemin</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">wave_planet</span><span class="o">&lt;</span><span class="n">wavemax</span><span class="p">)]</span>
+        <span class="n">wave_planet</span> <span class="o">=</span> <span class="n">wave_planet</span><span class="p">[(</span><span class="n">wave_planet</span><span class="o">&gt;</span><span class="n">wavemin</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">wave_planet</span><span class="o">&lt;</span><span class="n">wavemax</span><span class="p">)]</span>
     
-        <span class="n">flux_out_trans</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">wave_pR</span><span class="p">,</span> <span class="n">wave_star</span><span class="p">,</span> <span class="n">flux_star</span><span class="p">)</span>
+        <span class="n">flux_out_trans</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">wave_planet</span><span class="p">,</span> <span class="n">wave_star</span><span class="p">,</span> <span class="n">flux_star</span><span class="p">)</span>
 
         <span class="c1">#convert to 1-depth </span>
         <span class="k">if</span> <span class="n">planet</span><span class="p">[</span><span class="s1">&#39;f_unit&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;rp^2/r*^2&#39;</span> <span class="p">:</span>
-            <span class="n">depth_fraction</span> <span class="o">=</span> <span class="mf">1.</span><span class="o">-</span><span class="n">flux_planet_R</span> 
+            <span class="n">depth_fraction</span> <span class="o">=</span> <span class="mf">1.</span><span class="o">-</span><span class="n">flux_planet</span> 
             <span class="n">flux_in_trans</span> <span class="o">=</span> <span class="n">depth_fraction</span><span class="o">*</span><span class="n">flux_out_trans</span>
         <span class="k">elif</span> <span class="n">planet</span><span class="p">[</span><span class="s1">&#39;f_unit&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;fp/f*&#39;</span><span class="p">:</span>
-            <span class="n">depth_fraction</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">flux_planet_R</span><span class="p">)</span>
-            <span class="n">flux_in_trans</span> <span class="o">=</span> <span class="n">flux_out_trans</span><span class="o">*</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">flux_planet_R</span><span class="p">)</span>        
+            <span class="n">depth_fraction</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">flux_planet</span><span class="p">)</span>
+            <span class="n">flux_in_trans</span> <span class="o">=</span> <span class="n">flux_out_trans</span><span class="o">*</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">flux_planet</span><span class="p">)</span>        
         <span class="k">else</span><span class="p">:</span> 
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Units are not correct. Pick rp^2/r*^2 or fp/f*&#39;</span><span class="p">)</span>
     
-        <span class="n">results</span><span class="o">=</span> <span class="p">{</span><span class="s1">&#39;wave&#39;</span><span class="p">:</span><span class="n">wave_pR</span><span class="p">,</span> <span class="s1">&#39;flux_in_trans&#39;</span><span class="p">:</span> <span class="n">flux_in_trans</span><span class="p">,</span> <span class="s1">&#39;flux_out_trans&#39;</span><span class="p">:</span><span class="n">flux_out_trans</span><span class="p">,</span>
-                    <span class="s1">&#39;model_wave&#39;</span><span class="p">:</span><span class="n">wave_pR</span><span class="p">,</span> <span class="s1">&#39;model_spec&#39;</span><span class="p">:</span> <span class="n">flux_planet_R</span><span class="p">,</span> <span class="s1">&#39;frac&#39;</span><span class="p">:</span><span class="n">depth_fraction</span><span class="p">}</span> 
+        <span class="n">results</span><span class="o">=</span> <span class="p">{</span><span class="s1">&#39;wave&#39;</span><span class="p">:</span><span class="n">wave_planet</span><span class="p">,</span> <span class="s1">&#39;flux_in_trans&#39;</span><span class="p">:</span> <span class="n">flux_in_trans</span><span class="p">,</span> <span class="s1">&#39;flux_out_trans&#39;</span><span class="p">:</span><span class="n">flux_out_trans</span><span class="p">,</span>
+                    <span class="s1">&#39;model_wave&#39;</span><span class="p">:</span><span class="n">wave_planet</span><span class="p">,</span> <span class="s1">&#39;model_spec&#39;</span><span class="p">:</span> <span class="n">flux_planet</span><span class="p">,</span> <span class="s1">&#39;frac&#39;</span><span class="p">:</span><span class="n">depth_fraction</span><span class="p">}</span> 
     <span class="k">return</span> <span class="n">results</span></div>
 
 

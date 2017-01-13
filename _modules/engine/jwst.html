@@ -252,29 +252,29 @@
             <span class="s2">&quot;nframe&quot;</span><span class="p">:</span><span class="n">nframe</span><span class="p">,</span><span class="s2">&quot;mingroups&quot;</span><span class="p">:</span><span class="n">mingroups</span><span class="p">,</span><span class="s2">&quot;nskip&quot;</span><span class="p">:</span><span class="n">nskip</span><span class="p">}</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="c1">#run pandeia once to determine max exposure time per int and get exposure params</span>
-        <span class="nb">print</span> <span class="s2">&quot;Optimization Reqested: Computing Duty Cycle&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Optimization Reqested: Computing Duty Cycle&quot;</span><span class="p">)</span>
         <span class="n">m</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;maxexptime_per_int&quot;</span><span class="p">:</span><span class="n">compute_maxexptime_per_int</span><span class="p">(</span><span class="n">pandeia_input</span><span class="p">,</span> <span class="n">sat_level</span><span class="p">)</span> <span class="p">,</span> 
             <span class="s2">&quot;tframe&quot;</span><span class="p">:</span><span class="n">tframe</span><span class="p">,</span><span class="s2">&quot;nframe&quot;</span><span class="p">:</span><span class="n">nframe</span><span class="p">,</span><span class="s2">&quot;mingroups&quot;</span><span class="p">:</span><span class="n">mingroups</span><span class="p">,</span><span class="s2">&quot;nskip&quot;</span><span class="p">:</span><span class="n">nskip</span><span class="p">}</span>
-        <span class="nb">print</span> <span class="s2">&quot;Finished Duty Cycle Calc&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Finished Duty Cycle Calc&quot;</span><span class="p">)</span>
 
     <span class="c1">#calculate all timing info</span>
     <span class="n">timing</span><span class="p">,</span> <span class="n">flags</span> <span class="o">=</span> <span class="n">compute_timing</span><span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="n">transit_duration</span><span class="p">,</span><span class="n">expfact_out</span><span class="p">,</span><span class="n">noccultations</span><span class="p">)</span>
     
     <span class="c1">#Simulate out trans and in transit</span>
-    <span class="nb">print</span> <span class="s2">&quot;Starting Out of Transit Simulation&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Starting Out of Transit Simulation&quot;</span><span class="p">)</span>
     <span class="n">out</span> <span class="o">=</span> <span class="n">perform_out</span><span class="p">(</span><span class="n">pandeia_input</span><span class="p">,</span> <span class="n">pandexo_input</span><span class="p">,</span><span class="n">timing</span><span class="p">,</span> <span class="n">both_spec</span><span class="p">)</span>
     
     <span class="c1">#extract extraction area before dict conversion</span>
     <span class="n">extraction_area</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">extraction_area</span>
     <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span>
     <span class="n">out</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;3d&#39;</span><span class="p">)</span>
-    <span class="nb">print</span> <span class="s2">&quot;End out of Transit&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;End out of Transit&quot;</span><span class="p">)</span>
 
     <span class="c1">#this kind of redundant going to compute inn from out instead </span>
     <span class="c1">#keep perform_in but change inputs to (out, timing, both_spec)</span>
-    <span class="nb">print</span> <span class="s2">&quot;Starting In Transit Simulation&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Starting In Transit Simulation&quot;</span><span class="p">)</span>
     <span class="n">inn</span> <span class="o">=</span> <span class="n">perform_in</span><span class="p">(</span><span class="n">pandeia_input</span><span class="p">,</span> <span class="n">pandexo_input</span><span class="p">,</span><span class="n">timing</span><span class="p">,</span> <span class="n">both_spec</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">calculation</span><span class="p">)</span>
-    <span class="nb">print</span> <span class="s2">&quot;End In Transit&quot;</span> 
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;End In Transit&quot;</span><span class="p">)</span>
 
     <span class="c1">#compute warning flags for timing info </span>
     <span class="n">warnings</span> <span class="o">=</span> <span class="n">add_warnings</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">timing</span><span class="p">,</span> <span class="n">sat_level</span><span class="p">,</span> <span class="n">flags</span><span class="p">,</span> <span class="n">instrument</span><span class="p">)</span> 
