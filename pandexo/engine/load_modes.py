@@ -43,7 +43,7 @@ class SetDefaultModes():
         try: 
             return getattr(self, self.instrument)()
         except: 
-            print "INVALID INSTRUMENT NAME"
+            print("INVALID INSTRUMENT NAME")
             return 
                                    
     def wfc3(self):

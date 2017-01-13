@@ -168,7 +168,7 @@ def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', out
             myy = dict['OriginalInput']['model_spec']
             
             my = uniform_tophat_mean(x, mxx,myy)
-            fig1d.line(x,my, color='white',alpha=0.2, line_width = 4)
+            fig1d.line(x,my, color='black',alpha=0.2, line_width = 4)
         if legend: 
             fig1d.circle(x, y, color=colors[i], legend = legend_keys[i])
         else: 

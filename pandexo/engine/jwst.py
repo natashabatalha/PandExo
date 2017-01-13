@@ -118,29 +118,29 @@ def compute_full_sim(dictinput):
             "nframe":nframe,"mingroups":mingroups,"nskip":nskip}
     else:
         #run pandeia once to determine max exposure time per int and get exposure params
-        print "Optimization Reqested: Computing Duty Cycle"
+        print("Optimization Reqested: Computing Duty Cycle")
         m = {"maxexptime_per_int":compute_maxexptime_per_int(pandeia_input, sat_level) , 
             "tframe":tframe,"nframe":nframe,"mingroups":mingroups,"nskip":nskip}
-        print "Finished Duty Cycle Calc"
+        print("Finished Duty Cycle Calc")
 
     #calculate all timing info
     timing, flags = compute_timing(m,transit_duration,expfact_out,noccultations)
     
     #Simulate out trans and in transit
-    print "Starting Out of Transit Simulation"
+    print("Starting Out of Transit Simulation")
     out = perform_out(pandeia_input, pandexo_input,timing, both_spec)
     
     #extract extraction area before dict conversion
     extraction_area = out.extraction_area
     out = out.as_dict()
     out.pop('3d')
-    print "End out of Transit"
+    print("End out of Transit")
 
     #this kind of redundant going to compute inn from out instead 
     #keep perform_in but change inputs to (out, timing, both_spec)
-    print "Starting In Transit Simulation"
+    print("Starting In Transit Simulation")
     inn = perform_in(pandeia_input, pandexo_input,timing, both_spec, out, calculation)
-    print "End In Transit" 
+    print("End In Transit")
 
     #compute warning flags for timing info 
     warnings = add_warnings(out, timing, sat_level, flags, instrument) 

@@ -1,54 +1,6 @@
 import pysynphot as psyn
 import numpy as np 
 import pickle
-
-def binning(x, y, R=2000.0):
-    """Bins spectra at fixed dlambda 
-    
-    Takes 2 arrays x and y and bins them into groups of blength.
-    Uses uniform top hat to bin. This is necessary because really high resolution 
-    spectra cannot go through pandeia without crashing it. User is advised to bin spectra 
-    before running it through pandexo. 
-    
-    Parameters 
-    ----------
-	x : list or numpy array of float
-	    x (micron) 
-	y : list or numpy array of float
-	    (any unit)
-	R : int or float 
-	    (optional) Default is 2000.0 at micron which is approximately max resolution pandeia can handle.
-    
-    Returns
-    -------  
-    xout : numpy array of flaot
-        1D numpy arrays at new resolution 
-    yout : numpy array of flaot
-        1D numpy arrays at new resolution 
-    """
-    wlength = 1.0/R
-    ii = 0
-    start = 0
-    ind = []
-    for i in range(0, len(x)-1):
-        if x[i+1] - x[start] >= wlength:
-            ind.append(i+1)
-            start = i 
-    
-    if ind[len(ind)-1] != (len(x)):
-        ind.append(len(x))
-    
-    # convert to arrays if necessary
-    x = np.array(x)
-    y = np.array(y)
-
-    xout,yout= [],[]
-    first = 0
-    for i in ind:
-        xout.append(sum(x[first:i])/len(x[first:i]))
-        yout.append(sum(y[first:i])/len(y[first:i]))
-        first = i 
-    return np.array(xout),np.array(yout)
        
 def outTrans(input) :
     """Compute out of transit spectra
@@ -206,7 +158,7 @@ def bothTrans(out_trans, planet) :
         if planet['f_unit'] == 'fp/f*' :
             flux_planet = flux_planet 
         else: 
-            print "Seconds with rp^2/r*^2 units not an option. Switch to Fp/F*"
+            print("Seconds with rp^2/r*^2 units not an option. Switch to Fp/F*")
             return 
         
         return {'time':time, 'wave':wave_star,'flux_out_trans':flux_star, 'planet_phase':flux_planet,
@@ -216,31 +168,29 @@ def bothTrans(out_trans, planet) :
         #star flux to calc transit depth
         flux_star = out_trans['flux_out_trans']
         wave_star = out_trans['wave']
-    
-        #bin planet to R=3000 at 0.7 microns  
-        wave_pR, flux_planet_R = binning(wave_planet, flux_planet)
+
     
         #give them same wave min and wave max 
-        wavemin = max([min(wave_pR), min(wave_star),0.5])
-        wavemax = min([max(wave_pR),max(wave_star),15])
+        wavemin = max([min(wave_planet), min(wave_star),0.5])
+        wavemax = min([max(wave_planet),max(wave_star),15])
     
-        flux_planet_R = flux_planet_R[(wave_pR>wavemin) & (wave_pR<wavemax)]
-        wave_pR = wave_pR[(wave_pR>wavemin) & (wave_pR<wavemax)]
+        flux_planet = flux_planet[(wave_planet>wavemin) & (wave_planet<wavemax)]
+        wave_planet = wave_planet[(wave_planet>wavemin) & (wave_planet<wavemax)]
     
-        flux_out_trans = np.interp(wave_pR, wave_star, flux_star)
+        flux_out_trans = np.interp(wave_planet, wave_star, flux_star)
 
         #convert to 1-depth 
         if planet['f_unit'] == 'rp^2/r*^2' :
-            depth_fraction = 1.-flux_planet_R 
+            depth_fraction = 1.-flux_planet 
             flux_in_trans = depth_fraction*flux_out_trans
         elif planet['f_unit'] == 'fp/f*':
-            depth_fraction = (1.0 + flux_planet_R)
-            flux_in_trans = flux_out_trans*(1.0 + flux_planet_R)        
+            depth_fraction = (1.0 + flux_planet)
+            flux_in_trans = flux_out_trans*(1.0 + flux_planet)        
         else: 
             raise Exception('Units are not correct. Pick rp^2/r*^2 or fp/f*')
     
-        results= {'wave':wave_pR, 'flux_in_trans': flux_in_trans, 'flux_out_trans':flux_out_trans,
-                    'model_wave':wave_pR, 'model_spec': flux_planet_R, 'frac':depth_fraction} 
+        results= {'wave':wave_planet, 'flux_in_trans': flux_in_trans, 'flux_out_trans':flux_out_trans,
+                    'model_wave':wave_planet, 'model_spec': flux_planet, 'frac':depth_fraction} 
     return results
 
 
