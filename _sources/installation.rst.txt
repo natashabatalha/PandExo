@@ -22,8 +22,9 @@ OR Download PandExo's repository:
     cd pandexo
     python setup.py install
 
-2. Download the `Phoenix Stellar Atlas <ftp://ftp.stsci.edu/cdbs/tarfiles/synphot5.tar.gz>`_
-in order to easily pull Stellar SED's from phoenix database. 
+2. Download the Phoenix Stellar Atlas `FROM THIS LINK <ftp://ftp.stsci.edu/cdbs/tarfiles/synphot5.tar.gz>`_
+in order to easily pull Stellar SED's from phoenix database. Then type in the following bash commands. 
+It might be helpful to add the export command to your ~/.bashrc file. 
 
 .. code-block:: bash
 
@@ -41,11 +42,12 @@ get something different. So double check this.
     .DS_Store     catalog.fits  phoenixm05/   phoenixm15/   phoenixm25/   phoenixm35/   phoenixp03/   
     AA_README     phoenixm00/   phoenixm10/   phoenixm20/   phoenixm30/   phoenixm40/   phoenixp05/
 
-3. Download the `JWST Reference Data <http://ssb.stsci.edu/pandeia/engine/1.0/pandeia_data-1.0.tar.gz>`_ . 
+3. Download the JWST Reference Data `FROM HERE <http://ssb.stsci.edu/pandeia/engine/1.0/pandeia_data-1.0.tar.gz>`_ . 
 This is a big file (6 gigs) so think carefully about where you want to store it. Don't accidentally download 
 it on your Mac Air then wonder why you can't save a 32 Kb doc file. 
 
-Then make sure you untar and point to the file so PandExo knows where it is. 
+Then make sure you untar and point to the file so PandExo knows where it is. Like above, it might 
+be helpful to put this in your ~/.bashrc file. 
 
 .. code-block:: bash
 
