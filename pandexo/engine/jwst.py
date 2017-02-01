@@ -681,14 +681,14 @@ def bin_wave_to_R(w, R):
             tracker = max(w)
     return wave
     
-def uniform_tophat_sum(xnew,x, y):
+def uniform_tophat_sum(newx,x, y):
     """Adapted from Mike R. Line to rebin spectra
     
     Sums groups of points in certain wave bin 
     
     Parameters
     ----------
-    xnew : list of float or numpy array of float
+    newx : list of float or numpy array of float
         New wavelength grid to rebin to 
     x : list of float or numpy array of float 
         Old wavelength grid to get rid of 
@@ -710,7 +710,7 @@ def uniform_tophat_sum(xnew,x, y):
     >>> newy
     array([ 240.,  250.,  130.])
     """
-    xnew = np.array(newx)
+    newx = np.array(newx)
     szmod=newx.shape[0]
     delta=np.zeros(szmod)
     ynew=np.zeros(szmod)
