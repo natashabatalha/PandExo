@@ -54,13 +54,12 @@ class ExtractSpec():
         self.out = out 
         self.exptime_per_int = timing["Exposure Time Per Integration (secs)"]
         self.ngroups_per_int = timing["APT: Num Groups per Integration"]
-        self.nocc = timing["Number of Transits"]
         self.nint_out = timing["Num Integrations Out of Transit"]
         self.nint_in = timing["Num Integrations In Transit"]
         self.tframe = timing["Seconds per Frame"]
         self.rn = rn 
         self.extraction_area = extraction_area
-        
+
         #on source out versus in 
         self.on_source_in = self.tframe * (self.ngroups_per_int-1.0) * self.nint_in
         self.on_source_out = self.tframe * (self.ngroups_per_int-1.0) * self.nint_out
@@ -152,7 +151,6 @@ class ExtractSpec():
         dict 
             Dictionary with all extracted 1d products including noise, background, fluxes 
         """
-        nocc = self.nocc
         nint_in = self.nint_in
         nint_out = self.nint_out
         LBout = extract_info['bounds']['LBout']
@@ -184,14 +182,14 @@ class ExtractSpec():
 
         #sum 2d spectrum in extraction region in spatial direciton to create 1d spec
         for i in range(0,lenw):
-            photon_out_1d[i] = sum(photon_sig_out[LBout[i]:UBout[i],i])*nint_out*nocc
-            photon_in_1d[i] = sum(photon_sig_in[LBout[i]:UBout[i],i])*nint_in*nocc
-            var_out_1d[i] = sum(var_pix_out[LBout[i]:UBout[i],i])*nint_out*nocc
-            var_in_1d[i] = sum(var_pix_in[LBout[i]:UBout[i],i])*nint_in*nocc
-            sky_out_1d[i] = sum(photon_sky_out[LBout[i]:UBout[i],i])*nint_out*nocc
-            sky_in_1d[i] = sum(photon_sky_in[LBout[i]:UBout[i],i])*nint_in*nocc
-            rn_out_1d[i] = sum(rn_var_out[LBout[i]:UBout[i],i])*nint_out*nocc
-            rn_in_1d[i] = sum(rn_var_in[LBout[i]:UBout[i],i])*nint_in*nocc
+            photon_out_1d[i] = sum(photon_sig_out[LBout[i]:UBout[i],i])*nint_out
+            photon_in_1d[i] = sum(photon_sig_in[LBout[i]:UBout[i],i])*nint_in
+            var_out_1d[i] = sum(var_pix_out[LBout[i]:UBout[i],i])*nint_out
+            var_in_1d[i] = sum(var_pix_in[LBout[i]:UBout[i],i])*nint_in
+            sky_out_1d[i] = sum(photon_sky_out[LBout[i]:UBout[i],i])*nint_out
+            sky_in_1d[i] = sum(photon_sky_in[LBout[i]:UBout[i],i])*nint_in
+            rn_out_1d[i] = sum(rn_var_out[LBout[i]:UBout[i],i])*nint_out
+            rn_in_1d[i] = sum(rn_var_in[LBout[i]:UBout[i],i])*nint_in
 
 
         photon_out_1d = np.array(photon_out_1d)
@@ -204,8 +202,8 @@ class ExtractSpec():
         rn_in_1d = np.array(rn_in_1d)
 
         return {'photon_out_1d':photon_out_1d, 'photon_in_1d':photon_in_1d, 
-                'var_in_1d':var_in_1d, 'var_out_1d':var_out_1d, 'rn_in_1d':rn_in_1d,
-                'rn_out_1d':rn_out_1d,'sky_in_1d': sky_in_1d, 'sky_out_1d': sky_out_1d, 
+                'var_in_1d':var_in_1d, 'var_out_1d':var_out_1d,
+                'rn[out,in]':[rn_out_1d,rn_in_1d],'bkg[out,in]': [sky_in_1d,sky_out_1d], 
                 'extract_info':extract_info,'on_source_in':self.on_source_in, 
                 'on_source_out':self.on_source_out}
 
@@ -321,36 +319,58 @@ class ExtractSpec():
         """Compute noise using Pandeia 1d noise
         
         Contains functionality to compute noise using Pandeia 1d noise 
-        output products (uses MULTIACCUM) noise formula 
+        output products (uses MULTIACCUM) noise formula
         
         Return
         ------
         dict 
-            all optimally extracted 1d products        
+            all optimally extracted 1d products for a single occultation
         """
+        #on source out versus in 
+        on_source_in = self.on_source_in
+        on_source_out = self.on_source_out
+        
         curves_out = self.out['1d']
         curves_inn = self.inn['1d']
-        noccultations = self.nocc
+
+        #background + contamination extracted 
+        #not used for noise calculations, just 
+        #used for output
+        bkg_flux_inn = curves_inn['extracted_bg_only'][1] * on_source_in 
+        bkg_flux_out = curves_out['extracted_bg_only'][1] * on_source_out
+
+        #calculate rn 
+        rn_var = 2.0*self.rn**2.0
+                
+        #1d rn     = rn/pix * # of integrations * #extraction area 
+        #not used for noise calcualtions here 
+        #just used for output 
+        rn_var_inn = rn_var * self.nint_in * self.extraction_area 
+        rn_var_out = rn_var * self.nint_out * self.extraction_area 
+
         #In the following the SN is changed to incorporate number of occultations 
         #i.e. multiply by sqrt(n) 
-        sn_in = curves_inn['sn'][1]*np.sqrt(noccultations)
-        sn_out = curves_out['sn'][1]*np.sqrt(noccultations)
+        sn_in = curves_inn['sn'][1]
+        sn_out = curves_out['sn'][1]
 
-        extracted_flux_inn = curves_inn['extracted_flux'][1]
+        extracted_flux_inn = curves_inn['extracted_flux'][1]*on_source_in
+        
         extracted_noise_inn = curves_inn['extracted_flux'][1]/(sn_in)
 
-        extracted_flux_out = curves_out['extracted_flux'][1]
+        extracted_flux_out = curves_out['extracted_flux'][1]*on_source_out
+        
         extracted_noise_out = curves_out['extracted_flux'][1]/(sn_out)
 
         #units of this unconventional.. sigma/s
         #because snr = extracted flux / extracted noise and 
         #extracted flux in units of electrons /s
-        varin = (extracted_noise_inn)**2.0
-        varout = (extracted_noise_out)**2.0
+        varin = (extracted_noise_inn*on_source_in)**2.0
+        varout = (extracted_noise_out*on_source_out)**2.0
 
         return {'photon_out_1d':extracted_flux_out, 'photon_in_1d':extracted_flux_inn, 
                     'var_in_1d':varin, 'var_out_1d': varout,'on_source_in':self.on_source_in, 
-                'on_source_out':self.on_source_out}
+                'on_source_out':self.on_source_out,'bkg[out,in]':[bkg_flux_out,bkg_flux_inn],
+                'rn[out,in]':[rn_var_out,rn_var_inn]}
     
     
     def run_f_minus_l(self):
@@ -363,7 +383,7 @@ class ExtractSpec():
         Returns
         -------
         dict 
-            all optimally extracted 1d products        
+            all optimally extracted 1d products for a single transit     
         """
 
         inn = self.inn
@@ -378,26 +398,26 @@ class ExtractSpec():
         #calculate rn 
         rn_var = self.rn**2.0
                 
+        #1d rn     = rn/pix * # of integrations   * #pixs
+        rn_var_inn = rn_var * self.nint_in * self.extraction_area 
+        rn_var_out = rn_var * self.nint_out * self.extraction_area 
 
-        #1d rn     = rn/pix * # of integrations *nocc  * #pixs 
-        rn_var_inn = rn_var * self.nint_in * self.nocc * self.extraction_area 
-        rn_var_out = rn_var * self.nint_out * self.nocc * self.extraction_area 
-        
         #extract fluxs
-        extracted_flux_inn = curves_inn['extracted_flux'][1] * on_source_in * self.nocc
-        extracted_flux_out = curves_out['extracted_flux'][1] * on_source_out * self.nocc
+        extracted_flux_inn = curves_inn['extracted_flux'][1] * on_source_in 
+        extracted_flux_out = curves_out['extracted_flux'][1] * on_source_out 
                 
         #background + contamination extracted 
-        bkg_flux_inn = curves_inn['extracted_bg_only'][1] * on_source_in * self.nocc
-        bkg_flux_out = curves_out['extracted_bg_only'][1] * on_source_out * self.nocc
+        bkg_flux_inn = curves_inn['extracted_bg_only'][1] * on_source_in 
+        bkg_flux_out = curves_out['extracted_bg_only'][1] * on_source_out 
         
         #total nois 
-        varin = (extracted_flux_inn + bkg_flux_inn + rn_var_inn)/on_source_in**2.0
-        varout = (extracted_flux_out + bkg_flux_out + rn_var_out)/on_source_out**2.0
+        varin = (extracted_flux_inn + bkg_flux_inn + rn_var_inn)
+        varout = (extracted_flux_out + bkg_flux_out + rn_var_out)
         
-        return {'photon_out_1d':extracted_flux_out/on_source_out, 'photon_in_1d':extracted_flux_inn/on_source_in, 
+        return {'photon_out_1d':extracted_flux_out, 'photon_in_1d':extracted_flux_inn, 
                     'var_in_1d':varin, 'var_out_1d': varout,'on_source_in':self.on_source_in, 
-                'on_source_out':self.on_source_out}
+                'on_source_out':self.on_source_out, 'rn[out,in]':[rn_var_out,rn_var_inn], 
+                'bkg[out,in]':[bkg_flux_out,bkg_flux_inn]}
     
 
     
@@ -415,24 +435,24 @@ class ExtractSpec():
         """
         time = self.inn['time']
         tint = self.exptime_per_int 
-        curves_out = self.out.curves
-        #don't be an idiot and input a ridiculously low res phase curve
+        curves_out = self.out['1d']
+        #don't input a ridiculously low res phase curve
         new_t = np.arange(min(time), max(time), tint) 
         planet_phase = np.interp(new_t, time, self.inn['planet_phase'])
 
-        rn_var = self.rn**2.0
+        rn_var = 2.0*self.rn**2.0
 
 
-        #1d rn     = rn/pix * # of integrations *nocc  * #pixs 
-        rn_var_out = rn_var * self.nocc * self.extraction_area  # the initial output is always sampled by 1 integration
+        #1d rn     = rn/pix * # of integrations * #pixs 
+        rn_var_out = rn_var * self.extraction_area  # the initial output is always sampled by 1 integration
    
-        extracted_flux_out = sum(curves_out['extracted_flux'][1]) * tint * self.nocc
+        extracted_flux_out = sum(curves_out['extracted_flux'][1]) * tint 
         
         flux_time_out = extracted_flux_out+ np.zeros(len(new_t))
         
         flux_time_in = flux_time_out*(1.0 + planet_phase)
         
-        bkg_flux_out = sum(curves_out['extracted_bg_only'][1]) * tint * self.nocc
+        bkg_flux_out = sum(curves_out['extracted_bg_only'][1]) * tint 
         
         varout = flux_time_out + bkg_flux_out + rn_var_out
         varin = flux_time_in + bkg_flux_out + rn_var_out
@@ -440,6 +460,7 @@ class ExtractSpec():
         
         return {'photon_out_1d':flux_time_out, 'photon_in_1d':flux_time_in, 
                     'var_in_1d':varin, 'var_out_1d': varout, 'time':new_t,'on_source_in':'N/A', 
-                'on_source_out':'N/A'}
+                'on_source_out':'N/A','rn[out,in]':[rn_var_out,rn_var_out], 
+                'bkg[out,in]':[bkg_flux_out,bkg_flux_out]}
         
 
