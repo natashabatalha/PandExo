@@ -536,15 +536,14 @@
     <span class="n">exptime_per_int</span> <span class="o">=</span> <span class="n">ngroups_per_int</span><span class="o">*</span><span class="n">tframe</span>
     
     <span class="c1">#clock time includes the reset frame </span>
-    <span class="n">clocktime_per_int</span> <span class="o">=</span> <span class="n">ngroups_per_int</span><span class="o">*</span><span class="n">tframe</span>
+    <span class="n">clocktime_per_int</span> <span class="o">=</span> <span class="p">(</span><span class="n">ngroups_per_int</span><span class="o">+</span><span class="mf">1.0</span><span class="p">)</span><span class="o">*</span><span class="n">tframe</span>
     
     <span class="c1">#observing efficiency (i.e. what percentage of total time is spent on soure)</span>
     <span class="n">eff</span> <span class="o">=</span> <span class="p">(</span><span class="n">ngroups_per_int</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">ngroups_per_int</span> <span class="o">+</span> <span class="mf">1.0</span><span class="p">)</span>
     
     <span class="c1">#this says &quot;per occultation&quot; but this is just the in transit frames.. See below</span>
-    <span class="c1">#nframes_per_occultation = long(transit_duration/tframe)</span>
-    <span class="c1">#ngroups_per_occultation = long(nframes_per_occultation/(nframe + nskip))</span>
-    <span class="n">nint_per_occultation</span> <span class="o">=</span>  <span class="n">transit_duration</span><span class="o">*</span><span class="n">eff</span><span class="o">/</span><span class="n">exptime_per_int</span>
+    <span class="c1"># transit duration / ((ngroups + reset)*frame time)</span>
+    <span class="n">nint_per_occultation</span> <span class="o">=</span>  <span class="n">transit_duration</span><span class="o">/</span><span class="p">((</span><span class="n">ngroups_per_int</span><span class="o">+</span><span class="mf">1.0</span><span class="p">)</span><span class="o">*</span><span class="n">tframe</span><span class="p">)</span>
     
     <span class="c1">#figure out how many integrations are in transit and how many are out of transit </span>
     <span class="n">nint_in</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">nint_per_occultation</span><span class="p">)</span>
@@ -554,11 +553,11 @@
     <span class="c1">#here we assume that for very dim things, you would want at least </span>
     <span class="c1">#3 integrations in transit </span>
     <span class="k">if</span> <span class="n">nint_in</span> <span class="o">&lt;</span> <span class="n">min_nint_trans</span><span class="p">:</span>
-        <span class="n">ngroups_per_int</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">ngroups_per_int</span><span class="o">/</span><span class="mf">3.0</span><span class="p">)</span>
-        <span class="n">exptime_per_int</span> <span class="o">=</span> <span class="p">(</span><span class="n">ngroups_per_int</span><span class="o">-</span><span class="mf">1.</span><span class="p">)</span><span class="o">*</span><span class="n">tframe</span>
+        <span class="n">ngroups_per_int</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">ngroups_per_int</span><span class="o">/</span><span class="n">min_nint_trans</span><span class="p">)</span>
+        <span class="n">exptime_per_int</span> <span class="o">=</span> <span class="p">(</span><span class="n">ngroups_per_int</span><span class="p">)</span><span class="o">*</span><span class="n">tframe</span>
         <span class="n">clocktime_per_int</span> <span class="o">=</span> <span class="n">ngroups_per_int</span><span class="o">*</span><span class="n">tframe</span>
         <span class="n">eff</span> <span class="o">=</span> <span class="p">(</span><span class="n">ngroups_per_int</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">ngroups_per_int</span> <span class="o">+</span> <span class="mf">1.0</span><span class="p">)</span>
-        <span class="n">nint_per_occultation</span> <span class="o">=</span>  <span class="n">transit_duration</span><span class="o">*</span><span class="n">eff</span><span class="o">/</span><span class="n">exptime_per_int</span>
+        <span class="n">nint_per_occultation</span> <span class="o">=</span>  <span class="n">transit_duration</span><span class="o">/</span><span class="p">((</span><span class="n">ngroups_per_int</span><span class="o">+</span><span class="mf">1.0</span><span class="p">)</span><span class="o">*</span><span class="n">tframe</span><span class="p">)</span>
         <span class="n">nint_in</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">nint_per_occultation</span><span class="p">)</span>
         <span class="n">nint_out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">nint_in</span><span class="o">/</span><span class="n">expfact_out</span><span class="p">)</span>
         
@@ -568,14 +567,13 @@
     <span class="n">timing</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;Transit Duration&quot;</span> <span class="p">:</span> <span class="n">transit_duration</span><span class="o">/</span><span class="mf">60.0</span><span class="o">/</span><span class="mf">60.0</span><span class="p">,</span>
         <span class="s2">&quot;Seconds per Frame&quot;</span> <span class="p">:</span> <span class="n">tframe</span><span class="p">,</span>
-        <span class="s2">&quot;Exposure Time Per Integration (secs)&quot;</span><span class="p">:</span><span class="n">exptime_per_int</span><span class="p">,</span>
+        <span class="s2">&quot;Time/Integration incl reset (sec)&quot;</span><span class="p">:</span><span class="n">clocktime_per_int</span><span class="p">,</span>
         <span class="s2">&quot;APT: Num Groups per Integration&quot;</span> <span class="p">:</span><span class="n">ngroups_per_int</span><span class="p">,</span> 
         <span class="s2">&quot;Num Integrations Out of Transit&quot;</span><span class="p">:</span><span class="n">nint_out</span><span class="p">,</span>
         <span class="s2">&quot;Num Integrations In Transit&quot;</span><span class="p">:</span><span class="n">nint_in</span><span class="p">,</span>
         <span class="s2">&quot;APT: Num Integrations per Occultation&quot;</span><span class="p">:</span><span class="n">nint_out</span><span class="o">+</span><span class="n">nint_in</span><span class="p">,</span>
-        <span class="s2">&quot;On Source Time(sec)&quot;</span><span class="p">:</span> <span class="n">noccultations</span><span class="o">*</span><span class="n">clocktime_per_int</span><span class="o">*</span><span class="p">(</span><span class="n">nint_out</span><span class="o">+</span><span class="n">nint_in</span><span class="p">),</span>
-        <span class="s2">&quot;Reset time Plus 30 min TA time (hrs)&quot;</span><span class="p">:</span> <span class="n">overhead_per_int</span><span class="o">*</span><span class="p">(</span><span class="n">nint_in</span> <span class="o">+</span> <span class="n">nint_out</span><span class="p">)</span><span class="o">/</span><span class="mf">60.0</span><span class="o">/</span><span class="mf">60.0</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">,</span>
         <span class="s2">&quot;Observing Efficiency (%)&quot;</span><span class="p">:</span> <span class="n">eff</span><span class="o">*</span><span class="mf">100.0</span><span class="p">,</span>
+        <span class="s2">&quot;Transit+Baseline, no overhead (hrs)&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">nint_out</span><span class="o">+</span><span class="n">nint_in</span><span class="p">)</span><span class="o">*</span><span class="n">clocktime_per_int</span><span class="o">/</span><span class="mf">60.0</span><span class="o">/</span><span class="mf">60.0</span><span class="p">,</span> 
         <span class="s2">&quot;Number of Transits&quot;</span><span class="p">:</span> <span class="n">noccultations</span>
         <span class="p">}</span>      
         
