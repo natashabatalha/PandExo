@@ -37,14 +37,18 @@ def create_component_jwst(result_dict):
     
     if result_dict['input']['Calculation Type'] =='phase_spec':
         x_axis_label='Time (secs)'
+        frac = 1.0
     else:
         x_axis_label='Wavelength [microns]'
-        
+        frac = result_dict['timing']['Num Integrations Out of Transit']/result_dict['timing']['Num Integrations In Transit']
 
-    flux_out = result_dict['RawData']['flux_out']
-    flux_in = result_dict['RawData']['flux_in']
-    var_tot = result_dict['RawData']['var_out'] + result_dict['RawData']['var_in']
-
+    electrons_out = result_dict['RawData']['electrons_out']
+    electrons_in = result_dict['RawData']['electrons_in']
+    
+    var_in = result_dict['RawData']['var_in']
+    var_out = result_dict['RawData']['var_out']
+    
+    
     x = result_dict['FinalSpectrum']['wave']
     y = result_dict['FinalSpectrum']['spectrum_w_rand']
     err = result_dict['FinalSpectrum']['error_w_floor']
@@ -56,8 +60,9 @@ def create_component_jwst(result_dict):
         np.array(y_err.append((py - yerr, py + yerr)))
 
     source = ColumnDataSource(data=dict(x=x, y=y, y_err=y_err, x_err=x_err, err=err, 
-                                flux_out=flux_out, flux_in=flux_in, var_tot=var_tot, p=var_tot*0+p,nocc=var_tot*0+noccultations))
-    original = ColumnDataSource(data=dict(x=x, y=y, y_err=y_err, x_err=x_err, err=err, flux_out=flux_out, flux_in=flux_in, var_tot=var_tot))
+                                electrons_out=electrons_out, electrons_in=electrons_in, var_in=var_in, var_out=var_out, 
+                                p=var_in*0+p,nocc=var_in*0+noccultations, frac = var_in*0+frac))
+    original = ColumnDataSource(data=dict(x=x, y=y, y_err=y_err, x_err=x_err, err=err, electrons_out=electrons_out, electrons_in=electrons_in, var_in=var_in, var_out=var_out))
 
     ylims = [min(result_dict['OriginalInput']['model_spec'])- 0.1*min(result_dict['OriginalInput']['model_spec']),
                  0.1*max(result_dict['OriginalInput']['model_spec'])+max(result_dict['OriginalInput']['model_spec'])]
@@ -87,9 +92,10 @@ def create_component_jwst(result_dict):
             sdata['x_err'] = odata['x_err'].slice(0);
             sdata['err'] = odata['err'].slice(0);
 
-            sdata['flux_out'] = odata['flux_out'].slice(0);
-            sdata['flux_in'] = odata['flux_in'].slice(0);
-            sdata['var_tot'] = odata['var_tot'].slice(0);
+            sdata['electrons_out'] = odata['electrons_out'].slice(0);
+            sdata['electrons_in'] = odata['electrons_in'].slice(0);
+            sdata['var_in'] = odata['var_in'].slice(0);
+            sdata['var_out'] = odata['var_out'].slice(0);
 
             // Create some variables referencing the source data
             var x = sdata['x'];
@@ -98,11 +104,13 @@ def create_component_jwst(result_dict):
             var x_err = sdata['x_err'];
             var err = sdata['err'];
             var p = sdata['p'];
-            var og_ntran = sdata['nocc']
+            var frac = sdata['frac'];
+            var og_ntran = sdata['nocc'];
 
-            var flux_out = sdata['flux_out'];
-            var flux_in = sdata['flux_in'];
-            var var_tot = sdata['var_tot'];
+            var electrons_out = sdata['electrons_out'];
+            var electrons_in = sdata['electrons_in'];
+            var var_in = sdata['var_in'];
+            var var_out = sdata['var_out'];
 
             var f = wbin.get('value');
             var ntran = ntran.get('value');
@@ -130,14 +138,15 @@ def create_component_jwst(result_dict):
 
             var foutout = [];
             var finout = [];
-            var varout = [];
+            var varinout = [];
+            var varoutout = [];
 
             var xslice = []; 
 
-
             var foutslice = [];
             var finslice = [];
-            var varslice = [];
+            var varoutslice = [];
+            var varinslice = [];
 
             function add(a, b) {
                 return a+b;
@@ -146,34 +155,45 @@ def create_component_jwst(result_dict):
             for (i = 0; i < ind.length-1; i++) {
                 xslice = x.slice(ind[i],ind[i+1]);
 
-                foutslice = flux_out.slice(ind[i],ind[i+1]);
-                finslice = flux_in.slice(ind[i],ind[i+1]);
-                varslice = var_tot.slice(ind[i],ind[i+1]);
+                foutslice = electrons_out.slice(ind[i],ind[i+1]);
+                finslice = electrons_in.slice(ind[i],ind[i+1]);
+                
+                varinslice = var_in.slice(ind[i],ind[i+1]);
+                varoutslice = var_out.slice(ind[i],ind[i+1]);
 
                 xout.push(xslice.reduce(add, 0)/xslice.length);
                 foutout.push(foutslice.reduce(add, 0));
                 finout.push(finslice.reduce(add, 0));
-                varout.push(varslice.reduce(add, 0));
+                
+                varinout.push(varinslice.reduce(add, 0));
+                varoutout.push(varoutslice.reduce(add, 0));
 
-                new_err = 1.0;
                 xslice = [];
                 foutslice = [];
                 finslice = [];
-                varslice = [];
+                varinslice = [];
+                varoutslice = [];
             }
+            
+            var new_err = 1.0;
+            var rand = 1.0;
 
             for (i = 0; i < x.length; i++) {
-                new_err = Math.sqrt(varout[i]*og_ntran[i]/ntran)
-                y[i] = p[i]*(foutout[i]-finout[i]+ (new_err*(Math.random()-Math.random())))/foutout[i]; 
+                new_err = Math.pow((frac[i]/foutout[i]),2)*varinout[i] + Math.pow((finout[i]*frac[i]/Math.pow(foutout[i],2)),2)*varoutout[i];
+                new_err = Math.sqrt(new_err)*Math.sqrt(og_ntran[i]/ntran);
+                rand = new_err*(Math.random()-Math.random());
+                y[i] = p[i]*((1.0 - frac[i]*finout[i]/foutout[i]) + rand); 
                 x[i] = xout[i];
                 x_err[i][0] = xout[i];
                 x_err[i][1] = xout[i];
-                y_err[i][0] = y[i] + (new_err/foutout[i]);
-                y_err[i][1] = y[i] -(new_err/foutout[i]);            
+                y_err[i][0] = y[i] + new_err;
+                y_err[i][1] = y[i] - new_err;            
             }
 
             source.trigger('change');
         """)
+
+    #var_tot = (frac/electrons_out)**2.0 * var_in + (electrons_in*frac/electrons_out**2.0)**2.0 * var_out
 
     sliderWbin =  Slider(title="binning", value=np.log10(x[1]-x[0]), start=np.log10(x[1]-x[0]), end=np.log10(max(x)/2.0), step= .05, callback=callback)
     callback.args["wbin"] = sliderWbin
@@ -198,7 +218,7 @@ def create_component_jwst(result_dict):
     tab1 = Panel(child=plot_flux_1d1, title="Total Flux")
 
     # BG 1d
-    x, y = out['1d']['bg']
+    x, y = out['1d']['extracted_bg_only']
     y = y[~np.isnan(y)]
     x = x[~np.isnan(y)]
     plot_bg_1d1 = Figure(tools=TOOLS,
@@ -210,7 +230,7 @@ def create_component_jwst(result_dict):
 
     # SNR 1d accounting for number of occultations
     x= out['1d']['sn'][0]
-    y = flux_out/np.sqrt(result_dict['RawData']['var_out'])
+    y = electrons_out/np.sqrt(result_dict['RawData']['var_out'])
     x = x[~np.isnan(y)]
     y = y[~np.isnan(y)]
     #y = y*np.sqrt(noccultations)
