@@ -198,46 +198,57 @@ def compute_full_sim(dictinput):
         var_in_bin = varin
         var_out_bin = varout
     
-    #calculate total variance
-    var_tot = var_in_bin + var_out_bin
-    error = np.sqrt(var_tot)
-    
-    #calculate error on spectrum
-    error_spec = error/photon_out_bin
-   
+    if calculation == 'phase_spec':
+        to = timing['Exposure Time Per Integration (secs)']
+        ti = timing['Exposure Time Per Integration (secs)']
+    else: 
+        #otherwise error propagation and account for different 
+        #times in transit and out 
+        to = result['on_source_out']
+        ti = result['on_source_in']
+        
+    var_tot = (to/ti/photon_out_bin)**2.0 * var_in_bin + (photon_in_bin*to/ti/photon_out_bin**2.0)**2.0 * var_out_bin
+    error_spec = np.sqrt(var_tot)
+        
+    #factor in occultations to noise 
+    nocc = timing['Number of Transits']
+    error_spec = error_spec / np.sqrt(nocc)
+        
     #Add in user specified noise floor 
     error_spec_nfloor = add_noise_floor(noise_floor, wbin, error_spec) 
 
-    
     #add in random noise for the simulated spectrum 
-    rand_noise= np.sqrt((var_in_bin+var_out_bin))*(np.random.randn(len(wbin)))
-    raw_spec = (photon_out_bin-photon_in_bin)/photon_out_bin
-    sim_spec = (photon_out_bin-photon_in_bin + rand_noise)/photon_out_bin 
+    rand_noise= error_spec_nfloor*(np.random.randn(len(wbin)))
+    raw_spec = (photon_out_bin/to-photon_in_bin/ti)/(photon_out_bin/to)
+    sim_spec = raw_spec + rand_noise 
     
     #if secondary tranist, multiply spectra by -1 
     if pandexo_input['planet']['f_unit'] == 'fp/f*':
         sim_spec = -1.0*sim_spec
-        raw_spec = -1.0*raw_spec
-    
+        raw_spec = -1.0*raw_spec    
    
     #package processed data
-    binned = {'wave':wbin,
+    finalspec = {'wave':wbin,
               'spectrum': raw_spec,
               'spectrum_w_rand':sim_spec,
               'error_w_floor':error_spec_nfloor}
     
-    unbinned = {
-                'flux_out':extracted_flux_out, 
-                'flux_in':extracted_flux_inn,
-                'var_in':varin, 
-                'var_out':varout, 
+    rawstuff = {
+                'electrons_out':photon_out_bin*nocc, 
+                'electrons_in':photon_in_bin*nocc,
+                'var_in':varin*nocc, 
+                'var_out':varout*nocc,
+                'e_rate_out':photon_out_bin/to,
+                'e_rate_in':photon_out_bin/ti,
                 'wave':w,
-                'error_no_floor':np.sqrt(varin+varout)/extracted_flux_out
+                'error_no_floor':error_spec, 
+                'rn[out,in]':result['rn[out,in]'],
+                'bkg[out,in]':result['bkg[out,in]']
                 }
  
-    result_dict = as_dict(out,both_spec ,binned, 
+    result_dict = as_dict(out,both_spec ,finalspec, 
                 timing, mag, sat_level, warnings,
-                pandexo_input['planet']['f_unit'], unbinned,calculation)
+                pandexo_input['planet']['f_unit'], rawstuff,calculation)
 
     return result_dict 
     
@@ -681,14 +692,14 @@ def bin_wave_to_R(w, R):
             tracker = max(w)
     return wave
     
-def uniform_tophat_sum(xnew,x, y):
+def uniform_tophat_sum(newx,x, y):
     """Adapted from Mike R. Line to rebin spectra
     
     Sums groups of points in certain wave bin 
     
     Parameters
     ----------
-    xnew : list of float or numpy array of float
+    newx : list of float or numpy array of float
         New wavelength grid to rebin to 
     x : list of float or numpy array of float 
         Old wavelength grid to get rid of 
@@ -710,7 +721,7 @@ def uniform_tophat_sum(xnew,x, y):
     >>> newy
     array([ 240.,  250.,  130.])
     """
-    xnew = np.array(newx)
+    newx = np.array(newx)
     szmod=newx.shape[0]
     delta=np.zeros(szmod)
     ynew=np.zeros(szmod)
