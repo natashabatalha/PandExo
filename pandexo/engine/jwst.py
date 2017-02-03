@@ -402,15 +402,14 @@ def compute_timing(m,transit_duration,expfact_out,noccultations):
     exptime_per_int = ngroups_per_int*tframe
     
     #clock time includes the reset frame 
-    clocktime_per_int = ngroups_per_int*tframe
+    clocktime_per_int = (ngroups_per_int+1.0)*tframe
     
     #observing efficiency (i.e. what percentage of total time is spent on soure)
     eff = (ngroups_per_int - 1.0)/(ngroups_per_int + 1.0)
     
     #this says "per occultation" but this is just the in transit frames.. See below
-    #nframes_per_occultation = long(transit_duration/tframe)
-    #ngroups_per_occultation = long(nframes_per_occultation/(nframe + nskip))
-    nint_per_occultation =  transit_duration*eff/exptime_per_int
+    # transit duration / ((ngroups + reset)*frame time)
+    nint_per_occultation =  transit_duration/((ngroups_per_int+1.0)*tframe)
     
     #figure out how many integrations are in transit and how many are out of transit 
     nint_in = np.ceil(nint_per_occultation)
@@ -420,11 +419,11 @@ def compute_timing(m,transit_duration,expfact_out,noccultations):
     #here we assume that for very dim things, you would want at least 
     #3 integrations in transit 
     if nint_in < min_nint_trans:
-        ngroups_per_int = np.floor(ngroups_per_int/3.0)
-        exptime_per_int = (ngroups_per_int-1.)*tframe
+        ngroups_per_int = np.floor(ngroups_per_int/min_nint_trans)
+        exptime_per_int = (ngroups_per_int)*tframe
         clocktime_per_int = ngroups_per_int*tframe
         eff = (ngroups_per_int - 1.0)/(ngroups_per_int + 1.0)
-        nint_per_occultation =  transit_duration*eff/exptime_per_int
+        nint_per_occultation =  transit_duration/((ngroups_per_int+1.0)*tframe)
         nint_in = np.ceil(nint_per_occultation)
         nint_out = np.ceil(nint_in/expfact_out)
         
@@ -434,14 +433,13 @@ def compute_timing(m,transit_duration,expfact_out,noccultations):
     timing = {
         "Transit Duration" : transit_duration/60.0/60.0,
         "Seconds per Frame" : tframe,
-        "Exposure Time Per Integration (secs)":exptime_per_int,
+        "Time/Integration incl reset (sec)":clocktime_per_int,
         "APT: Num Groups per Integration" :ngroups_per_int, 
         "Num Integrations Out of Transit":nint_out,
         "Num Integrations In Transit":nint_in,
         "APT: Num Integrations per Occultation":nint_out+nint_in,
-        "On Source Time(sec)": noccultations*clocktime_per_int*(nint_out+nint_in),
-        "Reset time Plus 30 min TA time (hrs)": overhead_per_int*(nint_in + nint_out)/60.0/60.0 + 0.5,
         "Observing Efficiency (%)": eff*100.0,
+        "Transit+Baseline, no overhead (hrs)": (nint_out+nint_in)*clocktime_per_int/60.0/60.0, 
         "Number of Transits": noccultations
         }      
         
