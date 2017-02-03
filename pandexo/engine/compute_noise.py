@@ -52,7 +52,6 @@ class ExtractSpec():
     def __init__(self, inn, out, rn, extraction_area, timing):
         self.inn = inn
         self.out = out 
-        self.exptime_per_int = timing["Exposure Time Per Integration (secs)"]
         self.ngroups_per_int = timing["APT: Num Groups per Integration"]
         self.nint_out = timing["Num Integrations Out of Transit"]
         self.nint_in = timing["Num Integrations In Transit"]
@@ -61,6 +60,8 @@ class ExtractSpec():
         self.extraction_area = extraction_area
 
         #on source out versus in 
+        self.exptime_per_int = self.tframe * (self.ngroups_per_int-1.0)
+
         self.on_source_in = self.tframe * (self.ngroups_per_int-1.0) * self.nint_in
         self.on_source_out = self.tframe * (self.ngroups_per_int-1.0) * self.nint_out
 
