@@ -224,6 +224,7 @@
     
     <span class="c1">#return to Pandeia units... milliJy and micron </span>
     <span class="n">flux_out_trans</span> <span class="o">=</span> <span class="n">flux</span><span class="o">*</span><span class="n">wave</span><span class="o">/</span><span class="mf">1.509e7</span><span class="o">*</span><span class="mi">1</span><span class="n">e3</span> <span class="c1">#inverse of eq. C times 1e3 to get to milliJy instead of Jy </span>
+
     <span class="n">wave</span> <span class="o">=</span> <span class="n">wave</span><span class="o">*</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">3</span>  <span class="c1">#nm to micron</span>
 
     <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;flux_out_trans&#39;</span><span class="p">:</span> <span class="n">flux_out_trans</span><span class="p">,</span> <span class="s1">&#39;wave&#39;</span><span class="p">:</span> <span class="n">wave</span><span class="p">}</span> </div>

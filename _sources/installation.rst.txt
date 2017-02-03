@@ -88,6 +88,12 @@ If that doesn't work Zach Berta-Thompson pointed out that this worked for him:
     brew install fftw
     pip install pyfftw
 
+If that doesn't work Ian Crossfield pointed out that this worked for him: 
+
+.. code-block:: bash 
+
+    conda install -c https://conda.binstar.org/richli pyfftw
+
 Can't find Pandeia Reference Data
 `````````````````````````````````
 This usually looks like NoneType errors. 
