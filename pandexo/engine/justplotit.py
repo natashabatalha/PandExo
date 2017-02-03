@@ -88,8 +88,8 @@ def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', out
             y=y 
         elif (R != False) & (num_tran != False):     
             new_wave = bin_wave_to_R(x, R)
-            out = uniform_tophat_sum(new_wave,x, dict['RawData']['flux_out']*num_tran/ntran_old)
-            inn = uniform_tophat_sum(new_wave,x, dict['RawData']['flux_in']*num_tran/ntran_old)
+            out = uniform_tophat_sum(new_wave,x, dict['RawData']['electrons_out']*num_tran/ntran_old)
+            inn = uniform_tophat_sum(new_wave,x, dict['RawData']['electrons_in']*num_tran/ntran_old)
             vout = uniform_tophat_sum(new_wave,x, dict['RawData']['var_out']*num_tran/ntran_old)
             vin = uniform_tophat_sum(new_wave,x, dict['RawData']['var_in']*num_tran/ntran_old)
             if dict['input']['Primary/Secondary']=='fp/f*':
@@ -102,8 +102,8 @@ def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', out
             y = sim_spec
             err = np.sqrt(vout+vin)/out
         elif (R == False) & (num_tran != False):     
-            out = dict['RawData']['flux_out']*num_tran/ntran_old
-            inn = dict['RawData']['flux_in']*num_tran/ntran_old
+            out = dict['RawData']['electrons_out']*num_tran/ntran_old
+            inn = dict['RawData']['electrons_in']*num_tran/ntran_old
             vout = dict['RawData']['var_out']*num_tran/ntran_old
             vin = dict['RawData']['var_in']*num_tran/ntran_old
             if dict['input']['Primary/Secondary']=='fp/f*':
@@ -117,8 +117,8 @@ def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', out
             err = np.sqrt(vout+vin)/out
         elif (R != False) & (num_tran == False):     
             new_wave = bin_wave_to_R(x, R)
-            out = uniform_tophat_sum(new_wave,x, dict['RawData']['flux_out'])
-            inn = uniform_tophat_sum(new_wave,x, dict['RawData']['flux_in'])
+            out = uniform_tophat_sum(new_wave,x, dict['RawData']['electrons_out'])
+            inn = uniform_tophat_sum(new_wave,x, dict['RawData']['electrons_in'])
             vout = uniform_tophat_sum(new_wave,x, dict['RawData']['var_out'])
             vin = uniform_tophat_sum(new_wave,x, dict['RawData']['var_in'])
             if dict['input']['Primary/Secondary']=='fp/f*':
@@ -379,8 +379,8 @@ def jwst_1d_snr(result_dict, plot=True, output_file='snr.html'):
     TOOLS = "pan,wheel_zoom,box_zoom,resize,reset,save"
     # Flux 1d
     x= result_dict['RawData']['wave']
-    flux_out = result_dict['RawData']['flux_out']
-    y = flux_out/np.sqrt(result_dict['RawData']['var_out'])
+    electrons_out = result_dict['RawData']['electrons_out']
+    y = electrons_out/np.sqrt(result_dict['RawData']['var_out'])
     x = x[~np.isnan(y)]
     y = y[~np.isnan(y)]
     plot_snr_1d1 = Figure(tools=TOOLS,
@@ -421,7 +421,7 @@ def jwst_1d_bkg(result_dict, plot=True, output_file='bkg.html'):
     TOOLS = "pan,wheel_zoom,box_zoom,resize,reset,save"
     # BG 1d
     out = result_dict['PandeiaOutTrans']
-    x, y = out['1d']['bg']
+    x, y = out['1d']['extracted_bg_only']
     y = y[~np.isnan(y)]
     x = x[~np.isnan(y)]
     plot_bg_1d1 = Figure(tools=TOOLS,
