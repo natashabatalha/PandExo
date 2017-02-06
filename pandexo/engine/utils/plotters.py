@@ -230,13 +230,13 @@ def create_component_jwst(result_dict):
 
     # SNR 1d accounting for number of occultations
     x= out['1d']['sn'][0]
-    y = electrons_out/np.sqrt(result_dict['RawData']['var_out'])
+    y = out['1d']['sn'][1]
     x = x[~np.isnan(y)]
     y = y[~np.isnan(y)]
-    #y = y*np.sqrt(noccultations)
+    y = y*np.sqrt(noccultations)
     plot_snr_1d1 = Figure(tools=TOOLS,
                          x_axis_label=x_axis_label,
-                         y_axis_label='SNR', title="SNR Out of Trans",
+                         y_axis_label='SNR', title="Pandeia SNR",
                          plot_width=800, plot_height=300)
     plot_snr_1d1.line(x, y, line_width = 4, alpha = .7)
     tab3 = Panel(child=plot_snr_1d1, title="SNR")

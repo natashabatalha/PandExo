@@ -199,8 +199,8 @@ def compute_full_sim(dictinput):
         var_out_bin = varout
     
     if calculation == 'phase_spec':
-        to = timing['Exposure Time Per Integration (secs)']
-        ti = timing['Exposure Time Per Integration (secs)']
+        to = timing["APT: Num Groups per Integration"]*tframe
+        ti = timing["APT: Num Groups per Integration"]*tframe
     else: 
         #otherwise error propagation and account for different 
         #times in transit and out 

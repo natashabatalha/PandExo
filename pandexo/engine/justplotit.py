@@ -150,6 +150,7 @@ def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', out
 
             if dict['input']['Calculation Type'] =='phase_spec':
                 x_axis_label='Time (secs)'
+                x_range = [min(x), max(x)]
             else:
                 x_axis_label='Wavelength [microns]'
             
