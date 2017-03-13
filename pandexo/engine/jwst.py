@@ -147,8 +147,8 @@ def compute_full_sim(dictinput):
     print("End In Transit")
     
     #Remove effects of Quantum Yield from shot noise 
-    out = remove_QY(out)
-    inn = remove_QY(inn)
+    #out = remove_QY(out)
+    #inn = remove_QY(inn)
 
     #compute warning flags for timing info 
     warnings = add_warnings(out, timing, sat_level, flags, instrument) 
@@ -454,7 +454,7 @@ def compute_timing(m,transit_duration,expfact_out,noccultations):
     return timing, {'flag_default':flag_default,'flag_high':flag_high}
 
 def remove_QY(pandeia_dict):
-    """Removes Quantum Yield from Pandeia Fluxes
+    """Removes Quantum Yield from Pandeia Fluxes. Place Holder. 
     
     Parameters
     ----------
@@ -468,7 +468,7 @@ def remove_QY(pandeia_dict):
     """
     
     try:
-        pandeia_dict['1d']['extracted_flux'] = 
+        pandeia_dict['1d']['extracted_flux'] = 1
     
 
 def perform_out(pandeia_input, pandexo_input,timing, both_spec):
