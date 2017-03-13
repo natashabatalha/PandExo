@@ -161,8 +161,8 @@
 <div class="viewcode-block" id="print_instruments"><a class="viewcode-back" href="../../engine.html#engine.justdoit.print_instruments">[docs]</a><span class="k">def</span> <span class="nf">print_instruments</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;Prints a list of the possible instrument templates to load</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="nb">print</span> <span class="s2">&quot;Choose from the following:&quot;</span>
-    <span class="nb">print</span> <span class="n">ALL</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Choose from the following:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">ALL</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
     <span class="k">return</span></div>
 
 <div class="viewcode-block" id="load_exo_dict"><a class="viewcode-back" href="../../engine.html#engine.justdoit.load_exo_dict">[docs]</a><span class="k">def</span> <span class="nf">load_exo_dict</span><span class="p">():</span>
@@ -359,7 +359,7 @@
 
     <span class="c1">#single instrument mode with dictionary input OR single planet </span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">inst</span><span class="p">)</span> <span class="o">==</span> <span class="nb">dict</span><span class="p">:</span> 
-        <span class="nb">print</span> <span class="s2">&quot;Running Single Case w/ User Instrument Dict&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Running Single Case w/ User Instrument Dict&quot;</span><span class="p">)</span>
         <span class="n">results</span> <span class="o">=</span><span class="n">wrapper</span><span class="p">({</span><span class="s2">&quot;pandeia_input&quot;</span><span class="p">:</span> <span class="n">inst</span> <span class="p">,</span> <span class="s2">&quot;pandexo_input&quot;</span><span class="p">:</span><span class="n">exo</span><span class="p">})</span>
         <span class="k">if</span> <span class="n">output_file</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
             <span class="n">output_file</span> <span class="o">=</span> <span class="s1">&#39;singlerun.p&#39;</span>
@@ -371,8 +371,8 @@
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">inst</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">list</span><span class="p">:</span> 
             <span class="k">raise</span> <span class="ne">ValueError</span>
     <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-        <span class="nb">print</span> <span class="s1">&#39;Instrument input is not dict so must be list&#39;</span>
-        <span class="nb">print</span> <span class="s1">&#39;Enter in format [&quot;NIRSpec G140M&quot;] or [&quot;NIRISS SOSS&quot;,&quot;MIRI LRS&quot;]&#39;</span> 
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Instrument input is not dict so must be list&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Enter in format [&quot;NIRSpec G140M&quot;] or [&quot;NIRISS SOSS&quot;,&quot;MIRI LRS&quot;]&#39;</span><span class="p">)</span>
         <span class="k">return</span>    
          
     <span class="c1">#single instrument mode and single planet OR several planets  </span>
@@ -381,7 +381,7 @@
         
         <span class="c1">#start case of no parameter space run </span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">param_space</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">))</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">param_range</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">)):</span>
-            <span class="nb">print</span> <span class="s2">&quot;Running Single Case for: &quot;</span> <span class="o">+</span> <span class="n">inst</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Running Single Case for: &quot;</span> <span class="o">+</span> <span class="n">inst</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
             <span class="n">inst_dict</span> <span class="o">=</span> <span class="n">load_mode_dict</span><span class="p">(</span><span class="n">inst</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
             <span class="n">results</span> <span class="o">=</span><span class="n">wrapper</span><span class="p">({</span><span class="s2">&quot;pandeia_input&quot;</span><span class="p">:</span> <span class="n">inst_dict</span> <span class="p">,</span> <span class="s2">&quot;pandexo_input&quot;</span><span class="p">:</span><span class="n">exo</span><span class="p">})</span>
             <span class="k">if</span> <span class="n">output_file</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
@@ -390,7 +390,7 @@
             <span class="k">return</span> <span class="n">results</span>
          
         <span class="c1">#if there are parameters to cycle through this will run</span>
-        <span class="nb">print</span> <span class="s2">&quot;Running through exo parameters in parallel: &quot;</span> <span class="o">+</span> <span class="n">param_space</span> 
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Running through exo parameters in parallel: &quot;</span> <span class="o">+</span> <span class="n">param_space</span><span class="p">)</span>
         <span class="c1">#run the above function in parallel </span>
         <span class="n">results</span> <span class="o">=</span> <span class="n">Parallel</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="n">num_cores</span><span class="p">)(</span><span class="n">delayed</span><span class="p">(</span><span class="n">run_param_space</span><span class="p">)(</span><span class="n">i</span><span class="p">,</span><span class="n">exo</span><span class="p">,</span><span class="n">inst</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">param_space</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">param_range</span><span class="p">)</span>
         
@@ -403,7 +403,7 @@
         <span class="k">return</span> <span class="n">results</span>
         
     <span class="c1">#run several different instrument modes and single planet</span>
-    <span class="nb">print</span> <span class="s2">&quot;Running select instruments&quot;</span> 
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Running select instruments&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">inst</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">:</span>
         
         <span class="n">results</span> <span class="o">=</span> <span class="n">Parallel</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="n">num_cores</span><span class="p">)(</span><span class="n">delayed</span><span class="p">(</span><span class="n">run_inst_space</span><span class="p">)(</span><span class="n">i</span><span class="p">,</span> <span class="n">exo</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">inst</span><span class="p">)</span>
@@ -417,7 +417,7 @@
             
     <span class="c1">#cycle through all options  </span>
     <span class="k">elif</span> <span class="n">inst</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;run all&#39;</span><span class="p">:</span>
-        <span class="nb">print</span> <span class="s2">&quot;Running through all instruments&quot;</span>  
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Running through all instruments&quot;</span><span class="p">)</span>
         <span class="n">results</span> <span class="o">=</span> <span class="n">Parallel</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="n">num_cores</span><span class="p">)(</span><span class="n">delayed</span><span class="p">(</span><span class="n">run_inst_space</span><span class="p">)(</span><span class="n">i</span><span class="p">,</span> <span class="n">exo</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">ALL</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
     
         <span class="c1">#Default dump all results [an array of dictionaries] into single file</span>

@@ -33,8 +33,9 @@ It might be helpful to add the export command to your ~/.bashrc file.
     tar -xvf synphot5.tar.gz
     export PYSYN_CDBS=USRDIR/pysynphot_data
 
-Once you do this your untarred file should automatically have this structure. If you use wget you might 
-get something different. So double check this. 
+Once you do this your untarred file should automatically have this structure. STScI changed the structure of 
+this file but now how pysynphot calls the data. So you will most likely have to change this file structure to what
+is below: 
 
 .. code-block:: bash
 
@@ -88,11 +89,14 @@ If that doesn't work Zach Berta-Thompson pointed out that this worked for him:
     brew install fftw
     pip install pyfftw
 
-If that doesn't work Ian Crossfield pointed out that this worked for him: 
+There are several different conda distributions of pyfftw however, if 
+you install version <0.10 it may downgrade 
+your version of numpy. Therefore, a version that is greater than 0.10 is best. Numpy should be 
+numpy>=1.11.3. 
 
 .. code-block:: bash 
 
-    conda install -c https://conda.binstar.org/richli pyfftw
+    conda install -c spectraldns pyfftw=0.10.4 
 
 Can't find Pandeia Reference Data
 `````````````````````````````````
@@ -110,10 +114,18 @@ Problems Installing Pysynphot
 If you are having problems with this 
 you can use the astroconda distribution located `here <http://astroconda.readthedocs.io/en/latest/installation.html#install-astroconda>`_. 
 
+Or if you are using conda: 
+
+.. code-block:: bash
+
+    conda install -c astropy photutils=0.3
+
 Problems with Multiprocessing
 `````````````````````````````
 
-Multiprocessing seems to throw errors if you are using Python 3. No immediate solutions yet... Other than, don't use Python 3. 
+Multiprocessing seems to throw errors if you are using Python 3. Jonathan Fraine pointed out that 
+multiprocessing is automatically included in Python 3. Therefore, if you delete the multiprocessing from 
+setup.py your problem will go away. 
 
 To-Do
 -----

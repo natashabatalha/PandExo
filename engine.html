@@ -376,7 +376,7 @@ looped through.</p>
 </table>
 <p class="rubric">Examples</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">newwave</span> <span class="o">=</span> <span class="n">bin_wave_to_R</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1000</span><span class="p">),</span> <span class="mi">10</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="nb">len</span><span class="p">(</span><span class="n">newwave</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">newwave</span><span class="p">))</span>
 <span class="go">11</span>
 </pre></div>
 </div>
@@ -1654,7 +1654,7 @@ range noise floor.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">wave</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mf">2.7</span><span class="p">,</span><span class="mi">10</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">error</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">6</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">newerror</span> <span class="o">=</span> <span class="n">add_noise_floor</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="n">wave</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">newerror</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">newerror</span><span class="p">)</span>
 <span class="go">[  2.00000000e-05   2.00000000e-05   2.00000000e-05   2.00000000e-05</span>
 <span class="go">   2.00000000e-05   2.00000000e-05   2.00000000e-05   2.00000000e-05</span>
 <span class="go">   2.00000000e-05   2.00000000e-05]</span>
@@ -1754,7 +1754,7 @@ better JWST recommendations are made.</p>
 </table>
 <p class="rubric">Examples</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">newwave</span> <span class="o">=</span> <span class="n">bin_wave_to_R</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1000</span><span class="p">),</span> <span class="mi">10</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="nb">len</span><span class="p">(</span><span class="n">newwave</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">newwave</span><span class="p">))</span>
 <span class="go">11</span>
 </pre></div>
 </div>
@@ -1831,7 +1831,7 @@ error if saturation occurs. This routine assumes that min ngroups is 2.</p>
 </table>
 <p class="rubric">Examples</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">max_time</span> <span class="o">=</span> <span class="n">compute_maxexptime_per_int</span><span class="p">(</span><span class="n">pandeia_input</span><span class="p">,</span> <span class="mf">50000.0</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">max_time</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">max_time</span><span class="p">)</span>
 <span class="go">12.0</span>
 </pre></div>
 </div>
@@ -1874,7 +1874,7 @@ JWST terminology:</p>
 </table>
 <p class="rubric">Examples</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">timing</span><span class="p">,</span> <span class="n">flags</span> <span class="o">=</span> <span class="n">compute_timing</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="mf">60.0</span><span class="o">*</span><span class="mf">60.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">timing</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">timing</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
 <span class="go">[&#39;Number of Transits&#39;, &#39;Num Integrations Out of Transit&#39;, &#39;Num Integrations In Transit&#39;,</span>
 <span class="go">&#39;APT: Num Groups per Integration&#39;, &#39;Seconds per Frame&#39;, &#39;Observing Efficiency (%)&#39;, &#39;On Source Time(sec)&#39;,</span>
 <span class="go">&#39;Exposure Time Per Integration (secs)&#39;, &#39;Reset time Plus 30 min TA time (hrs)&#39;,</span>
@@ -1932,6 +1932,30 @@ Recommended for transit transmisstion spectra = fml</li>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">pandeia output dictionary for out of transit data</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">dict</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="engine.jwst.remove_QY">
+<code class="descclassname">engine.jwst.</code><code class="descname">remove_QY</code><span class="sig-paren">(</span><em>pandeia_dict</em>, <em>instrument</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/jwst.html#remove_QY"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.jwst.remove_QY" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes Quantum Yield from Pandeia Fluxes. Place Holder.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>pandeia_dict</strong> (<em>dict</em>) &#8211; pandeia output dictionary</li>
+<li><strong>instrument</strong> (<em>str</em>) &#8211; instrument running</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">same exact dictionary with extracted_flux = extracted_flux/QY</p>
 </td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">dict</p>

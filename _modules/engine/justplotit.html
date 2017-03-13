@@ -265,7 +265,7 @@
             <span class="n">y</span> <span class="o">=</span> <span class="n">sim_spec</span>
             <span class="n">err</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">vout</span><span class="o">+</span><span class="n">vin</span><span class="p">)</span><span class="o">/</span><span class="n">out</span>
         <span class="k">else</span><span class="p">:</span> 
-            <span class="nb">print</span> <span class="s2">&quot;Something went wrong. Cannot enter both resolution and ask to bin to new wave&quot;</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Something went wrong. Cannot enter both resolution and ask to bin to new wave&quot;</span><span class="p">)</span>
             <span class="k">return</span>
             
         <span class="c1">#create error bars for Bokeh&#39;s multi_line</span>
@@ -284,6 +284,7 @@
 
             <span class="k">if</span> <span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;Calculation Type&#39;</span><span class="p">]</span> <span class="o">==</span><span class="s1">&#39;phase_spec&#39;</span><span class="p">:</span>
                 <span class="n">x_axis_label</span><span class="o">=</span><span class="s1">&#39;Time (secs)&#39;</span>
+                <span class="n">x_range</span> <span class="o">=</span> <span class="p">[</span><span class="nb">min</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">x</span><span class="p">)]</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">x_axis_label</span><span class="o">=</span><span class="s1">&#39;Wavelength [microns]&#39;</span>
             
@@ -335,7 +336,7 @@
 <span class="sd">    --------</span>
 <span class="sd">    </span>
 <span class="sd">    &gt;&gt;&gt; newwave = bin_wave_to_R(np.linspace(1,2,1000), 10)</span>
-<span class="sd">    &gt;&gt;&gt; print len(newwave)</span>
+<span class="sd">    &gt;&gt;&gt; print(len(newwave))</span>
 <span class="sd">    11</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">wave</span> <span class="o">=</span> <span class="p">[]</span>
@@ -343,19 +344,27 @@
     <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span> 
     <span class="n">ind</span><span class="o">=</span> <span class="mi">0</span>
     <span class="k">while</span><span class="p">(</span><span class="n">tracker</span><span class="o">&lt;</span><span class="nb">max</span><span class="p">(</span><span class="n">w</span><span class="p">)):</span>
+        <span class="n">firsttime</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span><span class="nb">len</span><span class="p">(</span><span class="n">w</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
-        
             <span class="n">dlambda</span> <span class="o">=</span> <span class="n">w</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-</span><span class="n">w</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span>
             <span class="n">newR</span> <span class="o">=</span> <span class="n">w</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">/</span><span class="n">dlambda</span>
-            <span class="k">if</span> <span class="n">newR</span> <span class="o">&lt;</span> <span class="n">R</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">newR</span> <span class="o">&gt;</span> <span class="n">R</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">firsttime</span><span class="p">):</span>
+                <span class="n">tracker</span> <span class="o">=</span> <span class="n">w</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span>
+                <span class="n">wave</span> <span class="o">+=</span> <span class="p">[</span><span class="n">tracker</span><span class="p">]</span>
+                <span class="n">ind</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span> 
+            <span class="k">elif</span> <span class="n">newR</span> <span class="o">&lt;</span> <span class="n">R</span><span class="p">:</span>
+                <span class="n">firsttime</span> <span class="o">=</span> <span class="kc">False</span>
                 <span class="n">tracker</span> <span class="o">=</span> <span class="n">w</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span><span class="o">+</span><span class="n">dlambda</span><span class="o">/</span><span class="mf">2.0</span>
                 <span class="n">wave</span> <span class="o">+=</span><span class="p">[</span><span class="n">tracker</span><span class="p">]</span>
                 <span class="n">ind</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">w</span><span class="o">-</span><span class="n">tracker</span><span class="p">))</span><span class="o">.</span><span class="n">argmin</span><span class="p">()</span>
-                <span class="n">i</span> <span class="o">=</span> <span class="n">ind</span>
-            <span class="k">else</span><span class="p">:</span>            
+                <span class="n">i</span> <span class="o">=</span> <span class="n">ind</span><span class="o">+</span><span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">firsttime</span> <span class="o">=</span> <span class="kc">False</span>            
                 <span class="n">i</span><span class="o">+=</span><span class="mi">1</span>    
         <span class="k">else</span><span class="p">:</span>
             <span class="n">tracker</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+            <span class="n">wave</span> <span class="o">+=</span> <span class="p">[</span><span class="n">tracker</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">wave</span></div>
 
 <div class="viewcode-block" id="uniform_tophat_sum"><a class="viewcode-back" href="../../engine.html#engine.justplotit.uniform_tophat_sum">[docs]</a><span class="k">def</span> <span class="nf">uniform_tophat_sum</span><span class="p">(</span><span class="n">xnew</span><span class="p">,</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>

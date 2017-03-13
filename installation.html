@@ -172,8 +172,9 @@ tar -xvf synphot5.tar.gz
 <span class="nb">export</span> <span class="nv">PYSYN_CDBS</span><span class="o">=</span>USRDIR/pysynphot_data
 </pre></div>
 </div>
-<p>Once you do this your untarred file should automatically have this structure. If you use wget you might
-get something different. So double check this.</p>
+<p>Once you do this your untarred file should automatically have this structure. STScI changed the structure of
+this file but now how pysynphot calls the data. So you will most likely have to change this file structure to what
+is below:</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>ls pysynphot_data/grid/phoenix/
 .DS_Store     catalog.fits  phoenixm05/   phoenixm15/   phoenixm25/   phoenixm35/   phoenixp03/
 AA_README     phoenixm00/   phoenixm10/   phoenixm20/   phoenixm30/   phoenixm40/   phoenixp05/
@@ -215,8 +216,11 @@ chmod +x build_fftw.sh
 pip install pyfftw
 </pre></div>
 </div>
-<p>If that doesn&#8217;t work Ian Crossfield pointed out that this worked for him:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>conda install -c https://conda.binstar.org/richli pyfftw
+<p>There are several different conda distributions of pyfftw however, if
+you install version &lt;0.10 it may downgrade
+your version of numpy. Therefore, a version that is greater than 0.10 is best. Numpy should be
+numpy&gt;=1.11.3.</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>conda install -c spectraldns <span class="nv">pyfftw</span><span class="o">=</span>0.10.4
 </pre></div>
 </div>
 </div>
@@ -234,10 +238,16 @@ pip install pyfftw
 <h3>Problems Installing Pysynphot<a class="headerlink" href="#problems-installing-pysynphot" title="Permalink to this headline">¶</a></h3>
 <p>If you are having problems with this
 you can use the astroconda distribution located <a class="reference external" href="http://astroconda.readthedocs.io/en/latest/installation.html#install-astroconda">here</a>.</p>
+<p>Or if you are using conda:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>conda install -c astropy <span class="nv">photutils</span><span class="o">=</span>0.3
+</pre></div>
+</div>
 </div>
 <div class="section" id="problems-with-multiprocessing">
 <h3>Problems with Multiprocessing<a class="headerlink" href="#problems-with-multiprocessing" title="Permalink to this headline">¶</a></h3>
-<p>Multiprocessing seems to throw errors if you are using Python 3. No immediate solutions yet... Other than, don&#8217;t use Python 3.</p>
+<p>Multiprocessing seems to throw errors if you are using Python 3. Jonathan Fraine pointed out that
+multiprocessing is automatically included in Python 3. Therefore, if you delete the multiprocessing from
+setup.py your problem will go away.</p>
 </div>
 </div>
 <div class="section" id="to-do">
