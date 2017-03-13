@@ -691,8 +691,6 @@ def add_noise_floor(noise_floor, wave_bin, error_spec):
 def bin_wave_to_R(w, R):
     """Creates new wavelength axis at specified resolution
     
-    Rebins wavelength bin to a certain R 
-    
     Parameters
     ----------
     w : list of float or numpy array of float
@@ -716,20 +714,29 @@ def bin_wave_to_R(w, R):
     tracker = min(w)
     i = 1 
     ind= 0
+    firsttime = True
     while(tracker<max(w)):
         if i <len(w)-1:
-        
             dlambda = w[i]-w[ind]
             newR = w[i]/dlambda
-            if newR < R:
+            if (newR < R) & (firsttime):
+                tracker = w[ind]
+                wave += [tracker]
+                ind += 1
+                i += 1 
+                firsttime = True
+            elif newR < R:
                 tracker = w[ind]+dlambda/2.0
                 wave +=[tracker]
                 ind = (np.abs(w-tracker)).argmin()
-                i = ind
-            else:            
+                i = ind+1
+                firsttime = True
+            else:
+                firsttime = False            
                 i+=1    
         else:
             tracker = max(w)
+            wave += [tracker]
     return wave
     
 def uniform_tophat_sum(newx,x, y):

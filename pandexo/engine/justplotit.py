@@ -209,22 +209,23 @@ def bin_wave_to_R(w, R):
     tracker = min(w)
     i = 1 
     ind= 0
+    firsttime = True
     while(tracker<max(w)):
-        firsttime = True
         if i <len(w)-1:
             dlambda = w[i]-w[ind]
             newR = w[i]/dlambda
-            if (newR > R) & (firsttime):
+            if (newR < R) & (firsttime):
                 tracker = w[ind]
                 wave += [tracker]
                 ind += 1
                 i += 1 
+                firsttime = True
             elif newR < R:
-                firsttime = False
                 tracker = w[ind]+dlambda/2.0
                 wave +=[tracker]
                 ind = (np.abs(w-tracker)).argmin()
                 i = ind+1
+                firsttime = True
             else:
                 firsttime = False            
                 i+=1    
