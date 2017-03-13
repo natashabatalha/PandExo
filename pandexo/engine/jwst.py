@@ -1,3 +1,4 @@
+import os
 import sys
 import json
 import numpy as np
@@ -14,6 +15,9 @@ from compute_noise import ExtractSpec
 max_ngroup = 65536.0 
 #minimum number of integrations
 min_nint_trans = 1
+
+#refdata directory
+default_refdata_directory = os.environ.get("pandeia_refdata")
 
 def compute_full_sim(dictinput): 
     """Top level function to set up exoplanet obs. for JW
@@ -141,6 +145,10 @@ def compute_full_sim(dictinput):
     print("Starting In Transit Simulation")
     inn = perform_in(pandeia_input, pandexo_input,timing, both_spec, out, calculation)
     print("End In Transit")
+    
+    #Remove effects of Quantum Yield from shot noise 
+    out = remove_QY(out)
+    inn = remove_QY(inn)
 
     #compute warning flags for timing info 
     warnings = add_warnings(out, timing, sat_level, flags, instrument) 
@@ -445,6 +453,24 @@ def compute_timing(m,transit_duration,expfact_out,noccultations):
         
     return timing, {'flag_default':flag_default,'flag_high':flag_high}
 
+def remove_QY(pandeia_dict):
+    """Removes Quantum Yield from Pandeia Fluxes
+    
+    Parameters
+    ----------
+    pandeia_dict : dict 
+        pandeia output dictionary
+    
+    Returns
+    -------
+    dict 
+        same exact dictionary with extracted_flux = extracted_flux/QY
+    """
+    
+    try:
+        pandeia_dict['1d']['extracted_flux'] = 
+    
+
 def perform_out(pandeia_input, pandexo_input,timing, both_spec):
     """Runs pandeia for the out of transit data
     
@@ -470,7 +496,7 @@ def perform_out(pandeia_input, pandexo_input,timing, both_spec):
     pandeia_input['configuration']['detector']['nexp'] = 1 
 
     report_out = perform_calculation(pandeia_input, dict_report=False)
-
+    
     return report_out
 
     
