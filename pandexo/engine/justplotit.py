@@ -217,8 +217,8 @@ def bin_wave_to_R(w, R):
             if newR < R:
                 tracker = w[ind]+dlambda/2.0
                 wave +=[tracker]
-                ind = (np.abs(w-tracker)).argmin()
-                i = ind
+                ind = i
+                i+=1
             else:            
                 i+=1    
         else:
