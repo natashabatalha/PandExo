@@ -37,4 +37,4 @@ def wrapper(dictinput):
     elif telescope=='wfirst':
         return     
     else:
-        print "INVALID TELESCOPE. PandExo only accepts: jwst, hst, wfirst"
+        print("INVALID TELESCOPE. PandExo only accepts: jwst, hst, wfirst")

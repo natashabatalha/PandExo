@@ -285,7 +285,7 @@ def computeJac(molDict):
             
             flag[j] = 0
             
-            #print i, j, val, type(val)
+            #print(i, j, val, type(val))
             J[i,j] = float(val)
 
     return J

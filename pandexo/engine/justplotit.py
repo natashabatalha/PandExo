@@ -131,7 +131,7 @@ def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', out
             y = sim_spec
             err = np.sqrt(vout+vin)/out
         else: 
-            print "Something went wrong. Cannot enter both resolution and ask to bin to new wave"
+            print("Something went wrong. Cannot enter both resolution and ask to bin to new wave")
             return
             
         #create error bars for Bokeh's multi_line
@@ -202,7 +202,7 @@ def bin_wave_to_R(w, R):
     --------
     
     >>> newwave = bin_wave_to_R(np.linspace(1,2,1000), 10)
-    >>> print len(newwave)
+    >>> print(len(newwave))
     11
     """
     wave = []

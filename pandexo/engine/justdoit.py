@@ -27,8 +27,8 @@ ALL = {"WFC3 G141":False,
 def print_instruments():
     """Prints a list of the possible instrument templates to load
     """
-    print "Choose from the following:"
-    print ALL.keys()
+    print("Choose from the following:")
+    print(ALL.keys())
     return
 
 def load_exo_dict():
@@ -225,7 +225,7 @@ def run_pandexo(exo, inst, param_space = 0, param_range = 0,save_file = True,
 
     #single instrument mode with dictionary input OR single planet 
     if type(inst) == dict: 
-        print "Running Single Case w/ User Instrument Dict"
+        print("Running Single Case w/ User Instrument Dict")
         results =wrapper({"pandeia_input": inst , "pandexo_input":exo})
         if output_file == '':
             output_file = 'singlerun.p'
@@ -237,8 +237,8 @@ def run_pandexo(exo, inst, param_space = 0, param_range = 0,save_file = True,
         if type(inst) != list: 
             raise ValueError
     except ValueError:
-        print 'Instrument input is not dict so must be list'
-        print 'Enter in format ["NIRSpec G140M"] or ["NIRISS SOSS","MIRI LRS"]' 
+        print('Instrument input is not dict so must be list')
+        print('Enter in format ["NIRSpec G140M"] or ["NIRISS SOSS","MIRI LRS"]')
         return    
          
     #single instrument mode and single planet OR several planets  
@@ -247,7 +247,7 @@ def run_pandexo(exo, inst, param_space = 0, param_range = 0,save_file = True,
         
         #start case of no parameter space run 
         if isinstance(param_space, (float, int)) or isinstance(param_range, (float, int)):
-            print "Running Single Case for: " + inst[0]
+            print("Running Single Case for: " + inst[0])
             inst_dict = load_mode_dict(inst[0])
             results =wrapper({"pandeia_input": inst_dict , "pandexo_input":exo})
             if output_file == '':
@@ -256,7 +256,7 @@ def run_pandexo(exo, inst, param_space = 0, param_range = 0,save_file = True,
             return results
          
         #if there are parameters to cycle through this will run
-        print "Running through exo parameters in parallel: " + param_space 
+        print("Running through exo parameters in parallel: " + param_space)
         #run the above function in parallel 
         results = Parallel(n_jobs=num_cores)(delayed(run_param_space)(i,exo,inst[0],param_space) for i in param_range)
         
@@ -269,7 +269,7 @@ def run_pandexo(exo, inst, param_space = 0, param_range = 0,save_file = True,
         return results
         
     #run several different instrument modes and single planet
-    print "Running select instruments" 
+    print("Running select instruments")
     if len(inst)>1:
         
         results = Parallel(n_jobs=num_cores)(delayed(run_inst_space)(i, exo) for i in inst)
@@ -283,7 +283,7 @@ def run_pandexo(exo, inst, param_space = 0, param_range = 0,save_file = True,
             
     #cycle through all options  
     elif inst[0].lower() == 'run all':
-        print "Running through all instruments"  
+        print("Running through all instruments")
         results = Parallel(n_jobs=num_cores)(delayed(run_inst_space)(i, exo) for i in ALL.keys())
     
         #Default dump all results [an array of dictionaries] into single file
