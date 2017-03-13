@@ -348,8 +348,9 @@ class CalculationNewHandler(BaseHandler):
                 pandata = json.load(data_file)       
                 mirimode = self.get_argument("mirimode")
                 if (mirimode == "lrsslit"):
-                    pandata["configuration"]["mode"] = mirimode
+                    pandata["configuration"]["instrument"]["mode"] = mirimode
                     pandata["configuration"]["instrument"]["aperture"]="lrsslit"
+                    pandata["configuration"]["detector"]["subarray"] = "full"
                     
         if (self.get_argument("instrument")=="NIRSpec"): 
             with open(os.path.join(os.path.dirname(__file__), "reference",
