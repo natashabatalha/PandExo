@@ -210,19 +210,27 @@ def bin_wave_to_R(w, R):
     i = 1 
     ind= 0
     while(tracker<max(w)):
+        firsttime = True
         if i <len(w)-1:
-        
             dlambda = w[i]-w[ind]
             newR = w[i]/dlambda
-            if newR < R:
+            if (newR > R) & (firsttime):
+                tracker = w[ind]
+                wave += [tracker]
+                ind += 1
+                i += 1 
+            elif newR < R:
+                firsttime = False
                 tracker = w[ind]+dlambda/2.0
                 wave +=[tracker]
                 ind = (np.abs(w-tracker)).argmin()
-                i = ind
-            else:            
+                i = ind+1
+            else:
+                firsttime = False            
                 i+=1    
         else:
             tracker = max(w)
+            wave += [tracker]
     return wave
 
 def uniform_tophat_sum(xnew,x, y):
