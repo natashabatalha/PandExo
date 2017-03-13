@@ -278,7 +278,7 @@ def compute_maxexptime_per_int(pandeia_input, sat_level):
     --------
     
     >>> max_time = compute_maxexptime_per_int(pandeia_input, 50000.0)
-    >>> print max_time 
+    >>> print(max_time)
     12.0
     """
     
@@ -339,7 +339,7 @@ def compute_timing(m,transit_duration,expfact_out,noccultations):
     Examples
     --------
     >>> timing, flags = compute_timing(m, 2*60.0*60.0, 1.0, 1.0)
-    >>> print timing.keys()
+    >>> print(timing.keys())
     ['Number of Transits', 'Num Integrations Out of Transit', 'Num Integrations In Transit', 
     'APT: Num Groups per Integration', 'Seconds per Frame', 'Observing Efficiency (%)', 'On Source Time(sec)', 
     'Exposure Time Per Integration (secs)', 'Reset time Plus 30 min TA time (hrs)',
@@ -625,7 +625,7 @@ def add_noise_floor(noise_floor, wave_bin, error_spec):
     >>> wave = np.linspace(1,2.7,10)
     >>> error = np.zeros(10)+1e-6
     >>> newerror = add_noise_floor(20, wave, error)
-    >>> print newerror
+    >>> print(newerror)
     [  2.00000000e-05   2.00000000e-05   2.00000000e-05   2.00000000e-05
        2.00000000e-05   2.00000000e-05   2.00000000e-05   2.00000000e-05
        2.00000000e-05   2.00000000e-05]
@@ -667,7 +667,7 @@ def bin_wave_to_R(w, R):
     --------
     
     >>> newwave = bin_wave_to_R(np.linspace(1,2,1000), 10)
-    >>> print len(newwave)
+    >>> print(len(newwave))
     11
     """
     wave = []
