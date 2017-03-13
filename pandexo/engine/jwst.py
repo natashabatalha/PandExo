@@ -4,7 +4,7 @@ import json
 import numpy as np
 import pandas as pd
 from copy import deepcopy 
-
+from astropy.io import fits
 from pandeia.engine.instrument_factory import InstrumentFactory
 from pandeia.engine.perform_calculation import perform_calculation
 import create_input as create
@@ -139,6 +139,9 @@ def compute_full_sim(dictinput):
     out = out.as_dict()
     out.pop('3d')
     print("End out of Transit")
+    
+    #Remove effects of Quantum Yield from shot noise 
+    out = remove_QY(out, instrument)
 
     #this kind of redundant going to compute inn from out instead 
     #keep perform_in but change inputs to (out, timing, both_spec)
@@ -146,9 +149,7 @@ def compute_full_sim(dictinput):
     inn = perform_in(pandeia_input, pandexo_input,timing, both_spec, out, calculation)
     print("End In Transit")
     
-    #Remove effects of Quantum Yield from shot noise 
-    #out = remove_QY(out)
-    #inn = remove_QY(inn)
+
 
     #compute warning flags for timing info 
     warnings = add_warnings(out, timing, sat_level, flags, instrument) 
@@ -453,23 +454,35 @@ def compute_timing(m,transit_duration,expfact_out,noccultations):
         
     return timing, {'flag_default':flag_default,'flag_high':flag_high}
 
-def remove_QY(pandeia_dict):
+def remove_QY(pandeia_dict, instrument):
     """Removes Quantum Yield from Pandeia Fluxes. Place Holder. 
     
     Parameters
     ----------
     pandeia_dict : dict 
         pandeia output dictionary
+    instrument : str
+        instrument running
     
     Returns
     -------
     dict 
         same exact dictionary with extracted_flux = extracted_flux/QY
     """
-    
-    try:
-        pandeia_dict['1d']['extracted_flux'] = 1
-    
+    if instrument == 'niriss':
+        qy = fits.open(os.path.join(default_refdata_directory,'jwst', instrument,'qe' ,'jwst_niriss_h2rg_qe.fits'))
+        x_grid = pandeia_dict['1d']['extracted_flux'][0]
+        qy_on_grid = np.interp(x_grid, qy[1].data['WAVELENGTH'], qy[1].data['CONVERSION'])
+    elif instrument == 'nirspec':
+        qy = fits.open(os.path.join(default_refdata_directory,'jwst', instrument,'qe' ,'jwst_nirspec_qe.fits'))
+        x_grid = pandeia_dict['1d']['extracted_flux'][0]
+        qy_on_grid = np.interp(x_grid, qy[1].data['WAVELENGTH'], qy[1].data['CONVERSION'])
+    else:
+        #nircam and miri currently have no qy effects
+        qy_on_grid = 1.0
+
+    pandeia_dict['1d']['extracted_flux'][1] = pandeia_dict['1d']['extracted_flux'][1]/qy_on_grid
+    return pandeia_dict
 
 def perform_out(pandeia_input, pandexo_input,timing, both_spec):
     """Runs pandeia for the out of transit data
@@ -553,6 +566,9 @@ def perform_in(pandeia_input, pandexo_input,timing, both_spec, out, calculation)
         pandeia_input['scene'][0]['spectrum']['sed']['spectrum'] = in_transit_spec
 
         report_in = perform_calculation(pandeia_input, dict_report=True)
+        instrument = pandeia_input['configuration']['instrument']['instrument']
+        #remove QY effects 
+        report_in = remove_QY(report_in, instrument)
         report_in.pop('3d')
     
     return report_in
