@@ -323,7 +323,7 @@ class CalculationNewHandler(BaseHandler):
                 if exodata["planet"]["w_unit"] == 'sec':
                     exodata["planet"]["transit_duration"] = 0.0
                 else: 
-                    print "Need to give transit duration"
+                    print("Need to give transit duration")
                     raise 
                 
             #noise floor, set to 0.0 of no values are input        
