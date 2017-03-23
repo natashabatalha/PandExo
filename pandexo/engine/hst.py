@@ -543,8 +543,10 @@ def compute_sim_hst(dictinput):
         windowSize = 20.0
     if f_unit == "rp^2/r*^2":
         eventType       ='transit'
-    else:
+    elif f_unit == "fp/f*":
         eventType       ='eclipse'
+    else: 
+        raise Exception('Units are not correct. Pick rp^2/r*^2 or fp/f*')
     
     a = wfc3_TExoNS(dictinput)
     b = calc_start_window(eventType, a['light_curve_rms'], a['nframes_per_orb'], numorbits, depth, inc, aRs, period, windowSize, ecc, w)
