@@ -343,22 +343,23 @@
     <span class="n">tracker</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
     <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span> 
     <span class="n">ind</span><span class="o">=</span> <span class="mi">0</span>
+    <span class="n">firsttime</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="k">while</span><span class="p">(</span><span class="n">tracker</span><span class="o">&lt;</span><span class="nb">max</span><span class="p">(</span><span class="n">w</span><span class="p">)):</span>
-        <span class="n">firsttime</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span><span class="nb">len</span><span class="p">(</span><span class="n">w</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
             <span class="n">dlambda</span> <span class="o">=</span> <span class="n">w</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-</span><span class="n">w</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span>
             <span class="n">newR</span> <span class="o">=</span> <span class="n">w</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">/</span><span class="n">dlambda</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">newR</span> <span class="o">&gt;</span> <span class="n">R</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">firsttime</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">newR</span> <span class="o">&lt;</span> <span class="n">R</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">firsttime</span><span class="p">):</span>
                 <span class="n">tracker</span> <span class="o">=</span> <span class="n">w</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span>
                 <span class="n">wave</span> <span class="o">+=</span> <span class="p">[</span><span class="n">tracker</span><span class="p">]</span>
                 <span class="n">ind</span> <span class="o">+=</span> <span class="mi">1</span>
                 <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span> 
+                <span class="n">firsttime</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="k">elif</span> <span class="n">newR</span> <span class="o">&lt;</span> <span class="n">R</span><span class="p">:</span>
-                <span class="n">firsttime</span> <span class="o">=</span> <span class="kc">False</span>
                 <span class="n">tracker</span> <span class="o">=</span> <span class="n">w</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span><span class="o">+</span><span class="n">dlambda</span><span class="o">/</span><span class="mf">2.0</span>
                 <span class="n">wave</span> <span class="o">+=</span><span class="p">[</span><span class="n">tracker</span><span class="p">]</span>
                 <span class="n">ind</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">w</span><span class="o">-</span><span class="n">tracker</span><span class="p">))</span><span class="o">.</span><span class="n">argmin</span><span class="p">()</span>
                 <span class="n">i</span> <span class="o">=</span> <span class="n">ind</span><span class="o">+</span><span class="mi">1</span>
+                <span class="n">firsttime</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">firsttime</span> <span class="o">=</span> <span class="kc">False</span>            
                 <span class="n">i</span><span class="o">+=</span><span class="mi">1</span>    
