@@ -78,7 +78,10 @@ class SetDefaultModes():
                                "nirspec_input.json")) as data_file:
             pandeia_data = json.load(data_file)
             pandeia_data["configuration"]["instrument"]["disperser"] = self.config
-            pandeia_data["configuration"]["instrument"]["filter"] = filters[self.config]                                  
+            pandeia_data["configuration"]["instrument"]["filter"] = filters[self.config]    
+            if self.config == 'prism':
+                pandeia_data["configuration"]["detector"]["subarray"] = 'sub512'
+
         return pandeia_data
         
     def nircam(self):
