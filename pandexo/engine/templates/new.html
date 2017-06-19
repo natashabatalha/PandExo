@@ -5,6 +5,51 @@
 <link href="{{ static_url('css/select2.min.css')}}" rel="stylesheet">
 <link href="{{ static_url('css/select2-bootstrap-theme.min.css')}}" rel="stylesheet">
 <link href="{{ static_url('css/icheck-bootstrap.min.css')}}" rel="stylesheet">
+<style>
+    .radio-chooser {
+        border: 1px solid #cce6fa;
+        border-radius: 4px;
+        box-sizing: border-box;
+        display: flex;
+        font-family: 'Open Sans', sans-serif;
+        margin: 15px 0;
+    }
+    .radio-chooser-item {
+        width: 50%;
+        box-sizing: border-box;
+        padding: 20px;
+        display: inline-block;
+        background: white;
+    }
+    .radio-chooser-item.radio-chooser-selected {
+        background: #f4faff;
+    }
+    .radio-chooser-item:first-child {
+        border-right: 1px solid #cce6fa;
+        box-sizing: border-box;
+    }
+    .radio-chooser-item:hover {
+        background: #f4faff;
+    }
+    .radio-chooser-content {
+        cursor: pointer;
+        width: 100%;
+        margin: 0;
+        padding: 5px;
+    }
+    .radio-chooser-content input {
+        margin: 0 15px 0 0;
+        line-height: 20px;
+        vertical-align: middle;
+    }
+    .radio-chooser-title {
+        max-width: 270px;
+        display: inline-block;
+        vertical-align: middle;
+        font-weight: 100;
+        font-size: 18px;
+    }
+</style>
 {% end %}
 
 {% block body %}
@@ -24,33 +69,30 @@
     <hr class="col-md-11 col-md-offset-1">
 
     <div class="form-group">
-        <label class="col-md-3 control-label" for="type">Stellar Model?</label>
-        <div class="col-md-6">
-            <div class="radio icheck-turquoise">
-                <input type="radio" name="type" id="typeRadio1" value="user">
-                <label for="typeRadio1">User Defined Stellar Spectra</label>
-            </div>
-
-            <div class="radio icheck-turquoise">
-                <input type="radio" name="type" id="typeRadio2" value="phoenix">
-                <label for="typeRadio2">Phoenix Grid Models</label>
+        <label class="col-md-3 control-label" for="" style="top: 35px;">Stellar Model</label>
+        <div class="col-md-9">
+            <div class="radio-chooser">
+                <div class="radio-chooser-item">
+                    <label class="radio-chooser-content" for="stellarModelPhoenix">
+                        <input type="radio" name="stellarModal" id="stellarModelPhoenix" value="phoenix" />
+                        <div class="radio-chooser-title">Phoenix Grid Models</div>
+                    </label>
+                </div>
+                <div class="radio-chooser-item">
+                    <label class="radio-chooser-content" for="stellarModelUser">
+                        <input type="radio" name="stellarModal" id="stellarModelUser" value="user" />
+                        <div class="radio-chooser-title">User Defined Stellar Spectrum</div>
+                    </label>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="form-group">
-        <label class="col-md-3 control-label" for="starFile">Upload</label>
-        <div class="col-md-3">
+    <div class="form-group hidden upload-stellar-section">
+        <div class="col-md-3 col-md-offset-3">
+            <button class="btn btn-block" type="button" onclick="document.getElementById('starFile').click(); return false;">Choose File</button>
             <input type="file" id="starFile" name="starFile" style="display: none;">
-            <div class="dropdown">
-                <button class="btn dropdown-toggle" type="button" data-toggle="dropdown">Select Stellar Model
-                <span class="caret"></span></button>
-                <ul class="dropdown-menu">
-                    <li><a href="#">Default Model</a></li>
-                    <li><a href="#" onclick="document.getElementById('starFile').click(); return false;">Browse</a></li>
-                </ul>
-            </div>
-            <p class="help-block">Column 1: wavelength <br>Column 2: flux, no header</p>
+            <p class="help-block text-center">Column 1: wavelength <br>Column 2: flux, no header</p>
         </div>
         <div class="col-md-3">
             <select id="starwunits" name="starwunits" class="form-control" data-placeholder="Select Wavelength Units">
@@ -73,9 +115,8 @@
         </div>
     </div>
 
-    <div class="form-group" id="phoenix">
-        <label class="col-md-3 control-label" for="phoenix">Or Enter Star Info</label>
-        <div class="col-md-3">
+    <div class="form-group hidden phoenix-section">
+        <div class="col-md-3 col-md-offset-3">
             <div class="input-group">
                 <input type="text" class="form-control" id="temp" name="temp" >
                 <span class="input-group-addon">&deg; Kelvin</span>
@@ -92,38 +133,54 @@
         </div>
    </div>
 
-    <div class="form-group">
-        <label class="col-md-3 control-label" for="ref_wave">Magnitude</label>
-        <div class="col-md-3">
-            <select id="ref_wave" name="ref_wave" class="form-control" data-placeholder="Select Magnitude Units">
-                <option value=""></option>
-                <option value="1.26">J</option>
-                <option value="1.60">H</option>
-                <option value="2.22">K</option>
-            </select>
-        </div>
-        <div class="col-md-3">
-            <input type="text" class="form-control" id="mag" name="mag" >
-            <p class="help-block">Provide magnitude for Planet System</p>
+    <div class="form-group hidden phoenix-section upload-stellar-section">
+        <label class="col-md-3 control-label" for="mag">Magnitude</label>
+        <div class="col-md-4 form-inline">
+            <input type="text" class="form-control" id="mag" name="mag" style="width: 70%;">
+            <div class="input-group-btn" style="width: 20%;left: -8px;display: inline-block;">
+                <select id="ref_wave" name="ref_wave" class="form-control" data-placeholder="Select Magnitude Units">
+                    <!--<option value=""></option>-->
+                    <option value="1.26">J</option>
+                    <option value="1.60">H</option>
+                    <option value="2.22">K</option>
+                </select>
+            </div>
+            <p class="help-block">Magnitude for Planet System</p>
+            <style>
+                .phoenix-section .select2-selection {
+                    border-top-left-radius: 0;border-bottom-left-radius: 0;
+                }
+            </style>
         </div>
     </div>
 
     <hr class="col-md-11 col-md-offset-1">
 
     <div class="form-group">
-        <label class="col-md-3 control-label" for="planFile">Planet Model</label>
-
-        <div class="col-md-3">
-            <input type="file" id="planFile" name="planFile" style="display: none">
-            <div class="dropdown">
-                <button class="btn dropdown-toggle" type="button" data-toggle="dropdown">Select Planet Model
-                <span class="caret"></span></button>
-                <ul class="dropdown-menu">
-                    <li><a href="#">Default Model</a></li>
-                    <li><a href="#" onclick="document.getElementById('planFile').click(); return false;">Browse</a></li>
-                </ul>
+        <label class="col-md-3 control-label" for="" style="top: 35px;">Planet Model</label>
+        <div class="col-md-9">
+            <div class="radio-chooser">
+                <div class="radio-chooser-item">
+                    <label class="radio-chooser-content" for="planetModelConstant">
+                        <input type="radio" name="planetModel" id="planetModelConstant" value="constant" />
+                        <div class="radio-chooser-title">Constant Transit Depth</div>
+                    </label>
+                </div>
+                <div class="radio-chooser-item">
+                    <label class="radio-chooser-content" for="planetModelUser">
+                        <input type="radio" name="planetModel" id="planetModelUser" value="user" />
+                        <div class="radio-chooser-title">User Defined Planet Spectrum</div>
+                    </label>
+                </div>
             </div>
-            <p class="help-block">Column 1: wave or time <br>Column 2: Model, no header</p>
+        </div>
+    </div>
+
+    <div class="form-group hidden upload-planet-section">
+        <div class="col-md-3 col-md-offset-3">
+            <button class="btn btn-block" type="button" onclick="document.getElementById('planFile').click(); return false;">Choose File</button>
+            <input type="file" id="planFile" name="planFile" style="display: none">
+            <p class="help-block text-center">Column 1: wave or time <br>Column 2: Model, no header</p>
         </div>
         <div class="col-md-3">
             <select id="planwunits" name="planwunits" class="form-control" data-placeholder="Select Wave or Time Units">
@@ -139,11 +196,23 @@
         <div class="col-md-3">
             <select id="planfunits" name="planfunits" class="form-control" data-placeholder="Select Planet Model Units">
                 <option value=""></option>
-                <option value="rp^2/r*^2">(Rp/R*)^2 (primary)</option>
-                <option value="fp/f*">Fp/F* (secondary/phase curve)</option>
+                <option value="rp^2/r*^2">(R<sub>p</sub>/R<sub>*</sub>)^2 (primary)</option>
+                <option value="fp/f*">F<sub>p</sub>/F<sub>*</sub> (secondary/phase curve)</option>
             </select>
         </div>  
-    </div>    
+    </div>
+
+    <div class="form-group hidden constant-transit-section">
+        <div class="col-md-4 col-md-offset-3">
+            <div class="input-group">
+                <input type="text" class="form-control" id="transit_depth" name="transit_depth">
+                <span class="input-group-addon">(R<sub>p</sub>/R<sub>*</sub>)<sup>2</sup></span>
+            </div>
+            <p class="help-block">Wavelength-independent transit depth</p>
+        </div>
+    </div>
+
+    <hr class="col-md-11 col-md-offset-1">
 
     <div class="form-group">
         <label class="col-md-3 control-label" for="transit_duration">Transit Duration</label>
@@ -171,20 +240,16 @@
             <p class="help-block">Or number of phase observations</p>
         </div>
     </div>
-    
-    <div class="form-group">
-        <label class="col-md-3 control-label" for="optimize">Number of Groups per Integration</label>
-        <div class="col-md-4">
-            <input type="text" class="form-control" id="optimize" name="optimize" value="optimize" >
-            <p class="help-block">Recommended to compute optimal groups per integration first (type "optimize"). But, you can also input any number from 2-65536. </p>
-        </div>
-    </div>
+
+    <hr class="col-md-11 col-md-offset-1">
 
     <div class="form-group">
-        <label class="col-md-3 control-label" for="eff">Photon-Electron Conv. Eff.</label>
-            <div class="col-md-6">
-                <img id="full" alt="-" width="660" height="426" src="../static/img/pec_res.jpg">
-            </div>
+        <div class="col-md-6 col-md-offset-3">
+            <h4>JWST Instrument Modes</h4>
+        </div>
+        <div class="col-md-6 col-md-offset-3">
+            <img id="full" alt="-" width="660" height="426" src="../static/img/pec_res.jpg" style="left: -63px;position: relative;">
+        </div>
     </div>
 
     <div class="form-group">
@@ -200,9 +265,9 @@
         </div>
     </div>
 
-    <div class="form-group" onchange="showForm()">
+    <div class="form-group hidden" id="instrument-mode-section" onchange="showForm()">
         <label class="col-md-3 control-label" for="mirimode">Mode</label>
-        <div class="col-md-4" id = "MIRI" style="display:none">
+        <div class="col-md-4" id = "MIRI">
             <select id="mirimode" name="mirimode" onchange="showForm()" class="form-control" data-placeholder="Select MIRI Mode">
                 <option value=""></option>
                 <option value="lrsslitless">Slitless LRS</option>
@@ -210,8 +275,7 @@
             </select>
         </div>
 
-
-        <div class="col-md-6" id="NIRSpec" style="display:none">
+        <div class="col-md-6" id="NIRSpec">
             <div class="col-md-6" style="padding-left: 0;">
                 <select id="nirspecmode" name="nirspecmode" onchange="showForm()" class="form-control" data-placeholder="Select NIRSpec Mode">
                     <option value=""></option>
@@ -238,8 +302,7 @@
 
         </div>
 
-
-        <div class="col-md-4" id="NIRISS" style="display:none">
+        <div class="col-md-4" id="NIRISS">
             <select id="nirissmode" name="nirissmode" onchange="showForm()" class="form-control" data-placeholder="Select NIRISS Mode">
                 <option value=""></option>
                 <option value="substrip96">Substrip 96</option>
@@ -247,8 +310,7 @@
             </select>
         </div>
 
-
-        <div class="col-md-8" id="NIRCam" style="display:none">
+        <div class="col-md-6" id="NIRCam">
             <div class="col-md-6" style="padding-left: 0;">
                 <select id="nircammode" name="nircammode" onchange="showForm()" class="form-control" data-placeholder="Select NIRCam Mode">
                     <option value=""></option>
@@ -271,6 +333,14 @@
     </div>
 
     <div class="form-group">
+        <label class="col-md-3 control-label" for="optimize">Number of Groups per Integration</label>
+        <div class="col-md-4">
+            <input type="text" class="form-control" id="optimize" name="optimize" value="optimize" >
+            <p class="help-block">Recommended to compute optimal groups per integration first (type "optimize"). But, you can also input any number from 2-65536. </p>
+        </div>
+    </div>
+
+    <div class="form-group">
         <label class="col-md-3 control-label" for="satlevel">Percent Fullwell</label>
         <div class="col-md-3">
             <div class="input-group">
@@ -280,28 +350,42 @@
             <p class="help-block">Percent fullwell of electrons.</p>
         </div>
     </div>
-    
-    <div class="form-group">
-        <label class="col-md-3 control-label" for="noisefile">Noise Floor</label>
 
-        <div class="col-md-3">
-            <input type="file" id="noisefile" name="noisefile" style="display: none;">
-            <div class="dropdown">
-                <button class="btn dropdown-toggle" type="button" data-toggle="dropdown">Select Noise Floor
-                <span class="caret"></span></button>
-                <ul class="dropdown-menu">
-                    <li><a href="#">Default Model</a></li>
-                    <li><a href="#" onclick="document.getElementById('noisefile').click(); return false;">Browse</a></li>
-                </ul>
+    <div class="form-group">
+        <label class="col-md-3 control-label" for="" style="top: 35px;">Noise Floor</label>
+        <div class="col-md-9">
+            <div class="radio-chooser">
+                <div class="radio-chooser-item">
+                    <label class="radio-chooser-content" for="noiseModelConstant">
+                        <input type="radio" name="noiseModal" id="noiseModelConstant" value="constant-noise" />
+                        <div class="radio-chooser-title">Constant Minimum Noise</div>
+                    </label>
+                </div>
+                <div class="radio-chooser-item">
+                    <label class="radio-chooser-content" for="noiseModelUser">
+                        <input type="radio" name="noiseModal" id="noiseModelUser" value="user" />
+                        <div class="radio-chooser-title">User Defined Noise Model</div>
+                    </label>
+                </div>
             </div>
+        </div>
+    </div>
+
+    <div class="form-group hidden upload-noise-section">
+        <div class="col-md-3 col-md-offset-3">
+            <button class="btn btn-block" type="button" onclick="document.getElementById('noisefile').click(); return false;">Choose File</button>
+            <input type="file" id="noisefile" name="noisefile" style="display: none;">
             <p class="help-block">Column 1: wavelength <br>Column 2: Noise Floor (ppm)</p>
         </div>
-        <div class="col-md-3">
+    </div>
+
+    <div class="form-group hidden constant-noise-section">
+        <div class="col-md-3 col-md-offset-3">
             <div class="input-group">
                 <input type="text" class="form-control" id="noisefloor" name="noisefloor" >
                 <span class="input-group-addon">ppm</span>
             </div>
-            <p class="help-block">OR Constant Minimum Noise</p>
+            <p class="help-block">Constant Minimum Noise</p>
         </div>
     </div>  
 
@@ -326,62 +410,67 @@
             width: "100%",
             minimumResultsForSearch: 7
         });
+        $(".radio-chooser-content").click(function () {
+            $(".radio-chooser-item").removeClass("radio-chooser-selected");
+            $(this).parent().addClass("radio-chooser-selected");
+            switch ( $(this).find("input").attr("id") ) {
+                case "stellarModelPhoenix":
+                    $(".upload-stellar-section").addClass("hidden");
+                    $(".phoenix-section").removeClass("hidden");
+                    break;
+                case "stellarModelUser":
+                    $(".phoenix-section").addClass("hidden");
+                    $(".upload-stellar-section").removeClass("hidden");
+                    break;
+                case "planetModelConstant":
+                    $(".upload-planet-section").addClass("hidden");
+                    $(".constant-transit-section").removeClass("hidden");
+                    break;
+                case "planetModelUser":
+                    $(".constant-transit-section").addClass("hidden");
+                    $(".upload-planet-section").removeClass("hidden");
+                    break;
+                case "noiseModelConstant":
+                    $(".upload-noise-section").addClass("hidden");
+                    $(".constant-noise-section").removeClass("hidden");
+                    break;
+                case "noiseModelUser":
+                    $(".constant-noise-section").addClass("hidden");
+                    $(".upload-noise-section").removeClass("hidden");
+                    break;
+            }
+        });
     });
     function showForm() {
+        $("#instrument-mode-section").removeClass("hidden");
+        $("#MIRI, #NIRSpec, #NIRISS, #NIRCam").addClass("hidden");
         var selopt = document.getElementById("instrument").value;
         switch (selopt) {
             case "MIRI":
-                document.getElementById("MIRI").style.display = "block";
-                document.getElementById("NIRSpec").style.display = "none";
-                document.getElementById("NIRISS").style.display = "none";
-                document.getElementById("NIRCam").style.display = "none";
+                $("#MIRI").removeClass("hidden");
                 break;
             case "NIRSpec":
-                document.getElementById("NIRSpec").style.display = "block";
-                document.getElementById("MIRI").style.display = "none";
-                document.getElementById("NIRISS").style.display = "none";
-                document.getElementById("NIRCam").style.display = "none";
+                $("#NIRSpec").removeClass("hidden");
                 break;
             case "NIRISS":
-                document.getElementById("NIRISS").style.display = "block";
-                document.getElementById("MIRI").style.display = "none";
-                document.getElementById("NIRSpec").style.display = "none";
-                document.getElementById("NIRCam").style.display = "none";
+                $("#NIRISS").removeClass("hidden");
                 break;
             case "NIRCam":
-                document.getElementById("NIRCam").style.display = "block";
-                document.getElementById("MIRI").style.display = "none";
-                document.getElementById("NIRSpec").style.display = "none";
-                document.getElementById("NIRISS").style.display = "none";
+                $("#NIRCam").removeClass("hidden");
                 break;
-            default:
-                document.getElementById("MIRI").style.display = "none";
-                document.getElementById("NIRSpec").style.display = "none";
-                document.getElementById("NIRISS").style.display = "none";
-                document.getElementById("NIRCam").style.display = "none";
         }
     }
 
     function pickStar() {
+        $("#starFile, #starwunits, #starfunits, #phoenix").addClass("hidden");
         var selopt1 = document.getElementById("type").value;
         switch (selopt1) {
             case "user":
-                document.getElementById("starFile").style.display = "block";
-                document.getElementById("starwunits").style.display = "block";
-                document.getElementById("starfunits").style.display = "block";
-                document.getElementById("phoenix").style.display = "none";
+                $("#starFile, #starwunits, #starfunits").removeClass("hidden");
                 break;
             case "phoenix":
-                document.getElementById("starFile").style.display = "none";
-                document.getElementById("starwunits").style.display = "none";
-                document.getElementById("starfunits").style.display = "none";
-                document.getElementById("phoenix").style.display = "block";
+                $("#phoenix").removeClass("hidden");
                 break;
-            default:
-                document.getElementById("starFile").style.display = "none";
-                document.getElementById("starwunits").style.display = "none";
-                document.getElementById("starfunits").style.display = "none";
-                document.getElementById("phoenix").style.display = "none";
         }
     }
 </script>
