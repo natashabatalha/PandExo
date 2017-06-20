@@ -12,7 +12,7 @@ from .pandexo import wrapper
 from tornado.options import define, options
 import pickle
 from .ComputeZ import computeAlpha
-from utils.plotters import create_component_jwst, create_component_spec, create_component_hst
+from .utils.plotters import create_component_jwst, create_component_spec, create_component_hst
 import pandas as pd 
 import numpy as np
 
