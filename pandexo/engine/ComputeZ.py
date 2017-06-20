@@ -1,9 +1,10 @@
 from scipy.io.idl import readsav
 import os
 from bokeh.plotting import figure
-from bokeh.io import vform,output_file, show, vplot
+from bokeh.io import output_file, show
+from bokeh.layouts import column
 import numpy as np
-from elements import ELEMENTS as ele
+from .elements import ELEMENTS as ele
 try:
     from sympy.mpmath import *
 except:

@@ -7,9 +7,10 @@ from copy import deepcopy
 from astropy.io import fits
 from pandeia.engine.instrument_factory import InstrumentFactory
 from pandeia.engine.perform_calculation import perform_calculation
-import create_input as create
-from compute_noise import ExtractSpec
+from . import create_input as create
+from .compute_noise import ExtractSpec
 
+import pickle
 #constant parameters.. consider putting these into json file 
 #max groups in integration
 max_ngroup = 65536.0 
@@ -102,12 +103,12 @@ def compute_full_sim(dictinput):
     expfact_out = pandexo_input['observation']['fraction'] 
     noise_floor = pandexo_input['observation']['noise_floor']
 
-
+    
     #get stellar spectrum and in transit spec
     star_spec = create.outTrans(pandexo_input['star'])
     both_spec = create.bothTrans(star_spec, pandexo_input['planet'])
     out_spectrum = np.array([both_spec['wave'], both_spec['flux_out_trans']])
-        
+    
     #get transit duration from phase curve or from input 
     if calculation == 'phase_spec': 
         transit_duration = max(both_spec['time']) - min(both_spec['time'])
@@ -139,7 +140,7 @@ def compute_full_sim(dictinput):
     out = out.as_dict()
     out.pop('3d')
     print("End out of Transit")
-    
+
     #Remove effects of Quantum Yield from shot noise 
     out = remove_QY(out, instrument)
 
@@ -820,12 +821,18 @@ def as_dict(out, both_spec ,binned, timing, mag, sat_level, warnings, punit, unb
 
     p=1.0
     if punit == 'fp/f*': p = -1.0
-    
-    timing_div = pd.DataFrame(timing.items(), columns=['Timing Info', 'Values']).to_html().encode()
-    timing_div = '<table class="table table-striped"> \n' + timing_div[36:len(timing_div)]
-    
-    warnings_div = pd.DataFrame(warnings.items(), columns=['Check', 'Status']).to_html().encode()
+
+    timing_div = pd.DataFrame.from_dict(timing, orient='index')
+    timing_div.columns = ['Value']
+    timing_div = timing_div.to_html()
+    timing_div = '<table class="table table-striped"> \n' + timing_div[36:len(timing_div)] 
+    timing_div = timing_div.encode()
+
+    warnings_div = pd.DataFrame.from_dict(warnings, orient='index')
+    warnings_div.columns = ['Value']
+    warnings_div = warnings_div.to_html()
     warnings_div = '<table class="table table-striped"> \n' + warnings_div[36:len(warnings_div)]
+    warnings_div = warnings_div.encode()
        
     input_dict = {
    	 "Target Mag": mag , 
@@ -840,8 +847,11 @@ def as_dict(out, both_spec ,binned, timing, mag, sat_level, warnings, punit, unb
  	 "Primary/Secondary": punit
     }
     
-    input_div = pd.DataFrame(input_dict.items(), columns=['Component', 'Values']).to_html().encode()
+    input_div = pd.DataFrame.from_dict(input_dict, orient='index')
+    input_div.columns = ['Value']
+    input_div = input_div.to_html()
     input_div = '<table class="table table-striped"> \n' + input_div[36:len(input_div)]
+    input_div = input_div.encode()
     
     #add calc type to input dict (doing it here so it doesn't output on webpage
     input_dict["Calculation Type"]= calculation
