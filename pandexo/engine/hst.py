@@ -570,7 +570,7 @@ def create_out_div(input_dict,minphase,maxphase):
         html rendered table
     """
     input_dict['Start observations between orbital phases'] = str(minphase)+'-'+str(maxphase)
-    input_div = pd.DataFrame(input_dict.items(), columns=['Component', 'Values']).to_html().encode()
+    input_div = pd.DataFrame(input_dict.items(), columns=['Component', 'Values']).to_html()#.encode()
     input_div = '<table class="table table-striped"> \n' + input_div[36:len(input_div)]
     return input_div
     
