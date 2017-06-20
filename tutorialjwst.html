@@ -13,6 +13,8 @@
 
   
   
+  
+  
 
   
 
@@ -44,6 +46,7 @@
 
 <body class="wy-body-for-nav" role="document">
 
+   
   <div class="wy-grid-for-nav">
 
     
@@ -80,7 +83,10 @@
           
             
             
-                <ul class="current">
+              
+            
+            
+              <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="includeme.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">JWST Tutorial</a><ul>
@@ -126,8 +132,10 @@
 
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="index.html">PandExo</a>
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">PandExo</a>
+        
       </nav>
 
 
@@ -136,23 +144,40 @@
         <div class="rst-content">
           
 
- 
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 <div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
-    <li><a href="index.html">Docs</a> &raquo;</li>
-      
-    <li>JWST Tutorial</li>
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>JWST Tutorial</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
         
-          
+            
             <a href="_sources/tutorialjwst.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
@@ -219,7 +244,7 @@ common modes. Within those templates the subarrays selected are the ones
 with the lowest frame times, and the read modes selected are the ones with one frame
 per 1 group (standard). If this suits you see Option 1 below. There is additional
 fine tuning that can be done within each of these observing modes.
-As a first pass, I&#8217;d suggest skipping this for now. Then come back and fine tune after your first run.</p>
+As a first pass, I’d suggest skipping this for now. Then come back and fine tune after your first run.</p>
 <blockquote>
 <div><ul class="simple">
 <li>NIRCam F444W</li>
@@ -258,7 +283,7 @@ that can fit into an integration. If you want to set your own number of groups y
 change that too.</p>
 <p>..code:: python</p>
 <blockquote>
-<div>inst_dict[&#8220;configuration&#8221;][&#8220;detector&#8221;][&#8220;ngroup&#8221;] = 5</div></blockquote>
+<div>inst_dict[“configuration”][“detector”][“ngroup”] = 5</div></blockquote>
 </div>
 </div>
 <div class="section" id="running-pandexo-command-line">
@@ -422,15 +447,18 @@ the dictionary structure yourself.</p>
 
 
            </div>
+           <div class="articleComments">
+            
+           </div>
           </div>
           <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="jwstinput.html" class="btn btn-neutral float-right" title="Possible Instrument Input Params" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="jwstinput.html" class="btn btn-neutral float-right" title="Possible Instrument Input Params" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="installation.html" class="btn btn-neutral" title="Installation" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="installation.html" class="btn btn-neutral" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -464,7 +492,8 @@ the dictionary structure yourself.</p>
             VERSION:'',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
         };
     </script>
       <script type="text/javascript" src="_static/jquery.js"></script>

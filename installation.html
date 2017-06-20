@@ -13,6 +13,8 @@
 
   
   
+  
+  
 
   
 
@@ -44,6 +46,7 @@
 
 <body class="wy-body-for-nav" role="document">
 
+   
   <div class="wy-grid-for-nav">
 
     
@@ -80,13 +83,17 @@
           
             
             
-                <ul class="current">
+              
+            
+            
+              <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="includeme.html">Getting Started</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#installation-procedure">Installation Procedure</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#troubleshooting">Troubleshooting</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#typeerror-float-object-cannot-be-interpreted-as-an-index">TypeError: ‘float’ object cannot be interpreted as an index</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#problems-with-pyfftw">Problems with PYFFTW?</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#can-t-find-pandeia-reference-data">Can&#8217;t find Pandeia Reference Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#can-t-find-pandeia-reference-data">Can’t find Pandeia Reference Data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#problems-installing-pysynphot">Problems Installing Pysynphot</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#problems-with-multiprocessing">Problems with Multiprocessing</a></li>
 </ul>
@@ -111,8 +118,10 @@
 
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="index.html">PandExo</a>
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">PandExo</a>
+        
       </nav>
 
 
@@ -121,23 +130,40 @@
         <div class="rst-content">
           
 
- 
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 <div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
-    <li><a href="index.html">Docs</a> &raquo;</li>
-      
-    <li>Installation</li>
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Installation</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
         
-          
+            
             <a href="_sources/installation.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
@@ -157,14 +183,14 @@
 <div class="highlight-bash"><div class="highlight"><pre><span></span>pip install pandexo.engine
 </pre></div>
 </div>
-<p>OR Download PandExo&#8217;s repository:</p>
+<p>OR Download PandExo’s repository:</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>git clone --recursive https://github.com/natashabatalha/pandexo
 <span class="nb">cd</span> pandexo
 python setup.py install
 </pre></div>
 </div>
 <p>2. Download the Phoenix Stellar Atlas <a class="reference external" href="ftp://ftp.stsci.edu/cdbs/tarfiles/synphot5.tar.gz">FROM THIS LINK</a>
-in order to easily pull Stellar SED&#8217;s from the phoenix database. Then type the following commands.
+in order to easily pull Stellar SED’s from the phoenix database. Then type the following commands.
 It might be helpful to add the export command to your ~/.bashrc file.</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>mkdir pysynphot_data
 mv synphot5.tar.gz pysynphot_data
@@ -181,8 +207,8 @@ AA_README     phoenixm00/   phoenixm10/   phoenixm20/   phoenixm30/   phoenixm40
 </pre></div>
 </div>
 <p>3. Download the JWST Reference Data <a class="reference external" href="http://ssb.stsci.edu/pandeia/engine/1.0/pandeia_data-1.0.tar.gz">FROM HERE</a> .
-This is a big file (6 gigs) so think carefully about where you want to store it. Don&#8217;t accidentally download
-it on your Mac Air then wonder why you can&#8217;t save a 32 Kb doc file.</p>
+This is a big file (6 gigs) so think carefully about where you want to store it. Don’t accidentally download
+it on your Mac Air then wonder why you can’t save a 32 Kb doc file.</p>
 <p>Then make sure you untar and point to the file so PandExo knows where it is. Like above, it might
 be helpful to put this in your ~/.bashrc file.</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>tar xf pandeia_data-1.0.tar.gz
@@ -198,9 +224,17 @@ be helpful to put this in your ~/.bashrc file.</p>
 </div>
 <div class="section" id="troubleshooting">
 <h2>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="typeerror-float-object-cannot-be-interpreted-as-an-index">
+<h3>TypeError: ‘float’ object cannot be interpreted as an index<a class="headerlink" href="#typeerror-float-object-cannot-be-interpreted-as-an-index" title="Permalink to this headline">¶</a></h3>
+<p>This is an error within Pandeia, which has not yet been fixed by STScI folk. You can easily fix it by finding where the file /pandeia/engine/coords.py is and changing line 36:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">ones</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">ny</span><span class="p">,</span> <span class="n">nx</span><span class="p">))</span>
+<span class="n">ones</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">ny</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">nx</span><span class="p">)))</span>
+</pre></div>
+</div>
+</div>
 <div class="section" id="problems-with-pyfftw">
 <h3>Problems with PYFFTW?<a class="headerlink" href="#problems-with-pyfftw" title="Permalink to this headline">¶</a></h3>
-<p>Many users experience issues when downloading Pandeia because of it&#8217;s dependency on <cite>pyfftw</cite>. If you experience this problem try these steps:</p>
+<p>Many users experience issues when downloading Pandeia because of it’s dependency on <cite>pyfftw</cite>. If you experience this problem try these steps:</p>
 <ul class="simple">
 <li>If you do not have a non-LLVM based GCC installation on your system, you can obtain one from here but gcc 5.1 does not produce a usable FFTW installation so make sure you download <strong>gcc 4.9 or below</strong></li>
 <li>STScI created the following script to successfully install <cite>pyfftw</cite></li>
@@ -211,7 +245,7 @@ chmod +x build_fftw.sh
 ./build_fftw
 </pre></div>
 </div>
-<p>If that doesn&#8217;t work Zach Berta-Thompson pointed out that this worked for him:</p>
+<p>If that doesn’t work Zach Berta-Thompson pointed out that this worked for him:</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>brew install fftw
 pip install pyfftw
 </pre></div>
@@ -219,13 +253,13 @@ pip install pyfftw
 <p>There are several different conda distributions of pyfftw however, if
 you install version &lt;0.10 it may downgrade
 your version of numpy. Therefore, a version that is greater than 0.10 is best. Numpy should be
-numpy&gt;=1.11.3.</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>conda install -c spectraldns <span class="nv">pyfftw</span><span class="o">=</span>0.10.4
+numpy&gt;=1.12</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>conda install -c spectraldns <span class="nv">pyfftw</span><span class="o">=</span><span class="m">0</span>.10.4
 </pre></div>
 </div>
 </div>
 <div class="section" id="can-t-find-pandeia-reference-data">
-<h3>Can&#8217;t find Pandeia Reference Data<a class="headerlink" href="#can-t-find-pandeia-reference-data" title="Permalink to this headline">¶</a></h3>
+<h3>Can’t find Pandeia Reference Data<a class="headerlink" href="#can-t-find-pandeia-reference-data" title="Permalink to this headline">¶</a></h3>
 <p>This usually looks like NoneType errors.</p>
 <ul class="simple">
 <li>Make sure PandExo knows where the Pandeia reference data is:</li>
@@ -239,7 +273,7 @@ numpy&gt;=1.11.3.</p>
 <p>If you are having problems with this
 you can use the astroconda distribution located <a class="reference external" href="http://astroconda.readthedocs.io/en/latest/installation.html#install-astroconda">here</a>.</p>
 <p>Or if you are using conda:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>conda install -c astropy <span class="nv">photutils</span><span class="o">=</span>0.3
+<div class="highlight-bash"><div class="highlight"><pre><span></span>conda install -c astropy <span class="nv">photutils</span><span class="o">=</span><span class="m">0</span>.3
 </pre></div>
 </div>
 </div>
@@ -261,15 +295,18 @@ setup.py your problem will go away.</p>
 
 
            </div>
+           <div class="articleComments">
+            
+           </div>
           </div>
           <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="tutorialjwst.html" class="btn btn-neutral float-right" title="JWST Tutorial" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="tutorialjwst.html" class="btn btn-neutral float-right" title="JWST Tutorial" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="includeme.html" class="btn btn-neutral" title="Getting Started" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="includeme.html" class="btn btn-neutral" title="Getting Started" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -303,7 +340,8 @@ setup.py your problem will go away.</p>
             VERSION:'',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
         };
     </script>
       <script type="text/javascript" src="_static/jquery.js"></script>
