@@ -44,14 +44,15 @@ setup(
     namespace_packages=['pandexo'], packages=['pandexo'],
     d2to1=True,
     install_requires=[
-          'numpy>=1.11.3',
-          'bokeh==0.12.4',
+          'numpy>=1.12.1',
+          'bokeh==0.12.6',
           'tornado',
           'pandas',
-          'multiprocessing',
+#          'multiprocessing',
           'joblib',
           'pandeia.engine',
           'batman-package',
+          'photutils',
           'astropy'
           ],
     dependency_links=['https://github.com/spacetelescope/pysynphot.git@0.9.8.5']

@@ -8,10 +8,10 @@ import tornado.ioloop
 import tornado.options
 import tornado.web
 from concurrent.futures import ProcessPoolExecutor
-from pandexo import wrapper
+from .pandexo import wrapper
 from tornado.options import define, options
 import pickle
-from ComputeZ import computeAlpha
+from .ComputeZ import computeAlpha
 from utils.plotters import create_component_jwst, create_component_spec, create_component_hst
 import pandas as pd 
 import numpy as np
@@ -282,7 +282,7 @@ class CalculationNewHandler(BaseHandler):
         fname_plan = fileinfo_plan['filename']
         extn_plan = os.path.splitext(fname_plan)[1]
         cname_plan = id+'planet' + extn_plan
-        fh_plan = open(os.path.join(__TEMP__, cname_plan), 'w')
+        fh_plan = open(os.path.join(__TEMP__, cname_plan), 'wb')
         fh_plan.write(fileinfo_plan['body'])
         
         with open(os.path.join(os.path.dirname(__file__), "reference",
@@ -297,7 +297,7 @@ class CalculationNewHandler(BaseHandler):
                 fname_star = fileinfo_star['filename']
                 extn_star = os.path.splitext(fname_star)[1]
                 cname_star = id+'star' + extn_star
-                fh_star = open(os.path.join(__TEMP__, cname_star), 'w')
+                fh_star = open(os.path.join(__TEMP__, cname_star), 'wb')
                 fh_star.write(fileinfo_star['body'])
                 exodata["star"]["starpath"] = os.path.join(__TEMP__, cname_star)
                 exodata["star"]["f_unit"] = self.get_argument("starfunits")
@@ -336,7 +336,7 @@ class CalculationNewHandler(BaseHandler):
                 fname_noise = fileinfo_noise['filename']
                 extn_noise = os.path.splitext(fname_noise)[1]
                 cname_noise = id+'noise' + extn_noise
-                fh_noise = open(os.path.join(__TEMP__, cname_noise), 'w')
+                fh_noise = open(os.path.join(__TEMP__, cname_noise), 'wb')
                 fh_noise.write(fileinfo_star['body'])
                 exodata["observation"]["noise_floor"] = os.path.join(__TEMP__, cname_noise)
             except:
@@ -380,7 +380,7 @@ class CalculationNewHandler(BaseHandler):
             pandata["configuration"]["detector"]["ngroup"] = self.get_argument("optimize")
         
         finaldata = {"pandeia_input": pandata , "pandexo_input":exodata}
-
+        print(finaldata)
         task = self.executor.submit(wrapper, finaldata)
 
 
@@ -419,7 +419,7 @@ class CalculationNewHSTHandler(BaseHandler):
         fname_plan = fileinfo_plan['filename']
         extn_plan = os.path.splitext(fname_plan)[1]
         cname_plan = id+'planet' + extn_plan
-        fh_plan = open(os.path.join(__TEMP__, cname_plan), 'w')
+        fh_plan = open(os.path.join(__TEMP__, cname_plan), 'wb')
         fh_plan.write(fileinfo_plan['body'])
         
         with open(os.path.join(os.path.dirname(__file__), "reference",

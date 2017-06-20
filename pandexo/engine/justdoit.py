@@ -1,6 +1,6 @@
 import numpy as np
 from pandeia.engine.instrument_factory import InstrumentFactory
-from pandexo import wrapper
+from .pandexo import wrapper
 import load_modes as lm
 import os 
 import pickle as pkl
@@ -229,7 +229,7 @@ def run_pandexo(exo, inst, param_space = 0, param_range = 0,save_file = True,
         results =wrapper({"pandeia_input": inst , "pandexo_input":exo})
         if output_file == '':
             output_file = 'singlerun.p'
-        if save_file: pkl.dump(results, open(os.path.join(output_path,output_file),'w'))
+        if save_file: pkl.dump(results, open(os.path.join(output_path,output_file),'wb'))
         return results
 
     #make sure inst is in list format.. makes my life so much easier
@@ -252,7 +252,7 @@ def run_pandexo(exo, inst, param_space = 0, param_range = 0,save_file = True,
             results =wrapper({"pandeia_input": inst_dict , "pandexo_input":exo})
             if output_file == '':
                 output_file = 'singlerun.p'
-            if save_file: pkl.dump(results, open(os.path.join(output_path,output_file),'w'))
+            if save_file: pkl.dump(results, open(os.path.join(output_path,output_file),'wb'))
             return results
          
         #if there are parameters to cycle through this will run
@@ -265,7 +265,7 @@ def run_pandexo(exo, inst, param_space = 0, param_range = 0,save_file = True,
         if output_file == '':
             output_file = param_space + '.p'
 
-        if save_file: pkl.dump(results, open(os.path.join(output_path,output_file),'w'))
+        if save_file: pkl.dump(results, open(os.path.join(output_path,output_file),'wb'))
         return results
         
     #run several different instrument modes and single planet
@@ -278,7 +278,7 @@ def run_pandexo(exo, inst, param_space = 0, param_range = 0,save_file = True,
         #and return results immediately to user
         if output_file == '':
             output_file =  'instrument_run.p'
-        if save_file: pkl.dump(results, open(os.path.join(output_path,output_file),'w'))
+        if save_file: pkl.dump(results, open(os.path.join(output_path,output_file),'wb'))
         return results
             
     #cycle through all options  
@@ -290,5 +290,5 @@ def run_pandexo(exo, inst, param_space = 0, param_range = 0,save_file = True,
         #and return results immediately to user
         if output_file == '':
             output_file =  'instrument_run.p'
-        if save_file: pkl.dump(results, open(os.path.join(output_path,output_file),'w'))
+        if save_file: pkl.dump(results, open(os.path.join(output_path,output_file),'wb'))
         return results
