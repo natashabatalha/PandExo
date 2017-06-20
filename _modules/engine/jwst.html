@@ -13,6 +13,8 @@
 
   
   
+  
+  
 
   
 
@@ -43,6 +45,7 @@
 
 <body class="wy-body-for-nav" role="document">
 
+   
   <div class="wy-grid-for-nav">
 
     
@@ -79,7 +82,10 @@
           
             
             
-                <ul>
+              
+            
+            
+              <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../includeme.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorialjwst.html">JWST Tutorial</a></li>
@@ -99,8 +105,10 @@
 
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="../../index.html">PandExo</a>
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">PandExo</a>
+        
       </nav>
 
 
@@ -113,19 +121,36 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
-    <li><a href="../../index.html">Docs</a> &raquo;</li>
-      
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
           <li><a href="../index.html">Module code</a> &raquo;</li>
-      
-    <li>engine.jwst</li>
+        
+      <li>engine.jwst</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
         
-          
+            
         
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
@@ -141,9 +166,10 @@
 <span class="kn">from</span> <span class="nn">astropy.io</span> <span class="k">import</span> <span class="n">fits</span>
 <span class="kn">from</span> <span class="nn">pandeia.engine.instrument_factory</span> <span class="k">import</span> <span class="n">InstrumentFactory</span>
 <span class="kn">from</span> <span class="nn">pandeia.engine.perform_calculation</span> <span class="k">import</span> <span class="n">perform_calculation</span>
-<span class="kn">import</span> <span class="nn">create_input</span> <span class="k">as</span> <span class="nn">create</span>
-<span class="kn">from</span> <span class="nn">compute_noise</span> <span class="k">import</span> <span class="n">ExtractSpec</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">create_input</span> <span class="k">as</span> <span class="n">create</span>
+<span class="kn">from</span> <span class="nn">.compute_noise</span> <span class="k">import</span> <span class="n">ExtractSpec</span>
 
+<span class="kn">import</span> <span class="nn">pickle</span>
 <span class="c1">#constant parameters.. consider putting these into json file </span>
 <span class="c1">#max groups in integration</span>
 <span class="n">max_ngroup</span> <span class="o">=</span> <span class="mf">65536.0</span> 
@@ -236,12 +262,12 @@
     <span class="n">expfact_out</span> <span class="o">=</span> <span class="n">pandexo_input</span><span class="p">[</span><span class="s1">&#39;observation&#39;</span><span class="p">][</span><span class="s1">&#39;fraction&#39;</span><span class="p">]</span> 
     <span class="n">noise_floor</span> <span class="o">=</span> <span class="n">pandexo_input</span><span class="p">[</span><span class="s1">&#39;observation&#39;</span><span class="p">][</span><span class="s1">&#39;noise_floor&#39;</span><span class="p">]</span>
 
-
+    
     <span class="c1">#get stellar spectrum and in transit spec</span>
     <span class="n">star_spec</span> <span class="o">=</span> <span class="n">create</span><span class="o">.</span><span class="n">outTrans</span><span class="p">(</span><span class="n">pandexo_input</span><span class="p">[</span><span class="s1">&#39;star&#39;</span><span class="p">])</span>
     <span class="n">both_spec</span> <span class="o">=</span> <span class="n">create</span><span class="o">.</span><span class="n">bothTrans</span><span class="p">(</span><span class="n">star_spec</span><span class="p">,</span> <span class="n">pandexo_input</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">])</span>
     <span class="n">out_spectrum</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">both_spec</span><span class="p">[</span><span class="s1">&#39;wave&#39;</span><span class="p">],</span> <span class="n">both_spec</span><span class="p">[</span><span class="s1">&#39;flux_out_trans&#39;</span><span class="p">]])</span>
-        
+    
     <span class="c1">#get transit duration from phase curve or from input </span>
     <span class="k">if</span> <span class="n">calculation</span> <span class="o">==</span> <span class="s1">&#39;phase_spec&#39;</span><span class="p">:</span> 
         <span class="n">transit_duration</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">both_spec</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">])</span> <span class="o">-</span> <span class="nb">min</span><span class="p">(</span><span class="n">both_spec</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">])</span>
@@ -273,7 +299,7 @@
     <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span>
     <span class="n">out</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;3d&#39;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;End out of Transit&quot;</span><span class="p">)</span>
-    
+
     <span class="c1">#Remove effects of Quantum Yield from shot noise </span>
     <span class="n">out</span> <span class="o">=</span> <span class="n">remove_QY</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">instrument</span><span class="p">)</span>
 
@@ -808,7 +834,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1">#add user specified noise floor </span>
     <span class="k">if</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">noise_floor</span><span class="p">)</span><span class="o">==</span><span class="nb">float</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">noise_floor</span><span class="p">)</span> <span class="o">==</span> <span class="nb">int</span><span class="p">):</span>
-        <span class="n">error_spec</span><span class="p">[</span><span class="n">error_spec</span><span class="o">&lt;</span><span class="n">noise_floor</span><span class="o">*</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">6</span><span class="p">]</span> <span class="o">=</span> <span class="n">noise_floor</span><span class="o">*</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">6</span>
+        <span class="n">error_spec</span><span class="p">[</span><span class="n">error_spec</span><span class="o">&lt;</span><span class="n">noise_floor</span><span class="o">*</span><span class="mf">1e-6</span><span class="p">]</span> <span class="o">=</span> <span class="n">noise_floor</span><span class="o">*</span><span class="mf">1e-6</span>
     <span class="k">elif</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">noise_floor</span><span class="p">)</span><span class="o">==</span><span class="nb">str</span><span class="p">):</span>
         <span class="n">read_noise</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span><span class="n">noise_floor</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span> <span class="n">names</span><span class="o">=</span><span class="s1">&#39;w, n&#39;</span><span class="p">)</span>
         <span class="n">w_overlap</span> <span class="o">=</span> <span class="p">(</span><span class="n">wave_bin</span><span class="o">&gt;=</span><span class="nb">min</span><span class="p">(</span><span class="n">read_noise</span><span class="p">[</span><span class="s1">&#39;w&#39;</span><span class="p">]))</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">wave_bin</span><span class="o">&lt;=</span><span class="nb">max</span><span class="p">(</span><span class="n">read_noise</span><span class="p">[</span><span class="s1">&#39;w&#39;</span><span class="p">]))</span> 
@@ -817,7 +843,7 @@
         <span class="n">noise</span><span class="p">[</span><span class="n">w_overlap</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">wnoise</span> <span class="p">,</span> <span class="n">read_noise</span><span class="p">[</span><span class="s1">&#39;w&#39;</span><span class="p">],</span> <span class="n">read_noise</span><span class="p">[</span><span class="s1">&#39;n&#39;</span><span class="p">])</span>
         <span class="n">noise</span><span class="p">[(</span><span class="n">wave_bin</span><span class="o">&gt;</span><span class="nb">max</span><span class="p">(</span><span class="n">read_noise</span><span class="p">[</span><span class="s1">&#39;w&#39;</span><span class="p">]))]</span> <span class="o">=</span> <span class="n">read_noise</span><span class="p">[</span><span class="s1">&#39;n&#39;</span><span class="p">][</span><span class="n">read_noise</span><span class="p">[</span><span class="s1">&#39;w&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="nb">max</span><span class="p">(</span><span class="n">read_noise</span><span class="p">[</span><span class="s1">&#39;w&#39;</span><span class="p">])]</span>
         <span class="n">noise</span><span class="p">[(</span><span class="n">wave_bin</span><span class="o">&lt;</span><span class="nb">min</span><span class="p">(</span><span class="n">read_noise</span><span class="p">[</span><span class="s1">&#39;w&#39;</span><span class="p">]))]</span> <span class="o">=</span> <span class="n">read_noise</span><span class="p">[</span><span class="s1">&#39;n&#39;</span><span class="p">][</span><span class="n">read_noise</span><span class="p">[</span><span class="s1">&#39;w&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="nb">min</span><span class="p">(</span><span class="n">read_noise</span><span class="p">[</span><span class="s1">&#39;w&#39;</span><span class="p">])]</span>
-        <span class="n">error_spec</span><span class="p">[</span><span class="n">error_spec</span><span class="o">&lt;</span><span class="n">noise</span><span class="o">*</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">6</span><span class="p">]</span> <span class="o">=</span> <span class="n">noise</span><span class="p">[</span><span class="n">error_spec</span><span class="o">&lt;</span><span class="n">noise</span><span class="o">*</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">6</span><span class="p">]</span><span class="o">*</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">6</span>
+        <span class="n">error_spec</span><span class="p">[</span><span class="n">error_spec</span><span class="o">&lt;</span><span class="n">noise</span><span class="o">*</span><span class="mf">1e-6</span><span class="p">]</span> <span class="o">=</span> <span class="n">noise</span><span class="p">[</span><span class="n">error_spec</span><span class="o">&lt;</span><span class="n">noise</span><span class="o">*</span><span class="mf">1e-6</span><span class="p">]</span><span class="o">*</span><span class="mf">1e-6</span>
     <span class="k">else</span><span class="p">:</span> 
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Noise Floor added was not integer or file&#39;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">error_spec</span></div>
@@ -954,12 +980,18 @@
 
     <span class="n">p</span><span class="o">=</span><span class="mf">1.0</span>
     <span class="k">if</span> <span class="n">punit</span> <span class="o">==</span> <span class="s1">&#39;fp/f*&#39;</span><span class="p">:</span> <span class="n">p</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span>
-    
-    <span class="n">timing_div</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">timing</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Timing Info&#39;</span><span class="p">,</span> <span class="s1">&#39;Values&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">to_html</span><span class="p">()</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span>
-    <span class="n">timing_div</span> <span class="o">=</span> <span class="s1">&#39;&lt;table class=&quot;table table-striped&quot;&gt; </span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">timing_div</span><span class="p">[</span><span class="mi">36</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="n">timing_div</span><span class="p">)]</span>
-    
-    <span class="n">warnings_div</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">warnings</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Check&#39;</span><span class="p">,</span> <span class="s1">&#39;Status&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">to_html</span><span class="p">()</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span>
+
+    <span class="n">timing_div</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">timing</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">)</span>
+    <span class="n">timing_div</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Value&#39;</span><span class="p">]</span>
+    <span class="n">timing_div</span> <span class="o">=</span> <span class="n">timing_div</span><span class="o">.</span><span class="n">to_html</span><span class="p">()</span>
+    <span class="n">timing_div</span> <span class="o">=</span> <span class="s1">&#39;&lt;table class=&quot;table table-striped&quot;&gt; </span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">timing_div</span><span class="p">[</span><span class="mi">36</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="n">timing_div</span><span class="p">)]</span> 
+    <span class="n">timing_div</span> <span class="o">=</span> <span class="n">timing_div</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span>
+
+    <span class="n">warnings_div</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">warnings</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">)</span>
+    <span class="n">warnings_div</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Value&#39;</span><span class="p">]</span>
+    <span class="n">warnings_div</span> <span class="o">=</span> <span class="n">warnings_div</span><span class="o">.</span><span class="n">to_html</span><span class="p">()</span>
     <span class="n">warnings_div</span> <span class="o">=</span> <span class="s1">&#39;&lt;table class=&quot;table table-striped&quot;&gt; </span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">warnings_div</span><span class="p">[</span><span class="mi">36</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="n">warnings_div</span><span class="p">)]</span>
+    <span class="n">warnings_div</span> <span class="o">=</span> <span class="n">warnings_div</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span>
        
     <span class="n">input_dict</span> <span class="o">=</span> <span class="p">{</span>
    	 <span class="s2">&quot;Target Mag&quot;</span><span class="p">:</span> <span class="n">mag</span> <span class="p">,</span> 
@@ -974,8 +1006,11 @@
  	 <span class="s2">&quot;Primary/Secondary&quot;</span><span class="p">:</span> <span class="n">punit</span>
     <span class="p">}</span>
     
-    <span class="n">input_div</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">input_dict</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Component&#39;</span><span class="p">,</span> <span class="s1">&#39;Values&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">to_html</span><span class="p">()</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span>
+    <span class="n">input_div</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">input_dict</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">)</span>
+    <span class="n">input_div</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Value&#39;</span><span class="p">]</span>
+    <span class="n">input_div</span> <span class="o">=</span> <span class="n">input_div</span><span class="o">.</span><span class="n">to_html</span><span class="p">()</span>
     <span class="n">input_div</span> <span class="o">=</span> <span class="s1">&#39;&lt;table class=&quot;table table-striped&quot;&gt; </span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">input_div</span><span class="p">[</span><span class="mi">36</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="n">input_div</span><span class="p">)]</span>
+    <span class="n">input_div</span> <span class="o">=</span> <span class="n">input_div</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span>
     
     <span class="c1">#add calc type to input dict (doing it here so it doesn&#39;t output on webpage</span>
     <span class="n">input_dict</span><span class="p">[</span><span class="s2">&quot;Calculation Type&quot;</span><span class="p">]</span><span class="o">=</span> <span class="n">calculation</span>
@@ -1004,6 +1039,9 @@
     
 </pre></div>
 
+           </div>
+           <div class="articleComments">
+            
            </div>
           </div>
           <footer>
@@ -1038,7 +1076,8 @@
             VERSION:'',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
         };
     </script>
       <script type="text/javascript" src="../../_static/jquery.js"></script>

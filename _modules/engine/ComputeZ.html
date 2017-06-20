@@ -13,6 +13,8 @@
 
   
   
+  
+  
 
   
 
@@ -43,6 +45,7 @@
 
 <body class="wy-body-for-nav" role="document">
 
+   
   <div class="wy-grid-for-nav">
 
     
@@ -79,7 +82,10 @@
           
             
             
-                <ul>
+              
+            
+            
+              <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../includeme.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorialjwst.html">JWST Tutorial</a></li>
@@ -99,8 +105,10 @@
 
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="../../index.html">PandExo</a>
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">PandExo</a>
+        
       </nav>
 
 
@@ -113,19 +121,36 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
-    <li><a href="../../index.html">Docs</a> &raquo;</li>
-      
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
           <li><a href="../index.html">Module code</a> &raquo;</li>
-      
-    <li>engine.ComputeZ</li>
+        
+      <li>engine.ComputeZ</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
         
-          
+            
         
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
@@ -135,9 +160,10 @@
 <span></span><span class="kn">from</span> <span class="nn">scipy.io.idl</span> <span class="k">import</span> <span class="n">readsav</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">bokeh.plotting</span> <span class="k">import</span> <span class="n">figure</span>
-<span class="kn">from</span> <span class="nn">bokeh.io</span> <span class="k">import</span> <span class="n">vform</span><span class="p">,</span><span class="n">output_file</span><span class="p">,</span> <span class="n">show</span><span class="p">,</span> <span class="n">vplot</span>
+<span class="kn">from</span> <span class="nn">bokeh.io</span> <span class="k">import</span> <span class="n">output_file</span><span class="p">,</span> <span class="n">show</span>
+<span class="kn">from</span> <span class="nn">bokeh.layouts</span> <span class="k">import</span> <span class="n">column</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">elements</span> <span class="k">import</span> <span class="n">ELEMENTS</span> <span class="k">as</span> <span class="n">ele</span>
+<span class="kn">from</span> <span class="nn">.elements</span> <span class="k">import</span> <span class="n">ELEMENTS</span> <span class="k">as</span> <span class="n">ele</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">sympy.mpmath</span> <span class="k">import</span> <span class="o">*</span>
 <span class="k">except</span><span class="p">:</span>
@@ -156,7 +182,6 @@
 <span class="sd">    &quot;g&quot;:, </span>
 <span class="sd">    &quot;Rp&quot;:, </span>
 <span class="sd">    &quot;R*&quot;:, </span>
-<span class="sd">    &quot;beta&quot;:, </span>
 <span class="sd">    &quot;P&quot;: 1e-4, </span>
 <span class="sd">    &quot;P0&quot;: 10.0, </span>
 <span class="sd">    &quot;taueq&quot;: 0.56</span>
@@ -167,7 +192,7 @@
 <span class="n">barye</span> <span class="o">=</span> <span class="mf">1000000.0</span> <span class="c1">#1 bar to 1e6 barye</span>
 <span class="n">amu</span> <span class="o">=</span><span class="mf">1.66e-24</span> <span class="c1">#grams</span>
 <span class="n">color</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="s2">&quot;blue&quot;</span><span class="p">,</span> <span class="s2">&quot;green&quot;</span><span class="p">,</span> <span class="s2">&quot;purple&quot;</span><span class="p">,</span> <span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="s2">&quot;yellow&quot;</span><span class="p">,</span> <span class="s2">&quot;orange&quot;</span><span class="p">,</span> <span class="s2">&quot;pink&quot;</span><span class="p">,</span><span class="s2">&quot;cyan&quot;</span><span class="p">,</span><span class="s2">&quot;brown&quot;</span><span class="p">]</span>
-<span class="n">__XSEC__</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s2">&quot;reference/CrossSections/&quot;</span><span class="p">)</span>
+<span class="n">__XSEC__</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s2">&quot;reference/CrossSections/&quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="readXSecs"><a class="viewcode-back" href="../../engine.html#engine.ComputeZ.readXSecs">[docs]</a><span class="k">def</span> <span class="nf">readXSecs</span><span class="p">(</span><span class="n">molDict</span><span class="p">):</span>
     
@@ -230,7 +255,7 @@
     <span class="k">if</span> <span class="n">plot</span><span class="p">:</span>
         <span class="n">plot2</span> <span class="o">=</span> <span class="n">figure</span><span class="p">(</span><span class="n">plot_width</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span> <span class="n">plot_height</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>  <span class="n">tools</span><span class="o">=</span><span class="n">TOOLS</span><span class="p">,</span> <span class="n">responsive</span> <span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">y_axis_type</span><span class="o">=</span><span class="s2">&quot;log&quot;</span><span class="p">,</span>
                                  <span class="n">x_axis_label</span><span class="o">=</span><span class="s1">&#39;Wavelength [um]&#39;</span><span class="p">,</span> <span class="n">x_axis_type</span><span class="o">=</span><span class="s2">&quot;log&quot;</span><span class="p">,</span>
-                                 <span class="n">y_axis_label</span><span class="o">=</span><span class="s1">&#39;Weighted Cross Section&#39;</span><span class="p">,</span> <span class="n">y_range</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">29</span><span class="p">,</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">17</span><span class="p">])</span>
+                                 <span class="n">y_axis_label</span><span class="o">=</span><span class="s1">&#39;Weighted Cross Section&#39;</span><span class="p">,</span> <span class="n">y_range</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1e-29</span><span class="p">,</span> <span class="mf">1e-17</span><span class="p">])</span>
 
     <span class="c1">#compute mean molecular weight and beta </span>
     <span class="n">mu</span> <span class="o">=</span> <span class="n">computeMu</span><span class="p">(</span><span class="n">molDict</span><span class="p">[</span><span class="s2">&quot;mols&quot;</span><span class="p">])</span><span class="o">*</span><span class="n">amu</span>
@@ -252,10 +277,10 @@
         <span class="n">plot1</span> <span class="o">=</span> <span class="n">figure</span><span class="p">(</span><span class="n">plot_width</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span> <span class="n">plot_height</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>  <span class="n">tools</span><span class="o">=</span><span class="n">TOOLS</span><span class="p">,</span> <span class="n">responsive</span> <span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="c1">#y_axis_type=&quot;log&quot;,</span>
                                  <span class="n">x_axis_label</span><span class="o">=</span><span class="s1">&#39;Wavelength [um]&#39;</span><span class="p">,</span> <span class="n">x_axis_type</span><span class="o">=</span><span class="s2">&quot;log&quot;</span><span class="p">,</span>
                                  <span class="n">y_axis_label</span><span class="o">=</span><span class="s1">&#39;Alpha Lambda&#39;</span><span class="p">,</span> <span class="n">y_range</span> <span class="o">=</span> <span class="p">[</span><span class="nb">min</span><span class="p">(</span><span class="n">alpha</span><span class="p">[</span><span class="n">alpha</span><span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">]),</span> <span class="nb">max</span><span class="p">(</span><span class="n">alpha</span><span class="p">[</span><span class="n">alpha</span><span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">])])</span> 
-        <span class="n">plot1</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="mi">1</span><span class="n">e4</span><span class="o">/</span><span class="n">waves</span><span class="p">[</span><span class="n">MOL</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">alpha</span><span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">],</span> <span class="n">alpha</span><span class="p">[</span><span class="n">alpha</span><span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">],</span> <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">line_width</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">plot1</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="mf">1e4</span><span class="o">/</span><span class="n">waves</span><span class="p">[</span><span class="n">MOL</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">alpha</span><span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">],</span> <span class="n">alpha</span><span class="p">[</span><span class="n">alpha</span><span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">],</span> <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">line_width</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span>
     
    <span class="c1">#&quot;plot1&quot;:plot1,&quot;plot2&quot;:plot2, </span>
-    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;w&quot;</span><span class="p">:</span><span class="mi">1</span><span class="n">e4</span><span class="o">/</span><span class="n">waves</span><span class="p">[</span><span class="n">MOL</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">alpha</span><span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">],</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;w&quot;</span><span class="p">:</span><span class="mf">1e4</span><span class="o">/</span><span class="n">waves</span><span class="p">[</span><span class="n">MOL</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">alpha</span><span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">],</span>
              <span class="s2">&quot;Z&quot;</span><span class="p">:</span><span class="n">Z</span><span class="p">,</span> <span class="s2">&quot;alpha&quot;</span><span class="p">:</span><span class="n">alpha</span><span class="p">[</span><span class="n">alpha</span><span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">],</span> <span class="s2">&quot;H&quot;</span><span class="p">:</span><span class="n">H</span><span class="p">,</span> <span class="s2">&quot;mu&quot;</span><span class="p">:</span><span class="n">mu</span><span class="p">,</span> <span class="s2">&quot;xsec&quot;</span><span class="p">:</span><span class="n">xsec</span><span class="p">,</span><span class="s2">&quot;mols&quot;</span><span class="p">:</span><span class="n">molDict</span><span class="p">[</span><span class="s2">&quot;mols&quot;</span><span class="p">]}</span></div>
     
 <div class="viewcode-block" id="find_nearest"><a class="viewcode-back" href="../../engine.html#engine.ComputeZ.find_nearest">[docs]</a><span class="k">def</span> <span class="nf">find_nearest</span><span class="p">(</span><span class="n">array</span><span class="p">,</span><span class="n">value</span><span class="p">):</span>
@@ -272,19 +297,19 @@
             <span class="n">sumprod</span> <span class="o">+=</span> <span class="n">squig</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">xsec</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">squig</span><span class="p">[</span><span class="s2">&quot;H2&quot;</span><span class="p">]</span>
             <span class="n">num</span> <span class="o">+=</span><span class="mi">1</span>
             <span class="k">if</span> <span class="n">plot</span><span class="p">:</span>
-                <span class="n">plot2</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="mi">1</span><span class="n">e4</span><span class="o">/</span><span class="n">waves</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">squig</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">xsec</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">squig</span><span class="p">[</span><span class="s2">&quot;H2&quot;</span><span class="p">],</span> <span class="n">color</span> <span class="o">=</span> <span class="n">color</span><span class="p">[</span><span class="n">num</span><span class="p">],</span> <span class="n">legend</span> <span class="o">=</span> <span class="n">i</span><span class="p">)</span>
+                <span class="n">plot2</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="mf">1e4</span><span class="o">/</span><span class="n">waves</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">squig</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">xsec</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">squig</span><span class="p">[</span><span class="s2">&quot;H2&quot;</span><span class="p">],</span> <span class="n">color</span> <span class="o">=</span> <span class="n">color</span><span class="p">[</span><span class="n">num</span><span class="p">],</span> <span class="n">legend</span> <span class="o">=</span> <span class="n">i</span><span class="p">)</span>
 
         <span class="k">elif</span> <span class="n">i</span><span class="o">==</span><span class="s2">&quot;He&quot;</span><span class="p">:</span>
             <span class="n">sumprod</span> <span class="o">+=</span> <span class="n">squig</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">xsec</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">squig</span><span class="p">[</span><span class="s2">&quot;H2&quot;</span><span class="p">]</span>
             <span class="n">num</span> <span class="o">+=</span><span class="mi">1</span>
             <span class="k">if</span> <span class="n">plot</span><span class="p">:</span>
-                <span class="n">plot2</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="mi">1</span><span class="n">e4</span><span class="o">/</span><span class="n">waves</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">squig</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">xsec</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">squig</span><span class="p">[</span><span class="s2">&quot;H2&quot;</span><span class="p">],</span> <span class="n">color</span> <span class="o">=</span> <span class="n">color</span><span class="p">[</span><span class="n">num</span><span class="p">],</span> <span class="n">legend</span> <span class="o">=</span> <span class="n">i</span><span class="p">)</span>
+                <span class="n">plot2</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="mf">1e4</span><span class="o">/</span><span class="n">waves</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">squig</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">xsec</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">squig</span><span class="p">[</span><span class="s2">&quot;H2&quot;</span><span class="p">],</span> <span class="n">color</span> <span class="o">=</span> <span class="n">color</span><span class="p">[</span><span class="n">num</span><span class="p">],</span> <span class="n">legend</span> <span class="o">=</span> <span class="n">i</span><span class="p">)</span>
 
         <span class="k">else</span><span class="p">:</span>
             <span class="n">sumprod</span> <span class="o">+=</span> <span class="n">squig</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">xsec</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="n">num</span> <span class="o">+=</span><span class="mi">1</span>
             <span class="k">if</span> <span class="n">plot</span><span class="p">:</span>
-                <span class="n">plot2</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="mi">1</span><span class="n">e4</span><span class="o">/</span><span class="n">waves</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">squig</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">xsec</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">color</span> <span class="o">=</span> <span class="n">color</span><span class="p">[</span><span class="n">num</span><span class="p">],</span> <span class="n">legend</span> <span class="o">=</span> <span class="n">i</span><span class="p">)</span>
+                <span class="n">plot2</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="mf">1e4</span><span class="o">/</span><span class="n">waves</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">squig</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">xsec</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">color</span> <span class="o">=</span> <span class="n">color</span><span class="p">[</span><span class="n">num</span><span class="p">],</span> <span class="n">legend</span> <span class="o">=</span> <span class="n">i</span><span class="p">)</span>
 
             
     <span class="k">return</span> <span class="n">sumprod</span></div>
@@ -426,6 +451,9 @@
 </pre></div>
 
            </div>
+           <div class="articleComments">
+            
+           </div>
           </div>
           <footer>
   
@@ -459,7 +487,8 @@
             VERSION:'',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
         };
     </script>
       <script type="text/javascript" src="../../_static/jquery.js"></script>

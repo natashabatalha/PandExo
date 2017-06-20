@@ -13,6 +13,8 @@
 
   
   
+  
+  
 
   
 
@@ -43,6 +45,7 @@
 
 <body class="wy-body-for-nav" role="document">
 
+   
   <div class="wy-grid-for-nav">
 
     
@@ -79,7 +82,10 @@
           
             
             
-                <ul>
+              
+            
+            
+              <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../includeme.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorialjwst.html">JWST Tutorial</a></li>
@@ -99,8 +105,10 @@
 
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="../../index.html">PandExo</a>
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">PandExo</a>
+        
       </nav>
 
 
@@ -113,19 +121,36 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
-    <li><a href="../../index.html">Docs</a> &raquo;</li>
-      
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
           <li><a href="../index.html">Module code</a> &raquo;</li>
-      
-    <li>engine.load_modes</li>
+        
+      <li>engine.load_modes</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
         
-          
+            
         
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
@@ -184,7 +209,7 @@
         <span class="sd">&quot;&quot;&quot;Handles WFC3 template</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1">#wfc3_input</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s2">&quot;reference&quot;</span><span class="p">,</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s2">&quot;reference&quot;</span><span class="p">,</span>
                                <span class="s2">&quot;wfc3_input.json&quot;</span><span class="p">))</span> <span class="k">as</span> <span class="n">data_file</span><span class="p">:</span>
             <span class="n">pandeia_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">data_file</span><span class="p">)</span>
             <span class="n">pandeia_data</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">][</span><span class="s2">&quot;instrument&quot;</span><span class="p">][</span><span class="s2">&quot;disperser&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span>
@@ -195,7 +220,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1">#need to add in functionality for two orders, right now you only have option to do sub80</span>
         
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s2">&quot;reference&quot;</span><span class="p">,</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s2">&quot;reference&quot;</span><span class="p">,</span>
                                <span class="s2">&quot;niriss_input.json&quot;</span><span class="p">))</span> <span class="k">as</span> <span class="n">data_file</span><span class="p">:</span>
             <span class="n">pandeia_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">data_file</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">pandeia_data</span></div>
@@ -208,17 +233,20 @@
                     <span class="s1">&#39;g395m&#39;</span><span class="p">:</span><span class="s1">&#39;f290lp&#39;</span><span class="p">,</span><span class="s1">&#39;g395h&#39;</span><span class="p">:</span><span class="s1">&#39;f290lp&#39;</span><span class="p">,</span>
                     <span class="s1">&#39;prism&#39;</span><span class="p">:</span> <span class="s1">&#39;clear&#39;</span>
                     <span class="p">}</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s2">&quot;reference&quot;</span><span class="p">,</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s2">&quot;reference&quot;</span><span class="p">,</span>
                                <span class="s2">&quot;nirspec_input.json&quot;</span><span class="p">))</span> <span class="k">as</span> <span class="n">data_file</span><span class="p">:</span>
             <span class="n">pandeia_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">data_file</span><span class="p">)</span>
             <span class="n">pandeia_data</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">][</span><span class="s2">&quot;instrument&quot;</span><span class="p">][</span><span class="s2">&quot;disperser&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span>
-            <span class="n">pandeia_data</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">][</span><span class="s2">&quot;instrument&quot;</span><span class="p">][</span><span class="s2">&quot;filter&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">filters</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">]</span>                                  
+            <span class="n">pandeia_data</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">][</span><span class="s2">&quot;instrument&quot;</span><span class="p">][</span><span class="s2">&quot;filter&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">filters</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">]</span>    
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">==</span> <span class="s1">&#39;prism&#39;</span><span class="p">:</span>
+                <span class="n">pandeia_data</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">][</span><span class="s2">&quot;detector&quot;</span><span class="p">][</span><span class="s2">&quot;subarray&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;sub512&#39;</span>
+
         <span class="k">return</span> <span class="n">pandeia_data</span></div>
         
 <div class="viewcode-block" id="SetDefaultModes.nircam"><a class="viewcode-back" href="../../engine.html#engine.load_modes.SetDefaultModes.nircam">[docs]</a>    <span class="k">def</span> <span class="nf">nircam</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Handles NIRCam template</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s2">&quot;reference&quot;</span><span class="p">,</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s2">&quot;reference&quot;</span><span class="p">,</span>
                                <span class="s2">&quot;nircam_input.json&quot;</span><span class="p">))</span> <span class="k">as</span> <span class="n">data_file</span><span class="p">:</span>
             <span class="n">pandeia_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">data_file</span><span class="p">)</span>
             <span class="n">pandeia_data</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">][</span><span class="s2">&quot;instrument&quot;</span><span class="p">][</span><span class="s2">&quot;filter&quot;</span><span class="p">]</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span>           
@@ -228,12 +256,15 @@
         <span class="sd">&quot;&quot;&quot;Handles MIRI template</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1">#only lrs slit less     </span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s2">&quot;reference&quot;</span><span class="p">,</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s2">&quot;reference&quot;</span><span class="p">,</span>
                                <span class="s2">&quot;miri_input.json&quot;</span><span class="p">))</span> <span class="k">as</span> <span class="n">data_file</span><span class="p">:</span>
                 <span class="n">pandeia_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">data_file</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">pandeia_data</span></div></div>
 </pre></div>
 
+           </div>
+           <div class="articleComments">
+            
            </div>
           </div>
           <footer>
@@ -268,7 +299,8 @@
             VERSION:'',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
         };
     </script>
       <script type="text/javascript" src="../../_static/jquery.js"></script>

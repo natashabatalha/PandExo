@@ -13,6 +13,8 @@
 
   
   
+  
+  
 
   
 
@@ -43,6 +45,7 @@
 
 <body class="wy-body-for-nav" role="document">
 
+   
   <div class="wy-grid-for-nav">
 
     
@@ -79,7 +82,10 @@
           
             
             
-                <ul>
+              
+            
+            
+              <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../includeme.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorialjwst.html">JWST Tutorial</a></li>
@@ -99,8 +105,10 @@
 
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="../../index.html">PandExo</a>
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">PandExo</a>
+        
       </nav>
 
 
@@ -113,19 +121,36 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
-    <li><a href="../../index.html">Docs</a> &raquo;</li>
-      
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
           <li><a href="../index.html">Module code</a> &raquo;</li>
-      
-    <li>engine.create_input</li>
+        
+      <li>engine.create_input</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
         
-          
+            
         
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
@@ -182,24 +207,24 @@
         <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Wrong input type for stellar spectra&#39;</span><span class="p">)</span>
         
     <span class="n">ref_wave</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="nb">input</span><span class="p">[</span><span class="s1">&#39;ref_wave&#39;</span><span class="p">])</span>
-    <span class="n">ref_wave</span> <span class="o">=</span> <span class="n">ref_wave</span><span class="o">*</span><span class="mi">1</span><span class="n">e3</span>
+    <span class="n">ref_wave</span> <span class="o">=</span> <span class="n">ref_wave</span><span class="o">*</span><span class="mf">1e3</span>
     
     
         <span class="c1">#Convert evrything to nanometer for converstion based on gemini.edu  </span>
     <span class="k">if</span> <span class="nb">input</span><span class="p">[</span><span class="s1">&#39;w_unit&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;um&#39;</span><span class="p">:</span>
-        <span class="n">wave</span> <span class="o">=</span> <span class="n">wave</span><span class="o">*</span><span class="mi">1</span><span class="n">e3</span>
+        <span class="n">wave</span> <span class="o">=</span> <span class="n">wave</span><span class="o">*</span><span class="mf">1e3</span>
         
     <span class="k">elif</span> <span class="nb">input</span><span class="p">[</span><span class="s1">&#39;w_unit&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;nm&#39;</span><span class="p">:</span>
         <span class="n">wave</span> <span class="o">=</span> <span class="n">wave</span>
   
     <span class="k">elif</span> <span class="nb">input</span><span class="p">[</span><span class="s1">&#39;w_unit&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;cm&#39;</span> <span class="p">:</span>
-        <span class="n">wave</span> <span class="o">=</span> <span class="n">wave</span><span class="o">*</span><span class="mi">1</span><span class="n">e7</span>
+        <span class="n">wave</span> <span class="o">=</span> <span class="n">wave</span><span class="o">*</span><span class="mf">1e7</span>
  
     <span class="k">elif</span> <span class="nb">input</span><span class="p">[</span><span class="s1">&#39;w_unit&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Angs&#39;</span> <span class="p">:</span>
-        <span class="n">wave</span> <span class="o">=</span> <span class="n">wave</span><span class="o">*</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">1</span>
+        <span class="n">wave</span> <span class="o">=</span> <span class="n">wave</span><span class="o">*</span><span class="mf">1e-1</span>
 
     <span class="k">elif</span> <span class="nb">input</span><span class="p">[</span><span class="s1">&#39;w_unit&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Hz&#39;</span> <span class="p">:</span>
-        <span class="n">wave</span> <span class="o">=</span> <span class="mi">3</span><span class="n">e17</span><span class="o">/</span><span class="n">wave</span>
+        <span class="n">wave</span> <span class="o">=</span> <span class="mf">3e17</span><span class="o">/</span><span class="n">wave</span>
 
     <span class="k">else</span><span class="p">:</span> 
         <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Units are not correct. Pick um, nm, cm or Angs&#39;</span><span class="p">)</span>
@@ -223,9 +248,9 @@
     <span class="n">flux</span> <span class="o">=</span> <span class="n">flux</span><span class="o">/</span><span class="n">norm_flux</span><span class="o">*</span><span class="mf">1.97e7</span><span class="o">*</span><span class="mi">10</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="n">mag</span><span class="o">/</span><span class="mf">2.5</span><span class="p">)</span>
     
     <span class="c1">#return to Pandeia units... milliJy and micron </span>
-    <span class="n">flux_out_trans</span> <span class="o">=</span> <span class="n">flux</span><span class="o">*</span><span class="n">wave</span><span class="o">/</span><span class="mf">1.509e7</span><span class="o">*</span><span class="mi">1</span><span class="n">e3</span> <span class="c1">#inverse of eq. C times 1e3 to get to milliJy instead of Jy </span>
+    <span class="n">flux_out_trans</span> <span class="o">=</span> <span class="n">flux</span><span class="o">*</span><span class="n">wave</span><span class="o">/</span><span class="mf">1.509e7</span><span class="o">*</span><span class="mf">1e3</span> <span class="c1">#inverse of eq. C times 1e3 to get to milliJy instead of Jy </span>
 
-    <span class="n">wave</span> <span class="o">=</span> <span class="n">wave</span><span class="o">*</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">3</span>  <span class="c1">#nm to micron</span>
+    <span class="n">wave</span> <span class="o">=</span> <span class="n">wave</span><span class="o">*</span><span class="mf">1e-3</span>  <span class="c1">#nm to micron</span>
 
     <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;flux_out_trans&#39;</span><span class="p">:</span> <span class="n">flux_out_trans</span><span class="p">,</span> <span class="s1">&#39;wave&#39;</span><span class="p">:</span> <span class="n">wave</span><span class="p">}</span> </div>
 
@@ -273,13 +298,13 @@
     <span class="k">if</span> <span class="n">planet</span><span class="p">[</span><span class="s1">&#39;w_unit&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;um&#39;</span><span class="p">:</span>
         <span class="n">wave_planet</span> <span class="o">=</span> <span class="n">wave_planet</span>
     <span class="k">elif</span> <span class="n">planet</span><span class="p">[</span><span class="s1">&#39;w_unit&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;nm&#39;</span><span class="p">:</span>
-        <span class="n">wave_planet</span> <span class="o">=</span> <span class="n">wave_planet</span><span class="o">*</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">3</span>
+        <span class="n">wave_planet</span> <span class="o">=</span> <span class="n">wave_planet</span><span class="o">*</span><span class="mf">1e-3</span>
     <span class="k">elif</span> <span class="n">planet</span><span class="p">[</span><span class="s1">&#39;w_unit&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;cm&#39;</span><span class="p">:</span>
-        <span class="n">wave_planet</span> <span class="o">=</span> <span class="n">wave_planet</span><span class="o">*</span><span class="mi">1</span><span class="n">e4</span>
+        <span class="n">wave_planet</span> <span class="o">=</span> <span class="n">wave_planet</span><span class="o">*</span><span class="mf">1e4</span>
     <span class="k">elif</span> <span class="n">planet</span><span class="p">[</span><span class="s1">&#39;w_unit&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Angs&#39;</span> <span class="p">:</span>
-        <span class="n">wave_planet</span> <span class="o">=</span> <span class="n">wave_planet</span><span class="o">*</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">4</span>
+        <span class="n">wave_planet</span> <span class="o">=</span> <span class="n">wave_planet</span><span class="o">*</span><span class="mf">1e-4</span>
     <span class="k">elif</span> <span class="n">planet</span><span class="p">[</span><span class="s1">&#39;w_unit&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Hz&#39;</span> <span class="p">:</span>
-        <span class="n">wave_planet</span> <span class="o">=</span> <span class="mi">3</span><span class="n">e17</span><span class="o">/</span><span class="n">wave_planet</span>
+        <span class="n">wave_planet</span> <span class="o">=</span> <span class="mf">3e17</span><span class="o">/</span><span class="n">wave_planet</span>
     <span class="k">elif</span> <span class="n">planet</span><span class="p">[</span><span class="s1">&#39;w_unit&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;sec&#39;</span> <span class="p">:</span>
         <span class="n">wave_planet</span> <span class="o">=</span> <span class="n">wave_planet</span>
     <span class="k">else</span><span class="p">:</span> 
@@ -332,6 +357,9 @@
 </pre></div>
 
            </div>
+           <div class="articleComments">
+            
+           </div>
           </div>
           <footer>
   
@@ -365,7 +393,8 @@
             VERSION:'',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
         };
     </script>
       <script type="text/javascript" src="../../_static/jquery.js"></script>

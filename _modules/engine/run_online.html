@@ -13,6 +13,8 @@
 
   
   
+  
+  
 
   
 
@@ -43,6 +45,7 @@
 
 <body class="wy-body-for-nav" role="document">
 
+   
   <div class="wy-grid-for-nav">
 
     
@@ -79,7 +82,10 @@
           
             
             
-                <ul>
+              
+            
+            
+              <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../includeme.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorialjwst.html">JWST Tutorial</a></li>
@@ -99,8 +105,10 @@
 
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="../../index.html">PandExo</a>
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">PandExo</a>
+        
       </nav>
 
 
@@ -113,19 +121,36 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
-    <li><a href="../../index.html">Docs</a> &raquo;</li>
-      
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
           <li><a href="../index.html">Module code</a> &raquo;</li>
-      
-    <li>engine.run_online</li>
+        
+      <li>engine.run_online</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
         
-          
+            
         
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
@@ -142,16 +167,16 @@
 <span class="kn">import</span> <span class="nn">tornado.options</span>
 <span class="kn">import</span> <span class="nn">tornado.web</span>
 <span class="kn">from</span> <span class="nn">concurrent.futures</span> <span class="k">import</span> <span class="n">ProcessPoolExecutor</span>
-<span class="kn">from</span> <span class="nn">pandexo</span> <span class="k">import</span> <span class="n">wrapper</span>
+<span class="kn">from</span> <span class="nn">.pandexo</span> <span class="k">import</span> <span class="n">wrapper</span>
 <span class="kn">from</span> <span class="nn">tornado.options</span> <span class="k">import</span> <span class="n">define</span><span class="p">,</span> <span class="n">options</span>
 <span class="kn">import</span> <span class="nn">pickle</span>
-<span class="kn">from</span> <span class="nn">ComputeZ</span> <span class="k">import</span> <span class="n">computeAlpha</span>
-<span class="kn">from</span> <span class="nn">utils.plotters</span> <span class="k">import</span> <span class="n">create_component_jwst</span><span class="p">,</span> <span class="n">create_component_spec</span><span class="p">,</span> <span class="n">create_component_hst</span>
+<span class="kn">from</span> <span class="nn">.ComputeZ</span> <span class="k">import</span> <span class="n">computeAlpha</span>
+<span class="kn">from</span> <span class="nn">.utils.plotters</span> <span class="k">import</span> <span class="n">create_component_jwst</span><span class="p">,</span> <span class="n">create_component_spec</span><span class="p">,</span> <span class="n">create_component_hst</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span> 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="c1">#define location of temp files</span>
-<span class="n">__TEMP__</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s2">&quot;temp&quot;</span><span class="p">)</span>
+<span class="n">__TEMP__</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s2">&quot;temp&quot;</span><span class="p">)</span>
 
 <span class="n">define</span><span class="p">(</span><span class="s2">&quot;port&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">1111</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;run on the given port&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
 
@@ -168,35 +193,35 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">handlers</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="p">(</span><span class="s2">r&quot;/&quot;</span><span class="p">,</span> <span class="n">HomeHandler</span><span class="p">),</span>
-            <span class="p">(</span><span class="s2">r&quot;/about&quot;</span><span class="p">,</span> <span class="n">AboutHandler</span><span class="p">),</span>
-            <span class="p">(</span><span class="s2">r&quot;/dashboard&quot;</span><span class="p">,</span> <span class="n">DashboardHandler</span><span class="p">),</span>
-            <span class="p">(</span><span class="s2">r&quot;/dashboardspec&quot;</span><span class="p">,</span> <span class="n">DashboardSpecHandler</span><span class="p">),</span>
-            <span class="p">(</span><span class="s2">r&quot;/dashboardhst&quot;</span><span class="p">,</span> <span class="n">DashboardHSTHandler</span><span class="p">),</span>
-            <span class="p">(</span><span class="s2">r&quot;/tables&quot;</span><span class="p">,</span> <span class="n">TablesHandler</span><span class="p">),</span>
-            <span class="p">(</span><span class="s2">r&quot;/helpfulplots&quot;</span><span class="p">,</span> <span class="n">HelpfulPlotsHandler</span><span class="p">),</span>
-            <span class="p">(</span><span class="s2">r&quot;/calculation/new&quot;</span><span class="p">,</span> <span class="n">CalculationNewHandler</span><span class="p">),</span>
-            <span class="p">(</span><span class="s2">r&quot;/calculation/newHST&quot;</span><span class="p">,</span> <span class="n">CalculationNewHSTHandler</span><span class="p">),</span>
-            <span class="p">(</span><span class="s2">r&quot;/calculation/newspec&quot;</span><span class="p">,</span> <span class="n">CalculationNewSpecHandler</span><span class="p">),</span>
-            <span class="p">(</span><span class="s2">r&quot;/calculation/status/([^/]+)&quot;</span><span class="p">,</span> <span class="n">CalculationStatusHandler</span><span class="p">),</span>
-            <span class="p">(</span><span class="s2">r&quot;/calculation/statushst/([^/]+)&quot;</span><span class="p">,</span> <span class="n">CalculationStatusHSTHandler</span><span class="p">),</span>
-            <span class="p">(</span><span class="s2">r&quot;/calculation/statusspec/([^/]+)&quot;</span><span class="p">,</span> <span class="n">CalculationStatusSpecHandler</span><span class="p">),</span>
-            <span class="p">(</span><span class="s2">r&quot;/calculation/view/([^/]+)&quot;</span><span class="p">,</span> <span class="n">CalculationViewHandler</span><span class="p">),</span>
-            <span class="p">(</span><span class="s2">r&quot;/calculation/viewhst/([^/]+)&quot;</span><span class="p">,</span> <span class="n">CalculationViewHSTHandler</span><span class="p">),</span>
-            <span class="p">(</span><span class="s2">r&quot;/calculation/viewspec/([^/]+)&quot;</span><span class="p">,</span> <span class="n">CalculationViewSpecHandler</span><span class="p">),</span>
-            <span class="p">(</span><span class="s2">r&quot;/calculation/download/([^/]+)&quot;</span><span class="p">,</span> <span class="n">CalculationDownloadHandler</span><span class="p">),</span>
-            <span class="p">(</span><span class="s2">r&quot;/calculation/downloadspec/([^/]+)&quot;</span><span class="p">,</span> <span class="n">CalculationDownloadSpecHandler</span><span class="p">),</span>
-            <span class="p">(</span><span class="s2">r&quot;/calculation/downloadpandin/([^/]+)&quot;</span><span class="p">,</span> <span class="n">CalculationDownloadPandInHandler</span><span class="p">)</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">HomeHandler</span><span class="p">),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/about&quot;</span><span class="p">,</span> <span class="n">AboutHandler</span><span class="p">),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/dashboard&quot;</span><span class="p">,</span> <span class="n">DashboardHandler</span><span class="p">),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/dashboardspec&quot;</span><span class="p">,</span> <span class="n">DashboardSpecHandler</span><span class="p">),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/dashboardhst&quot;</span><span class="p">,</span> <span class="n">DashboardHSTHandler</span><span class="p">),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/tables&quot;</span><span class="p">,</span> <span class="n">TablesHandler</span><span class="p">),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/helpfulplots&quot;</span><span class="p">,</span> <span class="n">HelpfulPlotsHandler</span><span class="p">),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/calculation/new&quot;</span><span class="p">,</span> <span class="n">CalculationNewHandler</span><span class="p">),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/calculation/newHST&quot;</span><span class="p">,</span> <span class="n">CalculationNewHSTHandler</span><span class="p">),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/calculation/newspec&quot;</span><span class="p">,</span> <span class="n">CalculationNewSpecHandler</span><span class="p">),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/calculation/status/([^/]+)&quot;</span><span class="p">,</span> <span class="n">CalculationStatusHandler</span><span class="p">),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/calculation/statushst/([^/]+)&quot;</span><span class="p">,</span> <span class="n">CalculationStatusHSTHandler</span><span class="p">),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/calculation/statusspec/([^/]+)&quot;</span><span class="p">,</span> <span class="n">CalculationStatusSpecHandler</span><span class="p">),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/calculation/view/([^/]+)&quot;</span><span class="p">,</span> <span class="n">CalculationViewHandler</span><span class="p">),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/calculation/viewhst/([^/]+)&quot;</span><span class="p">,</span> <span class="n">CalculationViewHSTHandler</span><span class="p">),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/calculation/viewspec/([^/]+)&quot;</span><span class="p">,</span> <span class="n">CalculationViewSpecHandler</span><span class="p">),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/calculation/download/([^/]+)&quot;</span><span class="p">,</span> <span class="n">CalculationDownloadHandler</span><span class="p">),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/calculation/downloadspec/([^/]+)&quot;</span><span class="p">,</span> <span class="n">CalculationDownloadSpecHandler</span><span class="p">),</span>
+            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/calculation/downloadpandin/([^/]+)&quot;</span><span class="p">,</span> <span class="n">CalculationDownloadPandInHandler</span><span class="p">)</span>
         <span class="p">]</span>
         <span class="n">settings</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
-            <span class="n">blog_title</span><span class="o">=</span><span class="s2">u&quot;Pandexo&quot;</span><span class="p">,</span>
-            <span class="n">template_path</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s2">&quot;templates&quot;</span><span class="p">),</span>
-            <span class="n">static_path</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s2">&quot;static&quot;</span><span class="p">),</span>
+            <span class="n">blog_title</span><span class="o">=</span><span class="sa">u</span><span class="s2">&quot;Pandexo&quot;</span><span class="p">,</span>
+            <span class="n">template_path</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s2">&quot;templates&quot;</span><span class="p">),</span>
+            <span class="n">static_path</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s2">&quot;static&quot;</span><span class="p">),</span>
             <span class="n">xsrf_cookies</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">cookie_secret</span><span class="o">=</span><span class="s2">&quot;__TODO:_GENERATE_YOUR_OWN_RANDOM_VALUE_HERE__&quot;</span><span class="p">,</span>
             <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">Application</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">handlers</span><span class="p">,</span> <span class="o">**</span><span class="n">settings</span><span class="p">)</span></div>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Application</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">handlers</span><span class="p">,</span> <span class="o">**</span><span class="n">settings</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="BaseHandler"><a class="viewcode-back" href="../../engine.html#engine.run_online.BaseHandler">[docs]</a><span class="k">class</span> <span class="nc">BaseHandler</span><span class="p">(</span><span class="n">tornado</span><span class="o">.</span><span class="n">web</span><span class="o">.</span><span class="n">RequestHandler</span><span class="p">):</span>
@@ -416,10 +441,10 @@
         <span class="n">fname_plan</span> <span class="o">=</span> <span class="n">fileinfo_plan</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">]</span>
         <span class="n">extn_plan</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">fname_plan</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
         <span class="n">cname_plan</span> <span class="o">=</span> <span class="nb">id</span><span class="o">+</span><span class="s1">&#39;planet&#39;</span> <span class="o">+</span> <span class="n">extn_plan</span>
-        <span class="n">fh_plan</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">__TEMP__</span><span class="p">,</span> <span class="n">cname_plan</span><span class="p">),</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+        <span class="n">fh_plan</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">__TEMP__</span><span class="p">,</span> <span class="n">cname_plan</span><span class="p">),</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span>
         <span class="n">fh_plan</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fileinfo_plan</span><span class="p">[</span><span class="s1">&#39;body&#39;</span><span class="p">])</span>
         
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s2">&quot;reference&quot;</span><span class="p">,</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s2">&quot;reference&quot;</span><span class="p">,</span>
                                <span class="s2">&quot;exo_input.json&quot;</span><span class="p">))</span> <span class="k">as</span> <span class="n">data_file</span><span class="p">:</span>
 
             <span class="n">exodata</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">data_file</span><span class="p">)</span>
@@ -431,7 +456,7 @@
                 <span class="n">fname_star</span> <span class="o">=</span> <span class="n">fileinfo_star</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">]</span>
                 <span class="n">extn_star</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">fname_star</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
                 <span class="n">cname_star</span> <span class="o">=</span> <span class="nb">id</span><span class="o">+</span><span class="s1">&#39;star&#39;</span> <span class="o">+</span> <span class="n">extn_star</span>
-                <span class="n">fh_star</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">__TEMP__</span><span class="p">,</span> <span class="n">cname_star</span><span class="p">),</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+                <span class="n">fh_star</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">__TEMP__</span><span class="p">,</span> <span class="n">cname_star</span><span class="p">),</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span>
                 <span class="n">fh_star</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fileinfo_star</span><span class="p">[</span><span class="s1">&#39;body&#39;</span><span class="p">])</span>
                 <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;star&quot;</span><span class="p">][</span><span class="s2">&quot;starpath&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">__TEMP__</span><span class="p">,</span> <span class="n">cname_star</span><span class="p">)</span>
                 <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;star&quot;</span><span class="p">][</span><span class="s2">&quot;f_unit&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;starfunits&quot;</span><span class="p">)</span>
@@ -470,14 +495,14 @@
                 <span class="n">fname_noise</span> <span class="o">=</span> <span class="n">fileinfo_noise</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">]</span>
                 <span class="n">extn_noise</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">fname_noise</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
                 <span class="n">cname_noise</span> <span class="o">=</span> <span class="nb">id</span><span class="o">+</span><span class="s1">&#39;noise&#39;</span> <span class="o">+</span> <span class="n">extn_noise</span>
-                <span class="n">fh_noise</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">__TEMP__</span><span class="p">,</span> <span class="n">cname_noise</span><span class="p">),</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+                <span class="n">fh_noise</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">__TEMP__</span><span class="p">,</span> <span class="n">cname_noise</span><span class="p">),</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span>
                 <span class="n">fh_noise</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fileinfo_star</span><span class="p">[</span><span class="s1">&#39;body&#39;</span><span class="p">])</span>
                 <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;observation&quot;</span><span class="p">][</span><span class="s2">&quot;noise_floor&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">__TEMP__</span><span class="p">,</span> <span class="n">cname_noise</span><span class="p">)</span>
             <span class="k">except</span><span class="p">:</span>
                 <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;observation&quot;</span><span class="p">][</span><span class="s2">&quot;noise_floor&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
                 
         <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;instrument&quot;</span><span class="p">)</span><span class="o">==</span><span class="s2">&quot;MIRI&quot;</span><span class="p">):</span> 
-            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s2">&quot;reference&quot;</span><span class="p">,</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s2">&quot;reference&quot;</span><span class="p">,</span>
                                <span class="s2">&quot;miri_input.json&quot;</span><span class="p">))</span> <span class="k">as</span> <span class="n">data_file</span><span class="p">:</span>   
                 <span class="n">pandata</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">data_file</span><span class="p">)</span>       
                 <span class="n">mirimode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mirimode&quot;</span><span class="p">)</span>
@@ -487,7 +512,7 @@
                     <span class="n">pandata</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">][</span><span class="s2">&quot;detector&quot;</span><span class="p">][</span><span class="s2">&quot;subarray&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;full&quot;</span>
                     
         <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;instrument&quot;</span><span class="p">)</span><span class="o">==</span><span class="s2">&quot;NIRSpec&quot;</span><span class="p">):</span> 
-            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s2">&quot;reference&quot;</span><span class="p">,</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s2">&quot;reference&quot;</span><span class="p">,</span>
                                <span class="s2">&quot;nirspec_input.json&quot;</span><span class="p">))</span> <span class="k">as</span> <span class="n">data_file</span><span class="p">:</span>
                 <span class="n">pandata</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">data_file</span><span class="p">)</span>  
                 <span class="n">nirspecmode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;nirspecmode&quot;</span><span class="p">)</span>
@@ -495,13 +520,13 @@
                 <span class="n">pandata</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">][</span><span class="s2">&quot;instrument&quot;</span><span class="p">][</span><span class="s2">&quot;filter&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nirspecmode</span><span class="p">[</span><span class="mi">5</span><span class="p">:</span><span class="mi">11</span><span class="p">]</span>
                 <span class="n">pandata</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">][</span><span class="s2">&quot;detector&quot;</span><span class="p">][</span><span class="s2">&quot;subarray&quot;</span><span class="p">]</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;nirspecsubarray&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;instrument&quot;</span><span class="p">)</span><span class="o">==</span><span class="s2">&quot;NIRCam&quot;</span><span class="p">):</span> 
-            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s2">&quot;reference&quot;</span><span class="p">,</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s2">&quot;reference&quot;</span><span class="p">,</span>
                                <span class="s2">&quot;nircam_input.json&quot;</span><span class="p">))</span> <span class="k">as</span> <span class="n">data_file</span><span class="p">:</span>
                 <span class="n">pandata</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">data_file</span><span class="p">)</span> 
                 <span class="n">pandata</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">][</span><span class="s2">&quot;instrument&quot;</span><span class="p">][</span><span class="s2">&quot;filter&quot;</span><span class="p">]</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;nircammode&quot;</span><span class="p">)</span>
                 <span class="n">pandata</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">][</span><span class="s2">&quot;detector&quot;</span><span class="p">][</span><span class="s2">&quot;subarray&quot;</span><span class="p">]</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;nircamsubarray&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;instrument&quot;</span><span class="p">)</span><span class="o">==</span><span class="s2">&quot;NIRISS&quot;</span><span class="p">):</span> 
-            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s2">&quot;reference&quot;</span><span class="p">,</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s2">&quot;reference&quot;</span><span class="p">,</span>
                                <span class="s2">&quot;niriss_input.json&quot;</span><span class="p">))</span> <span class="k">as</span> <span class="n">data_file</span><span class="p">:</span>
                 <span class="n">pandata</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">data_file</span><span class="p">)</span> 
                 <span class="n">nirissmode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;nirissmode&quot;</span><span class="p">)</span>
@@ -514,7 +539,7 @@
             <span class="n">pandata</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">][</span><span class="s2">&quot;detector&quot;</span><span class="p">][</span><span class="s2">&quot;ngroup&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;optimize&quot;</span><span class="p">)</span>
         
         <span class="n">finaldata</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;pandeia_input&quot;</span><span class="p">:</span> <span class="n">pandata</span> <span class="p">,</span> <span class="s2">&quot;pandexo_input&quot;</span><span class="p">:</span><span class="n">exodata</span><span class="p">}</span>
-
+        <span class="nb">print</span><span class="p">(</span><span class="n">finaldata</span><span class="p">)</span>
         <span class="n">task</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">executor</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">wrapper</span><span class="p">,</span> <span class="n">finaldata</span><span class="p">)</span>
 
 
@@ -553,10 +578,10 @@
         <span class="n">fname_plan</span> <span class="o">=</span> <span class="n">fileinfo_plan</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">]</span>
         <span class="n">extn_plan</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">fname_plan</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
         <span class="n">cname_plan</span> <span class="o">=</span> <span class="nb">id</span><span class="o">+</span><span class="s1">&#39;planet&#39;</span> <span class="o">+</span> <span class="n">extn_plan</span>
-        <span class="n">fh_plan</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">__TEMP__</span><span class="p">,</span> <span class="n">cname_plan</span><span class="p">),</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+        <span class="n">fh_plan</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">__TEMP__</span><span class="p">,</span> <span class="n">cname_plan</span><span class="p">),</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span>
         <span class="n">fh_plan</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fileinfo_plan</span><span class="p">[</span><span class="s1">&#39;body&#39;</span><span class="p">])</span>
         
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s2">&quot;reference&quot;</span><span class="p">,</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s2">&quot;reference&quot;</span><span class="p">,</span>
                                <span class="s2">&quot;exo_input.json&quot;</span><span class="p">))</span> <span class="k">as</span> <span class="n">data_file</span><span class="p">:</span>
             <span class="n">exodata</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">data_file</span><span class="p">)</span>
             <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;telescope&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;hst&#39;</span>
@@ -579,12 +604,12 @@
             <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;calculation&quot;</span><span class="p">]</span>                          <span class="o">=</span> <span class="s1">&#39;scale&#39;</span>
                 
         <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;instrument&quot;</span><span class="p">)</span><span class="o">==</span><span class="s2">&quot;STIS&quot;</span><span class="p">):</span> 
-            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s2">&quot;reference&quot;</span><span class="p">,</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s2">&quot;reference&quot;</span><span class="p">,</span>
                                <span class="s2">&quot;stis_input.json&quot;</span><span class="p">))</span> <span class="k">as</span> <span class="n">data_file</span><span class="p">:</span>   
                 <span class="n">pandata</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">data_file</span><span class="p">)</span>       
                 <span class="n">stismode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;stismode&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;instrument&quot;</span><span class="p">)</span><span class="o">==</span><span class="s2">&quot;WFC3&quot;</span><span class="p">):</span> 
-            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s2">&quot;reference&quot;</span><span class="p">,</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s2">&quot;reference&quot;</span><span class="p">,</span>
                                <span class="s2">&quot;wfc3_input.json&quot;</span><span class="p">))</span> <span class="k">as</span> <span class="n">data_file</span><span class="p">:</span>
                 <span class="n">pandata</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">data_file</span><span class="p">)</span>  
                 <span class="n">pandata</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">][</span><span class="s1">&#39;detector&#39;</span><span class="p">][</span><span class="s1">&#39;subarray&#39;</span><span class="p">]</span>    <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;subarray&quot;</span><span class="p">)</span>
@@ -910,10 +935,13 @@
     <span class="n">tornado</span><span class="o">.</span><span class="n">ioloop</span><span class="o">.</span><span class="n">IOLoop</span><span class="o">.</span><span class="n">current</span><span class="p">()</span><span class="o">.</span><span class="n">start</span><span class="p">()</span></div>
 
 
-<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="n">main</span><span class="p">()</span>
 </pre></div>
 
+           </div>
+           <div class="articleComments">
+            
            </div>
           </div>
           <footer>
@@ -948,7 +976,8 @@
             VERSION:'',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
         };
     </script>
       <script type="text/javascript" src="../../_static/jquery.js"></script>
