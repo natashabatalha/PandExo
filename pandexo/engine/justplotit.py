@@ -89,9 +89,12 @@ def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', out
         else:
             fac =  1.0
 
-        out  = dict['RawData']['electrons_out']* num_tran/ntran_old
+        fraction = (dict['timing']['Num Integrations In Transit'] /
+                    dict['timing']['Num Integrations Out of Transit'])
+
+        out  = dict['RawData']['electrons_out']* num_tran/ntran_old * fraction
         inn  = dict['RawData']['electrons_in'] * num_tran/ntran_old
-        vout = dict['RawData']['var_out']      * num_tran/ntran_old
+        vout = dict['RawData']['var_out']      * num_tran/ntran_old * fraction
         vin  = dict['RawData']['var_in']       * num_tran/ntran_old
 
         if R is not False:
