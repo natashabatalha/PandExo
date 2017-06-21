@@ -55,7 +55,6 @@ def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', out
     See Also
     --------
     jwst_noise, jwst_1d_bkg, jwst_1d_flux, jwst_1d_snr, jwst_2d_det, jwst_2d_sat
-
     """
     outx=[]
     outy=[]
@@ -82,57 +81,31 @@ def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', out
         err = dict['FinalSpectrum']['error_w_floor'][~np.isnan(y)]
         y = y[~np.isnan(y)]
 
+        if num_tran is False:
+            num_tran = ntran_old
 
-        if (R == False) & (num_tran == False):
-            x=x
-            y=y
-        elif (R != False) & (num_tran != False):
-            new_wave = bin_wave_to_R(x, R)
-            out = uniform_tophat_sum(new_wave,x, dict['RawData']['electrons_out']*num_tran/ntran_old)
-            inn = uniform_tophat_sum(new_wave,x, dict['RawData']['electrons_in']*num_tran/ntran_old)
-            vout = uniform_tophat_sum(new_wave,x, dict['RawData']['var_out']*num_tran/ntran_old)
-            vin = uniform_tophat_sum(new_wave,x, dict['RawData']['var_in']*num_tran/ntran_old)
-            if dict['input']['Primary/Secondary']=='fp/f*':
-                fac = -1.0
-            else:
-                fac = 1.0
-            rand_noise = np.sqrt((vin+vout))*(np.random.randn(len(new_wave)))
-            sim_spec = fac*(out-inn + rand_noise)/out
-            x = new_wave
-            y = sim_spec
-            err = np.sqrt(vout+vin)/out
-        elif (R == False) & (num_tran != False):
-            out = dict['RawData']['electrons_out']*num_tran/ntran_old
-            inn = dict['RawData']['electrons_in']*num_tran/ntran_old
-            vout = dict['RawData']['var_out']*num_tran/ntran_old
-            vin = dict['RawData']['var_in']*num_tran/ntran_old
-            if dict['input']['Primary/Secondary']=='fp/f*':
-                fac = -1.0
-            else:
-                fac = 1.0
-            rand_noise = np.sqrt((vin+vout))*(np.random.randn(len(x)))
-            sim_spec = fac*(out-inn + rand_noise)/out
-            x = x
-            y = sim_spec
-            err = np.sqrt(vout+vin)/out
-        elif (R != False) & (num_tran == False):
-            new_wave = bin_wave_to_R(x, R)
-            out = uniform_tophat_sum(new_wave,x, dict['RawData']['electrons_out'])
-            inn = uniform_tophat_sum(new_wave,x, dict['RawData']['electrons_in'])
-            vout = uniform_tophat_sum(new_wave,x, dict['RawData']['var_out'])
-            vin = uniform_tophat_sum(new_wave,x, dict['RawData']['var_in'])
-            if dict['input']['Primary/Secondary']=='fp/f*':
-                fac = -1.0
-            else:
-                fac = 1.0
-            rand_noise = np.sqrt((vin+vout))*(np.random.randn(len(new_wave)))
-            sim_spec = fac*(out-inn + rand_noise)/out
-            x = new_wave
-            y = sim_spec
-            err = np.sqrt(vout+vin)/out
+        if dict['input']['Primary/Secondary']=='fp/f*':
+            fac = -1.0
         else:
-            print("Something went wrong. Cannot enter both resolution and ask to bin to new wave")
-            return
+            fac =  1.0
+
+        out  = dict['RawData']['electrons_out']* num_tran/ntran_old
+        inn  = dict['RawData']['electrons_in'] * num_tran/ntran_old
+        vout = dict['RawData']['var_out']      * num_tran/ntran_old
+        vin  = dict['RawData']['var_in']       * num_tran/ntran_old
+
+        if R is not False:
+            new_wave = bin_wave_to_R(x, R)
+            out  = uniform_tophat_sum(new_wave, x, out)
+            inn  = uniform_tophat_sum(new_wave, x, inn)
+            vout = uniform_tophat_sum(new_wave, x, vout)
+            vin  = uniform_tophat_sum(new_wave, x, vin)
+            x = new_wave
+
+        rand_noise = np.sqrt((vin+vout))*(np.random.randn(len(x)))
+        sim_spec   = fac*(out-inn + rand_noise)/out
+        y   = sim_spec
+        err = np.sqrt(vout+vin)/out
 
         #create error bars for Bokeh's multi_line
         y_err = []
@@ -722,7 +695,5 @@ def hst_time(result_dict, plot=True, output_file ='hsttime.html', model = True):
     if plot:
         outputfile(output_file)
         show(start_time)
-
-
 
     return obsphase1, obstr1, obsphase2, obstr2,rms
