@@ -92,8 +92,8 @@ def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', out
             new_wave = bin_wave_to_R(x, R)
             out = uniform_tophat_sum(new_wave,x, dict['RawData']['electrons_out']*num_tran/ntran_old)
             inn = uniform_tophat_sum(new_wave,x, dict['RawData']['electrons_in']*num_tran/ntran_old)
-            vout = uniform_tophat_sum(new_wave,x, dict['RawData']['var_out']*num_tran/ntran_old)
-            vin = uniform_tophat_sum(new_wave,x, dict['RawData']['var_in']*num_tran/ntran_old)
+            vout = uniform_tophat_sum(new_wave,x, dict['RawData']['var_out']*(num_tran/ntran_old)**2.0)
+            vin = uniform_tophat_sum(new_wave,x, dict['RawData']['var_in']*(num_tran/ntran_old)**2.0)
             var_tot = (to/ti/out)**2.0 * vout + (inn*to/ti/out**2.0)**2.0 * vout
             if dict['input']['Primary/Secondary']=='fp/f*':
                 fac = -1.0
@@ -108,8 +108,8 @@ def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', out
         elif (R == False) & (num_tran != False):     
             out = dict['RawData']['electrons_out']*num_tran/ntran_old
             inn = dict['RawData']['electrons_in']*num_tran/ntran_old
-            vout = dict['RawData']['var_out']*num_tran/ntran_old
-            vin = dict['RawData']['var_in']*num_tran/ntran_old
+            vout = dict['RawData']['var_out']*(num_tran/ntran_old)**2.0
+            vin = dict['RawData']['var_in']*(num_tran/ntran_old)**2.0
             var_tot = (to/ti/out)**2.0 * vout + (inn*to/ti/out**2.0)**2.0 * vout
             if dict['input']['Primary/Secondary']=='fp/f*':
                 fac = -1.0
