@@ -99,7 +99,7 @@ def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', out
                 fac = -1.0
             else:
                 fac = 1.0
-            rand_noise = np.sqrt((var_tot))*(np.random.randn(len(x)))
+            rand_noise = np.sqrt((var_tot))*(np.random.randn(len(new_wave)))
             raw_spec = (out/to-inn/ti)/(out/to)       
             sim_spec = fac*(raw_spec + rand_noise )
             x = new_wave
@@ -132,7 +132,7 @@ def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', out
                 fac = -1.0
             else:
                 fac = 1.0
-            rand_noise = np.sqrt((var_tot))*(np.random.randn(len(x)))
+            rand_noise = np.sqrt((var_tot))*(np.random.randn(len(new_wave)))
             raw_spec = (out/to-inn/ti)/(out/to)       
             sim_spec = fac*(raw_spec + rand_noise ) 
             x = new_wave
