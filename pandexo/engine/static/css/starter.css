@@ -1,4 +1,7 @@
+@import url('https://fonts.googleapis.com/css?family=Open+Sans:300,400,600');
+
 body {
+    font-family: 'Open Sans', "Helvetica Neue", Helvetica, Arial, sans-serif;
     padding-top: 50px;
 }
 
