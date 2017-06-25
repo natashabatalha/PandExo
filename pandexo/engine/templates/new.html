@@ -5,51 +5,6 @@
 <link href="{{ static_url('css/select2.min.css')}}" rel="stylesheet">
 <link href="{{ static_url('css/select2-bootstrap-theme.min.css')}}" rel="stylesheet">
 <link href="{{ static_url('css/icheck-bootstrap.min.css')}}" rel="stylesheet">
-<style>
-    .radio-chooser {
-        border: 1px solid #cce6fa;
-        border-radius: 4px;
-        box-sizing: border-box;
-        display: flex;
-        font-family: 'Open Sans', sans-serif;
-        margin: 15px 0;
-    }
-    .radio-chooser-item {
-        width: 50%;
-        box-sizing: border-box;
-        padding: 20px;
-        display: inline-block;
-        background: white;
-    }
-    .radio-chooser-item.radio-chooser-selected {
-        background: #f4faff;
-    }
-    .radio-chooser-item:first-child {
-        border-right: 1px solid #cce6fa;
-        box-sizing: border-box;
-    }
-    .radio-chooser-item:hover {
-        background: #f4faff;
-    }
-    .radio-chooser-content {
-        cursor: pointer;
-        width: 100%;
-        margin: 0;
-        padding: 5px;
-    }
-    .radio-chooser-content input {
-        margin: 0 15px 0 0;
-        line-height: 20px;
-        vertical-align: middle;
-    }
-    .radio-chooser-title {
-        max-width: 270px;
-        display: inline-block;
-        vertical-align: middle;
-        font-weight: 100;
-        font-size: 18px;
-    }
-</style>
 {% end %}
 
 {% block body %}
@@ -90,7 +45,7 @@
 
     <div class="form-group hidden upload-stellar-section">
         <div class="col-md-3 col-md-offset-3">
-            <button class="btn btn-block" type="button" onclick="document.getElementById('starFile').click(); return false;">Choose File</button>
+            <button class="btn btn-block niceFileBtn" type="button">Choose File</button>
             <input type="file" id="starFile" name="starFile" style="display: none;">
             <p class="help-block text-center">Column 1: wavelength <br>Column 2: flux, no header</p>
         </div>
@@ -125,7 +80,7 @@
         </div>
         <div class="col-md-3">
             <input type="text" class="form-control" id="metal" name="metal" >
-            <p class="help-block">Stellar metallically</p>
+            <p class="help-block">Stellar metallicity</p>
         </div>
         <div class="col-md-3">
             <input type="text" class="form-control" id="logg" name="logg" >
@@ -178,7 +133,7 @@
 
     <div class="form-group hidden upload-planet-section">
         <div class="col-md-3 col-md-offset-3">
-            <button class="btn btn-block" type="button" onclick="document.getElementById('planFile').click(); return false;">Choose File</button>
+            <button class="btn btn-block niceFileBtn" type="button">Choose File</button>
             <input type="file" id="planFile" name="planFile" style="display: none">
             <p class="help-block text-center">Column 1: wave or time <br>Column 2: Model, no header</p>
         </div>
@@ -253,9 +208,9 @@
     </div>
 
     <div class="form-group">
-        <label class="col-md-3 control-label" for="instrument" onchange="showForm()">Instrument</label>
+        <label class="col-md-3 control-label" for="instrument">Instrument</label>
         <div class="col-md-6">
-            <select id="instrument" name="instrument" class="form-control" onchange ="showForm()" data-placeholder="Select Instrument">
+            <select id="instrument" name="instrument" class="form-control" data-placeholder="Select Instrument">
                 <option value=""></option>
                 <option value="MIRI">MIRI Low Resolution Spectroscopy</option>
                 <option value="NIRSpec">NIRSpec Bright Object Time Series</option>
@@ -265,9 +220,9 @@
         </div>
     </div>
 
-    <div class="form-group hidden" id="instrument-mode-section" onchange="showForm()">
+    <div class="form-group hidden" id="instrument-mode-section">
         <label class="col-md-3 control-label" for="mirimode">Mode</label>
-        <div class="col-md-4" id = "MIRI">
+        <div class="col-md-4" id="MIRI">
             <select id="mirimode" name="mirimode" onchange="showForm()" class="form-control" data-placeholder="Select MIRI Mode">
                 <option value=""></option>
                 <option value="lrsslitless">Slitless LRS</option>
@@ -373,7 +328,7 @@
 
     <div class="form-group hidden upload-noise-section">
         <div class="col-md-3 col-md-offset-3">
-            <button class="btn btn-block" type="button" onclick="document.getElementById('noisefile').click(); return false;">Choose File</button>
+            <button class="btn btn-block niceFileBtn" type="button">Choose File</button>
             <input type="file" id="noisefile" name="noisefile" style="display: none;">
             <p class="help-block">Column 1: wavelength <br>Column 2: Noise Floor (ppm)</p>
         </div>
@@ -410,6 +365,8 @@
             width: "100%",
             minimumResultsForSearch: 7
         });
+
+        /* Nice block level radio selection */
         $(".radio-chooser-content").click(function () {
             $(".radio-chooser-item").removeClass("radio-chooser-selected");
             $(this).parent().addClass("radio-chooser-selected");
@@ -440,26 +397,36 @@
                     break;
             }
         });
+
+        /* File Browsing Button */
+        $(".niceFileBtn").click(function () {
+            $(this).parent().find("input").click().change(function () {
+                $(this).parent().find(".btn").css("display", "none");
+                $(this).css("display", "block");
+            });
+        });
+
+        /* Instrument Selection */
+        $("#instrument").change(function () {
+            $("#instrument-mode-section").removeClass("hidden");
+            $("#MIRI, #NIRSpec, #NIRISS, #NIRCam").addClass("hidden");
+            var selopt = $("#instrument").val();
+            switch (selopt) {
+                case "MIRI":
+                    $("#MIRI").removeClass("hidden");
+                    break;
+                case "NIRSpec":
+                    $("#NIRSpec").removeClass("hidden");
+                    break;
+                case "NIRISS":
+                    $("#NIRISS").removeClass("hidden");
+                    break;
+                case "NIRCam":
+                    $("#NIRCam").removeClass("hidden");
+                    break;
+            }
+        });
     });
-    function showForm() {
-        $("#instrument-mode-section").removeClass("hidden");
-        $("#MIRI, #NIRSpec, #NIRISS, #NIRCam").addClass("hidden");
-        var selopt = document.getElementById("instrument").value;
-        switch (selopt) {
-            case "MIRI":
-                $("#MIRI").removeClass("hidden");
-                break;
-            case "NIRSpec":
-                $("#NIRSpec").removeClass("hidden");
-                break;
-            case "NIRISS":
-                $("#NIRISS").removeClass("hidden");
-                break;
-            case "NIRCam":
-                $("#NIRCam").removeClass("hidden");
-                break;
-        }
-    }
 
     function pickStar() {
         $("#starFile, #starwunits, #starfunits, #phoenix").addClass("hidden");

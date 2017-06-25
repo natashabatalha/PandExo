@@ -69,3 +69,48 @@ body {
         -moz-transform: rotate(360deg);
     }
 }
+
+/* Radio Chooser */
+.radio-chooser {
+    border: 1px solid #cce6fa;
+    border-radius: 4px;
+    box-sizing: border-box;
+    display: flex;
+    font-family: 'Open Sans', sans-serif;
+    margin: 15px 0;
+}
+.radio-chooser-item {
+    width: 50%;
+    box-sizing: border-box;
+    padding: 20px;
+    display: inline-block;
+    background: white;
+}
+.radio-chooser-item.radio-chooser-selected {
+    background: #f4faff;
+}
+.radio-chooser-item:first-child {
+    border-right: 1px solid #cce6fa;
+    box-sizing: border-box;
+}
+.radio-chooser-item:hover {
+    background: #f4faff;
+}
+.radio-chooser-content {
+    cursor: pointer;
+    width: 100%;
+    margin: 0;
+    padding: 5px 15px;
+}
+.radio-chooser-content input {
+    margin: 0 15px 0 0 !important;
+    line-height: 20px;
+    vertical-align: middle;
+}
+.radio-chooser-title {
+    max-width: 270px;
+    display: inline-block;
+    vertical-align: middle;
+    font-weight: 100;
+    font-size: 18px;
+}
