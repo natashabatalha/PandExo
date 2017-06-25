@@ -76,6 +76,8 @@ def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', out
     i = 0     
     for dict in result_dict: 
         ntran_old = dict['timing']['Number of Transits']
+        to = dict['timing']["Num Integrations Out of Transit"]
+        ti = dict['timing']["Num Integrations In Transit"]
         #remove any nans 
         y = dict['FinalSpectrum']['spectrum_w_rand']
         x = dict['FinalSpectrum']['wave'][~np.isnan(y)]
@@ -92,44 +94,50 @@ def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', out
             inn = uniform_tophat_sum(new_wave,x, dict['RawData']['electrons_in']*num_tran/ntran_old)
             vout = uniform_tophat_sum(new_wave,x, dict['RawData']['var_out']*num_tran/ntran_old)
             vin = uniform_tophat_sum(new_wave,x, dict['RawData']['var_in']*num_tran/ntran_old)
+            var_tot = (to/ti/out)**2.0 * vout + (inn*to/ti/out**2.0)**2.0 * vout
             if dict['input']['Primary/Secondary']=='fp/f*':
                 fac = -1.0
             else:
                 fac = 1.0
-            rand_noise = np.sqrt((vin+vout))*(np.random.randn(len(new_wave)))
-            sim_spec = fac*(out-inn + rand_noise)/out 
+            rand_noise = np.sqrt((var_tot))*(np.random.randn(len(new_wave)))
+            raw_spec = (out/to-inn/ti)/(out/to)       
+            sim_spec = fac*(raw_spec + rand_noise )
             x = new_wave
             y = sim_spec
-            err = np.sqrt(vout+vin)/out
+            err = np.sqrt(var_tot)
         elif (R == False) & (num_tran != False):     
             out = dict['RawData']['electrons_out']*num_tran/ntran_old
             inn = dict['RawData']['electrons_in']*num_tran/ntran_old
             vout = dict['RawData']['var_out']*num_tran/ntran_old
             vin = dict['RawData']['var_in']*num_tran/ntran_old
+            var_tot = (to/ti/out)**2.0 * vout + (inn*to/ti/out**2.0)**2.0 * vout
             if dict['input']['Primary/Secondary']=='fp/f*':
                 fac = -1.0
             else:
                 fac = 1.0
-            rand_noise = np.sqrt((vin+vout))*(np.random.randn(len(x)))
-            sim_spec = fac*(out-inn + rand_noise)/out 
+            rand_noise = np.sqrt((var_tot))*(np.random.randn(len(x)))
+            raw_spec = (out/to-inn/ti)/(out/to)       
+            sim_spec = fac*(raw_spec + rand_noise ) 
             x = x
             y = sim_spec
-            err = np.sqrt(vout+vin)/out
+            err = np.sqrt(var_tot)
         elif (R != False) & (num_tran == False):     
             new_wave = bin_wave_to_R(x, R)
             out = uniform_tophat_sum(new_wave,x, dict['RawData']['electrons_out'])
             inn = uniform_tophat_sum(new_wave,x, dict['RawData']['electrons_in'])
             vout = uniform_tophat_sum(new_wave,x, dict['RawData']['var_out'])
             vin = uniform_tophat_sum(new_wave,x, dict['RawData']['var_in'])
+            var_tot = (to/ti/out)**2.0 * vout + (inn*to/ti/out**2.0)**2.0 * vout
             if dict['input']['Primary/Secondary']=='fp/f*':
                 fac = -1.0
             else:
                 fac = 1.0
-            rand_noise = np.sqrt((vin+vout))*(np.random.randn(len(new_wave)))
-            sim_spec = fac*(out-inn + rand_noise)/out 
+            rand_noise = np.sqrt((var_tot))*(np.random.randn(len(new_wave)))
+            raw_spec = (out/to-inn/ti)/(out/to)       
+            sim_spec = fac*(raw_spec + rand_noise ) 
             x = new_wave
             y = sim_spec
-            err = np.sqrt(vout+vin)/out
+            err = np.sqrt(var_tot)
         else: 
             print("Something went wrong. Cannot enter both resolution and ask to bin to new wave")
             return

@@ -1,7 +1,7 @@
 import numpy as np
 from pandeia.engine.instrument_factory import InstrumentFactory
 from .pandexo import wrapper
-import load_modes as lm
+from .load_modes import SetDefaultModes
 import os 
 import pickle as pkl
 from joblib import Parallel, delayed
@@ -75,7 +75,7 @@ def load_mode_dict(inst):
     >>> inst_dict = load_mode_dict('MIRI LRS')
     >>> inst_dict['configuration']['instrument']['aperture'] = 'lrsslit'
     """
-    return lm.SetDefaultModes(inst).pick()
+    return SetDefaultModes(inst).pick()
 
 def get_thruput(inst):
     """Returns complete instrument photon to electron conversion efficiency
@@ -98,7 +98,7 @@ def get_thruput(inst):
     """
     
     #pull correct dictionary
-    input_dict = lm.SetDefaultModes(inst).pick()
+    input_dict =  SetDefaultModes(inst).pick()
                              
     conf = {'instrument': input_dict['configuration']['instrument']}
     i = InstrumentFactory(config=conf)

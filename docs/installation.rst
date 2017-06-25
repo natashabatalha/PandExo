@@ -65,6 +65,14 @@ Your Pandeia data reference file should look like this:
     
 Troubleshooting
 ---------------
+TypeError: 'float' object cannot be interpreted as an index
+```````````````````````````````````````````````````````````
+This is an error within Pandeia, which has not yet been fixed by STScI folk. You can easily fix it by finding where the file /pandeia/engine/coords.py is and changing line 36:
+
+.. code-block:: python 
+   
+    ones = np.ones((ny, nx))
+    ones = np.ones((int(ny), int(nx)))
 
 Problems with PYFFTW?
 `````````````````````
@@ -92,7 +100,7 @@ If that doesn't work Zach Berta-Thompson pointed out that this worked for him:
 There are several different conda distributions of pyfftw however, if 
 you install version <0.10 it may downgrade 
 your version of numpy. Therefore, a version that is greater than 0.10 is best. Numpy should be 
-numpy>=1.11.3. 
+numpy>=1.12 
 
 .. code-block:: bash 
 
