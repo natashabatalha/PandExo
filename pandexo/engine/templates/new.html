@@ -29,13 +29,13 @@
             <div class="radio-chooser">
                 <div class="radio-chooser-item">
                     <label class="radio-chooser-content" for="stellarModelPhoenix">
-                        <input type="radio" name="stellarModal" id="stellarModelPhoenix" value="phoenix" />
+                        <input type="radio" name="stellarModel" id="stellarModelPhoenix" value="phoenix" />
                         <div class="radio-chooser-title">Phoenix Grid Models</div>
                     </label>
                 </div>
                 <div class="radio-chooser-item">
                     <label class="radio-chooser-content" for="stellarModelUser">
-                        <input type="radio" name="stellarModal" id="stellarModelUser" value="user" />
+                        <input type="radio" name="stellarModel" id="stellarModelUser" value="user" />
                         <div class="radio-chooser-title">User Defined Stellar Spectrum</div>
                     </label>
                 </div>
@@ -223,7 +223,7 @@
     <div class="form-group hidden" id="instrument-mode-section">
         <label class="col-md-3 control-label" for="mirimode">Mode</label>
         <div class="col-md-4" id="MIRI">
-            <select id="mirimode" name="mirimode" onchange="showForm()" class="form-control" data-placeholder="Select MIRI Mode">
+            <select id="mirimode" name="mirimode" class="form-control" data-placeholder="Select MIRI Mode">
                 <option value=""></option>
                 <option value="lrsslitless">Slitless LRS</option>
                 <option value="lrsslit">Slit LRS</option>
@@ -232,7 +232,7 @@
 
         <div class="col-md-6" id="NIRSpec">
             <div class="col-md-6" style="padding-left: 0;">
-                <select id="nirspecmode" name="nirspecmode" onchange="showForm()" class="form-control" data-placeholder="Select NIRSpec Mode">
+                <select id="nirspecmode" name="nirspecmode" class="form-control" data-placeholder="Select NIRSpec Mode">
                     <option value=""></option>
                     <option value="g140mf070lp">G140 R=1000 f070lp</option>
                     <option value="g140hf070lp">G140 R=2700 f070lp</option>
@@ -246,7 +246,7 @@
                 </select>
             </div>
             <div class="col-md-6" style="padding-right: 0;">
-                <select id="nirspecsubarray" name="nirspecsubarray" onchange="showForm()" class="form-control" data-placeholder="Select NIRSpec Subarray">
+                <select id="nirspecsubarray" name="nirspecsubarray" class="form-control" data-placeholder="Select NIRSpec Subarray">
                     <option value=""></option>
                     <option value="sub1024a">S1600A1 SUB1024A</option>
                     <option value="sub1024b">S1600A1 SUB1024B</option>
@@ -254,15 +254,6 @@
                     <option value="sub512">S1600A1 SUB512</option>
                 </select>
             </div>
-
-        </div>
-
-        <div class="col-md-4" id="NIRISS">
-            <select id="nirissmode" name="nirissmode" onchange="showForm()" class="form-control" data-placeholder="Select NIRISS Mode">
-                <option value=""></option>
-                <option value="substrip96">Substrip 96</option>
-                <option value="substrip256">Substrip 256</option>
-            </select>
         </div>
 
         <div class="col-md-6" id="NIRCam">
@@ -284,6 +275,14 @@
                     <option value="subgrism256 (noutputs=1)">SUBGRISM258, 1 out(tframe=5.2)</option>
                 </select>
             </div>
+        </div>
+
+        <div class="col-md-4" id="NIRISS">
+            <select id="nirissmode" name="nirissmode" onchange="showForm()" class="form-control" data-placeholder="Select NIRISS Mode">
+                <option value=""></option>
+                <option value="substrip96">Substrip 96</option>
+                <option value="substrip256">Substrip 256</option>
+            </select>
         </div>
     </div>
 
@@ -312,13 +311,13 @@
             <div class="radio-chooser">
                 <div class="radio-chooser-item">
                     <label class="radio-chooser-content" for="noiseModelConstant">
-                        <input type="radio" name="noiseModal" id="noiseModelConstant" value="constant-noise" />
+                        <input type="radio" name="noiseModel" id="noiseModelConstant" value="constant-noise" />
                         <div class="radio-chooser-title">Constant Minimum Noise</div>
                     </label>
                 </div>
                 <div class="radio-chooser-item">
                     <label class="radio-chooser-content" for="noiseModelUser">
-                        <input type="radio" name="noiseModal" id="noiseModelUser" value="user" />
+                        <input type="radio" name="noiseModel" id="noiseModelUser" value="user" />
                         <div class="radio-chooser-title">User Defined Noise Model</div>
                     </label>
                 </div>
@@ -329,7 +328,7 @@
     <div class="form-group hidden upload-noise-section">
         <div class="col-md-3 col-md-offset-3">
             <button class="btn btn-block niceFileBtn" type="button">Choose File</button>
-            <input type="file" id="noisefile" name="noisefile" style="display: none;">
+            <input type="file" id="noiseFile" name="noiseFile" style="display: none;">
             <p class="help-block">Column 1: wavelength <br>Column 2: Noise Floor (ppm)</p>
         </div>
     </div>

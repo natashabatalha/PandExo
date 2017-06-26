@@ -7,6 +7,7 @@ import tornado.httpserver
 import tornado.ioloop
 import tornado.options
 import tornado.web
+import tornado.log
 from concurrent.futures import ProcessPoolExecutor
 from .pandexo import wrapper
 from tornado.options import define, options
@@ -16,10 +17,13 @@ from .utils.plotters import create_component_jwst, create_component_spec, create
 import pandas as pd 
 import numpy as np
 
-#define location of temp files
+# define location of temp files
 __TEMP__ = os.path.join(os.path.dirname(__file__), "temp")
+__LOG__ = os.path.dirname(os.path.dirname(os.path.dirname(__file__))) + "/"
 
 define("port", default=1111, help="run on the given port", type=int)
+define("debug", default=False, help="automatically detect code changes in development")
+define("log_file_prefix", default=__LOG__ + "pandexo_logs.log", help="where to store logs")
 
 # Define a simple named tuple to keep track for submitted calculations
 CalculationTask = namedtuple('CalculationTask', ['id', 'name', 'task',
@@ -60,7 +64,7 @@ class Application(tornado.web.Application):
             static_path=os.path.join(os.path.dirname(__file__), "static"),
             xsrf_cookies=True,
             cookie_secret="__TODO:_GENERATE_YOUR_OWN_RANDOM_VALUE_HERE__",
-            debug=False,
+            debug=options.debug,
         )
         super(Application, self).__init__(handlers, **settings)
 
@@ -268,7 +272,7 @@ class CalculationNewHandler(BaseHandler):
 
     def post(self):
         """
-        The post method contains the retured data from the form data (
+        The post method contains the returned data from the form data (
         accessed by using `self.get_argument(...)` for specific arguments,
         or `self.request.body` to grab the entire returned object.
         """
@@ -276,110 +280,123 @@ class CalculationNewHandler(BaseHandler):
         #print(self.request.body)
         
         id = str(uuid.uuid4())+'e'
-                
-        #upload planet file
-        fileinfo_plan = self.request.files['planFile'][0]
-        fname_plan = fileinfo_plan['filename']
-        extn_plan = os.path.splitext(fname_plan)[1]
-        cname_plan = id+'planet' + extn_plan
-        fh_plan = open(os.path.join(__TEMP__, cname_plan), 'wb')
-        fh_plan.write(fileinfo_plan['body'])
-        
+
         with open(os.path.join(os.path.dirname(__file__), "reference",
                                "exo_input.json")) as data_file:
 
             exodata = json.load(data_file)
             exodata["telescope"] = 'jwst'
-            exodata["calculation"] = 'fml' #always for online form
-            exodata["star"]["type"] = self.get_argument("type")
-            if exodata["star"]["type"] == "user":     
+            exodata["calculation"] = 'fml'  # always for online form
+
+            # stellar model
+            exodata["star"]["type"] = self.get_argument("stellarModel")
+            if exodata["star"]["type"] == "user":
+                # process star file
                 fileinfo_star = self.request.files['starFile'][0]
                 fname_star = fileinfo_star['filename']
                 extn_star = os.path.splitext(fname_star)[1]
                 cname_star = id+'star' + extn_star
                 fh_star = open(os.path.join(__TEMP__, cname_star), 'wb')
                 fh_star.write(fileinfo_star['body'])
+
                 exodata["star"]["starpath"] = os.path.join(__TEMP__, cname_star)
                 exodata["star"]["f_unit"] = self.get_argument("starfunits")
                 exodata["star"]["w_unit"] = self.get_argument("starwunits")
-            else: 
+            else:
                 exodata["star"]["temp"] = float(self.get_argument("temp"))
                 exodata["star"]["logg"] = float(self.get_argument("logg"))
                 exodata["star"]["metal"] = float(self.get_argument("metal"))
             exodata["star"]["mag"] = float(self.get_argument("mag"))
             exodata["star"]["ref_wave"] = float(self.get_argument("ref_wave"))
-            exodata["planet"]["exopath"] = os.path.join(__TEMP__, cname_plan)
-            exodata["planet"]["w_unit"] = self.get_argument("planwunits")
-            exodata["planet"]["f_unit"] = self.get_argument("planfunits")
+
+            # planet model
+            exodata["planet"]["type"] = self.get_argument("planetModel")
+            if exodata["planet"]["type"] == "user":
+                # process planet file
+                fileinfo_plan = self.request.files['planFile'][0]
+                fname_plan = fileinfo_plan['filename']
+                extn_plan = os.path.splitext(fname_plan)[1]
+                cname_plan = id+'planet' + extn_plan
+                fh_plan = open(os.path.join(__TEMP__, cname_plan), 'wb')
+                fh_plan.write(fileinfo_plan['body'])
+
+                exodata["planet"]["exopath"] = os.path.join(__TEMP__, cname_plan)
+                exodata["planet"]["w_unit"] = self.get_argument("planwunits")
+                exodata["planet"]["f_unit"] = self.get_argument("planfunits")
+            else:
+                # TODO connect this variable with processing script
+                exodata["planet"]["transit_depth"] = self.get_argument("transit_depth")
             exodata["observation"]["fraction"] = float(self.get_argument("fraction"))
             exodata["observation"]["noccultations"] = float(self.get_argument("numtrans"))
             exodata["observation"]["sat_level"] = float(self.get_argument("satlevel"))
             
-            #for phase curves user doen't necessarily have to input a transit duration 
+            # for phase curves user doesn't necessarily have to input a transit duration
             try:
                 exodata["planet"]["transit_duration"] = float(self.get_argument("transit_duration"))
             except:
-                #but if they dont.. make sure that the planet units are in seconds... 
+                # but if they don't.. make sure that the planet units are in seconds...
                 if exodata["planet"]["w_unit"] == 'sec':
                     exodata["planet"]["transit_duration"] = 0.0
                 else: 
                     print("Need to give transit duration")
                     raise 
                 
-            #noise floor, set to 0.0 of no values are input        
-            try: 
-                exodata["observation"]["noise_floor"] = float(self.get_argument("noisefloor"))
+            # noise floor, set to 0.0 of no values are input
+            try:
+                observation_type = self.get_argument("noiseModel")
+                if observation_type == "user":
+                    # process noise file
+                    fileinfo_noise = self.request.files['noiseFile'][0]
+                    fname_noise = fileinfo_noise['filename']
+                    extn_noise = os.path.splitext(fname_noise)[1]
+                    cname_noise = id + 'noise' + extn_noise
+                    fh_noise = open(os.path.join(__TEMP__, cname_noise), 'wb')
+                    fh_noise.write(fileinfo_star['body'])
+                    exodata["observation"]["noise_floor"] = os.path.join(__TEMP__, cname_noise)
+                else:
+                    exodata["observation"]["noise_floor"] = float(self.get_argument("noisefloor"))
             except:
                 exodata["observation"]["noise_floor"] = 0.0
-            try: 
-                fileinfo_noise = self.request.files['noisefile'][0]
-                fname_noise = fileinfo_noise['filename']
-                extn_noise = os.path.splitext(fname_noise)[1]
-                cname_noise = id+'noise' + extn_noise
-                fh_noise = open(os.path.join(__TEMP__, cname_noise), 'wb')
-                fh_noise.write(fileinfo_star['body'])
-                exodata["observation"]["noise_floor"] = os.path.join(__TEMP__, cname_noise)
-            except:
-                exodata["observation"]["noise_floor"] = 0.0
-                
-        if (self.get_argument("instrument")=="MIRI"): 
-            with open(os.path.join(os.path.dirname(__file__), "reference",
-                               "miri_input.json")) as data_file:   
+
+        instrument = self.get_argument("instrument")
+        if instrument == "MIRI":
+            with open(os.path.join(os.path.dirname(__file__), "reference", "miri_input.json")) as data_file:
                 pandata = json.load(data_file)       
                 mirimode = self.get_argument("mirimode")
                 if (mirimode == "lrsslit"):
                     pandata["configuration"]["instrument"]["mode"] = mirimode
-                    pandata["configuration"]["instrument"]["aperture"]="lrsslit"
+                    pandata["configuration"]["instrument"]["aperture"] = "lrsslit"
                     pandata["configuration"]["detector"]["subarray"] = "full"
-                    
-        if (self.get_argument("instrument")=="NIRSpec"): 
-            with open(os.path.join(os.path.dirname(__file__), "reference",
-                               "nirspec_input.json")) as data_file:
+
+        if instrument == "NIRSpec":
+            with open(os.path.join(os.path.dirname(__file__), "reference", "nirspec_input.json")) as data_file:
                 pandata = json.load(data_file)  
                 nirspecmode = self.get_argument("nirspecmode")
                 pandata["configuration"]["instrument"]["disperser"] = nirspecmode[0:5]
                 pandata["configuration"]["instrument"]["filter"] = nirspecmode[5:11]
-                pandata["configuration"]["detector"]["subarray"]  = self.get_argument("nirspecsubarray")
-        if (self.get_argument("instrument")=="NIRCam"): 
-            with open(os.path.join(os.path.dirname(__file__), "reference",
-                               "nircam_input.json")) as data_file:
+                pandata["configuration"]["detector"]["subarray"] = self.get_argument("nirspecsubarray")
+
+        if instrument == "NIRCam":
+            with open(os.path.join(os.path.dirname(__file__), "reference", "nircam_input.json")) as data_file:
                 pandata = json.load(data_file) 
-                pandata["configuration"]["instrument"]["filter"]  = self.get_argument("nircammode")
-                pandata["configuration"]["detector"]["subarray"]  = self.get_argument("nircamsubarray")
-        if (self.get_argument("instrument")=="NIRISS"): 
-            with open(os.path.join(os.path.dirname(__file__), "reference",
-                               "niriss_input.json")) as data_file:
-                pandata = json.load(data_file) 
+                pandata["configuration"]["instrument"]["filter"] = self.get_argument("nircammode")
+                pandata["configuration"]["detector"]["subarray"] = self.get_argument("nircamsubarray")
+
+        if instrument == "NIRISS":
+            with open(os.path.join(os.path.dirname(__file__), "reference", "niriss_input.json")) as data_file:
+                pandata = json.load(data_file)
                 nirissmode = self.get_argument("nirissmode")
                 pandata["configuration"]["detector"]["subarray"] = nirissmode
+
+        pandata['configuration']['instrument']['instrument'] = instrument
         
-        #write in optimal groups or set a number 
+        # write in optimal groups or set a number
         try:
             pandata["configuration"]["detector"]["ngroup"] = int(self.get_argument("optimize"))
         except: 
             pandata["configuration"]["detector"]["ngroup"] = self.get_argument("optimize")
         
-        finaldata = {"pandeia_input": pandata , "pandexo_input":exodata}
+        finaldata = {"pandeia_input": pandata, "pandexo_input": exodata}
         print(finaldata)
         task = self.executor.submit(wrapper, finaldata)
 
