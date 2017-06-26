@@ -228,7 +228,10 @@ be helpful to put this in your ~/.bashrc file.</p>
 <h3>TypeError: ‘float’ object cannot be interpreted as an index<a class="headerlink" href="#typeerror-float-object-cannot-be-interpreted-as-an-index" title="Permalink to this headline">¶</a></h3>
 <p>This is an error within Pandeia, which has not yet been fixed by STScI folk. You can easily fix it by finding where the file /pandeia/engine/coords.py is and changing line 36:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">ones</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">ny</span><span class="p">,</span> <span class="n">nx</span><span class="p">))</span>
-<span class="n">ones</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">ny</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">nx</span><span class="p">)))</span>
+</pre></div>
+</div>
+<p>To this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">ones</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">ny</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">nx</span><span class="p">)))</span>
 </pre></div>
 </div>
 </div>
