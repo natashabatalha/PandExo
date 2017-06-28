@@ -1,0 +1,446 @@
+{% extends "base.html" %}
+
+{% block css %}
+<link rel="stylesheet" href="http://cdn.pydata.org/bokeh/release/bokeh-0.11.1.min.css" type="text/css"/>
+<link href="{{ static_url('css/select2.min.css')}}" rel="stylesheet">
+<link href="{{ static_url('css/select2-bootstrap-theme.min.css')}}" rel="stylesheet">
+<link href="{{ static_url('css/icheck-bootstrap.min.css')}}" rel="stylesheet">
+{% end %}
+
+{% block body %}
+<h1 class="page-header">New JWST Calculation</h1>
+
+<form enctype="multipart/form-data" class="form-horizontal" action="/calculation/new" method="post" id="calculation-form">
+
+    <div class="form-group">
+        <label class="col-md-3 control-label" for="calcName">Name</label>
+
+        <div class="col-md-9">
+            <input type="text" class="form-control" id="calcName" name="calcName" value="My New Calculation">
+            <p class="help-block">Provide a name for this calculation</p>
+        </div>
+    </div>
+
+    <hr class="col-md-11 col-md-offset-1">
+
+    <div class="form-group">
+        <label class="col-md-3 control-label" for="" style="top: 35px;">Stellar Model</label>
+        <div class="col-md-9">
+            <div class="radio-chooser">
+                <div class="radio-chooser-item">
+                    <label class="radio-chooser-content" for="stellarModelPhoenix">
+                        <input type="radio" name="stellarModel" id="stellarModelPhoenix" value="phoenix" />
+                        <div class="radio-chooser-title">Phoenix Grid Models</div>
+                    </label>
+                </div>
+                <div class="radio-chooser-item">
+                    <label class="radio-chooser-content" for="stellarModelUser">
+                        <input type="radio" name="stellarModel" id="stellarModelUser" value="user" />
+                        <div class="radio-chooser-title">User Defined Stellar Spectrum</div>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group hidden upload-stellar-section">
+        <div class="col-md-3 col-md-offset-3">
+            <button class="btn btn-block niceFileBtn" type="button">Choose File</button>
+            <input type="file" id="starFile" name="starFile" style="display: none;">
+            <p class="help-block text-center">Column 1: wavelength <br>Column 2: flux, no header</p>
+        </div>
+        <div class="col-md-3">
+            <select id="starwunits" name="starwunits" class="form-control" data-placeholder="Select Wavelength Units">
+                <option value=""></option>
+                <option value="um">micron</option>
+                <option value="nm">nanometer</option>
+                <option value="cm">centimeter</option>
+                <option value="Angs">Angstrom</option>
+                <option value="Hz">Hertz</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <select id="starfunits" name="starfunits" class="form-control" data-placeholder="Select Flux Units">
+                <option value=""></option>
+                <option value="Jy">Jy</option>
+                <option value="W/m2/um">W/m2/um</option>
+                <option value="FLAM">erg/cm2/s/Angs</option>
+                <option value="erg/s/cm2/Hz">erg/s/cm2/Hz</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="form-group hidden phoenix-section">
+        <div class="col-md-3 col-md-offset-3">
+            <div class="input-group">
+                <input type="text" class="form-control" id="temp" name="temp" >
+                <span class="input-group-addon">&deg; Kelvin</span>
+            </div>
+            <p class="help-block">Stellar temperature</p>
+        </div>
+        <div class="col-md-3">
+            <input type="text" class="form-control" id="metal" name="metal" >
+            <p class="help-block">Stellar metallicity</p>
+        </div>
+        <div class="col-md-3">
+            <input type="text" class="form-control" id="logg" name="logg" >
+            <p class="help-block">Stellar log g</p>
+        </div>
+   </div>
+
+    <div class="form-group hidden phoenix-section upload-stellar-section">
+        <label class="col-md-3 control-label" for="mag">Magnitude</label>
+        <div class="col-md-4 form-inline">
+            <input type="text" class="form-control" id="mag" name="mag" style="width: 70%;">
+            <div class="input-group-btn" style="width: 20%;left: -8px;display: inline-block;">
+                <select id="ref_wave" name="ref_wave" class="form-control" data-placeholder="Select Magnitude Units">
+                    <!--<option value=""></option>-->
+                    <option value="1.26">J</option>
+                    <option value="1.60">H</option>
+                    <option value="2.22">K</option>
+                </select>
+            </div>
+            <p class="help-block">Magnitude for Planet System</p>
+            <style>
+                .phoenix-section .select2-selection {
+                    border-top-left-radius: 0;border-bottom-left-radius: 0;
+                }
+            </style>
+        </div>
+    </div>
+
+    <hr class="col-md-11 col-md-offset-1">
+
+    <div class="form-group">
+        <label class="col-md-3 control-label" for="" style="top: 35px;">Planet Model</label>
+        <div class="col-md-9">
+            <div class="radio-chooser">
+                <div class="radio-chooser-item">
+                    <label class="radio-chooser-content" for="planetModelConstant">
+                        <input type="radio" name="planetModel" id="planetModelConstant" value="constant" />
+                        <div class="radio-chooser-title">Constant Transit Depth</div>
+                    </label>
+                </div>
+                <div class="radio-chooser-item">
+                    <label class="radio-chooser-content" for="planetModelUser">
+                        <input type="radio" name="planetModel" id="planetModelUser" value="user" />
+                        <div class="radio-chooser-title">User Defined Planet Spectrum</div>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group hidden upload-planet-section">
+        <div class="col-md-3 col-md-offset-3">
+            <button class="btn btn-block niceFileBtn" type="button">Choose File</button>
+            <input type="file" id="planFile" name="planFile" style="display: none">
+            <p class="help-block text-center">Column 1: wave or time <br>Column 2: Model, no header</p>
+        </div>
+        <div class="col-md-3">
+            <select id="planwunits" name="planwunits" class="form-control" data-placeholder="Select Wave or Time Units">
+                <option value=""></option>
+                <option value="sec">seconds</option>
+                <option value="um">micron</option>
+                <option value="nm">nanometer</option>
+                <option value="cm">centimeter</option>
+                <option value="Angs">Angstrom</option>
+                <option value="Hz">Hertz</option>                
+            </select>
+        </div>
+        <div class="col-md-3">
+            <select id="planfunits" name="planfunits" class="form-control" data-placeholder="Select Planet Model Units">
+                <option value=""></option>
+                <option value="rp^2/r*^2">(R<sub>p</sub>/R<sub>*</sub>)^2 (primary)</option>
+                <option value="fp/f*">F<sub>p</sub>/F<sub>*</sub> (secondary/phase curve)</option>
+            </select>
+        </div>  
+    </div>
+
+    <div class="form-group hidden constant-transit-section">
+        <div class="col-md-4 col-md-offset-3">
+            <div class="input-group">
+                <input type="text" class="form-control" id="transit_depth" name="transit_depth">
+                <span class="input-group-addon">(R<sub>p</sub>/R<sub>*</sub>)<sup>2</sup></span>
+            </div>
+            <p class="help-block">Wavelength-independent transit depth</p>
+        </div>
+    </div>
+
+    <hr class="col-md-11 col-md-offset-1">
+
+    <div class="form-group">
+        <label class="col-md-3 control-label" for="transit_duration">Transit Duration</label>
+        <div class="col-md-4">
+            <div class="input-group">
+                <input type="text" class="form-control" id="transit_duration" name="transit_duration">
+                <span class="input-group-addon">seconds</span>
+            </div>
+            <p class="help-block">For phase curves, will derive duration of phase from input file.</p>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-md-3 control-label" for="fraction">In:Out Ratio</label>
+        <div class="col-md-4">
+            <input type="text" class="form-control" id="fraction" name="fraction" >
+            <p class="help-block">Fraction of time spent in versus out of transit</p>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-md-3 control-label" for="numtrans">Number of Transits</label>
+        <div class="col-md-4">
+            <input type="text" class="form-control" id="numtrans" name="numtrans" >
+            <p class="help-block">Or number of phase observations</p>
+        </div>
+    </div>
+
+    <hr class="col-md-11 col-md-offset-1">
+
+    <div class="form-group">
+        <div class="col-md-6 col-md-offset-3">
+            <h4>JWST Instrument Modes</h4>
+        </div>
+        <div class="col-md-6 col-md-offset-3">
+            <img id="full" alt="-" width="660" height="426" src="../static/img/pec_res.jpg" style="left: -63px;position: relative;">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-md-3 control-label" for="instrument">Instrument</label>
+        <div class="col-md-6">
+            <select id="instrument" name="instrument" class="form-control" data-placeholder="Select Instrument">
+                <option value=""></option>
+                <option value="MIRI">MIRI Low Resolution Spectroscopy</option>
+                <option value="NIRSpec">NIRSpec Bright Object Time Series</option>
+                <option value="NIRCam">NIRCam Grism Time Series</option>
+                <option value="NIRISS">NIRISS Single Object Slitless Spectroscopy</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="form-group hidden" id="instrument-mode-section">
+        <label class="col-md-3 control-label" for="mirimode">Mode</label>
+        <div class="col-md-4" id="MIRI">
+            <select id="mirimode" name="mirimode" class="form-control" data-placeholder="Select MIRI Mode">
+                <option value=""></option>
+                <option value="lrsslitless">Slitless LRS</option>
+                <option value="lrsslit">Slit LRS</option>
+            </select>
+        </div>
+
+        <div class="col-md-6" id="NIRSpec">
+            <div class="col-md-6" style="padding-left: 0;">
+                <select id="nirspecmode" name="nirspecmode" class="form-control" data-placeholder="Select NIRSpec Mode">
+                    <option value=""></option>
+                    <option value="g140mf070lp">G140 R=1000 f070lp</option>
+                    <option value="g140hf070lp">G140 R=2700 f070lp</option>
+                    <option value="g140mf100lp">G140 R=1000 f100lp</option>
+                    <option value="g140hf100lp">G140 R=2700 f100lp</option>
+                    <option value="g235mf170lp">G235 R=1000 f170lp</option>
+                    <option value="g235hf170lp">G235 R=2700 f170lp</option>
+                    <option value="g395mf290lp">G395 R=1000 f290lp</option>
+                    <option value="g395hf290lp">G395 R=2700 f290lp</option>
+                    <option value="prismclear">Prism R=100 No filter</option>
+                </select>
+            </div>
+            <div class="col-md-6" style="padding-right: 0;">
+                <select id="nirspecsubarray" name="nirspecsubarray" class="form-control" data-placeholder="Select NIRSpec Subarray">
+                    <option value=""></option>
+                    <option value="sub1024a">S1600A1 SUB1024A</option>
+                    <option value="sub1024b">S1600A1 SUB1024B</option>
+                    <option value="sub2048">S1600A1 SUB2048</option>
+                    <option value="sub512">S1600A1 SUB512</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="col-md-6" id="NIRCam">
+            <div class="col-md-6" style="padding-left: 0;">
+                <select id="nircammode" name="nircammode" onchange="showForm()" class="form-control" data-placeholder="Select NIRCam Mode">
+                    <option value=""></option>
+                    <option value="f322w2">F322W2, 2.7-4 um</option>
+                    <option value="f444w">F444W, 4-5 um</option>
+                </select>
+            </div>
+            <div class="col-md-6" style="padding-right: 0;">
+                <select id="nircamsubarray" name="nircamsubarray" onchange="showForm()" class="form-control" data-placeholder="Select NIRCam Subarray">
+                    <option value=""></option>
+                    <option value="subgrism64">SUBGRISM64, 4 outs(tframe=0.34)</option>
+                    <option value="subgrism128">SUBGRISM128, 4 outs(tframe=0.67)</option>
+                    <option value="subgrism256">SUBGRISM258, 4 outs(tframe=1.34)</option>
+                    <option value="subgrism64 (noutputs=1)">SUBGRISM64, 1 out(tframe=1.3)</option>
+                    <option value="subgrism128 (noutputs=1)">SUBGRISM128, 1 out(tframe=2.6)</option>
+                    <option value="subgrism256 (noutputs=1)">SUBGRISM258, 1 out(tframe=5.2)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="col-md-4" id="NIRISS">
+            <select id="nirissmode" name="nirissmode" onchange="showForm()" class="form-control" data-placeholder="Select NIRISS Mode">
+                <option value=""></option>
+                <option value="substrip96">Substrip 96</option>
+                <option value="substrip256">Substrip 256</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-md-3 control-label" for="optimize">Number of Groups per Integration</label>
+        <div class="col-md-4">
+            <input type="text" class="form-control" id="optimize" name="optimize" value="optimize" >
+            <p class="help-block">Recommended to compute optimal groups per integration first (type "optimize"). But, you can also input any number from 2-65536. </p>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-md-3 control-label" for="satlevel">Percent Fullwell</label>
+        <div class="col-md-3">
+            <div class="input-group">
+                <input type="text" class="form-control" id="satlevel" name="satlevel" >
+                <span class="input-group-addon">%</span>
+            </div>
+            <p class="help-block">Percent fullwell of electrons.</p>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-md-3 control-label" for="" style="top: 35px;">Noise Floor</label>
+        <div class="col-md-9">
+            <div class="radio-chooser">
+                <div class="radio-chooser-item">
+                    <label class="radio-chooser-content" for="noiseModelConstant">
+                        <input type="radio" name="noiseModel" id="noiseModelConstant" value="constant-noise" />
+                        <div class="radio-chooser-title">Constant Minimum Noise</div>
+                    </label>
+                </div>
+                <div class="radio-chooser-item">
+                    <label class="radio-chooser-content" for="noiseModelUser">
+                        <input type="radio" name="noiseModel" id="noiseModelUser" value="user" />
+                        <div class="radio-chooser-title">User Defined Noise Model</div>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group hidden upload-noise-section">
+        <div class="col-md-3 col-md-offset-3">
+            <button class="btn btn-block niceFileBtn" type="button">Choose File</button>
+            <input type="file" id="noiseFile" name="noiseFile" style="display: none;">
+            <p class="help-block">Column 1: wavelength <br>Column 2: Noise Floor (ppm)</p>
+        </div>
+    </div>
+
+    <div class="form-group hidden constant-noise-section">
+        <div class="col-md-3 col-md-offset-3">
+            <div class="input-group">
+                <input type="text" class="form-control" id="noisefloor" name="noisefloor" >
+                <span class="input-group-addon">ppm</span>
+            </div>
+            <p class="help-block">Constant Minimum Noise</p>
+        </div>
+    </div>  
+
+    <div class="form-group">
+        <div class="col-sm-offset-3 col-sm-9">
+            <button type="submit" class="btn btn-success">Submit</button>
+            {% module xsrf_form_html() %}
+        </div>
+    </div>
+    
+</form>
+{% end %}
+
+{% block js %}        
+<script src="{{ static_url('js/starter.form.js') }}"></script>
+<script src="{{ static_url('js/select2.min.js') }}"></script>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        $("select").select2({
+            theme: "bootstrap",
+            width: "100%",
+            minimumResultsForSearch: 7
+        });
+
+        /* Nice block level radio selection */
+        $(".radio-chooser-content").click(function () {
+            $(".radio-chooser-item").removeClass("radio-chooser-selected");
+            $(this).parent().addClass("radio-chooser-selected");
+            switch ( $(this).find("input").attr("id") ) {
+                case "stellarModelPhoenix":
+                    $(".upload-stellar-section").addClass("hidden");
+                    $(".phoenix-section").removeClass("hidden");
+                    break;
+                case "stellarModelUser":
+                    $(".phoenix-section").addClass("hidden");
+                    $(".upload-stellar-section").removeClass("hidden");
+                    break;
+                case "planetModelConstant":
+                    $(".upload-planet-section").addClass("hidden");
+                    $(".constant-transit-section").removeClass("hidden");
+                    break;
+                case "planetModelUser":
+                    $(".constant-transit-section").addClass("hidden");
+                    $(".upload-planet-section").removeClass("hidden");
+                    break;
+                case "noiseModelConstant":
+                    $(".upload-noise-section").addClass("hidden");
+                    $(".constant-noise-section").removeClass("hidden");
+                    break;
+                case "noiseModelUser":
+                    $(".constant-noise-section").addClass("hidden");
+                    $(".upload-noise-section").removeClass("hidden");
+                    break;
+            }
+        });
+
+        /* File Browsing Button */
+        $(".niceFileBtn").click(function () {
+            $(this).parent().find("input").click().change(function () {
+                $(this).parent().find(".btn").css("display", "none");
+                $(this).css("display", "block");
+            });
+        });
+
+        /* Instrument Selection */
+        $("#instrument").change(function () {
+            $("#instrument-mode-section").removeClass("hidden");
+            $("#MIRI, #NIRSpec, #NIRISS, #NIRCam").addClass("hidden");
+            var selopt = $("#instrument").val();
+            switch (selopt) {
+                case "MIRI":
+                    $("#MIRI").removeClass("hidden");
+                    break;
+                case "NIRSpec":
+                    $("#NIRSpec").removeClass("hidden");
+                    break;
+                case "NIRISS":
+                    $("#NIRISS").removeClass("hidden");
+                    break;
+                case "NIRCam":
+                    $("#NIRCam").removeClass("hidden");
+                    break;
+            }
+        });
+    });
+
+    function pickStar() {
+        $("#starFile, #starwunits, #starfunits, #phoenix").addClass("hidden");
+        var selopt1 = document.getElementById("type").value;
+        switch (selopt1) {
+            case "user":
+                $("#starFile, #starwunits, #starfunits").removeClass("hidden");
+                break;
+            case "phoenix":
+                $("#phoenix").removeClass("hidden");
+                break;
+        }
+    }
+</script>
+
+
+<script type="text/javascript" src="http://cdn.pydata.org/bokeh/release/bokeh-0.11.1.min.js"></script>
+{% end %}
