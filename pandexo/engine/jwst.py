@@ -153,7 +153,7 @@ def compute_full_sim(dictinput):
 
 
     #compute warning flags for timing info 
-    warnings = add_warnings(out, timing, sat_level, flags, instrument) 
+    warnings = add_warnings(out, timing, sat_level/fullwell, flags, instrument) 
 
     compNoise = ExtractSpec(inn, out, rn, extraction_area, timing)
     
@@ -198,15 +198,25 @@ def compute_full_sim(dictinput):
     if R != None: 
         wbin = bin_wave_to_R(w, R)
         photon_out_bin = uniform_tophat_sum(wbin, w,extracted_flux_out)
+        wbin = wbin[photon_out_bin > 0 ]
         photon_in_bin = uniform_tophat_sum(wbin,w, extracted_flux_inn)
+        photon_in_bin = photon_in_bin[photon_out_bin > 0 ]
         var_in_bin = uniform_tophat_sum(wbin, w,varin)
+        var_in_bin = var_in_bin[photon_out_bin > 0 ]
         var_out_bin = uniform_tophat_sum(wbin,w, varout)
+        var_out_bin = var_out_bin[photon_out_bin > 0 ]
+        photon_out_bin = photon_out_bin
     else: 
         wbin = w
         photon_out_bin = extracted_flux_out
+        wbin = wbin[photon_out_bin>0]
         photon_in_bin = extracted_flux_inn
+        photon_in_bin = photon_in_bin[photon_out_bin>0]
         var_in_bin = varin
+        var_in_bin = var_in_bin[photon_out_bin>0]
         var_out_bin = varout
+        var_out_bin = var_out_bin[photon_out_bin>0]
+        photon_out_bin = photon_out_bin[photon_out_bin>0]
     
     if calculation == 'phase_spec':
         to = timing["APT: Num Groups per Integration"]*tframe
@@ -590,7 +600,7 @@ def add_warnings(pand_dict, timing, sat_level, flags,instrument):
     timing : dict 
         output from **compute_timing** 
     sat_level : int or float 
-        user specified saturation level in electrons 
+        user specified saturation level in fractional (00/100)
     flags : dict 
         warning flags taken from output of **compute_timing**
     instrument : str 
@@ -622,9 +632,9 @@ def add_warnings(pand_dict, timing, sat_level, flags,instrument):
     flag_low = "All good"
     flag_perc = "All good"
 
-    if (sat_level > 80) & (ngroups_per_int <5):
+    if (sat_level > .80) & (ngroups_per_int <3):
         flag_low = "% full well>80% & only " + str(ngroups_per_int) + " groups"
-    if (sat_level > 80): 
+    if (sat_level > .80): 
         flag_perc = "% full well>80%"
 
      
