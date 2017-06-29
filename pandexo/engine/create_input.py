@@ -130,8 +130,11 @@ def bothTrans(out_trans, planet) :
         wave_planet = sort[:,0]
         flux_planet = sort[:,1]
         
-    elif planet['type'] == 'database':
-        raise Exception("Empty Database")
+    elif planet['type'] == 'constant':
+        wave_planet = np.linspace(0.5,15,1000)
+        flux_planet = np.linspace(0.5,15,1000)*0 + planet['depth']
+        planet['w_unit'] = 'um'
+        planet['f_unit'] = 'rp^2/r*^2'
     else: 
         raise Exception("Incorrect Planet File") 
 

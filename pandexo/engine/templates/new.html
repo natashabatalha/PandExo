@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block css %}
-<link rel="stylesheet" href="http://cdn.pydata.org/bokeh/release/bokeh-0.11.1.min.css" type="text/css"/>
+<link rel="stylesheet" href="http://cdn.pydata.org/bokeh/release/bokeh-0.12.6.min.css" type="text/css"/>
 <link href="{{ static_url('css/select2.min.css')}}" rel="stylesheet">
 <link href="{{ static_url('css/select2-bootstrap-theme.min.css')}}" rel="stylesheet">
 <link href="{{ static_url('css/icheck-bootstrap.min.css')}}" rel="stylesheet">
@@ -100,7 +100,7 @@
                     <option value="2.22">K</option>
                 </select>
             </div>
-            <p class="help-block">Magnitude for Planet System</p>
+            <p class="help-block">Magnitude of Stellar Target</p>
             <style>
                 .phoenix-section .select2-selection {
                     border-top-left-radius: 0;border-bottom-left-radius: 0;
@@ -160,7 +160,7 @@
     <div class="form-group hidden constant-transit-section">
         <div class="col-md-4 col-md-offset-3">
             <div class="input-group">
-                <input type="text" class="form-control" id="transit_depth" name="transit_depth">
+                <input type="text" class="form-control" id="depth" name="depth">
                 <span class="input-group-addon">(R<sub>p</sub>/R<sub>*</sub>)<sup>2</sup></span>
             </div>
             <p class="help-block">Wavelength-independent transit depth</p>
@@ -442,5 +442,5 @@
 </script>
 
 
-<script type="text/javascript" src="http://cdn.pydata.org/bokeh/release/bokeh-0.11.1.min.js"></script>
+<script type="text/javascript" src="http://cdn.pydata.org/bokeh/release/bokeh-0.12.6.min.js"></script>
 {% end %}

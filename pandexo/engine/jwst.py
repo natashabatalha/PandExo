@@ -198,15 +198,25 @@ def compute_full_sim(dictinput):
     if R != None: 
         wbin = bin_wave_to_R(w, R)
         photon_out_bin = uniform_tophat_sum(wbin, w,extracted_flux_out)
+        wbin = wbin[photon_out_bin > 0 ]
         photon_in_bin = uniform_tophat_sum(wbin,w, extracted_flux_inn)
+        photon_in_bin = photon_in_bin[photon_out_bin > 0 ]
         var_in_bin = uniform_tophat_sum(wbin, w,varin)
+        var_in_bin = var_in_bin[photon_out_bin > 0 ]
         var_out_bin = uniform_tophat_sum(wbin,w, varout)
+        var_out_bin = var_out_bin[photon_out_bin > 0 ]
+        photon_out_bin = photon_out_bin
     else: 
         wbin = w
         photon_out_bin = extracted_flux_out
+        wbin = wbin[photon_out_bin>0]
         photon_in_bin = extracted_flux_inn
+        photon_in_bin = photon_in_bin[photon_out_bin>0]
         var_in_bin = varin
+        var_in_bin = var_in_bin[photon_out_bin>0]
         var_out_bin = varout
+        var_out_bin = var_out_bin[photon_out_bin>0]
+        photon_out_bin = photon_out_bin[photon_out_bin>0]
     
     if calculation == 'phase_spec':
         to = timing["APT: Num Groups per Integration"]*tframe

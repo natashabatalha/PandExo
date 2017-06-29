@@ -302,7 +302,7 @@ class CalculationNewHandler(BaseHandler):
                 exodata["star"]["starpath"] = os.path.join(__TEMP__, cname_star)
                 exodata["star"]["f_unit"] = self.get_argument("starfunits")
                 exodata["star"]["w_unit"] = self.get_argument("starwunits")
-            else:
+            elif exodata["star"]["type"] =="phoenix":
                 exodata["star"]["temp"] = float(self.get_argument("temp"))
                 exodata["star"]["logg"] = float(self.get_argument("logg"))
                 exodata["star"]["metal"] = float(self.get_argument("metal"))
@@ -323,9 +323,11 @@ class CalculationNewHandler(BaseHandler):
                 exodata["planet"]["exopath"] = os.path.join(__TEMP__, cname_plan)
                 exodata["planet"]["w_unit"] = self.get_argument("planwunits")
                 exodata["planet"]["f_unit"] = self.get_argument("planfunits")
-            else:
+            elif exodata["planet"]["type"] == "constant":
                 # TODO connect this variable with processing script
-                exodata["planet"]["transit_depth"] = self.get_argument("transit_depth")
+                exodata["planet"]["depth"] = float(self.get_argument("depth"))
+
+
             exodata["observation"]["fraction"] = float(self.get_argument("fraction"))
             exodata["observation"]["noccultations"] = float(self.get_argument("numtrans"))
             exodata["observation"]["sat_level"] = float(self.get_argument("satlevel"))
