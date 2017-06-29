@@ -59,7 +59,7 @@ class Application(tornado.web.Application):
             (r"/calculation/downloadpandin/([^/]+)", CalculationDownloadPandInHandler)
         ]
         settings = dict(
-            blog_title=u"Pandexo",
+            blog_title="Pandexo",
             template_path=os.path.join(os.path.dirname(__file__), "templates"),
             static_path=os.path.join(os.path.dirname(__file__), "static"),
             xsrf_cookies=True,
@@ -228,7 +228,7 @@ class DashboardHandler(BaseHandler):
     """
     def get(self):
         task_responses = [self._get_task_response(id) for id, nt in
-                          self.buffer.items()
+                          list(self.buffer.items())
                           if ((nt.cookie == self.get_cookie("pandexo_user"))
                           & (id[len(id)-1]=='e'))]
         
@@ -241,7 +241,7 @@ class DashboardHSTHandler(BaseHandler):
     """
     def get(self):
         task_responses = [self._get_task_response_hst(id) for id, nt in
-                          self.buffer.items()
+                          list(self.buffer.items())
                           if ((nt.cookie == self.get_cookie("pandexo_user"))
                           & (id[len(id)-1]=='h'))]
         
@@ -256,7 +256,7 @@ class DashboardSpecHandler(BaseHandler):
     """
     def get(self):
         task_responses = [self._get_task_response_spec(id) for id, nt in
-                          self.buffer.items()
+                          list(self.buffer.items())
                           if ((nt.cookie == self.get_cookie("pandexo_user"))
                           & (id[len(id)-1]=='s'))]
         self.render("dashboardspec.html", calculations=task_responses[::-1])
@@ -358,8 +358,8 @@ class CalculationNewHandler(BaseHandler):
             except:
                 exodata["observation"]["noise_floor"] = 0.0
 
-        instrument = self.get_argument("instrument")
-        if instrument == "MIRI":
+        instrument = self.get_argument("instrument").lower()
+        if instrument == "miri":
             with open(os.path.join(os.path.dirname(__file__), "reference", "miri_input.json")) as data_file:
                 pandata = json.load(data_file)       
                 mirimode = self.get_argument("mirimode")
@@ -368,7 +368,7 @@ class CalculationNewHandler(BaseHandler):
                     pandata["configuration"]["instrument"]["aperture"] = "lrsslit"
                     pandata["configuration"]["detector"]["subarray"] = "full"
 
-        if instrument == "NIRSpec":
+        if instrument == "nirspec":
             with open(os.path.join(os.path.dirname(__file__), "reference", "nirspec_input.json")) as data_file:
                 pandata = json.load(data_file)  
                 nirspecmode = self.get_argument("nirspecmode")
@@ -376,20 +376,20 @@ class CalculationNewHandler(BaseHandler):
                 pandata["configuration"]["instrument"]["filter"] = nirspecmode[5:11]
                 pandata["configuration"]["detector"]["subarray"] = self.get_argument("nirspecsubarray")
 
-        if instrument == "NIRCam":
+        if instrument == "nircam":
             with open(os.path.join(os.path.dirname(__file__), "reference", "nircam_input.json")) as data_file:
                 pandata = json.load(data_file) 
                 pandata["configuration"]["instrument"]["filter"] = self.get_argument("nircammode")
                 pandata["configuration"]["detector"]["subarray"] = self.get_argument("nircamsubarray")
 
-        if instrument == "NIRISS":
+        if instrument == "niriss":
             with open(os.path.join(os.path.dirname(__file__), "reference", "niriss_input.json")) as data_file:
                 pandata = json.load(data_file)
                 nirissmode = self.get_argument("nirissmode")
                 pandata["configuration"]["detector"]["subarray"] = nirissmode
 
         pandata['configuration']['instrument']['instrument'] = instrument
-        
+
         # write in optimal groups or set a number
         try:
             pandata["configuration"]["detector"]["ngroup"] = int(self.get_argument("optimize"))
@@ -649,7 +649,7 @@ class CalculationDownloadHandler(BaseHandler):
             return
         file_name = "ETC-calculation" +id+".p"
  
-        with open(os.path.join(__TEMP__,file_name), "w") as f:
+        with open(os.path.join(__TEMP__,file_name), "wb") as f:
             pickle.dump(result, f)
  
         buf_size = 4096
@@ -682,7 +682,7 @@ class CalculationDownloadSpecHandler(BaseHandler):
             return
         file_name = "spec-calculation" +id+".p"
  
-        with open(os.path.join(__TEMP__,file_name), "w") as f:
+        with open(os.path.join(__TEMP__,file_name), "wb") as f:
             pickle.dump(result, f)
  
         buf_size = 4096

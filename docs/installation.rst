@@ -72,6 +72,11 @@ This is an error within Pandeia, which has not yet been fixed by STScI folk. You
 .. code-block:: python 
    
     ones = np.ones((ny, nx))
+
+To this: 
+
+.. code-block:: python
+
     ones = np.ones((int(ny), int(nx)))
 
 Problems with PYFFTW?

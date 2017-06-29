@@ -2,8 +2,16 @@
 # On ubuntu/linux, run:
 # > cd /path/to/this/directory/
 # > sudo screen -S "Pandexo Server"
-# > python run_web_server.py
+# > sudo python3 run_web_server.py
 # This will enable the web server to run as a background process.
+#
+# The same applies for running a Jupyter IPython Notebook:
+# > cd /path/to/this/directory/
+# > sudo screen -S "Jupyter IPython Notebook"
+# > sudo jupyter notebook --allow-root
+#
+# To leave the screen:
+# Press [Ctrl-A] then [Ctrl-D]
 #
 # To reconnect to screen:
 # > screen -ls

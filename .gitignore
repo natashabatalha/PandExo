@@ -11,6 +11,9 @@ notebooks/*.html
 build/
 dist/
 *.egg-info/
+.eggs/
+.idea/
 
 # Mac files
 *.DS_Store
+__pycache__/

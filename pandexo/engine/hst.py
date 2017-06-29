@@ -112,7 +112,7 @@ def wfc3_obs(hmag, disperser, scanDirection, subarray, nsamp, samp_seq):
         elif samp_seq == 'spars25':
             exptime     = 0.853 + (nsamp-1)*22.9213 #SPARS25
         else:
-            print("****HALTED: Unknown SAMP_SEQ: %s" % samp_seq)
+            print(("****HALTED: Unknown SAMP_SEQ: %s" % samp_seq))
             return
     else:
         # GRISM256
@@ -123,7 +123,7 @@ def wfc3_obs(hmag, disperser, scanDirection, subarray, nsamp, samp_seq):
         elif samp_seq == 'spars25':
             exptime     = 0.278 + (nsamp-1)*22.346  #SPARS25
         else:
-            print("****HALTED: Unknown SAMP_SEQ: %s" % samp_seq)
+            print(("****HALTED: Unknown SAMP_SEQ: %s" % samp_seq))
             return
     
     # Recommended scan rate
@@ -161,7 +161,7 @@ def wfc3_obs(hmag, disperser, scanDirection, subarray, nsamp, samp_seq):
                          7.65510038e-01,  -6.24504499e+01,   5.51452028e-03]
         pointing    = c[0]*(1 - np.exp(-c[2]*(scanHeight-c[4]))) + c[1]*scanHeight + c[3]*scanRatep +c[5]*scanRatep**2
     else:
-        print("****HALTED: Unknown scan direction: %s" % scanDirection)
+        print(("****HALTED: Unknown scan direction: %s" % scanDirection))
         return
     # Estimate total frame time including overheads
     tottime     = exptime+read+pointing         #seconds
@@ -223,7 +223,7 @@ def wfc3_TExoNS(dictinput):
         refvar      = 9.75e7
         refexptime  = 103.129
     else:
-        print("****HALTED: Unknown disperser: %s" % disperser)
+        print(("****HALTED: Unknown disperser: %s" % disperser))
         return
     
     # Determine max recommended scan height
@@ -232,7 +232,7 @@ def wfc3_TExoNS(dictinput):
     elif subarray == 'grism256':
         maxScanHeight = 180
     else:
-        print("****HALTED: Unknown subarray aperture: %s" % subarray)
+        print(("****HALTED: Unknown subarray aperture: %s" % subarray))
         return
     
     # Define maximum frame time
@@ -244,7 +244,7 @@ def wfc3_TExoNS(dictinput):
     elif str(schedulability) == '100':
         obsTime   = 46.3*60
     else:
-        print("****HALTED: Unknown schedulability: %s" % schedulability)
+        print(("****HALTED: Unknown schedulability: %s" % schedulability))
         return
 
     
@@ -253,7 +253,7 @@ def wfc3_TExoNS(dictinput):
     if norbits == None:
         norbits = guessorbits
     elif norbits != guessorbits:
-        print("****WARNING: Number of specified HST orbits does not match number of recommended orbits: %0.0f" % guessorbits)
+        print(("****WARNING: Number of specified HST orbits does not match number of recommended orbits: %0.0f" % guessorbits))
 
      
     if nsamp == 0 or nsamp == None or samp_seq == None or samp_seq == "none":
@@ -264,9 +264,9 @@ def wfc3_TExoNS(dictinput):
     exptime, tottime, scanRate, scanHeight, fluence = wfc3_obs(hmag, disperser, scanDirection, 
                                                                subarray, nsamp, samp_seq)
     if scanHeight > maxScanHeight:
-        print("****WARNING: Computed scan height exceeds maximum recommended height of %0.0f pixels." % maxScanHeight)
+        print(("****WARNING: Computed scan height exceeds maximum recommended height of %0.0f pixels." % maxScanHeight))
     if exptime > maxExptime:
-        print("****WARNING: Computed frame time (%0.0f seconds) exceeds maximum recommended duration of %0.0f seconds." % (exptime,maxExptime))
+        print(("****WARNING: Computed frame time (%0.0f seconds) exceeds maximum recommended duration of %0.0f seconds." % (exptime,maxExptime)))
     
     # Compute number of data points (frames) per orbit
     ptsOrbit    = np.floor(obsTime/tottime)
@@ -392,7 +392,7 @@ def calc_start_window(eventType, rms, ptsOrbit, numOrbits, depth, inc, aRs, peri
         sfactor     = np.sqrt(1-ecc**2)/(1-ecc*np.sin(w*np.pi/180))   # Account for planet speed on eccentric orbits
         params.u    = [0.0, 0.0]                                      # limb darkening coefficients
     else:
-        print("****HALTED: Unknown event type: %s" % eventType)
+        print(("****HALTED: Unknown event type: %s" % eventType))
         return
     params.t0       = midpt/period          # phase of transit/eclipse
     params.per      = 1.                    # orbital period, units are orbital phase
@@ -465,13 +465,13 @@ def planet_spec(specfile, w_unit, disperser, deptherr, nchan, smooth=None):
     elif w_unit == 'nm':
         mwave /= 1000.
     else:
-        print("****HALTED: Unrecognized wavelength unit: '%s'" % w_unit)
+        print(("****HALTED: Unrecognized wavelength unit: '%s'" % w_unit))
         return
     
     # Smooth model spectrum (optional)
     if smooth != None:
-        import hst_smooth as sm
-        mspec = sm.smooth(mspec, smooth)
+        from .hst_smooth import smooth as sm
+        mspec = sm(mspec, smooth)
     
     # Determine disperser wavelength boundaries
     if disperser == 'g141':
@@ -481,7 +481,7 @@ def planet_spec(specfile, w_unit, disperser, deptherr, nchan, smooth=None):
         wmin = 0.84
         wmax = 1.13
     else:
-        print("****HALTED: Unrecognized disperser name: '%s'" % disperser)
+        print(("****HALTED: Unrecognized disperser name: '%s'" % disperser))
         return
     
     # Determine wavelength bins
@@ -570,7 +570,10 @@ def create_out_div(input_dict,minphase,maxphase):
         html rendered table
     """
     input_dict['Start observations between orbital phases'] = str(minphase)+'-'+str(maxphase)
-    input_div = pd.DataFrame(input_dict.items(), columns=['Component', 'Values']).to_html().encode()
+    input_div = pd.DataFrame.from_dict(input_dict, orient='index')
+    input_div.columns = ['Value']
+    input_div = input_div.to_html()
     input_div = '<table class="table table-striped"> \n' + input_div[36:len(input_div)]
+    input_div = input_div.encode()
     return input_div
     
