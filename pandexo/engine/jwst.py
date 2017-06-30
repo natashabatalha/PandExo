@@ -386,11 +386,11 @@ def compute_timing(m,transit_duration,expfact_out,noccultations):
         #divided by the time it takes for one frame. Note this does not include 
         #reset frames 
 
-        nframes_per_int = long(maxexptime_per_int/tframe)
+        nframes_per_int = np.floor(maxexptime_per_int/tframe)
     
         #for exoplanets nframe =1 an nskip always = 0 so ngroups_per_int 
         #and nframes_per_int area always the same 
-        ngroups_per_int = long(nframes_per_int/(nframe + nskip)) 
+        ngroups_per_int = np.floor(nframes_per_int/(nframe + nskip)) 
     
         #put restriction on number of groups 
         #there is a hard limit to the maximum number groups. 
