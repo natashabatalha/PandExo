@@ -90,11 +90,11 @@ def outTrans(input) :
     norm_flux = np.interp(ref_wave, wave, flux) 
 
     #get zero point for J H and K 
-    if (ref_wave <= 1.3) & (ref_wave >= 1.2):
+    if (ref_wave <= 1.3e3) & (ref_wave >= 1.2e3):
         zeropoint = 1.97e7
-    elif (ref_wave <= 1.7) & (ref_wave >= 1.6):
+    elif (ref_wave <= 1.7e3) & (ref_wave >= 1.6e3):
         zeropoint = 9.6e6
-    elif (ref_wave <= 2.3) & (ref_wave >= 2.1):
+    elif (ref_wave <= 2.3e3) & (ref_wave >= 2.1e3):
         zeropoint = 4.5e6
     else:
         raise Exception('Onlu J H and K zeropoints are included')
