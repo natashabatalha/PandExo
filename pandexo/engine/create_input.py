@@ -97,7 +97,7 @@ def outTrans(input) :
     elif (ref_wave <= 2.3e3) & (ref_wave >= 2.1e3):
         zeropoint = 4.5e6
     else:
-        raise Exception('Onlu J H and K zeropoints are included')
+        raise Exception('Only J H and K zeropoints are included')
 
     flux = flux/norm_flux*zeropoint*10**(-mag/2.5)
     
