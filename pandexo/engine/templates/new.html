@@ -5,6 +5,7 @@
 <link href="{{ static_url('css/select2.min.css')}}" rel="stylesheet">
 <link href="{{ static_url('css/select2-bootstrap-theme.min.css')}}" rel="stylesheet">
 <link href="{{ static_url('css/icheck-bootstrap.min.css')}}" rel="stylesheet">
+<link href="{{ static_url('css/form_validation.min.css')}}" rel="stylesheet">
 {% end %}
 
 {% block body %}
@@ -45,46 +46,70 @@
 
     <div class="form-group hidden upload-stellar-section">
         <div class="col-md-3 col-md-offset-3">
-            <button class="btn btn-block niceFileBtn" type="button">Choose File</button>
-            <input type="file" id="starFile" name="starFile" style="display: none;">
-            <p class="help-block text-center">Column 1: wavelength <br>Column 2: flux, no header</p>
+            <div class="form-group">
+                <div class="col-md-12">
+                    <button class="btn btn-block niceFileBtn" type="button">Choose File</button>
+                    <input type="file" id="starFile" name="starFile" style="display:none;padding:6px 1px;">
+                    <p class="help-block text-center">Column 1: wavelength <br>Column 2: flux, no header</p>
+                </div>
+            </div>
         </div>
         <div class="col-md-3">
-            <select id="starwunits" name="starwunits" class="form-control" data-placeholder="Select Wavelength Units">
-                <option value=""></option>
-                <option value="um">micron</option>
-                <option value="nm">nanometer</option>
-                <option value="cm">centimeter</option>
-                <option value="Angs">Angstrom</option>
-                <option value="Hz">Hertz</option>
-            </select>
+            <div class="form-group">
+                <div class="col-md-12">
+                    <select id="starwunits" name="starwunits" class="form-control" data-placeholder="Select Wavelength Units">
+                        <option value=""></option>
+                        <option value="um">micron</option>
+                        <option value="nm">nanometer</option>
+                        <option value="cm">centimeter</option>
+                        <option value="Angs">Angstrom</option>
+                        <option value="Hz">Hertz</option>
+                    </select>
+                </div>
+            </div>
         </div>
         <div class="col-md-3">
-            <select id="starfunits" name="starfunits" class="form-control" data-placeholder="Select Flux Units">
-                <option value=""></option>
-                <option value="Jy">Jy</option>
-                <option value="W/m2/um">W/m2/um</option>
-                <option value="FLAM">erg/cm2/s/Angs</option>
-                <option value="erg/s/cm2/Hz">erg/s/cm2/Hz</option>
-            </select>
+            <div class="form-group">
+                <div class="col-md-12">
+                    <select id="starfunits" name="starfunits" class="form-control" data-placeholder="Select Flux Units">
+                        <option value=""></option>
+                        <option value="Jy">Jy</option>
+                        <option value="W/m2/um">W/m2/um</option>
+                        <option value="FLAM">erg/cm2/s/Angs</option>
+                        <option value="erg/s/cm2/Hz">erg/s/cm2/Hz</option>
+                    </select>
+                </div>
+            </div>
         </div>
     </div>
 
     <div class="form-group hidden phoenix-section">
         <div class="col-md-3 col-md-offset-3">
-            <div class="input-group">
-                <input type="text" class="form-control" id="temp" name="temp" >
-                <span class="input-group-addon">&deg; Kelvin</span>
+            <div class="form-group">
+                <div class="col-md-12">
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="temp" name="temp" >
+                        <span class="input-group-addon">&deg; Kelvin</span>
+                    </div>
+                    <p class="help-block">Stellar temperature</p>
+                </div>
             </div>
-            <p class="help-block">Stellar temperature</p>
         </div>
         <div class="col-md-3">
-            <input type="text" class="form-control" id="metal" name="metal" >
-            <p class="help-block">Stellar metallicity</p>
+            <div class="form-group">
+                <div class="col-md-12">
+                    <input type="text" class="form-control" id="metal" name="metal" >
+                    <p class="help-block">Stellar metallicity</p>
+                </div>
+            </div>
         </div>
         <div class="col-md-3">
-            <input type="text" class="form-control" id="logg" name="logg" >
-            <p class="help-block">Stellar log g</p>
+            <div class="form-group">
+                <div class="col-md-12">
+                    <input type="text" class="form-control" id="logg" name="logg" >
+                    <p class="help-block">Stellar log g</p>
+                </div>
+            </div>
         </div>
    </div>
 
@@ -133,28 +158,40 @@
 
     <div class="form-group hidden upload-planet-section">
         <div class="col-md-3 col-md-offset-3">
-            <button class="btn btn-block niceFileBtn" type="button">Choose File</button>
-            <input type="file" id="planFile" name="planFile" style="display: none">
-            <p class="help-block text-center">Column 1: wave or time <br>Column 2: Model, no header</p>
+            <div class="form-group">
+                <div class="col-md-12">
+                    <button class="btn btn-block niceFileBtn" type="button">Choose File</button>
+                    <input type="file" id="planFile" name="planFile" style="display:none;padding:6px 1px;">
+                    <p class="help-block text-center">Column 1: wave or time <br>Column 2: Model, no header</p>
+                </div>
+            </div>
         </div>
         <div class="col-md-3">
-            <select id="planwunits" name="planwunits" class="form-control" data-placeholder="Select Wave or Time Units">
-                <option value=""></option>
-                <option value="sec">seconds</option>
-                <option value="um">micron</option>
-                <option value="nm">nanometer</option>
-                <option value="cm">centimeter</option>
-                <option value="Angs">Angstrom</option>
-                <option value="Hz">Hertz</option>                
-            </select>
+            <div class="form-group">
+                <div class="col-md-12">
+                    <select id="planwunits" name="planwunits" class="form-control" data-placeholder="Select Wave or Time Units">
+                        <option value=""></option>
+                        <option value="sec">seconds</option>
+                        <option value="um">micron</option>
+                        <option value="nm">nanometer</option>
+                        <option value="cm">centimeter</option>
+                        <option value="Angs">Angstrom</option>
+                        <option value="Hz">Hertz</option>
+                    </select>
+                </div>
+            </div>
         </div>
         <div class="col-md-3">
-            <select id="planfunits" name="planfunits" class="form-control" data-placeholder="Select Planet Model Units">
-                <option value=""></option>
-                <option value="rp^2/r*^2">(R<sub>p</sub>/R<sub>*</sub>)^2 (primary)</option>
-                <option value="fp/f*">F<sub>p</sub>/F<sub>*</sub> (secondary/phase curve)</option>
-            </select>
-        </div>  
+            <div class="form-group">
+                <div class="col-md-12">
+                    <select id="planfunits" name="planfunits" class="form-control" data-placeholder="Select Planet Model Units">
+                        <option value=""></option>
+                        <option value="rp^2/r*^2">(R<sub>p</sub>/R<sub>*</sub>)^2 (primary)</option>
+                        <option value="fp/f*">F<sub>p</sub>/F<sub>*</sub> (secondary/phase curve)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="form-group hidden constant-transit-section">
@@ -165,6 +202,7 @@
             </div>
             <p class="help-block">Wavelength-independent transit depth</p>
         </div>
+        <!-- TODO add constant transit units -->
     </div>
 
     <hr class="col-md-11 col-md-offset-1">
@@ -186,13 +224,14 @@
             <input type="text" class="form-control" id="fraction" name="fraction" >
             <p class="help-block">Fraction of time spent in versus out of transit</p>
         </div>
+        <!-- TODO out:in or in:out? -->
     </div>
 
     <div class="form-group">
         <label class="col-md-3 control-label" for="numtrans">Number of Transits</label>
         <div class="col-md-4">
             <input type="text" class="form-control" id="numtrans" name="numtrans" >
-            <p class="help-block">Or number of phase observations</p>
+            <p class="help-block">Number of transits or phase observations</p>
         </div>
     </div>
 
@@ -202,7 +241,7 @@
         <div class="col-md-6 col-md-offset-3">
             <h4>JWST Instrument Modes</h4>
         </div>
-        <div class="col-md-6 col-md-offset-3">
+        <div class="col-md-6 col-md-offset-3 col-sm-offset-1">
             <img id="full" alt="-" width="660" height="426" src="../static/img/pec_res.jpg" style="left: -63px;position: relative;">
         </div>
     </div>
@@ -231,49 +270,69 @@
         </div>
 
         <div class="col-md-6" id="NIRSpec">
-            <div class="col-md-6" style="padding-left: 0;">
-                <select id="nirspecmode" name="nirspecmode" class="form-control" data-placeholder="Select NIRSpec Mode">
-                    <option value=""></option>
-                    <option value="g140mf070lp">G140 R=1000 f070lp</option>
-                    <option value="g140hf070lp">G140 R=2700 f070lp</option>
-                    <option value="g140mf100lp">G140 R=1000 f100lp</option>
-                    <option value="g140hf100lp">G140 R=2700 f100lp</option>
-                    <option value="g235mf170lp">G235 R=1000 f170lp</option>
-                    <option value="g235hf170lp">G235 R=2700 f170lp</option>
-                    <option value="g395mf290lp">G395 R=1000 f290lp</option>
-                    <option value="g395hf290lp">G395 R=2700 f290lp</option>
-                    <option value="prismclear">Prism R=100 No filter</option>
-                </select>
-            </div>
-            <div class="col-md-6" style="padding-right: 0;">
-                <select id="nirspecsubarray" name="nirspecsubarray" class="form-control" data-placeholder="Select NIRSpec Subarray">
-                    <option value=""></option>
-                    <option value="sub1024a">S1600A1 SUB1024A</option>
-                    <option value="sub1024b">S1600A1 SUB1024B</option>
-                    <option value="sub2048">S1600A1 SUB2048</option>
-                    <option value="sub512">S1600A1 SUB512</option>
-                </select>
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <select id="nirspecmode" name="nirspecmode" class="form-control" data-placeholder="Select NIRSpec Mode">
+                                <option value=""></option>
+                                <option value="g140mf070lp">G140 R=1000 f070lp</option>
+                                <option value="g140hf070lp">G140 R=2700 f070lp</option>
+                                <option value="g140mf100lp">G140 R=1000 f100lp</option>
+                                <option value="g140hf100lp">G140 R=2700 f100lp</option>
+                                <option value="g235mf170lp">G235 R=1000 f170lp</option>
+                                <option value="g235hf170lp">G235 R=2700 f170lp</option>
+                                <option value="g395mf290lp">G395 R=1000 f290lp</option>
+                                <option value="g395hf290lp">G395 R=2700 f290lp</option>
+                                <option value="prismclear">Prism R=100 No filter</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <select id="nirspecsubarray" name="nirspecsubarray" class="form-control" data-placeholder="Select NIRSpec Subarray">
+                                <option value=""></option>
+                                <option value="sub1024a">S1600A1 SUB1024A</option>
+                                <option value="sub1024b">S1600A1 SUB1024B</option>
+                                <option value="sub2048">S1600A1 SUB2048</option>
+                                <option value="sub512">S1600A1 SUB512</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
         <div class="col-md-6" id="NIRCam">
-            <div class="col-md-6" style="padding-left: 0;">
-                <select id="nircammode" name="nircammode" onchange="showForm()" class="form-control" data-placeholder="Select NIRCam Mode">
-                    <option value=""></option>
-                    <option value="f322w2">F322W2, 2.7-4 um</option>
-                    <option value="f444w">F444W, 4-5 um</option>
-                </select>
-            </div>
-            <div class="col-md-6" style="padding-right: 0;">
-                <select id="nircamsubarray" name="nircamsubarray" onchange="showForm()" class="form-control" data-placeholder="Select NIRCam Subarray">
-                    <option value=""></option>
-                    <option value="subgrism64">SUBGRISM64, 4 outs(tframe=0.34)</option>
-                    <option value="subgrism128">SUBGRISM128, 4 outs(tframe=0.67)</option>
-                    <option value="subgrism256">SUBGRISM258, 4 outs(tframe=1.34)</option>
-                    <option value="subgrism64 (noutputs=1)">SUBGRISM64, 1 out(tframe=1.3)</option>
-                    <option value="subgrism128 (noutputs=1)">SUBGRISM128, 1 out(tframe=2.6)</option>
-                    <option value="subgrism256 (noutputs=1)">SUBGRISM258, 1 out(tframe=5.2)</option>
-                </select>
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <select id="nircammode" name="nircammode" onchange="showForm()" class="form-control" data-placeholder="Select NIRCam Mode">
+                                <option value=""></option>
+                                <option value="f322w2">F322W2, 2.7-4 um</option>
+                                <option value="f444w">F444W, 4-5 um</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <select id="nircamsubarray" name="nircamsubarray" onchange="showForm()" class="form-control" data-placeholder="Select NIRCam Subarray">
+                                <option value=""></option>
+                                <option value="subgrism64">SUBGRISM64, 4 outs(tframe=0.34)</option>
+                                <option value="subgrism128">SUBGRISM128, 4 outs(tframe=0.67)</option>
+                                <option value="subgrism256">SUBGRISM258, 4 outs(tframe=1.34)</option>
+                                <option value="subgrism64 (noutputs=1)">SUBGRISM64, 1 out(tframe=1.3)</option>
+                                <option value="subgrism128 (noutputs=1)">SUBGRISM128, 1 out(tframe=2.6)</option>
+                                <option value="subgrism256 (noutputs=1)">SUBGRISM258, 1 out(tframe=5.2)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -328,7 +387,7 @@
     <div class="form-group hidden upload-noise-section">
         <div class="col-md-3 col-md-offset-3">
             <button class="btn btn-block niceFileBtn" type="button">Choose File</button>
-            <input type="file" id="noiseFile" name="noiseFile" style="display: none;">
+            <input type="file" id="noiseFile" name="noiseFile" style="display:none;padding:6px 1px;">
             <p class="help-block">Column 1: wavelength <br>Column 2: Noise Floor (ppm)</p>
         </div>
     </div>
@@ -425,6 +484,349 @@
                     break;
             }
         });
+
+        /* Form Validation */
+        FormValidation.Validator.choiceTextNumber = {
+            validate: function(validator, $field, options) {
+                var value = $field.val();
+                if (value === '') {
+                    return true;
+                }
+
+                // Get validator settings
+                var text = options.text,
+                    min  = options.min,
+                    max  = options.max;
+
+                // Check if has correct text
+                if (value === text) {
+                    return true;
+                }
+
+                // Check if contains number
+                if (!$.isNumeric(value)) {
+                    return {
+                        valid: false,
+                        message: "Must be either '"+text+"' (recommended) or a number between "+min+" and "+max
+                    };
+                }
+                value = parseFloat(value);
+
+                // Check the bounds of the number
+                if (value < min || value > max) {
+                    return {
+                        valid: false,
+                        message: "Must be either '"+text+"' (recommended) or a number between "+min+" and "+max
+                    };
+                }
+
+                return true;
+            }
+        };
+
+        $('#calculation-form').formValidation({
+            framework: 'bootstrap',
+            icon: {
+                valid: 'glyphicon glyphicon-ok',
+                invalid: 'glyphicon glyphicon-remove',
+                validating: 'glyphicon glyphicon-refresh'
+            },
+            fields: {
+                calcName: {
+                    validators: {
+                        notEmpty: {
+                            message: 'Calculation name is required'
+                        }
+                    }
+                },
+                stellarModel: {
+                    validators: {
+                        notEmpty: {
+                            message: 'Stellar model is required'
+                        }
+                    }
+                },
+                starFile: {
+                    excluded: function () {
+                        return !$("#stellarModelUser").is(":checked");
+                    },
+                    validators: {
+                        notEmpty: {
+                            message: 'Stellar Spectrum file is required'
+                        },
+                        file: {
+                            type: 'text/plain',
+                            message: 'Please choose a text file'
+                        }
+                    }
+                },
+                starwunits: {
+                    validators: {
+                        notEmpty: {
+                            message: 'Stellar wavelength units are required'
+                        }
+                    }
+                },
+                starfunits: {
+                    validators: {
+                        notEmpty: {
+                            message: 'Stellar flux units are required'
+                        }
+                    }
+                },
+                temp: {
+                    validators: {
+                        notEmpty: {
+                            message: 'Stellar temperature is required'
+                        },
+                        numeric: {
+                            message: 'Stellar temperature must be a number'
+                        }
+                    }
+                },
+                metal: {
+                    validators: {
+                        notEmpty: {
+                            message: 'Stellar metallicity is required'
+                        },
+                        numeric: {
+                            message: 'Stellar metallicity must be a number'
+                        },
+                        between: {
+                            min: -5,
+                            max: 5,
+                            message: 'Stellar metallicity must be between -5 and 5'
+                            // TODO is this a correct assumption?
+                        }
+                    }
+                },
+                logg: {
+                    validators: {
+                        notEmpty: {
+                            message: 'Stellar log g is required'
+                        },
+                        numeric: {
+                            message: 'Stellar log g must be a number'
+                        }
+                    }
+                },
+                mag: {
+                    validators: {
+                        notEmpty: {
+                            message: 'Magnitude is required'
+                        },
+                        numeric: {
+                            message: 'Magnitude must be a number'
+                        }
+                    }
+                },
+                planetModel: {
+                    validators: {
+                        notEmpty: {
+                            message: 'Planet model is required'
+                        }
+                    }
+                },
+                planFile: {
+                    excluded: function () {
+                        return !$("#planetModelUser").is(":checked");
+                    },
+                    validators: {
+                        notEmpty: {
+                            message: 'Planet Spectrum file is required'
+                        },
+                        file: {
+                            type: 'text/plain',
+                            message: 'Please choose a text file'
+                        }
+                    }
+                },
+                planwunits: {
+                    validators: {
+                        notEmpty: {
+                            message: 'Planet time/wave units are required'
+                        }
+                    }
+                },
+                planfunits: {
+                    validators: {
+                        notEmpty: {
+                            message: 'Planet model units are required'
+                        }
+                    }
+                },
+                depth: {
+                    validators: {
+                        notEmpty: {
+                            message: 'Wavelength-independent transit depth is required'
+                        },
+                        numeric: {
+                            message: 'Wavelength-independent transit depth must be a number'
+                        }
+                    }
+                },
+                transit_duration: {
+                    validators: {
+                        numeric: {
+                            message: 'Transit duration must be a number'
+                        },
+                        greaterThan: {
+                            value: 60,
+                            message: 'Transit duration must be in seconds (greater than 60 seconds)'
+                        }
+                    }
+                },
+                fraction: {
+                    validators: {
+                        notEmpty: {
+                            message: 'In:out ratio is required'
+                        },
+                        numeric: {
+                            message: 'In:out ratio must be a number'
+                        }
+                        // TODO between specific values?
+                    }
+                },
+                numtrans: {
+                    validators: {
+                        notEmpty: {
+                            message: 'Transit number is required'
+                        },
+                        numeric: {
+                            message: 'Must be a number of transits'
+                        },
+                        integer: {
+                            message: 'Must be an integer number of transits'
+                        },
+                        greaterThan: {
+                            value: 0,
+                            inclusive: false,
+                            message: 'Transit number must be greater than 0'
+                        }
+                    }
+                },
+                instrument: {
+                    validators: {
+                        notEmpty: {
+                            message: 'Instrument selection is required'
+                        }
+                    }
+                },
+                mirimode: {
+                    validators: {
+                        notEmpty: {
+                            message: 'Please select a MIRI Mode'
+                        }
+                    }
+                },
+                nirspecmode: {
+                    validators: {
+                        notEmpty: {
+                            message: 'Please select a NIRSpec Mode'
+                        }
+                    }
+                },
+                nirspecsubarray: {
+                    validators: {
+                        notEmpty: {
+                            message: 'Please select a NIRSpec Subarray'
+                        }
+                    }
+                },
+                nircammode: {
+                    validators: {
+                        notEmpty: {
+                            message: 'Please select a NIRCam Mode'
+                        }
+                    }
+                },
+                nircamsubarray: {
+                    validators: {
+                        notEmpty: {
+                            message: 'Please select a NIRCam Subarray'
+                        }
+                    }
+                },
+                nirissmode: {
+                    validators: {
+                        notEmpty: {
+                            message: 'Please select a NIRISS Mode'
+                        }
+                    }
+                },
+                optimize: {
+                    validators: {
+                        notEmpty: {
+                            message: 'Number of transits is required'
+                        },
+                        choiceTextNumber: {
+                            text: 'optimize',
+                            min: 2,
+                            max: 65536,
+                            message: 'Must be a number of transits'
+                        }
+                    }
+                },
+                satlevel: {
+                    validators: {
+                        notEmpty: {
+                            message: 'Percent fullwell of electrons is required'
+                        },
+                        between: {
+                            min: 0,
+                            max: 100,
+                            message: 'Must be a percentage between 0 and 100'
+                        }
+                    }
+                },
+                noiseModel: {
+                    validators: {
+                        notEmpty: {
+                            message: 'Noise model is required'
+                        }
+                    }
+                },
+                noiseFile: {
+                    excluded: function () {
+                        return !$("#noiseModelUser").is(":checked");
+                    },
+                    validators: {
+                        notEmpty: {
+                            message: 'Noise Floor file is required'
+                        },
+                        file: {
+                            type: 'text/plain',
+                            message: 'Please choose a text file'
+                        }
+                    }
+                },
+                noisefloor: {
+                    validators: {
+                        notEmpty: {
+                            message: 'Noise floor is required'
+                        },
+                        numeric: {
+                            message: 'Noise floor must be a number'
+                        },
+                        greaterThan: {
+                            value: 0,
+                            message: 'Noise floor must be greater than 0'
+                        }
+                    }
+                }
+            }
+        }).on('err.field.fv', function(e, data) {
+            // $(e.target)  --> The field element
+            // data.fv      --> The FormValidation instance
+            // data.field   --> The field name
+            // data.element --> The field element
+
+            // Hide the messages
+            var hiddenMessageList = ["stellarModel", "planetModel", "noiseModel"];
+            $.each(hiddenMessageList, function (i, val) {
+//                data.element.data('fv.messages').find('.help-block[data-fv-for="' + val + '"]').hide();
+            });
+        });
     });
 
     function pickStar() {
@@ -441,6 +843,6 @@
     }
 </script>
 
-
+<script type="text/javascript" src="{{ static_url('js/form_validation.min.js')}}"></script>
 <script type="text/javascript" src="http://cdn.pydata.org/bokeh/release/bokeh-0.12.6.min.js"></script>
 {% end %}
