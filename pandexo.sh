@@ -30,5 +30,8 @@ conda install pyfftw
 
 conda install numpy scipy astropy pyfftw pysynphot photutils
 
+######### Try multiprocessing for 2.7 users##########
+conda install multiprocessing || echo 'OKAY that Multiprocessing not found. Python 3 user'
+
 ########## RUN TEST ###############
 python run_test.py
