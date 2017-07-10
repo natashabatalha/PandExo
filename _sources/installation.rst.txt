@@ -5,7 +5,7 @@
 
 Before we start, the scripts written to install PandExo assume the user has installed `Anaconda <https://www.continuum.io/downloads>`_. For diehard pip users, know that STScI tools will be only distributed on conda so PandExo will not be the only package to use it. 
 
-If you are dead set against it you will need to follow the installation guidelines 'here <https://natashabatalha.github.io/PandExo/installation.html>`_. 
+If you are dead set against it you will need to follow the installation guidelines `here <https://natashabatalha.github.io/PandExo/installation.html>`_. 
 
 Pre-installation Data Download
 ==============================

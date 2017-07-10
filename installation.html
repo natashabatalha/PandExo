@@ -101,7 +101,7 @@
 <li class="toctree-l1"><a class="reference internal" href="#installation-for-users-with-pip">Installation for Users With PIP</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#set-environment">Set Environment</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#dependencies">Dependencies</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#id3">COORDS.PY: TypeError: ‘float’ object cannot be interpreted as an index</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id4">COORDS.PY: TypeError: ‘float’ object cannot be interpreted as an index</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="#todos">TODOS</a></li>
@@ -178,7 +178,7 @@
 <p class="last">Before reading further, if you do not wish to install PandExo,there is an online version of the code here here at <a class="reference external" href="http://pandexo.science.psu.edu:1111">PSU Science</a> or here at NASA GSFC.</p>
 </div>
 <p>Before we start, the scripts written to install PandExo assume the user has installed <a class="reference external" href="https://www.continuum.io/downloads">Anaconda</a>. For diehard pip users, know that STScI tools will be only distributed on conda so PandExo will not be the only package to use it.</p>
-<p>If you are dead set against it you will need to follow the installation guidelines ‘here &lt;<a class="reference external" href="https://natashabatalha.github.io/PandExo/installation.html">https://natashabatalha.github.io/PandExo/installation.html</a>&gt;`_.</p>
+<p>If you are dead set against it you will need to follow the installation guidelines <a class="reference external" href="https://natashabatalha.github.io/PandExo/installation.html">here</a>.</p>
 <div class="section" id="pre-installation-data-download">
 <h1>Pre-installation Data Download<a class="headerlink" href="#pre-installation-data-download" title="Permalink to this headline">¶</a></h1>
 <p>ss mentioned, the user must provide their own reference data files in order for the engine to understand the instrument with which the calculations will be performed. First step to getting PandExo running is downloading four files. Download them and put them in the same directory.</p>
@@ -277,8 +277,8 @@ SUCCESS
 </div>
 <p>Hopefully you have had success but if not the most likely error you will get is the following:</p>
 </div>
-<div class="section" id="id3">
-<h2>COORDS.PY: TypeError: ‘float’ object cannot be interpreted as an index<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id4">
+<h2>COORDS.PY: TypeError: ‘float’ object cannot be interpreted as an index<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
 <p>This is an error within Pandeia, which has not yet been fixed by STScI folk. You can easily fix it by finding where the file /pandeia/engine/coords.py is and changing line 36:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">ones</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">ny</span><span class="p">,</span> <span class="n">nx</span><span class="p">))</span>
 </pre></div>
