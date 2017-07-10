@@ -87,7 +87,10 @@
             
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../includeme.html">Getting Started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Pre-installation Data Download</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html#installation-for-users-with-conda">Installation for Users With Conda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html#installation-for-users-with-pip">Installation for Users With PIP</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html#todos">TODOS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorialjwst.html">JWST Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../jwstinput.html">Possible Instrument Input Params</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../jwstdict.html">Py Dict Structure of JWST Output</a></li>
@@ -188,13 +191,13 @@
     <span class="n">telescope</span> <span class="o">=</span> <span class="n">pandeia_input</span><span class="p">[</span><span class="s1">&#39;telescope&#39;</span><span class="p">]</span>
 
     <span class="k">if</span> <span class="n">telescope</span><span class="o">==</span><span class="s1">&#39;jwst&#39;</span><span class="p">:</span>
-        <span class="kn">from</span> <span class="nn">jwst</span> <span class="k">import</span> <span class="n">compute_full_sim</span>
+        <span class="kn">from</span> <span class="nn">.jwst</span> <span class="k">import</span> <span class="n">compute_full_sim</span>
         <span class="k">return</span> <span class="n">compute_full_sim</span><span class="p">(</span><span class="n">dictinput</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">telescope</span><span class="o">==</span><span class="s1">&#39;hst&#39;</span><span class="p">:</span>
-        <span class="kn">from</span> <span class="nn">hst</span> <span class="k">import</span> <span class="n">compute_sim_hst</span> 
+        <span class="kn">from</span> <span class="nn">.hst</span> <span class="k">import</span> <span class="n">compute_sim_hst</span>
         <span class="k">return</span> <span class="n">compute_sim_hst</span><span class="p">(</span><span class="n">dictinput</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">telescope</span><span class="o">==</span><span class="s1">&#39;wfirst&#39;</span><span class="p">:</span>
-        <span class="k">return</span>     
+        <span class="k">return</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;INVALID TELESCOPE. PandExo only accepts: jwst, hst, wfirst&quot;</span><span class="p">)</span></div>
 </pre></div>

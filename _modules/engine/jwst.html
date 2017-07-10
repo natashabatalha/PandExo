@@ -87,7 +87,10 @@
             
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../includeme.html">Getting Started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Pre-installation Data Download</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html#installation-for-users-with-conda">Installation for Users With Conda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html#installation-for-users-with-pip">Installation for Users With PIP</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html#todos">TODOS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorialjwst.html">JWST Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../jwstinput.html">Possible Instrument Input Params</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../jwstdict.html">Py Dict Structure of JWST Output</a></li>
@@ -312,7 +315,7 @@
 
 
     <span class="c1">#compute warning flags for timing info </span>
-    <span class="n">warnings</span> <span class="o">=</span> <span class="n">add_warnings</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">timing</span><span class="p">,</span> <span class="n">sat_level</span><span class="p">,</span> <span class="n">flags</span><span class="p">,</span> <span class="n">instrument</span><span class="p">)</span> 
+    <span class="n">warnings</span> <span class="o">=</span> <span class="n">add_warnings</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">timing</span><span class="p">,</span> <span class="n">sat_level</span><span class="o">/</span><span class="n">fullwell</span><span class="p">,</span> <span class="n">flags</span><span class="p">,</span> <span class="n">instrument</span><span class="p">)</span> 
 
     <span class="n">compNoise</span> <span class="o">=</span> <span class="n">ExtractSpec</span><span class="p">(</span><span class="n">inn</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">rn</span><span class="p">,</span> <span class="n">extraction_area</span><span class="p">,</span> <span class="n">timing</span><span class="p">)</span>
     
@@ -357,15 +360,25 @@
     <span class="k">if</span> <span class="n">R</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span> 
         <span class="n">wbin</span> <span class="o">=</span> <span class="n">bin_wave_to_R</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">R</span><span class="p">)</span>
         <span class="n">photon_out_bin</span> <span class="o">=</span> <span class="n">uniform_tophat_sum</span><span class="p">(</span><span class="n">wbin</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span><span class="n">extracted_flux_out</span><span class="p">)</span>
+        <span class="n">wbin</span> <span class="o">=</span> <span class="n">wbin</span><span class="p">[</span><span class="n">photon_out_bin</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">]</span>
         <span class="n">photon_in_bin</span> <span class="o">=</span> <span class="n">uniform_tophat_sum</span><span class="p">(</span><span class="n">wbin</span><span class="p">,</span><span class="n">w</span><span class="p">,</span> <span class="n">extracted_flux_inn</span><span class="p">)</span>
+        <span class="n">photon_in_bin</span> <span class="o">=</span> <span class="n">photon_in_bin</span><span class="p">[</span><span class="n">photon_out_bin</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">]</span>
         <span class="n">var_in_bin</span> <span class="o">=</span> <span class="n">uniform_tophat_sum</span><span class="p">(</span><span class="n">wbin</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span><span class="n">varin</span><span class="p">)</span>
+        <span class="n">var_in_bin</span> <span class="o">=</span> <span class="n">var_in_bin</span><span class="p">[</span><span class="n">photon_out_bin</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">]</span>
         <span class="n">var_out_bin</span> <span class="o">=</span> <span class="n">uniform_tophat_sum</span><span class="p">(</span><span class="n">wbin</span><span class="p">,</span><span class="n">w</span><span class="p">,</span> <span class="n">varout</span><span class="p">)</span>
+        <span class="n">var_out_bin</span> <span class="o">=</span> <span class="n">var_out_bin</span><span class="p">[</span><span class="n">photon_out_bin</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">]</span>
+        <span class="n">photon_out_bin</span> <span class="o">=</span> <span class="n">photon_out_bin</span>
     <span class="k">else</span><span class="p">:</span> 
         <span class="n">wbin</span> <span class="o">=</span> <span class="n">w</span>
         <span class="n">photon_out_bin</span> <span class="o">=</span> <span class="n">extracted_flux_out</span>
+        <span class="n">wbin</span> <span class="o">=</span> <span class="n">wbin</span><span class="p">[</span><span class="n">photon_out_bin</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">photon_in_bin</span> <span class="o">=</span> <span class="n">extracted_flux_inn</span>
+        <span class="n">photon_in_bin</span> <span class="o">=</span> <span class="n">photon_in_bin</span><span class="p">[</span><span class="n">photon_out_bin</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">var_in_bin</span> <span class="o">=</span> <span class="n">varin</span>
+        <span class="n">var_in_bin</span> <span class="o">=</span> <span class="n">var_in_bin</span><span class="p">[</span><span class="n">photon_out_bin</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">var_out_bin</span> <span class="o">=</span> <span class="n">varout</span>
+        <span class="n">var_out_bin</span> <span class="o">=</span> <span class="n">var_out_bin</span><span class="p">[</span><span class="n">photon_out_bin</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">photon_out_bin</span> <span class="o">=</span> <span class="n">photon_out_bin</span><span class="p">[</span><span class="n">photon_out_bin</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">]</span>
     
     <span class="k">if</span> <span class="n">calculation</span> <span class="o">==</span> <span class="s1">&#39;phase_spec&#39;</span><span class="p">:</span>
         <span class="n">to</span> <span class="o">=</span> <span class="n">timing</span><span class="p">[</span><span class="s2">&quot;APT: Num Groups per Integration&quot;</span><span class="p">]</span><span class="o">*</span><span class="n">tframe</span>
@@ -535,11 +548,11 @@
         <span class="c1">#divided by the time it takes for one frame. Note this does not include </span>
         <span class="c1">#reset frames </span>
 
-        <span class="n">nframes_per_int</span> <span class="o">=</span> <span class="n">long</span><span class="p">(</span><span class="n">maxexptime_per_int</span><span class="o">/</span><span class="n">tframe</span><span class="p">)</span>
+        <span class="n">nframes_per_int</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">maxexptime_per_int</span><span class="o">/</span><span class="n">tframe</span><span class="p">)</span>
     
         <span class="c1">#for exoplanets nframe =1 an nskip always = 0 so ngroups_per_int </span>
         <span class="c1">#and nframes_per_int area always the same </span>
-        <span class="n">ngroups_per_int</span> <span class="o">=</span> <span class="n">long</span><span class="p">(</span><span class="n">nframes_per_int</span><span class="o">/</span><span class="p">(</span><span class="n">nframe</span> <span class="o">+</span> <span class="n">nskip</span><span class="p">))</span> 
+        <span class="n">ngroups_per_int</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">nframes_per_int</span><span class="o">/</span><span class="p">(</span><span class="n">nframe</span> <span class="o">+</span> <span class="n">nskip</span><span class="p">))</span> 
     
         <span class="c1">#put restriction on number of groups </span>
         <span class="c1">#there is a hard limit to the maximum number groups. </span>
@@ -749,7 +762,7 @@
 <span class="sd">    timing : dict </span>
 <span class="sd">        output from **compute_timing** </span>
 <span class="sd">    sat_level : int or float </span>
-<span class="sd">        user specified saturation level in electrons </span>
+<span class="sd">        user specified saturation level in fractional (00/100)</span>
 <span class="sd">    flags : dict </span>
 <span class="sd">        warning flags taken from output of **compute_timing**</span>
 <span class="sd">    instrument : str </span>
@@ -781,9 +794,9 @@
     <span class="n">flag_low</span> <span class="o">=</span> <span class="s2">&quot;All good&quot;</span>
     <span class="n">flag_perc</span> <span class="o">=</span> <span class="s2">&quot;All good&quot;</span>
 
-    <span class="k">if</span> <span class="p">(</span><span class="n">sat_level</span> <span class="o">&gt;</span> <span class="mi">80</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">ngroups_per_int</span> <span class="o">&lt;</span><span class="mi">5</span><span class="p">):</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">sat_level</span> <span class="o">&gt;</span> <span class="o">.</span><span class="mi">80</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">ngroups_per_int</span> <span class="o">&lt;</span><span class="mi">3</span><span class="p">):</span>
         <span class="n">flag_low</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">% f</span><span class="s2">ull well&gt;80% &amp; only &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">ngroups_per_int</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; groups&quot;</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">sat_level</span> <span class="o">&gt;</span> <span class="mi">80</span><span class="p">):</span> 
+    <span class="k">if</span> <span class="p">(</span><span class="n">sat_level</span> <span class="o">&gt;</span> <span class="o">.</span><span class="mi">80</span><span class="p">):</span> 
         <span class="n">flag_perc</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">% f</span><span class="s2">ull well&gt;80%&quot;</span>
 
      

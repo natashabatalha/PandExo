@@ -87,7 +87,10 @@
             
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../includeme.html">Getting Started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Pre-installation Data Download</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html#installation-for-users-with-conda">Installation for Users With Conda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html#installation-for-users-with-pip">Installation for Users With PIP</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html#todos">TODOS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorialjwst.html">JWST Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../jwstinput.html">Possible Instrument Input Params</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../jwstdict.html">Py Dict Structure of JWST Output</a></li>
@@ -229,7 +232,8 @@
     <span class="k">else</span><span class="p">:</span> 
         <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Units are not correct. Pick um, nm, cm or Angs&#39;</span><span class="p">)</span>
 
-    <span class="c1">#convert to photons/s/nm/m^2 for flux normalization based on gemini.edu</span>
+    <span class="c1">#convert to photons/s/nm/m^2 for flux normalization based on </span>
+    <span class="c1">#http://www.gemini.edu/sciops/instruments/integration-time-calculators/itc-help/source-definition</span>
     <span class="k">if</span> <span class="nb">input</span><span class="p">[</span><span class="s1">&#39;f_unit&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Jy&#39;</span><span class="p">:</span>
         <span class="n">flux</span> <span class="o">=</span> <span class="n">flux</span><span class="o">*</span><span class="mf">1.509e7</span><span class="o">/</span><span class="n">wave</span> <span class="c1">#eq. C</span>
         
@@ -243,9 +247,21 @@
         <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Units are not correct. Pick W/m2/um, FLAM, Jy, or erg/s/cm2/Hz&#39;</span><span class="p">)</span>
     
     <span class="c1">#normalize to specific mag </span>
+    
     <span class="n">mag</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="nb">input</span><span class="p">[</span><span class="s1">&#39;mag&#39;</span><span class="p">])</span>
-    <span class="n">norm_flux</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">ref_wave</span><span class="p">,</span> <span class="n">wave</span><span class="p">,</span> <span class="n">flux</span><span class="p">)</span>
-    <span class="n">flux</span> <span class="o">=</span> <span class="n">flux</span><span class="o">/</span><span class="n">norm_flux</span><span class="o">*</span><span class="mf">1.97e7</span><span class="o">*</span><span class="mi">10</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="n">mag</span><span class="o">/</span><span class="mf">2.5</span><span class="p">)</span>
+    <span class="n">norm_flux</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">ref_wave</span><span class="p">,</span> <span class="n">wave</span><span class="p">,</span> <span class="n">flux</span><span class="p">)</span> 
+
+    <span class="c1">#get zero point for J H and K </span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">ref_wave</span> <span class="o">&lt;=</span> <span class="mf">1.3e3</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">ref_wave</span> <span class="o">&gt;=</span> <span class="mf">1.2e3</span><span class="p">):</span>
+        <span class="n">zeropoint</span> <span class="o">=</span> <span class="mf">1.97e7</span>
+    <span class="k">elif</span> <span class="p">(</span><span class="n">ref_wave</span> <span class="o">&lt;=</span> <span class="mf">1.7e3</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">ref_wave</span> <span class="o">&gt;=</span> <span class="mf">1.6e3</span><span class="p">):</span>
+        <span class="n">zeropoint</span> <span class="o">=</span> <span class="mf">9.6e6</span>
+    <span class="k">elif</span> <span class="p">(</span><span class="n">ref_wave</span> <span class="o">&lt;=</span> <span class="mf">2.3e3</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">ref_wave</span> <span class="o">&gt;=</span> <span class="mf">2.1e3</span><span class="p">):</span>
+        <span class="n">zeropoint</span> <span class="o">=</span> <span class="mf">4.5e6</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Only J H and K zeropoints are included&#39;</span><span class="p">)</span>
+
+    <span class="n">flux</span> <span class="o">=</span> <span class="n">flux</span><span class="o">/</span><span class="n">norm_flux</span><span class="o">*</span><span class="n">zeropoint</span><span class="o">*</span><span class="mi">10</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="n">mag</span><span class="o">/</span><span class="mf">2.5</span><span class="p">)</span>
     
     <span class="c1">#return to Pandeia units... milliJy and micron </span>
     <span class="n">flux_out_trans</span> <span class="o">=</span> <span class="n">flux</span><span class="o">*</span><span class="n">wave</span><span class="o">/</span><span class="mf">1.509e7</span><span class="o">*</span><span class="mf">1e3</span> <span class="c1">#inverse of eq. C times 1e3 to get to milliJy instead of Jy </span>
@@ -289,8 +305,11 @@
         <span class="n">wave_planet</span> <span class="o">=</span> <span class="n">sort</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">flux_planet</span> <span class="o">=</span> <span class="n">sort</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span>
         
-    <span class="k">elif</span> <span class="n">planet</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;database&#39;</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Empty Database&quot;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">planet</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;constant&#39;</span><span class="p">:</span>
+        <span class="n">wave_planet</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span><span class="mi">15</span><span class="p">,</span><span class="mi">1000</span><span class="p">)</span>
+        <span class="n">flux_planet</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span><span class="mi">15</span><span class="p">,</span><span class="mi">1000</span><span class="p">)</span><span class="o">*</span><span class="mi">0</span> <span class="o">+</span> <span class="n">planet</span><span class="p">[</span><span class="s1">&#39;depth&#39;</span><span class="p">]</span>
+        <span class="n">planet</span><span class="p">[</span><span class="s1">&#39;w_unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;um&#39;</span>
+        <span class="n">planet</span><span class="p">[</span><span class="s1">&#39;f_unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;rp^2/r*^2&#39;</span>
     <span class="k">else</span><span class="p">:</span> 
         <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Incorrect Planet File&quot;</span><span class="p">)</span> 
 

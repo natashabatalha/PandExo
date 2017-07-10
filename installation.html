@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Installation &mdash; PandExo  documentation</title>
+  <title>Pre-installation Data Download &mdash; PandExo  documentation</title>
   
 
   
@@ -88,19 +88,23 @@
             
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="includeme.html">Getting Started</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#installation-procedure">Installation Procedure</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#troubleshooting">Troubleshooting</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#typeerror-float-object-cannot-be-interpreted-as-an-index">TypeError: ‘float’ object cannot be interpreted as an index</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#problems-with-pyfftw">Problems with PYFFTW?</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#can-t-find-pandeia-reference-data">Can’t find Pandeia Reference Data</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#problems-installing-pysynphot">Problems Installing Pysynphot</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#problems-with-multiprocessing">Problems with Multiprocessing</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Pre-installation Data Download</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#jwst-reference-data">JWST Reference Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#stellar-seds">Stellar SEDs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#pandexo-startup-bash-script">PandExo startup bash script</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#to-do">To-Do</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#installation-for-users-with-conda">Installation for Users With Conda</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#coords-py-typeerror-float-object-cannot-be-interpreted-as-an-index">COORDS.PY: TypeError: ‘float’ object cannot be interpreted as an index</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="#installation-for-users-with-pip">Installation for Users With PIP</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#set-environment">Set Environment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dependencies">Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id1">COORDS.PY: TypeError: ‘float’ object cannot be interpreted as an index</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#todos">TODOS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorialjwst.html">JWST Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="jwstinput.html">Possible Instrument Input Params</a></li>
 <li class="toctree-l1"><a class="reference internal" href="jwstdict.html">Py Dict Structure of JWST Output</a></li>
@@ -150,7 +154,7 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>Installation</li>
+      <li>Pre-installation Data Download</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -169,63 +173,36 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="installation">
-<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
-<div class="admonition warning">
+  <div class="admonition warning">
 <p class="first admonition-title">Warning</p>
 <p class="last">Before reading further, if you do not wish to install PandExo,there is an online version of the code here here at <a class="reference external" href="http://pandexo.science.psu.edu:1111">PSU Science</a> or here at NASA GSFC.</p>
 </div>
-<div class="section" id="installation-procedure">
-<h2>Installation Procedure<a class="headerlink" href="#installation-procedure" title="Permalink to this headline">¶</a></h2>
-<ol class="arabic simple">
-<li>Easiest way to Install:</li>
-</ol>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>pip install pandexo.engine
-</pre></div>
+<p>Before we start, the scripts written to install PandExo assume the user has installed <cite>Anaconda &lt;https://www.continuum.io/downloads&gt;_</cite>. For diehard pip users, know that STScI tools will be only distributed on conda so PandExo will not be the only package to use it.</p>
+<p>If you are dead set against it you will need to follow the installation guidelines ‘here &lt;<a class="reference external" href="https://natashabatalha.github.io/PandExo/installation.html">https://natashabatalha.github.io/PandExo/installation.html</a>&gt;_`.</p>
+<div class="section" id="pre-installation-data-download">
+<h1>Pre-installation Data Download<a class="headerlink" href="#pre-installation-data-download" title="Permalink to this headline">¶</a></h1>
+<p>ss mentioned, the user must provide their own reference data files in order for the engine to understand the instrument with which the calculations will be performed. First step to getting PandExo running is downloading four files. Download them and put them in the same directory.</p>
+<div class="section" id="jwst-reference-data">
+<h2>JWST Reference Data<a class="headerlink" href="#jwst-reference-data" title="Permalink to this headline">¶</a></h2>
+<p>For JWST, the user may download the required reference data <cite>here &lt;http://ssb.stsci.edu/pandeia/engine/1.0/pandeia_data-1.0.tar.gz&gt;_</cite>. Unpack and store the data in a choice location.</p>
 </div>
-<p>OR Download PandExo’s repository:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>git clone --recursive https://github.com/natashabatalha/pandexo
-<span class="nb">cd</span> pandexo
-python setup.py install
-</pre></div>
+<div class="section" id="stellar-seds">
+<h2>Stellar SEDs<a class="headerlink" href="#stellar-seds" title="Permalink to this headline">¶</a></h2>
+<p>Likewise, the user may wish to install specific data for use with the PySynPhot package Pandeia uses. We will only be using the Phoenix stellar atlas, which can be downloaded <cite>here &lt;ftp://ftp.stsci.edu/cdbs/tarfiles/synphot5.tar.gz&gt;_</cite>.</p>
 </div>
-<p>2. Download the Phoenix Stellar Atlas <a class="reference external" href="ftp://ftp.stsci.edu/cdbs/tarfiles/synphot5.tar.gz">FROM THIS LINK</a>
-in order to easily pull Stellar SED’s from the phoenix database. Then type the following commands.
-It might be helpful to add the export command to your ~/.bashrc file.</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>mkdir pysynphot_data
-mv synphot5.tar.gz pysynphot_data
-tar -xvf synphot5.tar.gz
-<span class="nb">export</span> <span class="nv">PYSYN_CDBS</span><span class="o">=</span>USRDIR/pysynphot_data
-</pre></div>
-</div>
-<p>Once you do this your untarred file should automatically have this structure. STScI changed the structure of
-this file but now how pysynphot calls the data. So you will most likely have to change this file structure to what
-is below:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>ls pysynphot_data/grid/phoenix/
-.DS_Store     catalog.fits  phoenixm05/   phoenixm15/   phoenixm25/   phoenixm35/   phoenixp03/
-AA_README     phoenixm00/   phoenixm10/   phoenixm20/   phoenixm30/   phoenixm40/   phoenixp05/
-</pre></div>
-</div>
-<p>3. Download the JWST Reference Data <a class="reference external" href="http://ssb.stsci.edu/pandeia/engine/1.0/pandeia_data-1.0.tar.gz">FROM HERE</a> .
-This is a big file (6 gigs) so think carefully about where you want to store it. Don’t accidentally download
-it on your Mac Air then wonder why you can’t save a 32 Kb doc file.</p>
-<p>Then make sure you untar and point to the file so PandExo knows where it is. Like above, it might
-be helpful to put this in your ~/.bashrc file.</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>tar xf pandeia_data-1.0.tar.gz
-<span class="nb">export</span> <span class="nv">pandeia_refdata</span><span class="o">=</span>USRDIR/pandeia_data-1.0
-</pre></div>
-</div>
-<p>Your Pandeia data reference file should look like this:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>ls pandeia_data/
-.DS_Store      README.md      background/    extinction/    jwst/          sed/           strategy/
-.git/          VERSION_PSF    devtools/      hst/           normalization/ source/        wfirst/
-</pre></div>
+<div class="section" id="pandexo-startup-bash-script">
+<h2>PandExo startup bash script<a class="headerlink" href="#pandexo-startup-bash-script" title="Permalink to this headline">¶</a></h2>
+<p>A startup script and a python test script was created to do an automatic install of PandExo. You can download both of them from a google drive located <cite>here &lt;https://drive.google.com/open?id=0ByRvbM3zW0d-d2xoSmNMc1RtdTQ&gt;_</cite>.</p>
 </div>
 </div>
-<div class="section" id="troubleshooting">
-<h2>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="typeerror-float-object-cannot-be-interpreted-as-an-index">
-<h3>TypeError: ‘float’ object cannot be interpreted as an index<a class="headerlink" href="#typeerror-float-object-cannot-be-interpreted-as-an-index" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="installation-for-users-with-conda">
+<h1>Installation for Users With Conda<a class="headerlink" href="#installation-for-users-with-conda" title="Permalink to this headline">¶</a></h1>
+<p>Open up the file <cite>pandexo.sh</cite>. There are two lines in the beginning which tell PandExo where your reference data will go. Currently this script is set to unpack and store the reference files in your HOME directory.</p>
+<p>If you are not okay with it, <strong>change</strong> $HOME in the first two lines of pandexo.sh to whatever you want the data to be.</p>
+<p>Then run</p>
+<p>Hopefully you have had success but if not the most likely error you will get is the following:</p>
+<div class="section" id="coords-py-typeerror-float-object-cannot-be-interpreted-as-an-index">
+<h2>COORDS.PY: TypeError: ‘float’ object cannot be interpreted as an index<a class="headerlink" href="#coords-py-typeerror-float-object-cannot-be-interpreted-as-an-index" title="Permalink to this headline">¶</a></h2>
 <p>This is an error within Pandeia, which has not yet been fixed by STScI folk. You can easily fix it by finding where the file /pandeia/engine/coords.py is and changing line 36:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">ones</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">ny</span><span class="p">,</span> <span class="n">nx</span><span class="p">))</span>
 </pre></div>
@@ -235,65 +212,57 @@ be helpful to put this in your ~/.bashrc file.</p>
 </pre></div>
 </div>
 </div>
-<div class="section" id="problems-with-pyfftw">
-<h3>Problems with PYFFTW?<a class="headerlink" href="#problems-with-pyfftw" title="Permalink to this headline">¶</a></h3>
-<p>Many users experience issues when downloading Pandeia because of it’s dependency on <cite>pyfftw</cite>. If you experience this problem try these steps:</p>
-<ul class="simple">
-<li>If you do not have a non-LLVM based GCC installation on your system, you can obtain one from here but gcc 5.1 does not produce a usable FFTW installation so make sure you download <strong>gcc 4.9 or below</strong></li>
-<li>STScI created the following script to successfully install <cite>pyfftw</cite></li>
-</ul>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>mv <span class="k">$(</span>which gcc<span class="k">)</span> <span class="k">$(</span>which gcc<span class="k">)</span>.orig
-curl -O https://bitbucket.org/api/2.0/snippets/jhunkeler/R7gy5/3265aea27175817087ab4a39c21157d926f8afc3/files/build_fftw.sh
-chmod +x build_fftw.sh
-./build_fftw
+</div>
+<div class="section" id="installation-for-users-with-pip">
+<h1>Installation for Users With PIP<a class="headerlink" href="#installation-for-users-with-pip" title="Permalink to this headline">¶</a></h1>
+<p>You should have already downloaded the two data tar files, pandexo.sh and run_test.py. If not, go back to <cite>Pre Installation Data Download</cite>.</p>
+<p>Then, start by installing PandExo, which should automatically isntall Pandeia and other dependencies</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>pip install pandexo.engine
 </pre></div>
 </div>
-<p>If that doesn’t work Zach Berta-Thompson pointed out that this worked for him:</p>
+<p>OR Download PandExo’s repository via Github:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>git clone --recursive https://github.com/natashabatalha/pandexo
+<span class="nb">cd</span> pandexo
+python setup.py install
+</pre></div>
+</div>
+<div class="section" id="set-environment">
+<h2>Set Environment<a class="headerlink" href="#set-environment" title="Permalink to this headline">¶</a></h2>
+<p>Open up the file <cite>pandexo.sh</cite>. The first two lines in the beginning tell PandExo where your reference data will go via the variable <cite>$USRDIR</cite>. Currently <cite>$USRDIR</cite> is equal to your HOME directory, meaning your big data files will be untarred there.</p>
+<p>If you are not okay with it, <strong>change</strong> $HOME in the first two lines of pandexo.sh to whatever you want the data to be. It should look like this:</p>
+<p>NEXT, since pandexo.sh is set for conda users, delete everything after line 22. We will have to do these manually since we don’t have conda. Once you have done these two things you can go ahead and run:</p>
+</div>
+<div class="section" id="dependencies">
+<h2>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h2>
+<p>PyFFTW is needed to run PandExo. In order to run PyFFTW you need to also isntall fftw. To do so, it is necessary to do so through Homebrew, if you do not have conda.</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>brew install fftw
 pip install pyfftw
 </pre></div>
 </div>
-<p>There are several different conda distributions of pyfftw however, if
-you install version &lt;0.10 it may downgrade
-your version of numpy. Therefore, a version that is greater than 0.10 is best. Numpy should be
-numpy&gt;=1.12</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>conda install -c spectraldns <span class="nv">pyfftw</span><span class="o">=</span><span class="m">0</span>.10.4
+<p>Lastly, Python 2.7 users will need to install multiprocessing:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>pip install multiprocessing
+</pre></div>
+</div>
+<p>Finally try to run the test file to see if there are any additional problems:</p>
+<p>Hopefully you have had success but if not the most likely error you will get is the following:</p>
+</div>
+<div class="section" id="id1">
+<h2>COORDS.PY: TypeError: ‘float’ object cannot be interpreted as an index<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<p>This is an error within Pandeia, which has not yet been fixed by STScI folk. You can easily fix it by finding where the file /pandeia/engine/coords.py is and changing line 36:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">ones</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">ny</span><span class="p">,</span> <span class="n">nx</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>To this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">ones</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">ny</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">nx</span><span class="p">)))</span>
 </pre></div>
 </div>
 </div>
-<div class="section" id="can-t-find-pandeia-reference-data">
-<h3>Can’t find Pandeia Reference Data<a class="headerlink" href="#can-t-find-pandeia-reference-data" title="Permalink to this headline">¶</a></h3>
-<p>This usually looks like NoneType errors.</p>
-<ul class="simple">
-<li>Make sure PandExo knows where the Pandeia reference data is:</li>
-</ul>
-<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">pandeia_refdata</span><span class="o">=</span>USRDIR/pandeia_data
-</pre></div>
 </div>
-</div>
-<div class="section" id="problems-installing-pysynphot">
-<h3>Problems Installing Pysynphot<a class="headerlink" href="#problems-installing-pysynphot" title="Permalink to this headline">¶</a></h3>
-<p>If you are having problems with this
-you can use the astroconda distribution located <a class="reference external" href="http://astroconda.readthedocs.io/en/latest/installation.html#install-astroconda">here</a>.</p>
-<p>Or if you are using conda:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>conda install -c astropy <span class="nv">photutils</span><span class="o">=</span><span class="m">0</span>.3
-</pre></div>
-</div>
-</div>
-<div class="section" id="problems-with-multiprocessing">
-<h3>Problems with Multiprocessing<a class="headerlink" href="#problems-with-multiprocessing" title="Permalink to this headline">¶</a></h3>
-<p>Multiprocessing seems to throw errors if you are using Python 3. Jonathan Fraine pointed out that
-multiprocessing is automatically included in Python 3. Therefore, if you delete the multiprocessing from
-setup.py your problem will go away.</p>
-</div>
-</div>
-<div class="section" id="to-do">
-<h2>To-Do<a class="headerlink" href="#to-do" title="Permalink to this headline">¶</a></h2>
-<p>Below are a list of task items. Please check below for your request before notifying me.</p>
+<div class="section" id="todos">
+<h1>TODOS<a class="headerlink" href="#todos" title="Permalink to this headline">¶</a></h1>
 <ol class="arabic simple">
 <li>Add error messages to the pandas output page</li>
 </ol>
-</div>
 </div>
 
 

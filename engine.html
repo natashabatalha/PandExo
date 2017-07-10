@@ -87,7 +87,10 @@
             
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="includeme.html">Getting Started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Pre-installation Data Download</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html#installation-for-users-with-conda">Installation for Users With Conda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html#installation-for-users-with-pip">Installation for Users With PIP</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html#todos">TODOS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorialjwst.html">JWST Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="jwstinput.html">Possible Instrument Input Params</a></li>
 <li class="toctree-l1"><a class="reference internal" href="jwstdict.html">Py Dict Structure of JWST Output</a></li>
@@ -331,7 +334,7 @@ i.e. [{‘First temp’: PandExoDict}, {‘Second temp’: PandExoDict}, etc..]<
 </pre></div>
 </div>
 <p>For multiple instruments:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">run_pandexo</span><span class="p">(</span><span class="n">exo_dict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;MIRI LRS&#39;</span><span class="p">,</span><span class="s1">&#39;NIRSpec G395H&#39;</span><span class="p">]</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">run_pandexo</span><span class="p">(</span><span class="n">exo_dict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;MIRI LRS&#39;</span><span class="p">,</span><span class="s1">&#39;NIRSpec G395H&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
 <p>Loop through a exoplanet parameter (stellar magnitude):</p>
@@ -903,7 +906,7 @@ a new calculation task to the parallelized workers.</p>
 <dl class="method">
 <dt id="engine.run_online.CalculationNewHandler.post">
 <code class="descname">post</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/run_online.html#CalculationNewHandler.post"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.run_online.CalculationNewHandler.post" title="Permalink to this definition">¶</a></dt>
-<dd><p>The post method contains the retured data from the form data (
+<dd><p>The post method contains the returned data from the form data (
 accessed by using <cite>self.get_argument(…)</cite> for specific arguments,
 or <cite>self.request.body</cite> to grab the entire returned object.</p>
 </dd></dl>
@@ -1704,7 +1707,7 @@ better JWST recommendations are made.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>pand_dict</strong> – output from pandeia run</li>
 <li><strong>timing</strong> (<em>dict</em>) – output from <strong>compute_timing</strong></li>
-<li><strong>sat_level</strong> (<em>int</em><em> or </em><em>float</em>) – user specified saturation level in electrons</li>
+<li><strong>sat_level</strong> (<em>int</em><em> or </em><em>float</em>) – user specified saturation level in fractional (00/100)</li>
 <li><strong>flags</strong> (<em>dict</em>) – warning flags taken from output of <strong>compute_timing</strong></li>
 <li><strong>instrument</strong> (<em>str</em>) – Only allowable strings are: “nirspec”, “niriss”, “nircam”, “miri”</li>
 </ul>

@@ -87,7 +87,10 @@
             
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../includeme.html">Getting Started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Pre-installation Data Download</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html#installation-for-users-with-conda">Installation for Users With Conda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html#installation-for-users-with-pip">Installation for Users With PIP</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html#todos">TODOS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorialjwst.html">JWST Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../jwstinput.html">Possible Instrument Input Params</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../jwstdict.html">Py Dict Structure of JWST Output</a></li>
@@ -271,7 +274,7 @@
         <span class="k">elif</span> <span class="n">samp_seq</span> <span class="o">==</span> <span class="s1">&#39;spars25&#39;</span><span class="p">:</span>
             <span class="n">exptime</span>     <span class="o">=</span> <span class="mf">0.853</span> <span class="o">+</span> <span class="p">(</span><span class="n">nsamp</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="mf">22.9213</span> <span class="c1">#SPARS25</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;****HALTED: Unknown SAMP_SEQ: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">samp_seq</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">((</span><span class="s2">&quot;****HALTED: Unknown SAMP_SEQ: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">samp_seq</span><span class="p">))</span>
             <span class="k">return</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># GRISM256</span>
@@ -282,7 +285,7 @@
         <span class="k">elif</span> <span class="n">samp_seq</span> <span class="o">==</span> <span class="s1">&#39;spars25&#39;</span><span class="p">:</span>
             <span class="n">exptime</span>     <span class="o">=</span> <span class="mf">0.278</span> <span class="o">+</span> <span class="p">(</span><span class="n">nsamp</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="mf">22.346</span>  <span class="c1">#SPARS25</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;****HALTED: Unknown SAMP_SEQ: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">samp_seq</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">((</span><span class="s2">&quot;****HALTED: Unknown SAMP_SEQ: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">samp_seq</span><span class="p">))</span>
             <span class="k">return</span>
     
     <span class="c1"># Recommended scan rate</span>
@@ -320,7 +323,7 @@
                          <span class="mf">7.65510038e-01</span><span class="p">,</span>  <span class="o">-</span><span class="mf">6.24504499e+01</span><span class="p">,</span>   <span class="mf">5.51452028e-03</span><span class="p">]</span>
         <span class="n">pointing</span>    <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">c</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">scanHeight</span><span class="o">-</span><span class="n">c</span><span class="p">[</span><span class="mi">4</span><span class="p">])))</span> <span class="o">+</span> <span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">scanHeight</span> <span class="o">+</span> <span class="n">c</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">*</span><span class="n">scanRatep</span> <span class="o">+</span><span class="n">c</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="o">*</span><span class="n">scanRatep</span><span class="o">**</span><span class="mi">2</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;****HALTED: Unknown scan direction: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">scanDirection</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">((</span><span class="s2">&quot;****HALTED: Unknown scan direction: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">scanDirection</span><span class="p">))</span>
         <span class="k">return</span>
     <span class="c1"># Estimate total frame time including overheads</span>
     <span class="n">tottime</span>     <span class="o">=</span> <span class="n">exptime</span><span class="o">+</span><span class="n">read</span><span class="o">+</span><span class="n">pointing</span>         <span class="c1">#seconds</span>
@@ -382,7 +385,7 @@
         <span class="n">refvar</span>      <span class="o">=</span> <span class="mf">9.75e7</span>
         <span class="n">refexptime</span>  <span class="o">=</span> <span class="mf">103.129</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;****HALTED: Unknown disperser: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">disperser</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">((</span><span class="s2">&quot;****HALTED: Unknown disperser: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">disperser</span><span class="p">))</span>
         <span class="k">return</span>
     
     <span class="c1"># Determine max recommended scan height</span>
@@ -391,7 +394,7 @@
     <span class="k">elif</span> <span class="n">subarray</span> <span class="o">==</span> <span class="s1">&#39;grism256&#39;</span><span class="p">:</span>
         <span class="n">maxScanHeight</span> <span class="o">=</span> <span class="mi">180</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;****HALTED: Unknown subarray aperture: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">subarray</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">((</span><span class="s2">&quot;****HALTED: Unknown subarray aperture: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">subarray</span><span class="p">))</span>
         <span class="k">return</span>
     
     <span class="c1"># Define maximum frame time</span>
@@ -403,7 +406,7 @@
     <span class="k">elif</span> <span class="nb">str</span><span class="p">(</span><span class="n">schedulability</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;100&#39;</span><span class="p">:</span>
         <span class="n">obsTime</span>   <span class="o">=</span> <span class="mf">46.3</span><span class="o">*</span><span class="mi">60</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;****HALTED: Unknown schedulability: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">schedulability</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">((</span><span class="s2">&quot;****HALTED: Unknown schedulability: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">schedulability</span><span class="p">))</span>
         <span class="k">return</span>
 
     
@@ -412,7 +415,7 @@
     <span class="k">if</span> <span class="n">norbits</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">norbits</span> <span class="o">=</span> <span class="n">guessorbits</span>
     <span class="k">elif</span> <span class="n">norbits</span> <span class="o">!=</span> <span class="n">guessorbits</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;****WARNING: Number of specified HST orbits does not match number of recommended orbits: </span><span class="si">%0.0f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">guessorbits</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">((</span><span class="s2">&quot;****WARNING: Number of specified HST orbits does not match number of recommended orbits: </span><span class="si">%0.0f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">guessorbits</span><span class="p">))</span>
 
      
     <span class="k">if</span> <span class="n">nsamp</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">nsamp</span> <span class="o">==</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">samp_seq</span> <span class="o">==</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">samp_seq</span> <span class="o">==</span> <span class="s2">&quot;none&quot;</span><span class="p">:</span>
@@ -423,9 +426,9 @@
     <span class="n">exptime</span><span class="p">,</span> <span class="n">tottime</span><span class="p">,</span> <span class="n">scanRate</span><span class="p">,</span> <span class="n">scanHeight</span><span class="p">,</span> <span class="n">fluence</span> <span class="o">=</span> <span class="n">wfc3_obs</span><span class="p">(</span><span class="n">hmag</span><span class="p">,</span> <span class="n">disperser</span><span class="p">,</span> <span class="n">scanDirection</span><span class="p">,</span> 
                                                                <span class="n">subarray</span><span class="p">,</span> <span class="n">nsamp</span><span class="p">,</span> <span class="n">samp_seq</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">scanHeight</span> <span class="o">&gt;</span> <span class="n">maxScanHeight</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;****WARNING: Computed scan height exceeds maximum recommended height of </span><span class="si">%0.0f</span><span class="s2"> pixels.&quot;</span> <span class="o">%</span> <span class="n">maxScanHeight</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">((</span><span class="s2">&quot;****WARNING: Computed scan height exceeds maximum recommended height of </span><span class="si">%0.0f</span><span class="s2"> pixels.&quot;</span> <span class="o">%</span> <span class="n">maxScanHeight</span><span class="p">))</span>
     <span class="k">if</span> <span class="n">exptime</span> <span class="o">&gt;</span> <span class="n">maxExptime</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;****WARNING: Computed frame time (</span><span class="si">%0.0f</span><span class="s2"> seconds) exceeds maximum recommended duration of </span><span class="si">%0.0f</span><span class="s2"> seconds.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">exptime</span><span class="p">,</span><span class="n">maxExptime</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">((</span><span class="s2">&quot;****WARNING: Computed frame time (</span><span class="si">%0.0f</span><span class="s2"> seconds) exceeds maximum recommended duration of </span><span class="si">%0.0f</span><span class="s2"> seconds.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">exptime</span><span class="p">,</span><span class="n">maxExptime</span><span class="p">)))</span>
     
     <span class="c1"># Compute number of data points (frames) per orbit</span>
     <span class="n">ptsOrbit</span>    <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">obsTime</span><span class="o">/</span><span class="n">tottime</span><span class="p">)</span>
@@ -551,7 +554,7 @@
         <span class="n">sfactor</span>     <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">ecc</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">ecc</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">w</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">180</span><span class="p">))</span>   <span class="c1"># Account for planet speed on eccentric orbits</span>
         <span class="n">params</span><span class="o">.</span><span class="n">u</span>    <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]</span>                                      <span class="c1"># limb darkening coefficients</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;****HALTED: Unknown event type: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">eventType</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">((</span><span class="s2">&quot;****HALTED: Unknown event type: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">eventType</span><span class="p">))</span>
         <span class="k">return</span>
     <span class="n">params</span><span class="o">.</span><span class="n">t0</span>       <span class="o">=</span> <span class="n">midpt</span><span class="o">/</span><span class="n">period</span>          <span class="c1"># phase of transit/eclipse</span>
     <span class="n">params</span><span class="o">.</span><span class="n">per</span>      <span class="o">=</span> <span class="mf">1.</span>                    <span class="c1"># orbital period, units are orbital phase</span>
@@ -624,13 +627,13 @@
     <span class="k">elif</span> <span class="n">w_unit</span> <span class="o">==</span> <span class="s1">&#39;nm&#39;</span><span class="p">:</span>
         <span class="n">mwave</span> <span class="o">/=</span> <span class="mf">1000.</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;****HALTED: Unrecognized wavelength unit: &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">w_unit</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">((</span><span class="s2">&quot;****HALTED: Unrecognized wavelength unit: &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">w_unit</span><span class="p">))</span>
         <span class="k">return</span>
     
     <span class="c1"># Smooth model spectrum (optional)</span>
     <span class="k">if</span> <span class="n">smooth</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="kn">import</span> <span class="nn">hst_smooth</span> <span class="k">as</span> <span class="nn">sm</span>
-        <span class="n">mspec</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">smooth</span><span class="p">(</span><span class="n">mspec</span><span class="p">,</span> <span class="n">smooth</span><span class="p">)</span>
+        <span class="kn">from</span> <span class="nn">.hst_smooth</span> <span class="k">import</span> <span class="n">smooth</span> <span class="k">as</span> <span class="n">sm</span>
+        <span class="n">mspec</span> <span class="o">=</span> <span class="n">sm</span><span class="p">(</span><span class="n">mspec</span><span class="p">,</span> <span class="n">smooth</span><span class="p">)</span>
     
     <span class="c1"># Determine disperser wavelength boundaries</span>
     <span class="k">if</span> <span class="n">disperser</span> <span class="o">==</span> <span class="s1">&#39;g141&#39;</span><span class="p">:</span>
@@ -640,7 +643,7 @@
         <span class="n">wmin</span> <span class="o">=</span> <span class="mf">0.84</span>
         <span class="n">wmax</span> <span class="o">=</span> <span class="mf">1.13</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;****HALTED: Unrecognized disperser name: &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">disperser</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">((</span><span class="s2">&quot;****HALTED: Unrecognized disperser name: &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">disperser</span><span class="p">))</span>
         <span class="k">return</span>
     
     <span class="c1"># Determine wavelength bins</span>
@@ -729,8 +732,11 @@
 <span class="sd">        html rendered table</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;Start observations between orbital phases&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">minphase</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;-&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">maxphase</span><span class="p">)</span>
-    <span class="n">input_div</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">input_dict</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Component&#39;</span><span class="p">,</span> <span class="s1">&#39;Values&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">to_html</span><span class="p">()</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span>
+    <span class="n">input_div</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">input_dict</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">)</span>
+    <span class="n">input_div</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Value&#39;</span><span class="p">]</span>
+    <span class="n">input_div</span> <span class="o">=</span> <span class="n">input_div</span><span class="o">.</span><span class="n">to_html</span><span class="p">()</span>
     <span class="n">input_div</span> <span class="o">=</span> <span class="s1">&#39;&lt;table class=&quot;table table-striped&quot;&gt; </span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">input_div</span><span class="p">[</span><span class="mi">36</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="n">input_div</span><span class="p">)]</span>
+    <span class="n">input_div</span> <span class="o">=</span> <span class="n">input_div</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">input_div</span></div>
     
 </pre></div>
