@@ -101,7 +101,7 @@
 <li class="toctree-l1"><a class="reference internal" href="#installation-for-users-with-pip">Installation for Users With PIP</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#set-environment">Set Environment</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#dependencies">Dependencies</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#id1">COORDS.PY: TypeError: ‘float’ object cannot be interpreted as an index</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id3">COORDS.PY: TypeError: ‘float’ object cannot be interpreted as an index</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="#todos">TODOS</a></li>
@@ -177,22 +177,22 @@
 <p class="first admonition-title">Warning</p>
 <p class="last">Before reading further, if you do not wish to install PandExo,there is an online version of the code here here at <a class="reference external" href="http://pandexo.science.psu.edu:1111">PSU Science</a> or here at NASA GSFC.</p>
 </div>
-<p>Before we start, the scripts written to install PandExo assume the user has installed <cite>Anaconda &lt;https://www.continuum.io/downloads&gt;_</cite>. For diehard pip users, know that STScI tools will be only distributed on conda so PandExo will not be the only package to use it.</p>
-<p>If you are dead set against it you will need to follow the installation guidelines ‘here &lt;<a class="reference external" href="https://natashabatalha.github.io/PandExo/installation.html">https://natashabatalha.github.io/PandExo/installation.html</a>&gt;_`.</p>
+<p>Before we start, the scripts written to install PandExo assume the user has installed <a class="reference external" href="https://www.continuum.io/downloads">Anaconda</a>. For diehard pip users, know that STScI tools will be only distributed on conda so PandExo will not be the only package to use it.</p>
+<p>If you are dead set against it you will need to follow the installation guidelines ‘here &lt;<a class="reference external" href="https://natashabatalha.github.io/PandExo/installation.html">https://natashabatalha.github.io/PandExo/installation.html</a>&gt;`_.</p>
 <div class="section" id="pre-installation-data-download">
 <h1>Pre-installation Data Download<a class="headerlink" href="#pre-installation-data-download" title="Permalink to this headline">¶</a></h1>
 <p>ss mentioned, the user must provide their own reference data files in order for the engine to understand the instrument with which the calculations will be performed. First step to getting PandExo running is downloading four files. Download them and put them in the same directory.</p>
 <div class="section" id="jwst-reference-data">
 <h2>JWST Reference Data<a class="headerlink" href="#jwst-reference-data" title="Permalink to this headline">¶</a></h2>
-<p>For JWST, the user may download the required reference data <cite>here &lt;http://ssb.stsci.edu/pandeia/engine/1.0/pandeia_data-1.0.tar.gz&gt;_</cite>. Unpack and store the data in a choice location.</p>
+<p>For JWST, the user may download the required reference data <a class="reference external" href="http://ssb.stsci.edu/pandeia/engine/1.0/pandeia_data-1.0.tar.gz">here</a>. Unpack and store the data in a choice location.</p>
 </div>
 <div class="section" id="stellar-seds">
 <h2>Stellar SEDs<a class="headerlink" href="#stellar-seds" title="Permalink to this headline">¶</a></h2>
-<p>Likewise, the user may wish to install specific data for use with the PySynPhot package Pandeia uses. We will only be using the Phoenix stellar atlas, which can be downloaded <cite>here &lt;ftp://ftp.stsci.edu/cdbs/tarfiles/synphot5.tar.gz&gt;_</cite>.</p>
+<p>Likewise, the user may wish to install specific data for use with the PySynPhot package Pandeia uses. We will only be using the Phoenix stellar atlas, which can be downloaded <a class="reference external" href="ftp://ftp.stsci.edu/cdbs/tarfiles/synphot5.tar.gz">here</a>.</p>
 </div>
 <div class="section" id="pandexo-startup-bash-script">
 <h2>PandExo startup bash script<a class="headerlink" href="#pandexo-startup-bash-script" title="Permalink to this headline">¶</a></h2>
-<p>A startup script and a python test script was created to do an automatic install of PandExo. You can download both of them from a google drive located <cite>here &lt;https://drive.google.com/open?id=0ByRvbM3zW0d-d2xoSmNMc1RtdTQ&gt;_</cite>.</p>
+<p>A startup script and a python test script was created to do an automatic install of PandExo. You can download both of them from a google drive located <a class="reference external" href="https://drive.google.com/open?id=0ByRvbM3zW0d-d2xoSmNMc1RtdTQ">here</a>.</p>
 </div>
 </div>
 <div class="section" id="installation-for-users-with-conda">
@@ -200,6 +200,18 @@
 <p>Open up the file <cite>pandexo.sh</cite>. There are two lines in the beginning which tell PandExo where your reference data will go. Currently this script is set to unpack and store the reference files in your HOME directory.</p>
 <p>If you are not okay with it, <strong>change</strong> $HOME in the first two lines of pandexo.sh to whatever you want the data to be.</p>
 <p>Then run</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>sh pandexo.sh
+Starting TEST run
+Running Single Case <span class="k">for</span>: NIRSpec G140H
+Optimization Reqested: Computing Duty Cycle
+Finished Duty Cycle Calc
+Starting Out of Transit Simulation
+End out of Transit
+Starting In Transit Simulation
+End In Transit
+SUCCESS
+</pre></div>
+</div>
 <p>Hopefully you have had success but if not the most likely error you will get is the following:</p>
 <div class="section" id="coords-py-typeerror-float-object-cannot-be-interpreted-as-an-index">
 <h2>COORDS.PY: TypeError: ‘float’ object cannot be interpreted as an index<a class="headerlink" href="#coords-py-typeerror-float-object-cannot-be-interpreted-as-an-index" title="Permalink to this headline">¶</a></h2>
@@ -230,7 +242,14 @@ python setup.py install
 <h2>Set Environment<a class="headerlink" href="#set-environment" title="Permalink to this headline">¶</a></h2>
 <p>Open up the file <cite>pandexo.sh</cite>. The first two lines in the beginning tell PandExo where your reference data will go via the variable <cite>$USRDIR</cite>. Currently <cite>$USRDIR</cite> is equal to your HOME directory, meaning your big data files will be untarred there.</p>
 <p>If you are not okay with it, <strong>change</strong> $HOME in the first two lines of pandexo.sh to whatever you want the data to be. It should look like this:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="nv">USRDIR</span><span class="o">=</span>/I/Want/My/Data/Here
+<span class="nb">echo</span> <span class="s1">&#39;USRDIR=/I/Want/My/Data/Here&#39;</span> &gt;&gt;~/.bash_profile
+</pre></div>
+</div>
 <p>NEXT, since pandexo.sh is set for conda users, delete everything after line 22. We will have to do these manually since we don’t have conda. Once you have done these two things you can go ahead and run:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>sh pandexo.sh
+</pre></div>
+</div>
 </div>
 <div class="section" id="dependencies">
 <h2>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h2>
@@ -244,10 +263,22 @@ pip install pyfftw
 </pre></div>
 </div>
 <p>Finally try to run the test file to see if there are any additional problems:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>python run_test.py
+Starting TEST run
+Running Single Case <span class="k">for</span>: NIRSpec G140H
+Optimization Reqested: Computing Duty Cycle
+Finished Duty Cycle Calc
+Starting Out of Transit Simulation
+End out of Transit
+Starting In Transit Simulation
+End In Transit
+SUCCESS
+</pre></div>
+</div>
 <p>Hopefully you have had success but if not the most likely error you will get is the following:</p>
 </div>
-<div class="section" id="id1">
-<h2>COORDS.PY: TypeError: ‘float’ object cannot be interpreted as an index<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id3">
+<h2>COORDS.PY: TypeError: ‘float’ object cannot be interpreted as an index<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
 <p>This is an error within Pandeia, which has not yet been fixed by STScI folk. You can easily fix it by finding where the file /pandeia/engine/coords.py is and changing line 36:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">ones</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">ny</span><span class="p">,</span> <span class="n">nx</span><span class="p">))</span>
 </pre></div>
