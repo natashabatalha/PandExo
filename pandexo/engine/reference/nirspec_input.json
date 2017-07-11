@@ -43,7 +43,7 @@
             "disperser": "g140m"
         },
     "detector": {
-            "subarray": "sub1024a",
+            "subarray": "sub2048",
             "readmode": "nrsrapid",
             "ngroup": "optimize",
             "nint": 1,
