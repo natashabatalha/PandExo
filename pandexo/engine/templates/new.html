@@ -5,7 +5,7 @@
 <link href="{{ static_url('css/select2.min.css')}}" rel="stylesheet">
 <link href="{{ static_url('css/select2-bootstrap-theme.min.css')}}" rel="stylesheet">
 <link href="{{ static_url('css/icheck-bootstrap.min.css')}}" rel="stylesheet">
-<link href="{{ static_url('css/form_validation.min.css')}}" rel="stylesheet">
+<link href="{{ static_url('css/bootstrapValidator.min.css')}}" rel="stylesheet">
 {% end %}
 
 {% block body %}
@@ -224,7 +224,6 @@
             <input type="text" class="form-control" id="fraction" name="fraction" >
             <p class="help-block">Fraction of time spent in versus out of transit</p>
         </div>
-        <!-- TODO out:in or in:out? -->
     </div>
 
     <div class="form-group">
@@ -395,7 +394,7 @@
     <div class="form-group hidden constant-noise-section">
         <div class="col-md-3 col-md-offset-3">
             <div class="input-group">
-                <input type="text" class="form-control" id="noisefloor" name="noisefloor" >
+                <input type="text" class="form-control" id="noisefloor" name="noisefloor" value="0">
                 <span class="input-group-addon">ppm</span>
             </div>
             <p class="help-block">Constant Minimum Noise</p>
@@ -486,7 +485,7 @@
         });
 
         /* Form Validation */
-        FormValidation.Validator.choiceTextNumber = {
+        $.fn.bootstrapValidator.validators.choiceTextNumber = {
             validate: function(validator, $field, options) {
                 var value = $field.val();
                 if (value === '') {
@@ -524,308 +523,297 @@
             }
         };
 
-        $('#calculation-form').formValidation({
-            framework: 'bootstrap',
-            icon: {
+        var validationConfigFields = {
+            calcName: {
+                validators: {
+                    notEmpty: {
+                        message: 'Calculation name is required'
+                    }
+                }
+            },
+            stellarModel: {
+                validators: {
+                    notEmpty: {
+                        message: 'Stellar model is required'
+                    }
+                }
+            },
+            starFile: {
+                excluded: function () {
+                    return !$("#stellarModelUser").is(":checked");
+                },
+                validators: {
+                    notEmpty: {
+                        message: 'Stellar Spectrum file is required'
+                    },
+                    file: {
+                        type: 'text/plain',
+                        message: 'Please choose a text file'
+                    }
+                }
+            },
+            starwunits: {
+                validators: {
+                    notEmpty: {
+                        message: 'Stellar wavelength units are required'
+                    }
+                }
+            },
+            starfunits: {
+                validators: {
+                    notEmpty: {
+                        message: 'Stellar flux units are required'
+                    }
+                }
+            },
+            temp: {
+                validators: {
+                    notEmpty: {
+                        message: 'Stellar temperature is required'
+                    },
+                    numeric: {
+                        message: 'Stellar temperature must be a number'
+                    }
+                    // TODO minimum temperature
+                }
+            },
+            metal: {
+                validators: {
+                    notEmpty: {
+                        message: 'Stellar metallicity is required'
+                    },
+                    numeric: {
+                        message: 'Stellar metallicity must be a number'
+                    },
+                    between: {
+                        min: -5,
+                        max: 5,
+                        message: 'Stellar metallicity must be between -5 and 5'
+                        // TODO is this a correct assumption?
+                    }
+                }
+            },
+            logg: {
+                validators: {
+                    notEmpty: {
+                        message: 'Stellar log g is required'
+                    },
+                    numeric: {
+                        message: 'Stellar log g must be a number'
+                    }
+                    // TODO
+                }
+            },
+            mag: {
+                validators: {
+                    notEmpty: {
+                        message: 'Magnitude is required'
+                    },
+                    numeric: {
+                        message: 'Magnitude must be a number'
+                    },
+                    greaterThan: {
+                        value: 0,   // TODO inclusive?
+                        message: 'Magnitude must be positive'
+                    }
+                }
+            },
+            planetModel: {
+                validators: {
+                    notEmpty: {
+                        message: 'Planet model is required'
+                    }
+                }
+            },
+            planFile: {
+                excluded: function () {
+                    return !$("#planetModelUser").is(":checked");
+                },
+                validators: {
+                    notEmpty: {
+                        message: 'Planet Spectrum file is required'
+                    },
+                    file: {
+                        type: 'text/plain',
+                        message: 'Please choose a text file'
+                    }
+                }
+            },
+            planwunits: {
+                validators: {
+                    notEmpty: {
+                        message: 'Planet time/wave units are required'
+                    }
+                }
+            },
+            planfunits: {
+                validators: {
+                    notEmpty: {
+                        message: 'Planet model units are required'
+                    }
+                }
+            },
+            depth: {
+                validators: {
+                    notEmpty: {
+                        message: 'Wavelength-independent transit depth is required'
+                    },
+                    numeric: {
+                        message: 'Wavelength-independent transit depth must be a number'
+                    }
+                    // TODO Negative
+                }
+            },
+            transit_duration: {
+                validators: {
+                    numeric: {
+                        message: 'Transit duration must be a number'
+                    },
+                    greaterThan: {
+                        value: 60,
+                        message: 'Transit duration must be in seconds (greater than 60 seconds)'
+                    }
+                }
+            },
+            fraction: {
+                validators: {
+                    notEmpty: {
+                        message: 'In:out ratio is required'
+                    },
+                    numeric: {
+                        message: 'In:out ratio must be a number'
+                    }
+                    // TODO between specific values?
+                }
+            },
+            numtrans: {
+                validators: {
+                    notEmpty: {
+                        message: 'Transit number is required'
+                    },
+                    numeric: {
+                        message: 'Must be a number of transits'
+                    },
+                    integer: {
+                        message: 'Must be an integer number of transits'
+                    },
+                    greaterThan: {
+                        value: 0,
+                        inclusive: false,
+                        message: 'Transit number must be greater than 0'
+                    }
+                }
+            },
+            instrument: {
+                validators: {
+                    notEmpty: {
+                        message: 'Instrument selection is required'
+                    }
+                }
+            },
+            mirimode: {
+                validators: {
+                    notEmpty: {
+                        message: 'Please select a MIRI Mode'
+                    }
+                }
+            },
+            nirspecmode: {
+                validators: {
+                    notEmpty: {
+                        message: 'Please select a NIRSpec Mode'
+                    }
+                }
+            },
+            nirspecsubarray: {
+                validators: {
+                    notEmpty: {
+                        message: 'Please select a NIRSpec Subarray'
+                    }
+                }
+            },
+            nircammode: {
+                validators: {
+                    notEmpty: {
+                        message: 'Please select a NIRCam Mode'
+                    }
+                }
+            },
+            nircamsubarray: {
+                validators: {
+                    notEmpty: {
+                        message: 'Please select a NIRCam Subarray'
+                    }
+                }
+            },
+            nirissmode: {
+                validators: {
+                    notEmpty: {
+                        message: 'Please select a NIRISS Mode'
+                    }
+                }
+            },
+            optimize: {
+                validators: {
+                    notEmpty: {
+                        message: 'Number of transits is required'
+                    },
+                    choiceTextNumber: {
+                        text: 'optimize',
+                        min: 2,
+                        max: 65536,
+                        message: 'Must be a number of transits'
+                    }
+                }
+            },
+            satlevel: {
+                validators: {
+                    notEmpty: {
+                        message: 'Percent fullwell of electrons is required'
+                    },
+                    between: {
+                        min: 0,
+                        max: 100,
+                        message: 'Must be a percentage between 0 and 100'
+                    }
+                    // TODO not zero
+                }
+            },
+            noiseModel: {
+                validators: {}
+            },
+            noiseFile: {
+                excluded: function () {
+                    return !$("#noiseModelUser").is(":checked");
+                },
+                validators: {
+                    file: {
+                        type: 'text/plain',
+                        message: 'Please choose a text file'
+                    }
+                }
+            },
+            noisefloor: {
+                validators: {
+                    numeric: {
+                        message: 'Noise floor must be a number'
+                    },
+                    greaterThan: {
+                        value: 0,
+                        message: 'Noise floor must be greater than 0'
+                    }
+                }
+            }
+        };
+
+        $('#calculation-form').bootstrapValidator({
+            verbose: false,
+            feedbackIcons: {
                 valid: 'glyphicon glyphicon-ok',
                 invalid: 'glyphicon glyphicon-remove',
                 validating: 'glyphicon glyphicon-refresh'
             },
-            fields: {
-                calcName: {
-                    validators: {
-                        notEmpty: {
-                            message: 'Calculation name is required'
-                        }
-                    }
-                },
-                stellarModel: {
-                    validators: {
-                        notEmpty: {
-                            message: 'Stellar model is required'
-                        }
-                    }
-                },
-                starFile: {
-                    excluded: function () {
-                        return !$("#stellarModelUser").is(":checked");
-                    },
-                    validators: {
-                        notEmpty: {
-                            message: 'Stellar Spectrum file is required'
-                        },
-                        file: {
-                            type: 'text/plain',
-                            message: 'Please choose a text file'
-                        }
-                    }
-                },
-                starwunits: {
-                    validators: {
-                        notEmpty: {
-                            message: 'Stellar wavelength units are required'
-                        }
-                    }
-                },
-                starfunits: {
-                    validators: {
-                        notEmpty: {
-                            message: 'Stellar flux units are required'
-                        }
-                    }
-                },
-                temp: {
-                    validators: {
-                        notEmpty: {
-                            message: 'Stellar temperature is required'
-                        },
-                        numeric: {
-                            message: 'Stellar temperature must be a number'
-                        }
-                    }
-                },
-                metal: {
-                    validators: {
-                        notEmpty: {
-                            message: 'Stellar metallicity is required'
-                        },
-                        numeric: {
-                            message: 'Stellar metallicity must be a number'
-                        },
-                        between: {
-                            min: -5,
-                            max: 5,
-                            message: 'Stellar metallicity must be between -5 and 5'
-                            // TODO is this a correct assumption?
-                        }
-                    }
-                },
-                logg: {
-                    validators: {
-                        notEmpty: {
-                            message: 'Stellar log g is required'
-                        },
-                        numeric: {
-                            message: 'Stellar log g must be a number'
-                        }
-                    }
-                },
-                mag: {
-                    validators: {
-                        notEmpty: {
-                            message: 'Magnitude is required'
-                        },
-                        numeric: {
-                            message: 'Magnitude must be a number'
-                        }
-                    }
-                },
-                planetModel: {
-                    validators: {
-                        notEmpty: {
-                            message: 'Planet model is required'
-                        }
-                    }
-                },
-                planFile: {
-                    excluded: function () {
-                        return !$("#planetModelUser").is(":checked");
-                    },
-                    validators: {
-                        notEmpty: {
-                            message: 'Planet Spectrum file is required'
-                        },
-                        file: {
-                            type: 'text/plain',
-                            message: 'Please choose a text file'
-                        }
-                    }
-                },
-                planwunits: {
-                    validators: {
-                        notEmpty: {
-                            message: 'Planet time/wave units are required'
-                        }
-                    }
-                },
-                planfunits: {
-                    validators: {
-                        notEmpty: {
-                            message: 'Planet model units are required'
-                        }
-                    }
-                },
-                depth: {
-                    validators: {
-                        notEmpty: {
-                            message: 'Wavelength-independent transit depth is required'
-                        },
-                        numeric: {
-                            message: 'Wavelength-independent transit depth must be a number'
-                        }
-                    }
-                },
-                transit_duration: {
-                    validators: {
-                        numeric: {
-                            message: 'Transit duration must be a number'
-                        },
-                        greaterThan: {
-                            value: 60,
-                            message: 'Transit duration must be in seconds (greater than 60 seconds)'
-                        }
-                    }
-                },
-                fraction: {
-                    validators: {
-                        notEmpty: {
-                            message: 'In:out ratio is required'
-                        },
-                        numeric: {
-                            message: 'In:out ratio must be a number'
-                        }
-                        // TODO between specific values?
-                    }
-                },
-                numtrans: {
-                    validators: {
-                        notEmpty: {
-                            message: 'Transit number is required'
-                        },
-                        numeric: {
-                            message: 'Must be a number of transits'
-                        },
-                        integer: {
-                            message: 'Must be an integer number of transits'
-                        },
-                        greaterThan: {
-                            value: 0,
-                            inclusive: false,
-                            message: 'Transit number must be greater than 0'
-                        }
-                    }
-                },
-                instrument: {
-                    validators: {
-                        notEmpty: {
-                            message: 'Instrument selection is required'
-                        }
-                    }
-                },
-                mirimode: {
-                    validators: {
-                        notEmpty: {
-                            message: 'Please select a MIRI Mode'
-                        }
-                    }
-                },
-                nirspecmode: {
-                    validators: {
-                        notEmpty: {
-                            message: 'Please select a NIRSpec Mode'
-                        }
-                    }
-                },
-                nirspecsubarray: {
-                    validators: {
-                        notEmpty: {
-                            message: 'Please select a NIRSpec Subarray'
-                        }
-                    }
-                },
-                nircammode: {
-                    validators: {
-                        notEmpty: {
-                            message: 'Please select a NIRCam Mode'
-                        }
-                    }
-                },
-                nircamsubarray: {
-                    validators: {
-                        notEmpty: {
-                            message: 'Please select a NIRCam Subarray'
-                        }
-                    }
-                },
-                nirissmode: {
-                    validators: {
-                        notEmpty: {
-                            message: 'Please select a NIRISS Mode'
-                        }
-                    }
-                },
-                optimize: {
-                    validators: {
-                        notEmpty: {
-                            message: 'Number of transits is required'
-                        },
-                        choiceTextNumber: {
-                            text: 'optimize',
-                            min: 2,
-                            max: 65536,
-                            message: 'Must be a number of transits'
-                        }
-                    }
-                },
-                satlevel: {
-                    validators: {
-                        notEmpty: {
-                            message: 'Percent fullwell of electrons is required'
-                        },
-                        between: {
-                            min: 0,
-                            max: 100,
-                            message: 'Must be a percentage between 0 and 100'
-                        }
-                    }
-                },
-                noiseModel: {
-                    validators: {
-                        notEmpty: {
-                            message: 'Noise model is required'
-                        }
-                    }
-                },
-                noiseFile: {
-                    excluded: function () {
-                        return !$("#noiseModelUser").is(":checked");
-                    },
-                    validators: {
-                        notEmpty: {
-                            message: 'Noise Floor file is required'
-                        },
-                        file: {
-                            type: 'text/plain',
-                            message: 'Please choose a text file'
-                        }
-                    }
-                },
-                noisefloor: {
-                    validators: {
-                        notEmpty: {
-                            message: 'Noise floor is required'
-                        },
-                        numeric: {
-                            message: 'Noise floor must be a number'
-                        },
-                        greaterThan: {
-                            value: 0,
-                            message: 'Noise floor must be greater than 0'
-                        }
-                    }
-                }
-            }
-        }).on('err.field.fv', function(e, data) {
-            // $(e.target)  --> The field element
-            // data.fv      --> The FormValidation instance
-            // data.field   --> The field name
-            // data.element --> The field element
-
-            // Hide the messages
-            var hiddenMessageList = ["stellarModel", "planetModel", "noiseModel"];
-            $.each(hiddenMessageList, function (i, val) {
-//                data.element.data('fv.messages').find('.help-block[data-fv-for="' + val + '"]').hide();
-            });
+            fields: validationConfigFields
         });
     });
 
@@ -843,6 +831,6 @@
     }
 </script>
 
-<script type="text/javascript" src="{{ static_url('js/form_validation.min.js')}}"></script>
-<script type="text/javascript" src="http://cdn.pydata.org/bokeh/release/bokeh-0.12.6.min.js"></script>
+<script type="text/javascript" src="{{ static_url('js/bootstrapValidator.js')}}"></script>
+<!--<script type="text/javascript" src="http://cdn.pydata.org/bokeh/release/bokeh-0.12.6.min.js"></script>-->
 {% end %}
