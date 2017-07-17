@@ -56,7 +56,7 @@
         </div>
         <div class="col-md-3">
             <div class="form-group">
-                <div class="col-md-12">
+                <div class="col-md-12 hidden">
                     <select id="starwunits" name="starwunits" class="form-control" data-placeholder="Select Wavelength Units">
                         <option value=""></option>
                         <option value="um">micron</option>
@@ -70,7 +70,7 @@
         </div>
         <div class="col-md-3">
             <div class="form-group">
-                <div class="col-md-12">
+                <div class="col-md-12 hidden">
                     <select id="starfunits" name="starfunits" class="form-control" data-placeholder="Select Flux Units">
                         <option value=""></option>
                         <option value="Jy">Jy</option>
@@ -143,7 +143,7 @@
                 <div class="radio-chooser-item">
                     <label class="radio-chooser-content" for="planetModelConstant">
                         <input type="radio" name="planetModel" id="planetModelConstant" value="constant" />
-                        <div class="radio-chooser-title">Constant Transit Depth</div>
+                        <div class="radio-chooser-title">Constant Temp / Radius Model</div>
                     </label>
                 </div>
                 <div class="radio-chooser-item">
@@ -168,7 +168,7 @@
         </div>
         <div class="col-md-3">
             <div class="form-group">
-                <div class="col-md-12">
+                <div class="col-md-12 hidden">
                     <select id="planwunits" name="planwunits" class="form-control" data-placeholder="Select Wave or Time Units">
                         <option value=""></option>
                         <option value="sec">seconds</option>
@@ -183,10 +183,10 @@
         </div>
         <div class="col-md-3">
             <div class="form-group">
-                <div class="col-md-12">
+                <div class="col-md-12 hidden">
                     <select id="planfunits" name="planfunits" class="form-control" data-placeholder="Select Planet Model Units">
                         <option value=""></option>
-                        <option value="rp^2/r*^2">(R<sub>p</sub>/R<sub>*</sub>)^2 (primary)</option>
+                        <option value="rp^2/r*^2" selected>(R<sub>p</sub>/R<sub>*</sub>)^2 (primary)</option>
                         <option value="fp/f*">F<sub>p</sub>/F<sub>*</sub> (secondary/phase curve)</option>
                     </select>
                 </div>
@@ -195,14 +195,52 @@
     </div>
 
     <div class="form-group hidden constant-transit-section">
-        <div class="col-md-4 col-md-offset-3">
-            <div class="input-group">
-                <input type="text" class="form-control" id="depth" name="depth">
-                <span class="input-group-addon">(R<sub>p</sub>/R<sub>*</sub>)<sup>2</sup></span>
+        <div class="col-md-3 col-md-offset-3">
+            <div class="form-group">
+                <div class="col-md-12">
+                    <select id="constplanfunits" name="constplanfunits" class="form-control" data-placeholder="Select Planet Model Units">
+                        <option value=""></option>
+                        <option value="primary" selected>Primary: (R<sub>p</sub>/R<sub>*</sub>)^2</option>
+                        <option value="secondary" disabled>Secondary: F<sub>p</sub>/F<sub>*</sub></option>
+                        <option value="phase" disabled>Phase Curve: F<sub>p</sub>/F<sub>*</sub></option>
+                    </select>
+                </div>
             </div>
-            <p class="help-block">Wavelength-independent transit depth</p>
         </div>
-        <!-- TODO add constant transit units -->
+        <div class="col-md-3 primary-transit-section secondary-transit-section">
+            <div class="form-group">
+                <div class="col-md-12">
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="depth" name="depth">
+                        <span class="input-group-addon">(R<sub>p</sub>/R<sub>*</sub>)<sup>2</sup></span>
+                    </div>
+                    <p class="help-block primary-transit-section">Wavelength-independent transit depth</p>
+                    <p class="help-block secondary-transit-section hidden">Planet/Star Radius Ratio</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 secondary-transit-section hidden">
+            <div class="form-group">
+                <div class="col-md-12">
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="ptemp" name="ptemp" >
+                        <span class="input-group-addon">&deg; Kelvin</span>
+                    </div>
+                    <p class="help-block">Planet temperature</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 hidden">
+            <div class="form-group">
+                <div class="col-md-12">
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="pradius" name="pradius" >
+                        <span class="input-group-addon">R <sub>J</sub></span>
+                    </div>
+                    <p class="help-block">Planet Radius</p>
+                </div>
+            </div>
+        </div>
     </div>
 
     <hr class="col-md-11 col-md-offset-1">
@@ -222,7 +260,7 @@
         <label class="col-md-3 control-label" for="fraction">In:Out Ratio</label>
         <div class="col-md-4">
             <input type="text" class="form-control" id="fraction" name="fraction" >
-            <p class="help-block">Fraction of time spent in versus out of transit</p>
+            <p class="help-block">Fraction of time spent in versus out of transit (in/out)</p>
         </div>
     </div>
 
@@ -387,7 +425,7 @@
         <div class="col-md-3 col-md-offset-3">
             <button class="btn btn-block niceFileBtn" type="button">Choose File</button>
             <input type="file" id="noiseFile" name="noiseFile" style="display:none;padding:6px 1px;">
-            <p class="help-block">Column 1: wavelength <br>Column 2: Noise Floor (ppm)</p>
+            <p class="help-block">Column 1: Wavelength <br>Column 2: Noise Floor (ppm)</p>
         </div>
     </div>
 
@@ -484,6 +522,22 @@
             }
         });
 
+        /* Constant Planet Units */
+        $("#constplanfunits").change(function () {
+            $(".primary-transit-section, .secondary-transit-section").addClass("hidden");
+            var selopt = $("#constplanfunits").val();
+            switch (selopt) {
+                case "primary":
+                    $(".primary-transit-section").removeClass("hidden");
+                    break;
+                case "secondary":
+                    $(".secondary-transit-section").removeClass("hidden");
+                    break;
+                case "phase":
+                    break;
+            }
+        });
+
         /* Form Validation */
         $.fn.bootstrapValidator.validators.choiceTextNumber = {
             validate: function(validator, $field, options) {
@@ -522,6 +576,77 @@
                 return true;
             }
         };
+        $.fn.bootstrapValidator.validators.checkFileColumns = {
+            validate: function(validator, $field, options) {
+                var file = $field.prop("files")[0];
+
+                // Check if FileReader is available
+                if (!window.FileReader) return true;
+
+                // Read text file
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    var customMessage = function (validator, $field, row_num, message) {
+                        var message_prefix = "Error on line " + (row_num + 1) + ": ";
+                        if (row_num === 0) message_prefix = "";
+                        validator.updateMessage($field, "checkFileColumns", message_prefix + message);
+                        validator.updateStatus($field, "INVALID", "checkFileColumns");
+                    };
+                    var data = e.target.result;
+                    var rows = data.split("\n");
+                    var columns = [[], []];
+                    for (var i = 0; i < rows.length; i++) {
+                        // Skip empty rows
+                        if (rows[i].length === 0) continue;
+                        var row = rows[i].split(" ");
+
+                        // Check for number of columns
+                        if (row.length !== 2) {
+                            return customMessage(validator, $field, i, "Must be two columns delimited by spaces");
+                        }
+
+                        // Check values are numbers
+                        if (!$.isNumeric(row[0]) || !$.isNumeric(row[1])) {
+                            return customMessage(validator, $field, i, "Must be a valid number");
+                        }
+
+                        // Push values to column list
+                        columns[0].push(row[0]);
+                        columns[1].push(row[1]);
+                    }
+
+                    // Compute column mean values
+                    var columnMeans = [0, 0];
+                    var numRows = columns[0].length;
+                    for (i = 0; i < numRows; i++) {
+                        columnMeans[0] += parseFloat(columns[0][i]);
+                        columnMeans[1] += parseFloat(columns[1][i]);
+                    }
+                    columnMeans[0] = columnMeans[0] / numRows;
+                    columnMeans[1] = columnMeans[1] / numRows;
+
+                    // Detect units
+                    var units = "";
+                    if (columnMeans[0] < parseFloat("3e-5")) return customMessage(validator, $field, 0, "Wavelength must be in either: cm, um, nm, Angs, Hz, sec");
+                    else if ( columnMeans[0] >= parseFloat("3e-5") && columnMeans[0] < parseFloat("3e-1") ) units = "cm";
+                    else if ( columnMeans[0] >= parseFloat("3e-1") && columnMeans[0] < parseFloat("3e2") ) units = "um";
+                    else if ( columnMeans[0] >= parseFloat("3e2") && columnMeans[0] < parseFloat("3e4") ) units = "nm";
+                    else if ( columnMeans[0] >= parseFloat("3e4") && columnMeans[0] < parseFloat("3e5") ) units = "Angs";
+                    else if ( columnMeans[0] >= parseFloat("3e5")) units = "Hz";
+
+                    // Display the dropdowns
+                    if ($field.is("#starFile")) {
+                        $("#starwunits").val(units).trigger("change");
+                        $("#starwunits, #starfunits").parent().removeClass("hidden");
+                    } else if ($field.is("#planFile")) {
+                        $("#planwunits").val(units).trigger("change");
+                        $("#planwunits, #planfunits").parent().removeClass("hidden");
+                    }
+                };
+                reader.readAsText(file);
+                return true;
+            }
+        };
 
         var validationConfigFields = {
             calcName: {
@@ -549,7 +674,8 @@
                     file: {
                         type: 'text/plain',
                         message: 'Please choose a text file'
-                    }
+                    },
+                    checkFileColumns: {}
                 }
             },
             starwunits: {
@@ -573,8 +699,12 @@
                     },
                     numeric: {
                         message: 'Stellar temperature must be a number'
+                    },
+                    between: {
+                        min: 2300,
+                        max: 12000,
+                        message: 'Stellar temperature must be between 2300K and 12000K'
                     }
-                    // TODO minimum temperature
                 }
             },
             metal: {
@@ -586,10 +716,9 @@
                         message: 'Stellar metallicity must be a number'
                     },
                     between: {
-                        min: -5,
-                        max: 5,
-                        message: 'Stellar metallicity must be between -5 and 5'
-                        // TODO is this a correct assumption?
+                        min: -4,
+                        max: 1,
+                        message: 'Stellar metallicity must be between -4.0 and +1.0'
                     }
                 }
             },
@@ -600,8 +729,12 @@
                     },
                     numeric: {
                         message: 'Stellar log g must be a number'
+                    },
+                    between: {
+                        min: 0,
+                        max: 6,
+                        message: 'Stellar log g must be between 0.0 and 6.0'
                     }
-                    // TODO
                 }
             },
             mag: {
@@ -611,10 +744,6 @@
                     },
                     numeric: {
                         message: 'Magnitude must be a number'
-                    },
-                    greaterThan: {
-                        value: 0,   // TODO inclusive?
-                        message: 'Magnitude must be positive'
                     }
                 }
             },
@@ -636,7 +765,8 @@
                     file: {
                         type: 'text/plain',
                         message: 'Please choose a text file'
-                    }
+                    },
+                    checkFileColumns: {}
                 }
             },
             planwunits: {
@@ -653,6 +783,13 @@
                     }
                 }
             },
+            constplanfunits: {
+                validators: {
+                    notEmpty: {
+                        message: 'Planet model units are required'
+                    }
+                }
+            },
             depth: {
                 validators: {
                     notEmpty: {
@@ -660,8 +797,11 @@
                     },
                     numeric: {
                         message: 'Wavelength-independent transit depth must be a number'
+                    },
+                    greaterThan: {
+                        value: 0,
+                        message: 'Wavelength-independent transit depth must be a positive number'
                     }
-                    // TODO Negative
                 }
             },
             transit_duration: {
@@ -682,8 +822,12 @@
                     },
                     numeric: {
                         message: 'In:out ratio must be a number'
+                    },
+                    greaterThan: {
+                        value: 0,
+                        inclusive: false,
+                        message: 'In:out ratio must be greater than zero'
                     }
-                    // TODO between specific values?
                 }
             },
             numtrans: {
@@ -762,7 +906,7 @@
                         text: 'optimize',
                         min: 2,
                         max: 65536,
-                        message: 'Must be a number of transits'
+                        message: '' // see custom validation rule
                     }
                 }
             },
@@ -775,8 +919,12 @@
                         min: 0,
                         max: 100,
                         message: 'Must be a percentage between 0 and 100'
+                    },
+                    greaterThan: {
+                        value: 0,
+                        inclusive: false,
+                        message: 'Percent fullwell of electrons may not be zero'
                     }
-                    // TODO not zero
                 }
             },
             noiseModel: {
@@ -790,7 +938,8 @@
                     file: {
                         type: 'text/plain',
                         message: 'Please choose a text file'
-                    }
+                    },
+                    checkFileColumns: {}
                 }
             },
             noisefloor: {
@@ -831,6 +980,6 @@
     }
 </script>
 
-<script type="text/javascript" src="{{ static_url('js/bootstrapValidator.js')}}"></script>
+<script type="text/javascript" src="{{ static_url('js/bootstrapValidator.min.js')}}"></script>
 <!--<script type="text/javascript" src="http://cdn.pydata.org/bokeh/release/bokeh-0.12.6.min.js"></script>-->
 {% end %}

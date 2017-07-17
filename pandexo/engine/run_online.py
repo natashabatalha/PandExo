@@ -324,14 +324,20 @@ class CalculationNewHandler(BaseHandler):
                 exodata["planet"]["w_unit"] = self.get_argument("planwunits")
                 exodata["planet"]["f_unit"] = self.get_argument("planfunits")
             elif exodata["planet"]["type"] == "constant":
-                # TODO connect this variable with processing script
-                exodata["planet"]["depth"] = float(self.get_argument("depth"))
-
+                # TODO connect these variables with processing script
+                planet_units = self.get_argument("constplanfunits")
+                if planet_units == "primary":
+                    exodata["planet"]["f_unit"] = "rp^2/r*^2"
+                    exodata["planet"]["depth"] = float(self.get_argument("depth"))
+                if planet_units == "secondary":
+                    exodata["planet"]["f_unit"] = "fp/f*"
+                    exodata["planet"]["depth"] = float(self.get_argument("depth"))
+                    exodata["planet"]["temp"] = float(self.get_argument("ptemp"))
 
             exodata["observation"]["fraction"] = float(self.get_argument("fraction"))
             exodata["observation"]["noccultations"] = float(self.get_argument("numtrans"))
             exodata["observation"]["sat_level"] = float(self.get_argument("satlevel"))
-            
+
             # for phase curves user doesn't necessarily have to input a transit duration
             try:
                 exodata["planet"]["transit_duration"] = float(self.get_argument("transit_duration"))
@@ -339,10 +345,10 @@ class CalculationNewHandler(BaseHandler):
                 # but if they don't.. make sure that the planet units are in seconds...
                 if exodata["planet"]["w_unit"] == 'sec':
                     exodata["planet"]["transit_duration"] = 0.0
-                else: 
+                else:
                     print("Need to give transit duration")
-                    raise 
-                
+                    raise
+
             # noise floor, set to 0.0 of no values are input
             try:
                 observation_type = self.get_argument("noiseModel")
@@ -390,7 +396,6 @@ class CalculationNewHandler(BaseHandler):
                 nirissmode = self.get_argument("nirissmode")
                 pandata["configuration"]["detector"]["subarray"] = nirissmode
 
-        pandata['configuration']['instrument']['instrument'] = instrument
 
         # write in optimal groups or set a number
         try:
