@@ -54,6 +54,5 @@ setup(
           'batman-package',
           'photutils',
           'astropy'
-          ],
-    dependency_links=['https://github.com/spacetelescope/pysynphot.git@0.9.8.5']
+          ]
 )

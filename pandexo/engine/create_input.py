@@ -70,7 +70,8 @@ def outTrans(input) :
     else: 
         raise Exception('Units are not correct. Pick um, nm, cm or Angs')
 
-    #convert to photons/s/nm/m^2 for flux normalization based on gemini.edu
+    #convert to photons/s/nm/m^2 for flux normalization based on 
+    #http://www.gemini.edu/sciops/instruments/integration-time-calculators/itc-help/source-definition
     if input['f_unit'] == 'Jy':
         flux = flux*1.509e7/wave #eq. C
         
@@ -84,9 +85,21 @@ def outTrans(input) :
         raise Exception('Units are not correct. Pick W/m2/um, FLAM, Jy, or erg/s/cm2/Hz')
     
     #normalize to specific mag 
+    
     mag = float(input['mag'])
-    norm_flux = np.interp(ref_wave, wave, flux)
-    flux = flux/norm_flux*1.97e7*10**(-mag/2.5)
+    norm_flux = np.interp(ref_wave, wave, flux) 
+
+    #get zero point for J H and K 
+    if (ref_wave <= 1.3e3) & (ref_wave >= 1.2e3):
+        zeropoint = 1.97e7
+    elif (ref_wave <= 1.7e3) & (ref_wave >= 1.6e3):
+        zeropoint = 9.6e6
+    elif (ref_wave <= 2.3e3) & (ref_wave >= 2.1e3):
+        zeropoint = 4.5e6
+    else:
+        raise Exception('Only J H and K zeropoints are included')
+
+    flux = flux/norm_flux*zeropoint*10**(-mag/2.5)
     
     #return to Pandeia units... milliJy and micron 
     flux_out_trans = flux*wave/1.509e7*1e3 #inverse of eq. C times 1e3 to get to milliJy instead of Jy 

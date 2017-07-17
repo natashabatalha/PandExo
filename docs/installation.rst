@@ -1,72 +1,56 @@
-Installation
-==============
 .. warning::
     Before reading further, if you do not wish to install PandExo,\
     there is an online version of the code here here at \
     `PSU Science <http://pandexo.science.psu.edu:1111>`_ or here at NASA GSFC. 
 
-Installation Procedure 
-----------------------
+Before we start, the scripts written to install PandExo assume the user has installed `Anaconda <https://www.continuum.io/downloads>`_. For diehard pip users, know that STScI tools will be only distributed on conda so PandExo will not be the only package to use it. 
 
-1. Easiest way to Install: 
+If you are dead set against it you will need to follow the installation guidelines `here <https://natashabatalha.github.io/PandExo/installation.html>`_. 
 
-.. code-block:: bash
-    
-    pip install pandexo.engine
+Pre-installation Data Download
+==============================
 
-OR Download PandExo's repository: 
+ss mentioned, the user must provide their own reference data files in order for the engine to understand the instrument with which the calculations will be performed. First step to getting PandExo running is downloading four files. Download them and put them in the same directory. 
 
-.. code-block:: bash
+JWST Reference Data
+```````````````````
+For JWST, the user may download the required reference data `here <http://ssb.stsci.edu/pandeia/engine/1.0/pandeia_data-1.0.tar.gz>`_. Unpack and store the data in a choice location.
 
-    git clone --recursive https://github.com/natashabatalha/pandexo
-    cd pandexo
-    python setup.py install
+Stellar SEDs 
+````````````
+Likewise, the user may wish to install specific data for use with the PySynPhot package Pandeia uses. We will only be using the Phoenix stellar atlas, which can be downloaded `here <ftp://ftp.stsci.edu/cdbs/tarfiles/synphot5.tar.gz>`_. 
 
-2. Download the Phoenix Stellar Atlas `FROM THIS LINK <ftp://ftp.stsci.edu/cdbs/tarfiles/synphot5.tar.gz>`_
-in order to easily pull Stellar SED's from the phoenix database. Then type the following commands. 
-It might be helpful to add the export command to your ~/.bashrc file. 
+PandExo startup bash script
+````````````````````````````
+A startup script and a python test script was created to do an automatic install of PandExo. You can download both of them from a google drive located `here <https://drive.google.com/open?id=0ByRvbM3zW0d-d2xoSmNMc1RtdTQ>`_.
 
-.. code-block:: bash
 
-    mkdir pysynphot_data
-    mv synphot5.tar.gz pysynphot_data
-    tar -xvf synphot5.tar.gz
-    export PYSYN_CDBS=USRDIR/pysynphot_data
+Installation for Users With Conda
+====================================
 
-Once you do this your untarred file should automatically have this structure. STScI changed the structure of 
-this file but now how pysynphot calls the data. So you will most likely have to change this file structure to what
-is below: 
+Open up the file `pandexo.sh`. There are two lines in the beginning which tell PandExo where your reference data will go. Currently this script is set to unpack and store the reference files in your HOME directory. 
 
-.. code-block:: bash
+If you are not okay with it, **change** $HOME in the first two lines of pandexo.sh to whatever you want the data to be.
 
-    ls pysynphot_data/grid/phoenix/
-    .DS_Store     catalog.fits  phoenixm05/   phoenixm15/   phoenixm25/   phoenixm35/   phoenixp03/   
-    AA_README     phoenixm00/   phoenixm10/   phoenixm20/   phoenixm30/   phoenixm40/   phoenixp05/
-
-3. Download the JWST Reference Data `FROM HERE <http://ssb.stsci.edu/pandeia/engine/1.0/pandeia_data-1.0.tar.gz>`_ . 
-This is a big file (6 gigs) so think carefully about where you want to store it. Don't accidentally download 
-it on your Mac Air then wonder why you can't save a 32 Kb doc file. 
-
-Then make sure you untar and point to the file so PandExo knows where it is. Like above, it might 
-be helpful to put this in your ~/.bashrc file. 
-
-.. code-block:: bash
-
-    tar xf pandeia_data-1.0.tar.gz 
-    export pandeia_refdata=USRDIR/pandeia_data-1.0
-
-Your Pandeia data reference file should look like this: 
+Then run
 
 .. code-block:: bash 
 
-    ls pandeia_data/
-    .DS_Store      README.md      background/    extinction/    jwst/          sed/           strategy/      
-    .git/          VERSION_PSF    devtools/      hst/           normalization/ source/        wfirst/ 
-    
-Troubleshooting
----------------
-TypeError: 'float' object cannot be interpreted as an index
-```````````````````````````````````````````````````````````
+    sh pandexo.sh
+    Starting TEST run
+    Running Single Case for: NIRSpec G140H
+    Optimization Reqested: Computing Duty Cycle
+    Finished Duty Cycle Calc
+    Starting Out of Transit Simulation
+    End out of Transit
+    Starting In Transit Simulation
+    End In Transit
+    SUCCESS
+
+Hopefully you have had success but if not the most likely error you will get is the following:
+
+COORDS.PY: TypeError: 'float' object cannot be interpreted as an index
+```````````````````````````````````````````````````````````````````````
 This is an error within Pandeia, which has not yet been fixed by STScI folk. You can easily fix it by finding where the file /pandeia/engine/coords.py is and changing line 36:
 
 .. code-block:: python 
@@ -79,70 +63,90 @@ To this:
 
     ones = np.ones((int(ny), int(nx)))
 
-Problems with PYFFTW?
-`````````````````````
-Many users experience issues when downloading Pandeia because of it's dependency \
-on `pyfftw`. If you experience this problem try these steps:
 
-- If you do not have a non-LLVM based GCC installation on your system, you can obtain one from here but gcc 5.1 does not produce a usable FFTW installation so make sure you download **gcc 4.9 or below**
+Installation for Users With PIP
+===============================
 
-- STScI created the following script to successfully install `pyfftw`
+You should have already downloaded the two data tar files, pandexo.sh and run_test.py. If not, go back to `Pre Installation Data Download`. 
+
+Then, start by installing PandExo, which should automatically isntall Pandeia and other dependencies 
+
+.. code-block:: bash
+    
+    pip install pandexo.engine
+
+OR Download PandExo's repository via Github: 
 
 .. code-block:: bash
 
-    mv $(which gcc) $(which gcc).orig
-    curl -O https://bitbucket.org/api/2.0/snippets/jhunkeler/R7gy5/3265aea27175817087ab4a39c21157d926f8afc3/files/build_fftw.sh
-    chmod +x build_fftw.sh
-    ./build_fftw
+    git clone --recursive https://github.com/natashabatalha/pandexo
+    cd pandexo
+    python setup.py install
 
-If that doesn't work Zach Berta-Thompson pointed out that this worked for him: 
+Set Environment
+```````````````
+Open up the file `pandexo.sh`. The first two lines in the beginning tell PandExo where your reference data will go via the variable `$USRDIR`. Currently `$USRDIR` is equal to your HOME directory, meaning your big data files will be untarred there. 
+
+If you are not okay with it, **change** $HOME in the first two lines of pandexo.sh to whatever you want the data to be. It should look like this: 
+
+.. code-block:: bash 
+
+    USRDIR=/I/Want/My/Data/Here
+    echo 'USRDIR=/I/Want/My/Data/Here' >>~/.bash_profile
+
+NEXT, since pandexo.sh is set for conda users, delete everything after line 22. We will have to do these manually since we don't have conda. Once you have done these two things you can go ahead and run: 
+
+.. code-block:: bash 
+
+    sh pandexo.sh
+
+Dependencies
+````````````
+PyFFTW is needed to run PandExo. In order to run PyFFTW you need to also isntall fftw. To do so, it is necessary to do so through Homebrew, if you do not have conda. 
 
 .. code-block:: bash 
 
     brew install fftw
-    pip install pyfftw
+    pip install pyfftw  
 
-There are several different conda distributions of pyfftw however, if 
-you install version <0.10 it may downgrade 
-your version of numpy. Therefore, a version that is greater than 0.10 is best. Numpy should be 
-numpy>=1.12 
+Lastly, Python 2.7 users will need to install multiprocessing: 
+
+.. code-block:: bash 
+    
+    pip install multiprocessing
+
+Finally try to run the test file to see if there are any additional problems: 
 
 .. code-block:: bash 
 
-    conda install -c spectraldns pyfftw=0.10.4 
+    python run_test.py
+    Starting TEST run
+    Running Single Case for: NIRSpec G140H
+    Optimization Reqested: Computing Duty Cycle
+    Finished Duty Cycle Calc
+    Starting Out of Transit Simulation
+    End out of Transit
+    Starting In Transit Simulation
+    End In Transit
+    SUCCESS
 
-Can't find Pandeia Reference Data
-`````````````````````````````````
-This usually looks like NoneType errors. 
+Hopefully you have had success but if not the most likely error you will get is the following:
 
-- Make sure PandExo knows where the Pandeia reference data is: 
+COORDS.PY: TypeError: 'float' object cannot be interpreted as an index
+```````````````````````````````````````````````````````````````````````
+This is an error within Pandeia, which has not yet been fixed by STScI folk. You can easily fix it by finding where the file /pandeia/engine/coords.py is and changing line 36:
 
-.. code-block:: bash
+.. code-block:: python 
+   
+    ones = np.ones((ny, nx))
 
-    export pandeia_refdata=USRDIR/pandeia_data
-    
-Problems Installing Pysynphot
-`````````````````````````````
+To this: 
 
-If you are having problems with this 
-you can use the astroconda distribution located `here <http://astroconda.readthedocs.io/en/latest/installation.html#install-astroconda>`_. 
+.. code-block:: python
 
-Or if you are using conda: 
+    ones = np.ones((int(ny), int(nx)))
 
-.. code-block:: bash
-
-    conda install -c astropy photutils=0.3
-
-Problems with Multiprocessing
-`````````````````````````````
-
-Multiprocessing seems to throw errors if you are using Python 3. Jonathan Fraine pointed out that 
-multiprocessing is automatically included in Python 3. Therefore, if you delete the multiprocessing from 
-setup.py your problem will go away. 
-
-To-Do
------
-
-Below are a list of task items. Please check below for your request before notifying me. 
+TODOS
+===== 
 
 1. Add error messages to the pandas output page 

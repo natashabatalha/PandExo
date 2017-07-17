@@ -215,7 +215,7 @@ def run_pandexo(exo, inst, param_space = 0, param_range = 0,save_file = True,
     
     For multiple instruments:
     
-    >>> a = run_pandexo(exo_dict, ['MIRI LRS','NIRSpec G395H']
+    >>> a = run_pandexo(exo_dict, ['MIRI LRS','NIRSpec G395H'])
     
     Loop through a exoplanet parameter (stellar magnitude): 
     
