@@ -19,7 +19,9 @@
 #
 # If the GUI is interrupted due to a server error, kill the process first:
 # > ps -a
-# > kill [PID of sudo and python]
+# > sudo kill [PID of sudo and python]
+# A quick one liner to kill all PIDs returned from `ps -a`:
+# > sudo kill `ps -a | awk 'NR>1 {print $1}' | tr '\n' ' ' | awk '{print "\n"$0"\n"}'`
 # Then reconnect to screen (see above)
 # Then relaunch the GUI (see above)
 
