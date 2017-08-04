@@ -50,7 +50,7 @@ setup(
           'pandas',
 #          'multiprocessing',
           'joblib',
-          'pandeia.engine',
+          'pandeia.engine==1.0',
           'batman-package',
           'photutils',
           'astropy'
