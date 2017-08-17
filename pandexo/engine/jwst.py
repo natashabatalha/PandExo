@@ -868,7 +868,8 @@ def as_dict(out, both_spec ,binned, timing, mag, sat_level, warnings, punit, unb
     
     final_dict = {
     'OriginalInput': {'model_spec':both_spec['model_spec'],
-                     'model_wave' : both_spec['model_wave']},
+                     'model_wave' : both_spec['model_wave'],
+                     'star_spec': both_spec['flux_out_trans']},
     'RawData': unbinned,
     'FinalSpectrum': binned,
         

@@ -13,8 +13,8 @@ echo 'export PYSYN_CDBS="$USRDIR/pysynphot_data"' >>~/.bash_profile
 
 ############ BLOCK TO SET PANDEIA REFERENCE DATA #########################
 
-tar -xvf pandeia_data-1.0.tar.gz || tar -xvf pandeia_data-1.0.tar
-echo 'export pandeia_refdata="$USRDIR/pandeia_data-1.0"' >>~/.bash_profile
+tar -xvf pandeia_data-1.1.1.tar.gz || tar -xvf pandeia_data-1.1.1.tar
+echo 'export pandeia_refdata="$USRDIR/pandeia_data-1.1.1"' >>~/.bash_profile
 
 ##############Make sure your bash profile is sourced
 source ~/.bash_profile

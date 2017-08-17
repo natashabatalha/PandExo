@@ -14,7 +14,7 @@ ss mentioned, the user must provide their own reference data files in order for 
 
 JWST Reference Data
 ```````````````````
-For JWST, the user may download the required reference data `here <http://ssb.stsci.edu/pandeia/engine/1.0/pandeia_data-1.0.tar.gz>`_. Unpack and store the data in a choice location.
+For JWST, the user may download the required reference data `here <http://ssb.stsci.edu/pandeia/engine/1.1.1/pandeia_data-1.1.1.tar.gz>`_. Unpack and store the data in a choice location.
 
 Stellar SEDs 
 ````````````
