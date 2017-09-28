@@ -79,6 +79,9 @@ body {
     font-family: 'Open Sans', sans-serif;
     margin: 15px 0;
 }
+.radio-chooser + small.help-block {
+    display: none !important;
+}
 .radio-chooser-item {
     width: 50%;
     box-sizing: border-box;
@@ -100,12 +103,22 @@ body {
     cursor: pointer;
     width: 100%;
     margin: 0;
-    padding: 5px 15px;
+    padding: 5px 10px;
 }
 .radio-chooser-content input {
     margin: 0 15px 0 0 !important;
     line-height: 20px;
     vertical-align: middle;
+}
+.radio-chooser-content input:active, .radio-chooser-content input:focus {
+    outline: 0;
+}
+.radio-chooser-content .form-control-feedback {
+    margin-top: 35px;
+    margin-right: 15px;
+}
+.radio-chooser-content .form-control-feedback.glyphicon {
+    display: none !important;
 }
 .radio-chooser-title {
     max-width: 270px;
@@ -113,4 +126,32 @@ body {
     vertical-align: middle;
     font-weight: 100;
     font-size: 18px;
+}
+
+/* Form Validation */
+.form-group.has-feedback.has-error p.help-block {
+    display: none;
+}
+.form-group.has-feedback.has-error small.help-block {
+    font-size: 14px;
+}
+/* Special rules: Select2, input-addon, radio-chooser */
+.form-group.has-feedback.has-success .select2 .select2-selection__arrow b {
+    border-top-color: #3c763d;
+}
+.form-group.has-feedback.has-error .select2 .select2-selection__arrow b {
+    border-top-color: #a94442;
+}
+.form-group.has-feedback.has-error .select2 .select2-selection__placeholder {
+    color: #b05a5a;
+}
+.form-group.has-feedback.has-error .input-group ~ .form-control-feedback,
+.form-group.has-feedback.has-feedback .input-group ~ .form-control-feedback,
+.form-group.has-feedback.has-success .input-group ~ .form-control-feedback,
+.form-group.has-feedback select ~ .form-control-feedback,
+.form-group.has-feedback select ~ .help-block {
+    display: none !important;
+}
+.form-group.has-feedback.has-error .radio-chooser, .form-group.has-feedback.has-error .radio-chooser-item {
+    border-color: #bd8484;
 }

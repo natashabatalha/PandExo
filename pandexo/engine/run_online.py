@@ -7,7 +7,8 @@ import tornado.httpserver
 import tornado.ioloop
 import tornado.options
 import tornado.web
-#import tornado.log
+import tornado.log
+import traceback
 from concurrent.futures import ProcessPoolExecutor
 from .pandexo import wrapper
 from tornado.options import define, options
@@ -19,11 +20,11 @@ import numpy as np
 
 # define location of temp files
 __TEMP__ = os.path.join(os.path.dirname(__file__), "temp")
-#__LOG__ = os.path.dirname(os.path.dirname(os.path.dirname(__file__))) + "/"
+__LOG__ = os.path.dirname(os.path.dirname(os.path.dirname(__file__))) + "/"
 
 define("port", default=1111, help="run on the given port", type=int)
 define("debug", default=False, help="automatically detect code changes in development")
-#define("log_file_prefix", default=__LOG__ + "pandexo_logs.log", help="where to store logs")
+define("log_file_prefix", default=__LOG__ + "pandexo_logs.log", help="where to store logs")
 
 # Define a simple named tuple to keep track for submitted calculations
 CalculationTask = namedtuple('CalculationTask', ['id', 'name', 'task',
@@ -160,7 +161,17 @@ class BaseHandler(tornado.web.RequestHandler):
         """
         This renders a customized error page
         """
-        self.render('errors.html',page=None)
+        reason = self._reason
+        error_info = ''
+        trace_print = ''
+        if 'exc_info' in kwargs:
+            error_info = kwargs['exc_info']
+            try:
+                trace_print = traceback.format_exception(*error_info)
+                trace_print = "\n".join(map(str,trace_print))
+            except:
+                pass
+        self.render('errors.html',page=None, status_code=status_code, reason=reason, error_log=trace_print)
 
 
 
@@ -324,14 +335,20 @@ class CalculationNewHandler(BaseHandler):
                 exodata["planet"]["w_unit"] = self.get_argument("planwunits")
                 exodata["planet"]["f_unit"] = self.get_argument("planfunits")
             elif exodata["planet"]["type"] == "constant":
-                # TODO connect this variable with processing script
-                exodata["planet"]["depth"] = float(self.get_argument("depth"))
-
+                # TODO connect these variables with processing script
+                planet_units = self.get_argument("constplanfunits")
+                if planet_units == "primary":
+                    exodata["planet"]["f_unit"] = "rp^2/r*^2"
+                    exodata["planet"]["depth"] = float(self.get_argument("depth"))
+                if planet_units == "secondary":
+                    exodata["planet"]["f_unit"] = "fp/f*"
+                    exodata["planet"]["depth"] = float(self.get_argument("depth"))
+                    exodata["planet"]["temp"] = float(self.get_argument("ptemp"))
 
             exodata["observation"]["fraction"] = float(self.get_argument("fraction"))
             exodata["observation"]["noccultations"] = float(self.get_argument("numtrans"))
             exodata["observation"]["sat_level"] = float(self.get_argument("satlevel"))
-            
+
             # for phase curves user doesn't necessarily have to input a transit duration
             try:
                 exodata["planet"]["transit_duration"] = float(self.get_argument("transit_duration"))
@@ -339,10 +356,10 @@ class CalculationNewHandler(BaseHandler):
                 # but if they don't.. make sure that the planet units are in seconds...
                 if exodata["planet"]["w_unit"] == 'sec':
                     exodata["planet"]["transit_duration"] = 0.0
-                else: 
+                else:
                     print("Need to give transit duration")
-                    raise 
-                
+                    raise
+
             # noise floor, set to 0.0 of no values are input
             try:
                 observation_type = self.get_argument("noiseModel")
@@ -390,8 +407,7 @@ class CalculationNewHandler(BaseHandler):
                 nirissmode = self.get_argument("nirissmode")
                 pandata["configuration"]["detector"]["subarray"] = nirissmode
 
-        pandata['configuration']['instrument']['instrument'] = instrument
-        
+
         # write in optimal groups or set a number
         try:
             pandata["configuration"]["detector"]["ngroup"] = int(self.get_argument("optimize"))
