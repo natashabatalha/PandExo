@@ -3,7 +3,7 @@
 {% block prebody %}
 <div class="jumbotron">
     <div class="container">
-        <h1>PandExo: An Exoplanet ETC </h1>
+        <h1>PandExo: The Exoplanet ETC </h1>
 
         <p>Tools to help the community with planning exoplanet observations.</p>
     </div>
@@ -13,61 +13,52 @@
 {% block body %}
 <!-- Example row of columns -->
 <div class="row">
-  <div class="col-md-4">
-    <div class="thumbnail">
-      <img src="../static/img/getting_started_thumb.jpg" alt="...">
-      <div class="caption">
-        <h3>Getting Started</h3>
-        <p> <a href="about" class="btn btn-primary" role="button">Overview &raquo;</a></p>
-      </div>
-    </div>
-  </div>
-    <div class="col-md-4">
+    <div class="col-md-6">
     <div class="thumbnail">
       <img src="../static/img/jwst_thumb.jpg" alt="...">
       <div class="caption">
-        <h3>JWST</h3>
-        <p><a href="/calculation/new" class="btn btn-success" role="button">New Calculation</a> <a href="/dashboard" class="btn btn-default" role="button">Dashboard</a></p>
+        <p><a href="/calculation/new" class="btn btn-success btn-lg" role="button">New Calculation</a> <a href="/dashboard" class="btn btn-default btn-lg" role="button">Dashboard</a></p>
       </div>
     </div>
   </div>
-    <div class="col-md-4">
+    <div class="col-md-6">
     <div class="thumbnail">
       <img src="../static/img/hst_thumb.jpg" alt="...">
       <div class="caption">
-        <h3>HST</h3>
-        <p><a href="/calculation/newHST" class="btn btn-success" role="button">New Calculation</a> <a href="/dashboardhst" class="btn btn-default" role="button">Dashboard</a></p>
+        <p><a href="/calculation/newHST" class="btn btn-success btn-lg" role="button">New Calculation</a> <a href="/dashboardhst" class="btn btn-default btn-lg" role="button">Dashboard</a></p>
       </div>
     </div>
   </div>
 </div>
 
+
 <div class="row">
-  <div class="col-md-4">
-    <div class="thumbnail">
-      <img src="../static/img/known_thumb.jpg" alt="...">
-      <div class="caption">
-        <h3>Precomputed Noise Models</h3>
-        <p> <a href="tables" class="btn btn-primary" role="button">Download &raquo;</a></p>
-      </div>
+    <div class="col-md-9">
+        <h2>About PandExo</h2>
+
+        <p>PandExo was written using the core capabilities of STScI's Pandeia (Pandeia + Exoplanets = PandExo). The front end of Pandexo
+        is designed specifically for exoplanet transit studies. You might ask-- what's the difference between running Pandeia 
+        and PandExo? Pandeia requires that you know the number of groups, frames, and integrations. It also only takes in as input a 
+        stellar SED. PandExo takes in a stellar SED, a planet spectrum, and the transit duration and provides, as output, the error 
+        obtained on your spectrum. You also have the option of optimizing the number of groups, per integration or 
+        hard coding your own. PandExo has nice front end plotting functions built in, as well as parallelized bash 
+        scripts for running multiple noise models at once. Fundamentally, they also use different methods for computing noise. 
+        For a complete explanation of this, <a href="https://arxiv.org/abs/1702.01820">Batalha+2017</a> </p>
+        
+        <h2>Important Links</h2>
+        <ul>
+        <li><a href="https://github.com/natashabatalha/PandExo">PandExo Github</a></li>
+        <li><a href="https://natashabatalha.github.io/PandExo/installation.html">Guide to Installing PandExo</a></li>
+        <li><a href="https://natashabatalha.github.io/PandExo/tutorialjwst.html#editting-input-dictionaries">Editting Input Dict Manually</a></li>
+        <li><a href="https://natashabatalha.github.io/PandExo/tutorialjwst.html#analyzing-output">Analyzing PandExo Output</a></li>
+        <li><a href="https://github.com/natashabatalha/PandExo/tree/master/notebooks">Notebooks Examples</a></li>
+        </ul>
+
+        <h2>Reference Info</h2>
+        <p>A detailed description of PandExo is available in Batalha et al. 2017. For specifics about the code please visit the 
+        <a href="https://natashabatalha.github.io/PandExo/index.html">PandExo's Github.io</a>. </p>
+        
     </div>
-  </div>
-  <div class="col-md-4">
-    <div class="thumbnail">
-      <img src="../static/img/models_thumb.jpg" alt="...">
-      <div class="caption">
-        <h3>Model Transit Spectra</h3>
-        <p> <a href="#" class="btn btn-primary" role="button">Emission</a><a href="#" class="btn btn-success" role="button">Transmission</a><a href="#" class="btn btn-default" role="button">Dashboard</a></p>
-      </div>
-    </div>
-  </div>
-  <div class="col-md-4">
-    <div class="thumbnail">
-      <img src="../static/img/python_thumb.jpg" alt="...">
-      <div class="caption">
-        <h3>Help! PandExo Dictionaries!</h3>
-        <p> <a href="https://natashabatalha.github.io/PandExo/jwstdict.html" class="btn btn-primary" role="button">View Tutorial &raquo;</a></p>
-      </div>
-    </div>
-  </div></div>
+</div>
+
 {% end %}

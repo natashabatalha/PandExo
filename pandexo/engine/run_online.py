@@ -7,6 +7,7 @@ import tornado.httpserver
 import tornado.ioloop
 import tornado.options
 import tornado.web
+import traceback
 #import tornado.log
 from concurrent.futures import ProcessPoolExecutor
 from .pandexo import wrapper
@@ -160,8 +161,17 @@ class BaseHandler(tornado.web.RequestHandler):
         """
         This renders a customized error page
         """
-        self.render('errors.html',page=None)
-
+        reason = self._reason
+        error_info = ''
+        trace_print = ''
+        if 'exc_info' in kwargs:
+            error_info = kwargs['exc_info']
+            try:
+                trace_print = traceback.format_exception(*error_info)
+                trace_print = "\n".join(map(str,trace_print))
+            except:
+                pass
+        self.render('errors.html',page=None, status_code=status_code, reason=reason, error_log=trace_print)
 
 
     def _get_task_result(self, id):
