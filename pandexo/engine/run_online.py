@@ -19,7 +19,7 @@ import pandas as pd
 import numpy as np
 
 # define location of temp files
-__TEMP__ = os.path.join(os.path.dirname(__file__), "temp")
+__TEMP__ = os.environ.get("PANDEXO_TEMP", os.path.join(os.path.dirname(__file__), "temp"))
 #__LOG__ = os.path.dirname(os.path.dirname(os.path.dirname(__file__))) + "/"
 
 define("port", default=1111, help="run on the given port", type=int)
