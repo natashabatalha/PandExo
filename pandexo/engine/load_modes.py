@@ -65,7 +65,7 @@ class SetDefaultModes():
                                "niriss_input.json")) as data_file:
             pandeia_data = json.load(data_file)
         return pandeia_data
-        
+
     def nirspec(self):
         """Handles NIRSpec template
         """
@@ -83,7 +83,7 @@ class SetDefaultModes():
                 pandeia_data["configuration"]["detector"]["subarray"] = 'sub512'
 
         return pandeia_data
-        
+
     def nircam(self):
         """Handles NIRCam template
         """

@@ -292,3 +292,84 @@ def run_pandexo(exo, inst, param_space = 0, param_range = 0,save_file = True,
             output_file =  'instrument_run.p'
         if save_file: pkl.dump(results, open(os.path.join(output_path,output_file),'wb'))
         return results
+
+def subarrays(inst):
+  """function to show availalble subarrays and their times (in secons)
+
+  Parameters
+  ----------
+  inst : str 
+    string of either niriss, nirspec, miri or nircam
+
+  Returns
+  -------
+  dict 
+    dictionary with name of subarray as keys and time in seconds as entry
+  """
+  print("Subarray field stored in inst_dict['configuration']['detector']['subarray']")
+
+  if inst.lower() == 'niriss':
+    return {'substrip96':2.2129,'substrip256':5.4913}
+  elif inst.lower() == 'nirspec':
+    return {'sub1024a':0.451,'sub1024b':0.451,'sub2048':0.90156,'sub512':0.22572}
+  elif inst.lower() == 'miri':
+    return {'slitlessprism':0.159}
+  elif inst.lower()  == 'nircam':
+    return {"subgrism64":0.34, "subgrism128":0.67, "subgrism256":1.34, 
+      "subgrism64 (noutputs=1)":1.3, "subgrism128 (noutputs=1)":2.6, "subgrism256 (noutputs=1)":5.2}
+  else:
+    raise Exception("Only instruments are niriss, nirspec, miri, nircam. Pick one.")
+
+def dispersers(inst):
+  """function to show available dispersers
+
+  Parameters
+  ----------
+  inst : str 
+    string of either niriss, nirspec, miri or nircam
+
+  Returns 
+  -------
+  list 
+    lsit with available dispersers
+  """
+  print("Dispersers field stored in inst_dict['configuration']['instrument']['disperser']")
+  if inst.lower() == 'niriss':
+    return ['gr700xd']
+  elif inst.lower() == 'nirspec':
+    return ['g140m','g140h','g235m','g235h','g395m','g395h','prism']    
+  elif inst.lower() == 'miri':
+    return ['p750l']
+  elif inst.lower()  == 'nircam':
+    return ['grismr']
+  else:
+    raise Exception("Only instruments are niriss, nirspec, miri, nircam. Pick one.")     
+
+def filters(inst):
+    """Function to show availalbe filters 
+
+  Parameters
+  ----------
+  inst : str 
+    string of either niriss, nirspec, miri or nircam
+
+  Returns
+  -------
+  list 
+    list with availalbe filters
+  """
+    print("Filters field stored in inst_dict['configuration']['instrument']['filter']")
+
+    if inst.lower() == 'niriss':
+        print("No filters for niriss soss, type None, or null in filter field")
+        return [None]
+    elif inst.lower() == 'nirspec':
+        return ['f070lp','f100lp','f170lp','f290lp','clear']   
+    elif inst.lower() == 'miri':
+        print("No filters for miri lrs, type None, or null in filter field")
+        return [None]
+    elif inst.lower()  == 'nircam':
+        return ['f322w2','f444w']
+    else:
+        raise Exception("Only instruments are niriss, nirspec, miri, nircam. Pick one.") 
+
