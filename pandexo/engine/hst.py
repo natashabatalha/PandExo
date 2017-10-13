@@ -64,7 +64,7 @@ def wfc3_GuessParams(hmag, disperser, scanDirection, subarray, obsTime,maxExptim
             # Exposure time should be less than 2.5 minutes to achieve good time resolution
             ptsOrbit    = np.floor(obsTime/tottime)
             dutyCycle   = (exptime*(ptsOrbit-1))/50./60*100
-            if (dutyCycle > maxDutyCycle) and (exptime < maxExptime):
+            if (dutyCycle > maxDutyCycle) and (exptime < maxExptime) and (scanHeight < maxScanHeight):
                 maxDutyCycle    = dutyCycle
                 bestsampseq     = samp_seq
                 bestnsamp       = nsamp
