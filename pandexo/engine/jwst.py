@@ -107,8 +107,7 @@ def compute_full_sim(dictinput):
     
     noccultations = pandexo_input['observation']['noccultations']
     R = pandexo_input['observation']['R']
-    #amount of exposure time out-of-occultation, as a fraction of in-occ time 
-    expfact_out = pandexo_input['observation']['fraction'] 
+
     noise_floor = pandexo_input['observation']['noise_floor']
 
     
@@ -122,6 +121,20 @@ def compute_full_sim(dictinput):
         transit_duration = max(both_spec['time']) - min(both_spec['time'])
     else: 
         transit_duration = pandexo_input['planet']['transit_duration']
+
+    #amount of exposure time out-of-occultation, as a fraction of in-occ time 
+    try:
+        expfact_out = pandexo_input['observation']['fraction'] 
+        print("WARNING: key input fraction has been replaced with new 'baseline option'. See notebook example")
+        pandexo_input['observation']['baseline'] = pandexo_input['observation']['fraction'] 
+        pandexo_input['observation']['baseline_unit'] ='frac'
+    except:
+        if pandexo_input['observation']['baseline_unit'] =='frac':
+            expfact_out = pandexo_input['observation']['baseline'] 
+        elif pandexo_input['observation']['baseline_unit'] =='total':
+            expfact_out = transit_duration/( pandexo_input['observation']['baseline'] - transit_duration)
+        else: 
+            raise Exception("Wrong units for baseine: either 'frac' or 'total' accepted")
 
     #add to pandeia input 
     pandeia_input['scene'][0]['spectrum']['sed']['spectrum'] = out_spectrum

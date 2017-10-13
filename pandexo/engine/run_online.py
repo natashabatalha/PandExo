@@ -337,8 +337,10 @@ class CalculationNewHandler(BaseHandler):
                 # TODO connect this variable with processing script
                 exodata["planet"]["depth"] = float(self.get_argument("depth"))
 
+            #baseline 
+            exodata["observation"]["baseline"] = float(self.get_argument("baseline"))
+            exodata["observation"]["baseline_unit"] = self.get_argument("baseline_unit")
 
-            exodata["observation"]["fraction"] = float(self.get_argument("fraction"))
             exodata["observation"]["noccultations"] = float(self.get_argument("numtrans"))
             exodata["observation"]["sat_level"] = float(self.get_argument("satlevel"))
             exodata["observation"]["sat_unit"] = self.get_argument("sat_unit")

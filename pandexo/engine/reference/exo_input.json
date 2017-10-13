@@ -31,7 +31,8 @@
         "sat_unit":"% full well or e",
         "noccultations": 1,
         "R": null,
-        "fraction": 1, 
+        "baseline": 1,
+	"baseline_unit":"frac", 
         "noise_floor":0.0
         }
 }
