@@ -493,6 +493,7 @@ class CalculationNewHSTHandler(BaseHandler):
             exodata["observation"]["noccultations"]         = int(self.get_argument("noccultations"))
             pandata["strategy"]["nchan"]                 = int(self.get_argument("nchan"))
             pandata["strategy"]["scanDirection"]         = self.get_argument("scanDirection")
+            pandata["strategy"]["useFirstOrbit"]         = self.get_argument("useFirstOrbit").lower() == 'true'
             try:
                 pandata["strategy"]["windowSize"]        = float(self.get_argument("windowSize"))
             except:

@@ -28,7 +28,7 @@ def wfc3_GuessNOrbits(trdur):
     
     return norbits
 
-def wfc3_GuessParams(hmag, disperser, scanDirection, subarray, obsTime,maxExptime=150.):
+def wfc3_GuessParams(hmag, disperser, scanDirection, subarray, obsTime,maxScanHeight=180.,maxExptime=150.):
     '''Predict nsamp and samp_seq when values not provided by the user.
     
     Parameters
@@ -43,6 +43,8 @@ def wfc3_GuessParams(hmag, disperser, scanDirection, subarray, obsTime,maxExptim
         Subarray aperture ('grism256' or 'grism512')
     obsTime : float 
         Available observing time per HST orbit in seconds
+    maxScanHeight : float
+        (optional) maximum scan height in pixels
     maxExptime : float 
         (Optional) default=150.0, maximum exposure time in seconds
 
@@ -200,6 +202,7 @@ def wfc3_TExoNS(dictinput):
     scanDirection   = pandeia_input['strategy']['scanDirection']
     nchan           = pandeia_input['strategy']['nchan']
     norbits         = pandeia_input['strategy']['norbits']
+    useFirstOrbit   = pandeia_input['strategy']['useFirstOrbit']
     disperser       = pandeia_input['configuration']['instrument']['disperser'].lower()
     subarray        = pandeia_input['configuration']['detector']['subarray'].lower()
     nsamp           = pandeia_input['configuration']['detector']['nsamp']
@@ -319,6 +322,7 @@ def wfc3_TExoNS(dictinput):
     deptherr    = np.sqrt(inTrrms**2 + outTrrms**2) #ppm
     
     info = {"Number of HST orbits": norbits,
+            "Use first orbit" :   useFirstOrbit, 
             "WFC3 parameters: NSAMP": nsamp, 
             "WFC3 parameters: SAMP_SEQ":samp_seq.upper(),
             "Recommended scan rate (arcsec/s)": scanRate,
@@ -331,7 +335,7 @@ def wfc3_TExoNS(dictinput):
     
     return {"spec_error": deptherr/1e6, "light_curve_rms":chanrms/1e6, "nframes_per_orb":ptsOrbit,"info":info}
 
-def calc_start_window(eventType, rms, ptsOrbit, numOrbits, depth, inc, aRs, period, windowSize, ecc=0, w=90., duration=None, offset=0.):
+def calc_start_window(eventType, rms, ptsOrbit, numOrbits, depth, inc, aRs, period, windowSize, ecc=0, w=90., duration=None, offset=0., useFirstOrbit=False):
     '''Calculate earliest and latest start times
     
     Plot earliest and latest possible spectroscopic light curves for given start window size
@@ -364,6 +368,8 @@ def calc_start_window(eventType, rms, ptsOrbit, numOrbits, depth, inc, aRs, peri
         (Optional) full transit/eclipse duration in days
     offset : float 
         (Optional) manual offset in observation start time, in minutes
+    useFirstOrbit : bool 
+        (Optional) whether to use first orbit 
 
     Returns
     -------
@@ -405,7 +411,7 @@ def calc_start_window(eventType, rms, ptsOrbit, numOrbits, depth, inc, aRs, peri
 
     if duration == None:                    # Transit/eclipse duration (in days)
         duration = period/np.pi*np.arcsin(1./aRs*np.sqrt(((1+rprs)**2-(aRs*cosi)**2)/(1-cosi**2)))*sfactor
-    phase1      = (midpt + duration/2. - hstperiod*(numOrbits-2) - hstperiod/2 + offset/24./60)/period
+    phase1      = (midpt + duration/2. - hstperiod*(numOrbits-2-useFirstOrbit) - hstperiod/2 + offset/24./60)/period
     phase2      = (midpt - duration/2. - hstperiod*2 + offset/24./60)/period
     minphase    = (phase1+phase2)/2-punc
     maxphase    = (phase1+phase2)/2+punc
@@ -413,8 +419,8 @@ def calc_start_window(eventType, rms, ptsOrbit, numOrbits, depth, inc, aRs, peri
     #Compute light curves at extremes of HST start window
     npts        = 4 * ptsOrbit * numOrbits
     phdur       = duration/period
-    phase1      = np.linspace(minphase+hstperiod/period,minphase+hstperiod/period*(numOrbits-1)+hstperiod/period/2,npts)
-    phase2      = np.linspace(maxphase+hstperiod/period,maxphase+hstperiod/period*(numOrbits-1)+hstperiod/period/2,npts)
+    phase1      = np.linspace(minphase+(1-useFirstOrbit)*hstperiod/period,minphase+hstperiod/period*(numOrbits-1)+hstperiod/period/2,npts)
+    phase2      = np.linspace(maxphase+(1-useFirstOrbit)*hstperiod/period,maxphase+hstperiod/period*(numOrbits-1)+hstperiod/period/2,npts)
     m           = batman.TransitModel(params, phase1)
     trmodel1    = m.light_curve(params)
     m           = batman.TransitModel(params, phase2)
@@ -523,6 +529,7 @@ def compute_sim_hst(dictinput):
     numorbits       = pandeia_input['strategy']['norbits']
     nchan           = pandeia_input['strategy']['nchan']
     windowSize      = pandeia_input['strategy']['windowSize']
+    useFirstOrbit   = pandeia_input['strategy']['useFirstOrbit']
 
     hmag            = pandexo_input['star']['mag']
     specfile        = pandexo_input['planet']['exopath']
@@ -534,6 +541,7 @@ def compute_sim_hst(dictinput):
     period          = pandexo_input['planet']['period']
     ecc             = pandexo_input['planet']['ecc']
     w               = pandexo_input['planet']['w']
+
     #check to see if ecc or w was provided 
     if (type(ecc)!=float) and (type(ecc)!= int): 
         ecc = 0.0 
@@ -549,7 +557,7 @@ def compute_sim_hst(dictinput):
         raise Exception('Units are not correct. Pick rp^2/r*^2 or fp/f*')
     
     a = wfc3_TExoNS(dictinput)
-    b = calc_start_window(eventType, a['light_curve_rms'], a['nframes_per_orb'], numorbits, depth, inc, aRs, period, windowSize, ecc, w)
+    b = calc_start_window(eventType, a['light_curve_rms'], a['nframes_per_orb'], numorbits, depth, inc, aRs, period, windowSize, ecc, w, useFirstOrbit=useFirstOrbit)
     c = planet_spec(specfile, w_unit, disperser, a['spec_error'], nchan,smooth=20) 
     info_div = create_out_div(a['info'], b['minphase'],b['maxphase'])
     
