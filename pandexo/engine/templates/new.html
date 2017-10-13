@@ -295,13 +295,19 @@
     </div>
 
     <div class="form-group">
-        <label class="col-md-3 control-label" for="satlevel">Percent Fullwell</label>
+        <label class="col-md-3 control-label" for="satlevel">Saturation Limit</label>
         <div class="col-md-3">
             <div class="input-group">
                 <input type="text" class="form-control" id="satlevel" name="satlevel" >
-                <span class="input-group-addon">%</span>
             </div>
-            <p class="help-block">Percent fullwell of electrons.</p>
+            <p class="help-block">Percent fullwell or number of electrons.</p>
+        </div>
+        <div class="col-md-3">
+            <select id="sat_unit" name="sat_unit" class="form-control"" data-placeholder="Select e- or % fullwell">
+            <option value=""></option>
+            <option value="%">% Full Well</option>
+            <option value="e">Electrons</option>
+            </select>
         </div>
     </div>
 

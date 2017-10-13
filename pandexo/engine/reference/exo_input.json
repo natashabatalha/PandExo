@@ -27,7 +27,8 @@
             },
 
     "observation": {
-        "sat_level": "% full well",
+        "sat_level": null,
+        "sat_unit":"% full well or e",
         "noccultations": 1,
         "R": null,
         "fraction": 1, 

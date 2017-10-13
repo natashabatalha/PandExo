@@ -83,9 +83,17 @@ def compute_full_sim(dictinput):
         exp_pars = i.get_exposure_pars()
         
     #detector parameters
-    fullwell = det_pars['fullwell']
+    fullwell = det_pars['fullwell'] #from pandeia data
     rn = det_pars['rn']
-    sat_level = pandexo_input['observation']['sat_level']/100.0*fullwell
+    sat_unit = pandexo_input['observation']['sat_unit']
+
+    if sat_unit =='%':
+        sat_level = pandexo_input['observation']['sat_level']/100.0*fullwell
+    elif sat_unit =='e':
+        sat_level = pandexo_input['observation']['sat_level']
+    else: 
+        raise Exception("Saturation Level Needs Units: % fullwell or Electrons ")
+
     mingroups = det_pars['mingroups']
     
     #exposure parameters 

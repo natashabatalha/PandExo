@@ -341,7 +341,7 @@ class CalculationNewHandler(BaseHandler):
             exodata["observation"]["fraction"] = float(self.get_argument("fraction"))
             exodata["observation"]["noccultations"] = float(self.get_argument("numtrans"))
             exodata["observation"]["sat_level"] = float(self.get_argument("satlevel"))
-            
+            exodata["observation"]["sat_unit"] = self.get_argument("sat_unit")
             # for phase curves user doesn't necessarily have to input a transit duration
             try:
                 exodata["planet"]["transit_duration"] = float(self.get_argument("transit_duration"))
