@@ -169,6 +169,7 @@
 <span class="kn">import</span> <span class="nn">tornado.ioloop</span>
 <span class="kn">import</span> <span class="nn">tornado.options</span>
 <span class="kn">import</span> <span class="nn">tornado.web</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
 <span class="c1">#import tornado.log</span>
 <span class="kn">from</span> <span class="nn">concurrent.futures</span> <span class="k">import</span> <span class="n">ProcessPoolExecutor</span>
 <span class="kn">from</span> <span class="nn">.pandexo</span> <span class="k">import</span> <span class="n">wrapper</span>
@@ -180,7 +181,7 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="c1"># define location of temp files</span>
-<span class="n">__TEMP__</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s2">&quot;temp&quot;</span><span class="p">)</span>
+<span class="n">__TEMP__</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;PANDEXO_TEMP&quot;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s2">&quot;temp&quot;</span><span class="p">))</span>
 <span class="c1">#__LOG__ = os.path.dirname(os.path.dirname(os.path.dirname(__file__))) + &quot;/&quot;</span>
 
 <span class="n">define</span><span class="p">(</span><span class="s2">&quot;port&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">1111</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;run on the given port&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
@@ -322,8 +323,17 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This renders a customized error page</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s1">&#39;errors.html&#39;</span><span class="p">,</span><span class="n">page</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></div>
-
+        <span class="n">reason</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reason</span>
+        <span class="n">error_info</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">trace_print</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">if</span> <span class="s1">&#39;exc_info&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">error_info</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;exc_info&#39;</span><span class="p">]</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">trace_print</span> <span class="o">=</span> <span class="n">traceback</span><span class="o">.</span><span class="n">format_exception</span><span class="p">(</span><span class="o">*</span><span class="n">error_info</span><span class="p">)</span>
+                <span class="n">trace_print</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span><span class="n">trace_print</span><span class="p">))</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">pass</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s1">&#39;errors.html&#39;</span><span class="p">,</span><span class="n">page</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="n">status_code</span><span class="p">,</span> <span class="n">reason</span><span class="o">=</span><span class="n">reason</span><span class="p">,</span> <span class="n">error_log</span><span class="o">=</span><span class="n">trace_print</span><span class="p">)</span></div>
 
 
     <span class="k">def</span> <span class="nf">_get_task_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
@@ -489,11 +499,13 @@
                 <span class="c1"># TODO connect this variable with processing script</span>
                 <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;planet&quot;</span><span class="p">][</span><span class="s2">&quot;depth&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;depth&quot;</span><span class="p">))</span>
 
+            <span class="c1">#baseline </span>
+            <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;observation&quot;</span><span class="p">][</span><span class="s2">&quot;baseline&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;baseline&quot;</span><span class="p">))</span>
+            <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;observation&quot;</span><span class="p">][</span><span class="s2">&quot;baseline_unit&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;baseline_unit&quot;</span><span class="p">)</span>
 
-            <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;observation&quot;</span><span class="p">][</span><span class="s2">&quot;fraction&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;fraction&quot;</span><span class="p">))</span>
             <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;observation&quot;</span><span class="p">][</span><span class="s2">&quot;noccultations&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;numtrans&quot;</span><span class="p">))</span>
             <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;observation&quot;</span><span class="p">][</span><span class="s2">&quot;sat_level&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;satlevel&quot;</span><span class="p">))</span>
-            
+            <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;observation&quot;</span><span class="p">][</span><span class="s2">&quot;sat_unit&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;sat_unit&quot;</span><span class="p">)</span>
             <span class="c1"># for phase curves user doesn&#39;t necessarily have to input a transit duration</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;planet&quot;</span><span class="p">][</span><span class="s2">&quot;transit_duration&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;transit_duration&quot;</span><span class="p">))</span>
@@ -645,6 +657,7 @@
             <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;observation&quot;</span><span class="p">][</span><span class="s2">&quot;noccultations&quot;</span><span class="p">]</span>         <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;noccultations&quot;</span><span class="p">))</span>
             <span class="n">pandata</span><span class="p">[</span><span class="s2">&quot;strategy&quot;</span><span class="p">][</span><span class="s2">&quot;nchan&quot;</span><span class="p">]</span>                 <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;nchan&quot;</span><span class="p">))</span>
             <span class="n">pandata</span><span class="p">[</span><span class="s2">&quot;strategy&quot;</span><span class="p">][</span><span class="s2">&quot;scanDirection&quot;</span><span class="p">]</span>         <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;scanDirection&quot;</span><span class="p">)</span>
+            <span class="n">pandata</span><span class="p">[</span><span class="s2">&quot;strategy&quot;</span><span class="p">][</span><span class="s2">&quot;useFirstOrbit&quot;</span><span class="p">]</span>         <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;useFirstOrbit&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;true&#39;</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">pandata</span><span class="p">[</span><span class="s2">&quot;strategy&quot;</span><span class="p">][</span><span class="s2">&quot;windowSize&quot;</span><span class="p">]</span>        <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;windowSize&quot;</span><span class="p">))</span>
             <span class="k">except</span><span class="p">:</span>

@@ -245,9 +245,17 @@
         <span class="n">exp_pars</span> <span class="o">=</span> <span class="n">i</span><span class="o">.</span><span class="n">get_exposure_pars</span><span class="p">()</span>
         
     <span class="c1">#detector parameters</span>
-    <span class="n">fullwell</span> <span class="o">=</span> <span class="n">det_pars</span><span class="p">[</span><span class="s1">&#39;fullwell&#39;</span><span class="p">]</span>
+    <span class="n">fullwell</span> <span class="o">=</span> <span class="n">det_pars</span><span class="p">[</span><span class="s1">&#39;fullwell&#39;</span><span class="p">]</span> <span class="c1">#from pandeia data</span>
     <span class="n">rn</span> <span class="o">=</span> <span class="n">det_pars</span><span class="p">[</span><span class="s1">&#39;rn&#39;</span><span class="p">]</span>
-    <span class="n">sat_level</span> <span class="o">=</span> <span class="n">pandexo_input</span><span class="p">[</span><span class="s1">&#39;observation&#39;</span><span class="p">][</span><span class="s1">&#39;sat_level&#39;</span><span class="p">]</span><span class="o">/</span><span class="mf">100.0</span><span class="o">*</span><span class="n">fullwell</span>
+    <span class="n">sat_unit</span> <span class="o">=</span> <span class="n">pandexo_input</span><span class="p">[</span><span class="s1">&#39;observation&#39;</span><span class="p">][</span><span class="s1">&#39;sat_unit&#39;</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">sat_unit</span> <span class="o">==</span><span class="s1">&#39;%&#39;</span><span class="p">:</span>
+        <span class="n">sat_level</span> <span class="o">=</span> <span class="n">pandexo_input</span><span class="p">[</span><span class="s1">&#39;observation&#39;</span><span class="p">][</span><span class="s1">&#39;sat_level&#39;</span><span class="p">]</span><span class="o">/</span><span class="mf">100.0</span><span class="o">*</span><span class="n">fullwell</span>
+    <span class="k">elif</span> <span class="n">sat_unit</span> <span class="o">==</span><span class="s1">&#39;e&#39;</span><span class="p">:</span>
+        <span class="n">sat_level</span> <span class="o">=</span> <span class="n">pandexo_input</span><span class="p">[</span><span class="s1">&#39;observation&#39;</span><span class="p">][</span><span class="s1">&#39;sat_level&#39;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span> 
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Saturation Level Needs Units: </span><span class="si">% f</span><span class="s2">ullwell or Electrons &quot;</span><span class="p">)</span>
+
     <span class="n">mingroups</span> <span class="o">=</span> <span class="n">det_pars</span><span class="p">[</span><span class="s1">&#39;mingroups&#39;</span><span class="p">]</span>
     
     <span class="c1">#exposure parameters </span>
@@ -261,8 +269,7 @@
     
     <span class="n">noccultations</span> <span class="o">=</span> <span class="n">pandexo_input</span><span class="p">[</span><span class="s1">&#39;observation&#39;</span><span class="p">][</span><span class="s1">&#39;noccultations&#39;</span><span class="p">]</span>
     <span class="n">R</span> <span class="o">=</span> <span class="n">pandexo_input</span><span class="p">[</span><span class="s1">&#39;observation&#39;</span><span class="p">][</span><span class="s1">&#39;R&#39;</span><span class="p">]</span>
-    <span class="c1">#amount of exposure time out-of-occultation, as a fraction of in-occ time </span>
-    <span class="n">expfact_out</span> <span class="o">=</span> <span class="n">pandexo_input</span><span class="p">[</span><span class="s1">&#39;observation&#39;</span><span class="p">][</span><span class="s1">&#39;fraction&#39;</span><span class="p">]</span> 
+
     <span class="n">noise_floor</span> <span class="o">=</span> <span class="n">pandexo_input</span><span class="p">[</span><span class="s1">&#39;observation&#39;</span><span class="p">][</span><span class="s1">&#39;noise_floor&#39;</span><span class="p">]</span>
 
     
@@ -276,6 +283,20 @@
         <span class="n">transit_duration</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">both_spec</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">])</span> <span class="o">-</span> <span class="nb">min</span><span class="p">(</span><span class="n">both_spec</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">])</span>
     <span class="k">else</span><span class="p">:</span> 
         <span class="n">transit_duration</span> <span class="o">=</span> <span class="n">pandexo_input</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;transit_duration&#39;</span><span class="p">]</span>
+
+    <span class="c1">#amount of exposure time out-of-occultation, as a fraction of in-occ time </span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">expfact_out</span> <span class="o">=</span> <span class="n">pandexo_input</span><span class="p">[</span><span class="s1">&#39;observation&#39;</span><span class="p">][</span><span class="s1">&#39;fraction&#39;</span><span class="p">]</span> 
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;WARNING: key input fraction has been replaced with new &#39;baseline option&#39;. See notebook example&quot;</span><span class="p">)</span>
+        <span class="n">pandexo_input</span><span class="p">[</span><span class="s1">&#39;observation&#39;</span><span class="p">][</span><span class="s1">&#39;baseline&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pandexo_input</span><span class="p">[</span><span class="s1">&#39;observation&#39;</span><span class="p">][</span><span class="s1">&#39;fraction&#39;</span><span class="p">]</span> 
+        <span class="n">pandexo_input</span><span class="p">[</span><span class="s1">&#39;observation&#39;</span><span class="p">][</span><span class="s1">&#39;baseline_unit&#39;</span><span class="p">]</span> <span class="o">=</span><span class="s1">&#39;frac&#39;</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">pandexo_input</span><span class="p">[</span><span class="s1">&#39;observation&#39;</span><span class="p">][</span><span class="s1">&#39;baseline_unit&#39;</span><span class="p">]</span> <span class="o">==</span><span class="s1">&#39;frac&#39;</span><span class="p">:</span>
+            <span class="n">expfact_out</span> <span class="o">=</span> <span class="n">pandexo_input</span><span class="p">[</span><span class="s1">&#39;observation&#39;</span><span class="p">][</span><span class="s1">&#39;baseline&#39;</span><span class="p">]</span> 
+        <span class="k">elif</span> <span class="n">pandexo_input</span><span class="p">[</span><span class="s1">&#39;observation&#39;</span><span class="p">][</span><span class="s1">&#39;baseline_unit&#39;</span><span class="p">]</span> <span class="o">==</span><span class="s1">&#39;total&#39;</span><span class="p">:</span>
+            <span class="n">expfact_out</span> <span class="o">=</span> <span class="n">transit_duration</span><span class="o">/</span><span class="p">(</span> <span class="n">pandexo_input</span><span class="p">[</span><span class="s1">&#39;observation&#39;</span><span class="p">][</span><span class="s1">&#39;baseline&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">transit_duration</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span> 
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Wrong units for baseine: either &#39;frac&#39; or &#39;total&#39; accepted&quot;</span><span class="p">)</span>
 
     <span class="c1">#add to pandeia input </span>
     <span class="n">pandeia_input</span><span class="p">[</span><span class="s1">&#39;scene&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;spectrum&#39;</span><span class="p">][</span><span class="s1">&#39;sed&#39;</span><span class="p">][</span><span class="s1">&#39;spectrum&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">out_spectrum</span>

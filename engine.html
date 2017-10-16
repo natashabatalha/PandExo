@@ -182,6 +182,42 @@
 <div class="section" id="module-engine.justdoit">
 <span id="engine-justdoit"></span><h2>engine.justdoit<a class="headerlink" href="#module-engine.justdoit" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
+<dt id="engine.justdoit.dispersers">
+<code class="descclassname">engine.justdoit.</code><code class="descname">dispersers</code><span class="sig-paren">(</span><em>inst</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/justdoit.html#dispersers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.justdoit.dispersers" title="Permalink to this definition">¶</a></dt>
+<dd><p>function to show available dispersers</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>inst</strong> (<em>str</em>) – string of either niriss, nirspec, miri or nircam</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">lsit with available dispersers</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="engine.justdoit.filters">
+<code class="descclassname">engine.justdoit.</code><code class="descname">filters</code><span class="sig-paren">(</span><em>inst</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/justdoit.html#filters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.justdoit.filters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to show availalbe filters</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>inst</strong> (<em>str</em>) – string of either niriss, nirspec, miri or nircam</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list with availalbe filters</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
 <dt id="engine.justdoit.get_thruput">
 <code class="descclassname">engine.justdoit.</code><code class="descname">get_thruput</code><span class="sig-paren">(</span><em>inst</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/justdoit.html#get_thruput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.justdoit.get_thruput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns complete instrument photon to electron conversion efficiency
@@ -372,6 +408,24 @@ looped through.</p>
 </tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">dict</p>
 </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="engine.justdoit.subarrays">
+<code class="descclassname">engine.justdoit.</code><code class="descname">subarrays</code><span class="sig-paren">(</span><em>inst</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/justdoit.html#subarrays"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.justdoit.subarrays" title="Permalink to this definition">¶</a></dt>
+<dd><p>function to show availalble subarrays and their times (in secons)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>inst</strong> (<em>str</em>) – string of either niriss, nirspec, miri or nircam</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">dictionary with name of subarray as keys and time in seconds as entry</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">dict</td>
 </tr>
 </tbody>
 </table>
@@ -1438,7 +1492,7 @@ filename which points to a stellar spectrum</td>
 <span id="engine-hst"></span><h2>engine.hst<a class="headerlink" href="#module-engine.hst" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="engine.hst.calc_start_window">
-<code class="descclassname">engine.hst.</code><code class="descname">calc_start_window</code><span class="sig-paren">(</span><em>eventType</em>, <em>rms</em>, <em>ptsOrbit</em>, <em>numOrbits</em>, <em>depth</em>, <em>inc</em>, <em>aRs</em>, <em>period</em>, <em>windowSize</em>, <em>ecc=0</em>, <em>w=90.0</em>, <em>duration=None</em>, <em>offset=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/hst.html#calc_start_window"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.hst.calc_start_window" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">engine.hst.</code><code class="descname">calc_start_window</code><span class="sig-paren">(</span><em>eventType</em>, <em>rms</em>, <em>ptsOrbit</em>, <em>numOrbits</em>, <em>depth</em>, <em>inc</em>, <em>aRs</em>, <em>period</em>, <em>windowSize</em>, <em>ecc=0</em>, <em>w=90.0</em>, <em>duration=None</em>, <em>offset=0.0</em>, <em>useFirstOrbit=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/hst.html#calc_start_window"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.hst.calc_start_window" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate earliest and latest start times</p>
 <p>Plot earliest and latest possible spectroscopic light curves for given start window size</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -1459,6 +1513,7 @@ filename which points to a stellar spectrum</td>
 <li><strong>w</strong> (<em>float</em>) – (Optional) longitude of periastron</li>
 <li><strong>duration</strong> (<em>float</em>) – (Optional) full transit/eclipse duration in days</li>
 <li><strong>offset</strong> (<em>float</em>) – (Optional) manual offset in observation start time, in minutes</li>
+<li><strong>useFirstOrbit</strong> (<em>bool</em>) – (Optional) whether to use first orbit</li>
 </ul>
 </td>
 </tr>
@@ -1566,7 +1621,7 @@ compute simulated spectrum.</p>
 
 <dl class="function">
 <dt id="engine.hst.wfc3_GuessParams">
-<code class="descclassname">engine.hst.</code><code class="descname">wfc3_GuessParams</code><span class="sig-paren">(</span><em>hmag</em>, <em>disperser</em>, <em>scanDirection</em>, <em>subarray</em>, <em>obsTime</em>, <em>maxExptime=150.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/hst.html#wfc3_GuessParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.hst.wfc3_GuessParams" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">engine.hst.</code><code class="descname">wfc3_GuessParams</code><span class="sig-paren">(</span><em>hmag</em>, <em>disperser</em>, <em>scanDirection</em>, <em>subarray</em>, <em>obsTime</em>, <em>maxScanHeight=180.0</em>, <em>maxExptime=150.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/hst.html#wfc3_GuessParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.hst.wfc3_GuessParams" title="Permalink to this definition">¶</a></dt>
 <dd><p>Predict nsamp and samp_seq when values not provided by the user.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1578,6 +1633,7 @@ compute simulated spectrum.</p>
 <li><strong>scanDirection</strong> (<em>str</em>) – spatial scan direction (‘Forward’ or ‘Round Trip’)</li>
 <li><strong>subarray</strong> (<em>str</em>) – Subarray aperture (‘grism256’ or ‘grism512’)</li>
 <li><strong>obsTime</strong> (<em>float</em>) – Available observing time per HST orbit in seconds</li>
+<li><strong>maxScanHeight</strong> (<em>float</em>) – (optional) maximum scan height in pixels</li>
 <li><strong>maxExptime</strong> (<em>float</em>) – (Optional) default=150.0, maximum exposure time in seconds</li>
 </ul>
 </td>
