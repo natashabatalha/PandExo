@@ -69,7 +69,7 @@ class SetDefaultModes():
     def nirspec(self):
         """Handles NIRSpec template
         """
-        filters = {'g140m':'f070lp','g140h':'f070lp',
+        filters = {'g140m':'f100lp','g140h':'f100lp',
                     'g235m':'f170lp','g235h':'f170lp',
                     'g395m':'f290lp','g395h':'f290lp',
                     'prism': 'clear'
