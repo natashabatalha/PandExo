@@ -77,7 +77,7 @@ def load_mode_dict(inst):
     """
     return SetDefaultModes(inst).pick()
 
-def get_thruput(inst, niriss=1, nirspec='f070lp'):
+def get_thruput(inst, niriss=1, nirspec='f100lp'):
     """Returns complete instrument photon to electron conversion efficiency
     Pulls complete instrument photon to electron conversion efficiency 
     (PCE) based on instrument key input 
