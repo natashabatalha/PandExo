@@ -883,8 +883,12 @@ that run_pandexo assigns.</li>
 <dl class="function">
 <dt id="engine.bintools.binning">
 <code class="descclassname">engine.bintools.</code><code class="descname">binning</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>dy=None</em>, <em>binwidth=None</em>, <em>r=None</em>, <em>newx=None</em>, <em>log=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/bintools.html#binning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.bintools.binning" title="Permalink to this definition">¶</a></dt>
-<dd><p>This contains functionality to regroup x, y and dy. Users can either specify
-constant binwidth, constant resolution or give a user defined x axis</p>
+<dd><p>This contains functionality for binning spectroscopy given an x, y and set of errors.
+This is similar to IDL’s regroup but in Python (obviously). Note that y is binned as the
+mean(ordinates) instead of sum(ordinates), as you would want for cmputing flux in a set of
+pixels. User can input a constant resolution, constant binwidth or provide a user defined
+bin. The error is computed as sum(sqrt(sig1^2, sig2^2, sig3^2) )/3, for example
+if there were 3 points to bin.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />

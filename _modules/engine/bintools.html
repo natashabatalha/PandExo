@@ -167,8 +167,12 @@
 <span class="kn">import</span> <span class="nn">astropy.units</span> <span class="k">as</span> <span class="nn">u</span>
 <div class="viewcode-block" id="binning"><a class="viewcode-back" href="../../engine.html#engine.bintools.binning">[docs]</a><span class="k">def</span> <span class="nf">binning</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span>  <span class="n">dy</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">binwidth</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">newx</span><span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">log</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
 	<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">	This contains functionality to regroup x, y and dy. Users can either specify </span>
-<span class="sd">	constant binwidth, constant resolution or give a user defined x axis </span>
+<span class="sd">	This contains functionality for binning spectroscopy given an x, y and set of errors. </span>
+<span class="sd">	This is similar to IDL&#39;s regroup but in Python (obviously). Note that y is binned as the </span>
+<span class="sd">	mean(ordinates) instead of sum(ordinates), as you would want for cmputing flux in a set of </span>
+<span class="sd">	pixels. User can input a constant resolution, constant binwidth or provide a user defined </span>
+<span class="sd">	bin. The error is computed as sum(sqrt(sig1^2, sig2^2, sig3^2) )/3, for example </span>
+<span class="sd">	if there were 3 points to bin. </span>
 <span class="sd">	</span>
 <span class="sd">	Parameters</span>
 <span class="sd">	----------</span>
