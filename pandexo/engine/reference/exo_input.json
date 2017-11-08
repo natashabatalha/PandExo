@@ -9,7 +9,8 @@
                 "ref_wave": "1.25 for J, 1.60 for H, 2.22 for K",
                 "temp": "Kelvin",
                 "metal": "log[M/H]",
-                "logg": "log gravity cgs"
+                "logg": "log gravity cgs",
+                "rstar":null
             },
 
     "planet" :{
@@ -23,7 +24,13 @@
             "a":null, 
             "period":null,
             "ecc":null,
-            "w":null
+            "w":null,
+            "temp":null,
+            "gravity":null,
+            "chem":null,
+            "ray":null,
+            "cloud":null,
+            "reference_radius":null
             },
 
     "observation": {
