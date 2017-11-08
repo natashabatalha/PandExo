@@ -219,7 +219,7 @@
 
 <dl class="function">
 <dt id="engine.justdoit.get_thruput">
-<code class="descclassname">engine.justdoit.</code><code class="descname">get_thruput</code><span class="sig-paren">(</span><em>inst</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/justdoit.html#get_thruput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.justdoit.get_thruput" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">engine.justdoit.</code><code class="descname">get_thruput</code><span class="sig-paren">(</span><em>inst</em>, <em>niriss=1</em>, <em>nirspec=’f100lp’</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/justdoit.html#get_thruput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.justdoit.get_thruput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns complete instrument photon to electron conversion efficiency
 Pulls complete instrument photon to electron conversion efficiency
 (PCE) based on instrument key input</p>
@@ -227,11 +227,19 @@ Pulls complete instrument photon to electron conversion efficiency
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>inst</strong> (<em>str</em>) – One of the instrument keys in <cite>print_instruments</cite></td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>inst</strong> (<em>str</em>) – One of the instrument keys in <cite>print_instruments</cite></li>
+<li><strong>niriss</strong> (<em>int</em>) – (Optional) defines which niriss order you want (1 or 2)</li>
+<li><strong>nirspec</strong> (<em>str</em>) – (Optional) for NIRISS G140M/H there are two available filters (f100lp and f070lp)
+if you are selecting G140M or G140H, this allows you to pick which one</li>
+</ul>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Dictionary with wave solution and PCE</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Dictionary with wave solution and PCE</p>
+</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">dict</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">dict</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -1440,7 +1448,7 @@ taking into account integrations and number of transits</p>
 <span id="engine-create-input"></span><h2>engine.create_input<a class="headerlink" href="#module-engine.create_input" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="engine.create_input.bothTrans">
-<code class="descclassname">engine.create_input.</code><code class="descname">bothTrans</code><span class="sig-paren">(</span><em>out_trans</em>, <em>planet</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/create_input.html#bothTrans"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.create_input.bothTrans" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">engine.create_input.</code><code class="descname">bothTrans</code><span class="sig-paren">(</span><em>out_trans</em>, <em>planet</em>, <em>star=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/create_input.html#bothTrans"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.create_input.bothTrans" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates in transit flux</p>
 <p>Takes output from <cite>outTrans</cite>, which is the normalized stellar flux, and
 creates either a transit transmission spectrum, phase curve or emission spectrum.
@@ -1452,6 +1460,8 @@ Magnitude</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>out_trans</strong> (<em>dict</em>) – includes dictionary from <cite>outTrans</cite> output.</li>
 <li><strong>planet</strong> (<em>dict</em>) – dictionary with direction to planet spectra, wavelength and flux units</li>
+<li><strong>star</strong> (<em>dict</em>) – (Optional) dictionary within exo_input with stellar information. Only
+used when scaling Fortney Grid spectra to get (rp/r*)^2</li>
 </ul>
 </td>
 </tr>

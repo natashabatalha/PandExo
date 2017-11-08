@@ -239,7 +239,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">SetDefaultModes</span><span class="p">(</span><span class="n">inst</span><span class="p">)</span><span class="o">.</span><span class="n">pick</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="get_thruput"><a class="viewcode-back" href="../../engine.html#engine.justdoit.get_thruput">[docs]</a><span class="k">def</span> <span class="nf">get_thruput</span><span class="p">(</span><span class="n">inst</span><span class="p">):</span>
+<div class="viewcode-block" id="get_thruput"><a class="viewcode-back" href="../../engine.html#engine.justdoit.get_thruput">[docs]</a><span class="k">def</span> <span class="nf">get_thruput</span><span class="p">(</span><span class="n">inst</span><span class="p">,</span> <span class="n">niriss</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">nirspec</span><span class="o">=</span><span class="s1">&#39;f100lp&#39;</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Returns complete instrument photon to electron conversion efficiency</span>
 <span class="sd">    Pulls complete instrument photon to electron conversion efficiency </span>
 <span class="sd">    (PCE) based on instrument key input </span>
@@ -248,7 +248,11 @@
 <span class="sd">    ----------</span>
 <span class="sd">    inst : str</span>
 <span class="sd">        One of the instrument keys in `print_instruments`</span>
-<span class="sd">    </span>
+<span class="sd">    niriss : int</span>
+<span class="sd">        (Optional) defines which niriss order you want (1 or 2)</span>
+<span class="sd">    nirspec : str</span>
+<span class="sd">        (Optional) for NIRISS G140M/H there are two available filters (f100lp and f070lp)</span>
+<span class="sd">        if you are selecting G140M or G140H, this allows you to pick which one</span>
 <span class="sd">    Returns</span>
 <span class="sd">    ------- </span>
 <span class="sd">    dict </span>
@@ -261,8 +265,21 @@
     
     <span class="c1">#pull correct dictionary</span>
     <span class="n">input_dict</span> <span class="o">=</span>  <span class="n">SetDefaultModes</span><span class="p">(</span><span class="n">inst</span><span class="p">)</span><span class="o">.</span><span class="n">pick</span><span class="p">()</span>
-                             
-    <span class="n">conf</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;instrument&#39;</span><span class="p">:</span> <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;configuration&#39;</span><span class="p">][</span><span class="s1">&#39;instrument&#39;</span><span class="p">]}</span>
+    <span class="n">conf</span> <span class="o">=</span> <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;configuration&#39;</span><span class="p">]</span>
+    <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;detector&#39;</span><span class="p">][</span><span class="s1">&#39;ngroup&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+
+    <span class="k">if</span> <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;instrument&#39;</span><span class="p">][</span><span class="s1">&#39;instrument&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span><span class="s1">&#39;niriss&#39;</span><span class="p">:</span>
+        <span class="c1">#pandeia handles slit losses inside the 2d engine. So, you need to account for the </span>
+        <span class="c1">#extra .663 here</span>
+        <span class="n">conf</span><span class="p">[</span><span class="s2">&quot;instrument&quot;</span><span class="p">][</span><span class="s2">&quot;disperser&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">conf</span><span class="p">[</span><span class="s2">&quot;instrument&quot;</span><span class="p">][</span><span class="s2">&quot;disperser&quot;</span><span class="p">]</span> <span class="o">+</span><span class="s1">&#39;_&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">niriss</span><span class="p">)</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">InstrumentFactory</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">conf</span><span class="p">)</span>
+        <span class="n">wr</span> <span class="o">=</span> <span class="n">i</span><span class="o">.</span><span class="n">get_wave_range</span><span class="p">()</span>
+        <span class="n">wave</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">wr</span><span class="p">[</span><span class="s1">&#39;wmin&#39;</span><span class="p">],</span> <span class="n">wr</span><span class="p">[</span><span class="s1">&#39;wmax&#39;</span><span class="p">],</span> <span class="n">num</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+        <span class="n">pce</span> <span class="o">=</span> <span class="n">i</span><span class="o">.</span><span class="n">get_total_eff</span><span class="p">(</span><span class="n">wave</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;wave&#39;</span><span class="p">:</span><span class="n">wave</span><span class="p">,</span><span class="s1">&#39;pce&#39;</span><span class="p">:</span><span class="mf">0.663</span><span class="o">*</span><span class="n">pce</span><span class="p">}</span>
+    <span class="k">elif</span> <span class="p">(</span><span class="n">conf</span><span class="p">[</span><span class="s1">&#39;instrument&#39;</span><span class="p">][</span><span class="s1">&#39;instrument&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span><span class="s1">&#39;nirspec&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;g140&#39;</span> <span class="ow">in</span> <span class="n">conf</span><span class="p">[</span><span class="s2">&quot;instrument&quot;</span><span class="p">][</span><span class="s2">&quot;disperser&quot;</span><span class="p">]):</span>
+        <span class="n">conf</span><span class="p">[</span><span class="s2">&quot;instrument&quot;</span><span class="p">][</span><span class="s2">&quot;filter&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nirspec</span>
+
     <span class="n">i</span> <span class="o">=</span> <span class="n">InstrumentFactory</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">conf</span><span class="p">)</span>
     <span class="n">wr</span> <span class="o">=</span> <span class="n">i</span><span class="o">.</span><span class="n">get_wave_range</span><span class="p">()</span>
     <span class="n">wave</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">wr</span><span class="p">[</span><span class="s1">&#39;wmin&#39;</span><span class="p">],</span> <span class="n">wr</span><span class="p">[</span><span class="s1">&#39;wmax&#39;</span><span class="p">],</span> <span class="n">num</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>

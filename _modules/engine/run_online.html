@@ -170,7 +170,7 @@
 <span class="kn">import</span> <span class="nn">tornado.options</span>
 <span class="kn">import</span> <span class="nn">tornado.web</span>
 <span class="kn">import</span> <span class="nn">traceback</span>
-<span class="c1">#import tornado.log</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="o">*</span>
 <span class="kn">from</span> <span class="nn">concurrent.futures</span> <span class="k">import</span> <span class="n">ProcessPoolExecutor</span>
 <span class="kn">from</span> <span class="nn">.pandexo</span> <span class="k">import</span> <span class="n">wrapper</span>
 <span class="kn">from</span> <span class="nn">tornado.options</span> <span class="k">import</span> <span class="n">define</span><span class="p">,</span> <span class="n">options</span>
@@ -182,7 +182,11 @@
 
 <span class="c1"># define location of temp files</span>
 <span class="n">__TEMP__</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;PANDEXO_TEMP&quot;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s2">&quot;temp&quot;</span><span class="p">))</span>
-<span class="c1">#__LOG__ = os.path.dirname(os.path.dirname(os.path.dirname(__file__))) + &quot;/&quot;</span>
+
+<span class="c1">#define location of fort grids</span>
+<span class="n">__FORT__</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;FORTGRID_DIR&#39;</span><span class="p">)</span>
+<span class="n">db_fort</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="s1">&#39;sqlite:///&#39;</span><span class="o">+</span><span class="n">__FORT__</span><span class="p">)</span>
+
 
 <span class="n">define</span><span class="p">(</span><span class="s2">&quot;port&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">1111</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;run on the given port&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
 <span class="n">define</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;automatically detect code changes in development&quot;</span><span class="p">)</span>
@@ -440,7 +444,20 @@
 <span class="sd">    a new calculation task to the parallelized workers.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 <div class="viewcode-block" id="CalculationNewHandler.get"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationNewHandler.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">&quot;new.html&quot;</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="p">)</span></div>
+        <span class="k">try</span><span class="p">:</span> 
+            <span class="n">header</span><span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_sql_table</span><span class="p">(</span><span class="s1">&#39;header&#39;</span><span class="p">,</span><span class="n">db_fort</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">header</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+            <span class="s1">&#39;temp&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;NO GRID DB FOUND&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;gravity&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;NO GRID DB FOUND&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;ray&#39;</span> <span class="p">:</span> <span class="p">[</span><span class="s1">&#39;NO GRID DB FOUND&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;flat&#39;</span><span class="p">:[</span><span class="s1">&#39;NO GRID DB FOUND&#39;</span><span class="p">]})</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">&quot;new.html&quot;</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="p">,</span>
+                                 <span class="n">temp</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">header</span><span class="o">.</span><span class="n">temp</span><span class="o">.</span><span class="n">unique</span><span class="p">())),</span>
+                                 <span class="n">gravity</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">header</span><span class="o">.</span><span class="n">gravity</span><span class="o">.</span><span class="n">unique</span><span class="p">())),</span>
+                                 <span class="n">ray</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">header</span><span class="o">.</span><span class="n">ray</span><span class="o">.</span><span class="n">unique</span><span class="p">())),</span>
+                                 <span class="n">flat</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">header</span><span class="o">.</span><span class="n">flat</span><span class="o">.</span><span class="n">unique</span><span class="p">())))</span></div>
 
 <div class="viewcode-block" id="CalculationNewHandler.post"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationNewHandler.post">[docs]</a>    <span class="k">def</span> <span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -496,9 +513,15 @@
                 <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;planet&quot;</span><span class="p">][</span><span class="s2">&quot;w_unit&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;planwunits&quot;</span><span class="p">)</span>
                 <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;planet&quot;</span><span class="p">][</span><span class="s2">&quot;f_unit&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;planfunits&quot;</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;planet&quot;</span><span class="p">][</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;constant&quot;</span><span class="p">:</span>
-                <span class="c1"># TODO connect this variable with processing script</span>
                 <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;planet&quot;</span><span class="p">][</span><span class="s2">&quot;depth&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;depth&quot;</span><span class="p">))</span>
-
+            <span class="k">elif</span> <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;planet&quot;</span><span class="p">][</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;grid&quot;</span><span class="p">:</span>
+                <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;star&quot;</span><span class="p">][</span><span class="s2">&quot;rstar&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;rstar&quot;</span><span class="p">))</span>
+                <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;planet&quot;</span><span class="p">][</span><span class="s2">&quot;reference_radius&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;refrad&quot;</span><span class="p">))</span>
+                <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;planet&quot;</span><span class="p">][</span><span class="s2">&quot;temp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;ptemp&quot;</span><span class="p">))</span>
+                <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;planet&quot;</span><span class="p">][</span><span class="s2">&quot;gravity&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;pgravity&quot;</span><span class="p">))</span>
+                <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;planet&quot;</span><span class="p">][</span><span class="s2">&quot;chem&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;pchem&quot;</span><span class="p">))</span>
+                <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;planet&quot;</span><span class="p">][</span><span class="s2">&quot;ray&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;pray&quot;</span><span class="p">))</span>
+                <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;planet&quot;</span><span class="p">][</span><span class="s2">&quot;cloud&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;pcloud&quot;</span><span class="p">)</span> <span class="p">)</span>
             <span class="c1">#baseline </span>
             <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;observation&quot;</span><span class="p">][</span><span class="s2">&quot;baseline&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;baseline&quot;</span><span class="p">))</span>
             <span class="n">exodata</span><span class="p">[</span><span class="s2">&quot;observation&quot;</span><span class="p">][</span><span class="s2">&quot;baseline_unit&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;baseline_unit&quot;</span><span class="p">)</span>
@@ -585,7 +608,7 @@
         
         
         <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">response</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;/dashboard&quot;</span><span class="p">)</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;../dashboard&quot;</span><span class="p">)</span></div></div>
         
     
 <div class="viewcode-block" id="CalculationNewHSTHandler"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationNewHSTHandler">[docs]</a><span class="k">class</span> <span class="nc">CalculationNewHSTHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
@@ -676,7 +699,7 @@
         
         
         <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">response</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;/dashboardhst&quot;</span><span class="p">)</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;../dashboardhst&quot;</span><span class="p">)</span></div></div>
         
             
 <div class="viewcode-block" id="CalculationNewSpecHandler"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationNewSpecHandler">[docs]</a><span class="k">class</span> <span class="nc">CalculationNewSpecHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
@@ -775,7 +798,7 @@
         
         
         <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">response</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;/dashboardspec&quot;</span><span class="p">)</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;../dashboardspec&quot;</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="CalculationStatusHandler"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationStatusHandler">[docs]</a><span class="k">class</span> <span class="nc">CalculationStatusHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
