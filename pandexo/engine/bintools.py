@@ -5,8 +5,12 @@ import warnings as warn
 import astropy.units as u
 def binning(x, y,  dy=None, binwidth=None, r=None,newx= None, log = False):
 	"""
-	This contains functionality to regroup x, y and dy. Users can either specify 
-	constant binwidth, constant resolution or give a user defined x axis 
+	This contains functionality for binning spectroscopy given an x, y and set of errors. 
+	This is similar to IDL's regroup but in Python (obviously). Note that y is binned as the 
+	mean(ordinates) instead of sum(ordinates), as you would want for cmputing flux in a set of 
+	pixels. User can input a constant resolution, constant binwidth or provide a user defined 
+	bin. The error is computed as sum(sqrt(sig1^2, sig2^2, sig3^2) )/3, for example 
+	if there were 3 points to bin. 
 	
 	Parameters
 	----------
