@@ -1,7 +1,11 @@
 import pysynphot as psyn
 import numpy as np 
 import pickle
-       
+import pandas as pd
+from sqlalchemy import *   
+import astropy.units as u 
+import astropy.constants as c
+import os 
 def outTrans(input) :
     """Compute out of transit spectra
     
@@ -109,7 +113,7 @@ def outTrans(input) :
     return {'flux_out_trans': flux_out_trans, 'wave': wave} 
 
 
-def bothTrans(out_trans, planet) :
+def bothTrans(out_trans, planet,star=None) :
     """Calculates in transit flux 
     
     Takes output from `outTrans`, which is the normalized stellar flux, and 
@@ -122,6 +126,9 @@ def bothTrans(out_trans, planet) :
         includes dictionary from `outTrans` output. 
     planet: dict
         dictionary with direction to planet spectra, wavelength and flux units
+    star: dict
+        (Optional) dictionary within exo_input with stellar information. Only 
+        used when scaling Fortney Grid spectra to get (rp/r*)^2
 
     Return
     ------
@@ -148,8 +155,41 @@ def bothTrans(out_trans, planet) :
         flux_planet = np.linspace(0.5,15,1000)*0 + planet['depth']
         planet['w_unit'] = 'um'
         planet['f_unit'] = 'rp^2/r*^2'
+    elif planet['type'] =='grid':
+        try:
+            db = create_engine('sqlite:///'+os.environ.get('FORTGRID_DIR'))
+            header= pd.read_sql_table('header',db)
+        except:
+            raise Exception('Fortney Grid File Path is incorrect, or not initialized')
+        try:
+            rstar = star['rstar']
+        except:
+            raise Exception("Radius of Star not supplied for scaling. Check exo_input['star']['rstar']")
+
+        try:
+            rplan = planet['reference_radius']
+            rplan = rplan - float((1.25*c.R_jup).to(u.km)/u.km)
+        except: 
+            planet['reference_radius'] = float((1.25*c.R_jup).to(u.km)/u.km)
+            rplan = 0
+            print('Default Planet Radius of 1.25 Rj given')
+
+        if planet['chem'] == 'noTiO': 
+            planet['noTiO'] = True
+            planet['eqchem'] = True 
+        if planet['chem'] == 'eqchem': 
+            planet['noTiO'] = False
+            planet['eqchem'] = True 
+        
+        df = header.loc[(header.gravity==planet['gravity']) & (header.temp==planet['temp'])
+                           & (header.noTiO==planet['noTiO']) & (header.ray==planet['ray']) &
+                           (header.flat==planet['cloud'])]
+        wave_planet=np.array(pd.read_sql_table(df['name'].values[0],db)['wavelength'])[::-1]
+        flux_planet=(np.array(pd.read_sql_table(df['name'].values[0],db)['radius'] + rplan )[::-1])**2.0/rstar**2.0
+        planet['w_unit'] = 'um'
+        planet['f_unit'] = 'rp^2/r*^2'
     else: 
-        raise Exception("Incorrect Planet File") 
+        raise Exception("Incorrect Planet Type. Options are 'user','constant','grid'") 
 
     #Convert wave to micron 
     if planet['w_unit'] == 'um':
