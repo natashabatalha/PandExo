@@ -124,13 +124,85 @@
                 <div class="radio-chooser-item">
                     <label class="radio-chooser-content" for="planetModelUser">
                         <input type="radio" name="planetModel" id="planetModelUser" value="user" />
-                        <div class="radio-chooser-title">User Defined Planet Spectrum</div>
+                        <div class="radio-chooser-title">Upload Planet Spectrum</div>
+                    </label>
+                </div>
+                <div class="radio-chooser-item">
+                    <label class="radio-chooser-content" for="planetModelGrid">
+                        <input type="radio" name="planetModel" id="planetModelGrid" value="grid" />
+                        <div class="radio-chooser-title">Select From Grid (Primary)</div>
                     </label>
                 </div>
             </div>
         </div>
     </div>
 
+    <div class="form-group hidden select-from-grid">
+        <div class="col-md-3 col-md-offset-3"">
+            <select id="ptemp" name="ptemp" class="form-control" data-placeholder="Select Temp (K)">
+                <option value=""></option> 
+                {% for i in temp %}
+                    <option {{ escape(i) }} value={{ escape(i) }}>{{ escape(i) }}</option>
+                {% end %}               
+            </select>
+            <p class="help-block">Temperature (K)</p>
+        </div>  
+
+        <div class="col-md-3"">
+            <select id="pgravity" name="pgravity" class="form-control" data-placeholder="Select Gravity">
+                <option value=""></option> 
+                {% for i in gravity %}
+                    <option {{ escape(i) }} value={{ escape(i) }}>{{ escape(i) }}</option>
+                {% end %}               
+            </select>
+            <p class="help-block">Gravity (m/s<sup>2</sup>)</p>
+        </div>  
+
+        <div class="col-md-3"">
+            <select id="pchem" name="pchem" class="form-control" data-placeholder="Select Chemistry">
+                <option value=""></option> 
+                <option value='eqchem'>Equilibrium Chemistry</option>  
+                <option value='noTiO'>Equilibrium Chemistry, w/o TiO</option>         
+            </select>
+            <p class="help-block">Select Chemistry Type</p>
+        </div>  
+
+        <div class="col-md-3 col-md-offset-3"">
+            <select id="pray" name="pray" class="form-control" data-placeholder="Rayleigh">
+                <option value=""></option> 
+                <option value="0">None</option>  
+                <option value="10">Weak</option>  
+                <option value="100">Medium</option>             
+                <option value="1000">Strong</option>             
+            </select>
+            <p class="help-block">Rayleigh Scattering Strength</p>
+        </div>  
+
+        <div class="col-md-3"">
+            <select id="pcloud" name="pcloud" class="form-control" data-placeholder="Clouds">
+                <option value=""></option> 
+                <option value="0">None</option>  
+                <option value="1">Weak</option>  
+                <option value="10">Medium</option>             
+                <option value="100">Strong</option>             
+            </select>
+            <p class="help-block">Cloud Strength</p>
+        </div> 
+        <div class="col-md-4 col-md-offset-3">
+            <div class="input-group">
+                <input type="text" class="form-control" id="rstar" name="refrad">
+                <span class="input-group-addon">Km</span>
+            </div>
+            <p class="help-block">Planet Radius</p>
+        </div>
+        <div class="col-md-4 col-md-offset-3">
+            <div class="input-group">
+                <input type="text" class="form-control" id="rstar" name="rstar">
+                <span class="input-group-addon">Km</span>
+            </div>
+            <p class="help-block">Stellar Radius</p>
+        </div>  
+    </div>   
     <div class="form-group hidden upload-planet-section">
         <div class="col-md-3 col-md-offset-3">
             <button class="btn btn-block niceFileBtn" type="button">Choose File</button>
@@ -394,10 +466,17 @@
                 case "planetModelConstant":
                     $(".upload-planet-section").addClass("hidden");
                     $(".constant-transit-section").removeClass("hidden");
+                    $(".select-from-grid").addClass("hidden");
                     break;
                 case "planetModelUser":
                     $(".constant-transit-section").addClass("hidden");
                     $(".upload-planet-section").removeClass("hidden");
+                    $(".select-from-grid").addClass("hidden");
+                    break;
+                case "planetModelGrid":
+                    $(".constant-transit-section").addClass("hidden");
+                    $(".upload-planet-section").addClass("hidden");
+                    $(".select-from-grid").removeClass("hidden");
                     break;
                 case "noiseModelConstant":
                     $(".upload-noise-section").addClass("hidden");

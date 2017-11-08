@@ -8,7 +8,7 @@ import tornado.ioloop
 import tornado.options
 import tornado.web
 import traceback
-#import tornado.log
+from sqlalchemy import *
 from concurrent.futures import ProcessPoolExecutor
 from .pandexo import wrapper
 from tornado.options import define, options
@@ -20,7 +20,11 @@ import numpy as np
 
 # define location of temp files
 __TEMP__ = os.environ.get("PANDEXO_TEMP", os.path.join(os.path.dirname(__file__), "temp"))
-#__LOG__ = os.path.dirname(os.path.dirname(os.path.dirname(__file__))) + "/"
+
+#define location of fort grids
+__FORT__ = os.environ.get('FORTGRID_DIR')
+db_fort = create_engine('sqlite:///'+__FORT__)
+
 
 define("port", default=1111, help="run on the given port", type=int)
 define("debug", default=False, help="automatically detect code changes in development")
@@ -278,7 +282,20 @@ class CalculationNewHandler(BaseHandler):
     a new calculation task to the parallelized workers.
     """
     def get(self):
-        self.render("new.html", id=id)
+        try: 
+            header= pd.read_sql_table('header',db_fort)
+        except:
+            header = pd.DataFrame({
+            'temp': ['NO GRID DB FOUND'],
+            'gravity': ['NO GRID DB FOUND'],
+            'ray' : ['NO GRID DB FOUND'],
+            'flat':['NO GRID DB FOUND']})
+
+        self.render("new.html", id=id,
+                                 temp=list(map(str, header.temp.unique())),
+                                 gravity=list(map(str, header.gravity.unique())),
+                                 ray=list(map(str, header.ray.unique())),
+                                 flat=list(map(str, header.flat.unique())))
 
     def post(self):
         """
@@ -334,9 +351,15 @@ class CalculationNewHandler(BaseHandler):
                 exodata["planet"]["w_unit"] = self.get_argument("planwunits")
                 exodata["planet"]["f_unit"] = self.get_argument("planfunits")
             elif exodata["planet"]["type"] == "constant":
-                # TODO connect this variable with processing script
                 exodata["planet"]["depth"] = float(self.get_argument("depth"))
-
+            elif exodata["planet"]["type"] == "grid":
+                exodata["star"]["rstar"] = float(self.get_argument("rstar"))
+                exodata["planet"]["reference_radius"] = float(self.get_argument("refrad"))
+                exodata["planet"]["temp"] = float(self.get_argument("ptemp"))
+                exodata["planet"]["gravity"] = float(self.get_argument("pgravity"))
+                exodata["planet"]["chem"] = str(self.get_argument("pchem"))
+                exodata["planet"]["ray"] = int(self.get_argument("pray"))
+                exodata["planet"]["cloud"] = int(self.get_argument("pcloud") )
             #baseline 
             exodata["observation"]["baseline"] = float(self.get_argument("baseline"))
             exodata["observation"]["baseline_unit"] = self.get_argument("baseline_unit")
