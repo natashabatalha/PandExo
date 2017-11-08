@@ -77,7 +77,7 @@ def load_mode_dict(inst):
     """
     return SetDefaultModes(inst).pick()
 
-def get_thruput(inst):
+def get_thruput(inst, niriss=1, nirspec='f100lp'):
     """Returns complete instrument photon to electron conversion efficiency
     Pulls complete instrument photon to electron conversion efficiency 
     (PCE) based on instrument key input 
@@ -86,7 +86,11 @@ def get_thruput(inst):
     ----------
     inst : str
         One of the instrument keys in `print_instruments`
-    
+    niriss : int
+        (Optional) defines which niriss order you want (1 or 2)
+    nirspec : str
+        (Optional) for NIRISS G140M/H there are two available filters (f100lp and f070lp)
+        if you are selecting G140M or G140H, this allows you to pick which one
     Returns
     ------- 
     dict 
@@ -99,8 +103,21 @@ def get_thruput(inst):
     
     #pull correct dictionary
     input_dict =  SetDefaultModes(inst).pick()
-                             
-    conf = {'instrument': input_dict['configuration']['instrument']}
+    conf = input_dict['configuration']
+    conf['detector']['ngroup'] = 2
+
+    if conf['instrument']['instrument'].lower() =='niriss':
+        #pandeia handles slit losses inside the 2d engine. So, you need to account for the 
+        #extra .663 here
+        conf["instrument"]["disperser"] = conf["instrument"]["disperser"] +'_'+str(niriss)
+        i = InstrumentFactory(config=conf)
+        wr = i.get_wave_range()
+        wave = np.linspace(wr['wmin'], wr['wmax'], num=500)
+        pce = i.get_total_eff(wave)
+        return {'wave':wave,'pce':0.663*pce}
+    elif (conf['instrument']['instrument'].lower() =='nirspec') and ('g140' in conf["instrument"]["disperser"]):
+        conf["instrument"]["filter"] = nirspec
+
     i = InstrumentFactory(config=conf)
     wr = i.get_wave_range()
     wave = np.linspace(wr['wmin'], wr['wmax'], num=500)
