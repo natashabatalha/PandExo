@@ -98,6 +98,7 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">The Code</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#module-engine.justdoit">engine.justdoit</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-engine.justplotit">engine.justplotit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-engine.bintools">engine.bintools</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-engine.run_online">engine.run_online</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-engine.compute_noise">engine.compute_noise</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-engine.create_input">engine.create_input</a></li>
@@ -838,6 +839,136 @@ that run_pandexo assigns.</li>
 </table>
 <p class="rubric">Examples</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">oldgrid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">100</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="o">+</span><span class="mf">10.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">newy</span> <span class="o">=</span> <span class="n">uniform_tophat_sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">oldgrid</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">newy</span>
+<span class="go">array([ 240.,  250.,  130.])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="module-engine.bintools">
+<span id="engine-bintools"></span><h2>engine.bintools<a class="headerlink" href="#module-engine.bintools" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="engine.bintools.bin_wave_to_R">
+<code class="descclassname">engine.bintools.</code><code class="descname">bin_wave_to_R</code><span class="sig-paren">(</span><em>w</em>, <em>R</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/bintools.html#bin_wave_to_R"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.bintools.bin_wave_to_R" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates new wavelength axis at specified resolution</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>w</strong> (<em>list of float</em><em> or </em><em>numpy array of float</em>) – Wavelength axis to be rebinned</li>
+<li><strong>R</strong> (<em>float</em><em> or </em><em>int</em>) – Resolution to bin axis to</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">New wavelength axis at specified resolution</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list of float</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">newwave</span> <span class="o">=</span> <span class="n">bin_wave_to_R</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1000</span><span class="p">),</span> <span class="mi">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">newwave</span><span class="p">)))</span>
+<span class="go">11</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="engine.bintools.binning">
+<code class="descclassname">engine.bintools.</code><code class="descname">binning</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>dy=None</em>, <em>binwidth=None</em>, <em>r=None</em>, <em>newx=None</em>, <em>log=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/bintools.html#binning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.bintools.binning" title="Permalink to this definition">¶</a></dt>
+<dd><p>This contains functionality to regroup x, y and dy. Users can either specify
+constant binwidth, constant resolution or give a user defined x axis</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>x</strong> (<em>array</em><em>, </em><em>float</em>) – vector containing abcissae.</li>
+<li><strong>y</strong> (<em>array</em><em>,</em><em>float</em>) – vector containing ordinates.</li>
+<li><strong>dy</strong> (<em>array</em><em>,</em><em>float</em>) – (Optional) errors on ordinates, can be float or array</li>
+<li><strong>binwidth</strong> (<em>float</em>) – (Optional) constant bin width in same units as x</li>
+<li><strong>r</strong> (<em>float</em>) – (Optional) constant resolution to bin to</li>
+<li><strong>newx</strong> (<em>array</em><em>, </em><em>float</em>) – (Optional) new x axis to bin to</li>
+<li><strong>log</strong> (<em>bool</em>) – (Optional) computes equal bin spacing logarithmically, Default = False</li>
+<li><strong>sort</strong> (<em>bool</em>) – (Optional) sort into ascending order of x, default = True</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">bin_y : binned ordinates
+bin_x : binned abcissae
+bin_edge : edges of bins (always contains len(bin_x)+1 elements)
+bin_dy : error on ordinate bin
+bin_n : number of points contained in each bin</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">dict</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">bintools</span> <span class="k">import</span> <span class="n">binning</span>
+</pre></div>
+</div>
+<p>If you want constant resolution (using output dict from PandExo):</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pandexo</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;FinalSpectrum&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">err</span> <span class="o">=</span> <span class="n">pandexo</span><span class="p">[</span><span class="s1">&#39;wave&#39;</span><span class="p">],</span> <span class="n">pandexo</span><span class="p">[</span><span class="s1">&#39;spectrum_w_rand&#39;</span><span class="p">],</span> <span class="n">pandexo</span><span class="p">[</span><span class="s1">&#39;error_w_floor&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">final</span> <span class="o">=</span> <span class="n">binning</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">dy</span> <span class="o">=</span> <span class="n">err</span><span class="p">,</span> <span class="n">r</span> <span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">newx</span><span class="p">,</span> <span class="n">newy</span><span class="p">,</span> <span class="n">newerr</span> <span class="o">=</span> <span class="n">final</span><span class="p">[</span><span class="s1">&#39;bin_x&#39;</span><span class="p">],</span> <span class="n">final</span><span class="p">[</span><span class="s1">&#39;bin_y&#39;</span><span class="p">],</span> <span class="n">final</span><span class="p">[</span><span class="s1">&#39;bin_dy&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>If you have a x axis that you want PandExo output to be binned to</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">newx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">final</span> <span class="o">=</span> <span class="n">binning</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">dy</span> <span class="o">=</span> <span class="n">err</span><span class="p">,</span> <span class="n">newx</span> <span class="o">=</span><span class="n">newx</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">newx</span><span class="p">,</span> <span class="n">newy</span><span class="p">,</span> <span class="n">newerr</span> <span class="o">=</span> <span class="n">final</span><span class="p">[</span><span class="s1">&#39;bin_x&#39;</span><span class="p">],</span> <span class="n">final</span><span class="p">[</span><span class="s1">&#39;bin_y&#39;</span><span class="p">],</span> <span class="n">final</span><span class="p">[</span><span class="s1">&#39;bin_dy&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>If you want a constant bin width and want everything to be spaced linearly</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">final</span> <span class="o">=</span> <span class="n">binning</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">dy</span> <span class="o">=</span> <span class="n">err</span><span class="p">,</span> <span class="n">binwidth</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">newx</span><span class="p">,</span> <span class="n">newy</span><span class="p">,</span> <span class="n">newerr</span> <span class="o">=</span> <span class="n">final</span><span class="p">[</span><span class="s1">&#39;bin_x&#39;</span><span class="p">],</span> <span class="n">final</span><span class="p">[</span><span class="s1">&#39;bin_y&#39;</span><span class="p">],</span> <span class="n">final</span><span class="p">[</span><span class="s1">&#39;bin_dy&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>If you want constant bin width but want everything to spaced logarithmically</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">final</span> <span class="o">=</span> <span class="n">binning</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">dy</span> <span class="o">=</span> <span class="n">err</span><span class="p">,</span> <span class="n">binwidth</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">newx</span><span class="p">,</span> <span class="n">newy</span><span class="p">,</span> <span class="n">newerr</span> <span class="o">=</span> <span class="n">final</span><span class="p">[</span><span class="s1">&#39;bin_x&#39;</span><span class="p">],</span> <span class="n">final</span><span class="p">[</span><span class="s1">&#39;bin_y&#39;</span><span class="p">],</span> <span class="n">final</span><span class="p">[</span><span class="s1">&#39;bin_dy&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="engine.bintools.uniform_tophat_mean">
+<code class="descclassname">engine.bintools.</code><code class="descname">uniform_tophat_mean</code><span class="sig-paren">(</span><em>newx</em>, <em>x</em>, <em>y</em>, <em>dy=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/bintools.html#uniform_tophat_mean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.bintools.uniform_tophat_mean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adapted from Mike R. Line to rebin spectra</p>
+<p>Takes mean of groups of points in certain wave bin</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>newx</strong> (<em>list of float</em><em> or </em><em>numpy array of float</em>) – New wavelength grid to rebin to</li>
+<li><strong>x</strong> (<em>list of float</em><em> or </em><em>numpy array of float</em>) – Old wavelength grid to get rid of</li>
+<li><strong>y</strong> (<em>list of float</em><em> or </em><em>numpy array of float</em>) – New rebinned y axis</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">new wavelength grid</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">array of floats</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pandexo.engine.jwst</span> <span class="k">import</span> <span class="n">uniform_tophat_sum</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">oldgrid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">100</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="o">+</span><span class="mf">10.0</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">newy</span> <span class="o">=</span> <span class="n">uniform_tophat_sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">oldgrid</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">newy</span>

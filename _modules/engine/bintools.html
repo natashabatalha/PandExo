@@ -1,0 +1,447 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>engine.bintools &mdash; PandExo  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="PandExo  documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> PandExo
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../includeme.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Pre-installation Data Download</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html#installation-for-users-with-conda">Installation for Users With Conda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html#installation-for-users-with-pip">Installation for Users With PIP</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html#todos">TODOS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorialjwst.html">JWST Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../jwstinput.html">Possible Instrument Input Params</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../jwstdict.html">Py Dict Structure of JWST Output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorialhst.html">HST Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../engine.html">The Code</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">PandExo</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>engine.bintools</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for engine.bintools</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span> 
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span> 
+<span class="kn">import</span> <span class="nn">synphot.binning</span> <span class="k">as</span> <span class="nn">astrobin</span> 
+<span class="kn">import</span> <span class="nn">warnings</span> <span class="k">as</span> <span class="nn">warn</span>
+<span class="kn">import</span> <span class="nn">astropy.units</span> <span class="k">as</span> <span class="nn">u</span>
+<div class="viewcode-block" id="binning"><a class="viewcode-back" href="../../engine.html#engine.bintools.binning">[docs]</a><span class="k">def</span> <span class="nf">binning</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span>  <span class="n">dy</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">binwidth</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">newx</span><span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">log</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	This contains functionality to regroup x, y and dy. Users can either specify </span>
+<span class="sd">	constant binwidth, constant resolution or give a user defined x axis </span>
+<span class="sd">	</span>
+<span class="sd">	Parameters</span>
+<span class="sd">	----------</span>
+<span class="sd">	x : array, float </span>
+<span class="sd">		vector containing abcissae.</span>
+<span class="sd">	y : array,float </span>
+<span class="sd">		vector containing ordinates.</span>
+<span class="sd">	dy : array,float</span>
+<span class="sd">		(Optional) errors on ordinates, can be float or array</span>
+<span class="sd">	binwidth : float </span>
+<span class="sd">		(Optional) constant bin width in same units as x </span>
+<span class="sd">	r : float </span>
+<span class="sd">		(Optional) constant resolution to bin to </span>
+<span class="sd">	newx : array, float </span>
+<span class="sd">		(Optional) new x axis to bin to </span>
+<span class="sd">	log : bool</span>
+<span class="sd">		(Optional) computes equal bin spacing logarithmically, Default = False</span>
+<span class="sd">	sort : bool </span>
+<span class="sd">		(Optional) sort into ascending order of x, default = True</span>
+<span class="sd">	</span>
+
+<span class="sd">	Returns</span>
+<span class="sd">	-------</span>
+<span class="sd">	dict </span>
+<span class="sd">		bin_y : binned ordinates </span>
+<span class="sd">		bin_x : binned abcissae </span>
+<span class="sd">		bin_edge : edges of bins (always contains len(bin_x)+1 elements)</span>
+<span class="sd">		bin_dy : error on ordinate bin </span>
+<span class="sd">		bin_n : number of points contained in each bin </span>
+
+<span class="sd">	Examples</span>
+<span class="sd">	--------</span>
+
+<span class="sd">	&gt;&gt;&gt; from bintools import binning </span>
+
+<span class="sd">	If you want constant resolution (using output dict from PandExo): </span>
+<span class="sd">	</span>
+<span class="sd">	&gt;&gt;&gt; pandexo = result[&#39;FinalSpectrum&#39;]</span>
+<span class="sd">	&gt;&gt;&gt; x, y, err = pandexo[&#39;wave&#39;], pandexo[&#39;spectrum_w_rand&#39;], pandexo[&#39;error_w_floor&#39;]</span>
+<span class="sd">	&gt;&gt;&gt; final = binning(x, y, dy = err, r =100)</span>
+<span class="sd">	&gt;&gt;&gt; newx, newy, newerr = final[&#39;bin_x&#39;], final[&#39;bin_y&#39;], final[&#39;bin_dy&#39;]</span>
+
+<span class="sd">	If you have a x axis that you want PandExo output to be binned to</span>
+
+<span class="sd">	&gt;&gt;&gt; newx = np.linspace(1,5,10)</span>
+<span class="sd">	&gt;&gt;&gt; final = binning(x, y, dy = err, newx =newx)</span>
+<span class="sd">	&gt;&gt;&gt; newx, newy, newerr = final[&#39;bin_x&#39;], final[&#39;bin_y&#39;], final[&#39;bin_dy&#39;]</span>
+
+<span class="sd">	If you want a constant bin width and want everything to be spaced linearly</span>
+
+<span class="sd">	&gt;&gt;&gt; final = binning(x, y, dy = err, binwidth = 0.1)</span>
+<span class="sd">	&gt;&gt;&gt; newx, newy, newerr = final[&#39;bin_x&#39;], final[&#39;bin_y&#39;], final[&#39;bin_dy&#39;]</span>
+
+<span class="sd">	If you want constant bin width but want everything to spaced logarithmically </span>
+
+<span class="sd">	&gt;&gt;&gt; final = binning(x, y, dy = err, binwidth = 0.1, log=True)</span>
+<span class="sd">	&gt;&gt;&gt; newx, newy, newerr = final[&#39;bin_x&#39;], final[&#39;bin_y&#39;], final[&#39;bin_dy&#39;]</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="c1">#check x and y are same length </span>
+	<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">):</span>
+		<span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;X and Y are not the same length&#39;</span><span class="p">)</span>
+
+	<span class="c1">#check that either newx or binwidth are specified </span>
+
+	<span class="k">if</span> <span class="n">newx</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">binwidth</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">r</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+		<span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Need to either supply new x axis, resolution, or a binwidth&#39;</span><span class="p">)</span>
+	<span class="k">if</span> <span class="p">(</span><span class="n">binwidth</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">log</span><span class="p">):</span> 
+		<span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Cannot do logarithmic binning with out a binwidth&quot;</span><span class="p">)</span>
+
+	<span class="k">if</span> <span class="n">newx</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> 
+		<span class="n">bin_x</span> <span class="o">=</span> <span class="n">newx</span>
+		<span class="n">bin_y</span><span class="p">,</span> <span class="n">bin_dy</span><span class="p">,</span> <span class="n">bin_n</span> <span class="o">=</span> <span class="n">uniform_tophat_mean</span><span class="p">(</span><span class="n">bin_x</span><span class="p">,</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span><span class="n">dy</span><span class="p">)</span>
+		<span class="n">bin_edge</span> <span class="o">=</span> <span class="n">astrobin</span><span class="o">.</span><span class="n">calculate_bin_edges</span><span class="p">(</span><span class="n">bin_x</span><span class="p">)</span><span class="o">/</span><span class="n">u</span><span class="o">.</span><span class="n">Angstrom</span>
+		<span class="k">return</span> <span class="p">{</span><span class="s1">&#39;bin_y&#39;</span><span class="p">:</span><span class="n">bin_y</span><span class="p">,</span> <span class="s1">&#39;bin_x&#39;</span><span class="p">:</span><span class="n">bin_x</span><span class="p">,</span> <span class="s1">&#39;bin_edge&#39;</span><span class="p">:</span><span class="n">bin_edge</span><span class="p">,</span> <span class="s1">&#39;bin_dy&#39;</span><span class="p">:</span><span class="n">bin_dy</span><span class="p">,</span> <span class="s1">&#39;bin_n&#39;</span><span class="p">:</span><span class="n">bin_n</span><span class="p">}</span>
+
+	<span class="k">elif</span> <span class="n">r</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+		<span class="n">bin_x</span> <span class="o">=</span> <span class="n">bin_wave_to_R</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
+		<span class="n">bin_y</span><span class="p">,</span> <span class="n">bin_dy</span><span class="p">,</span> <span class="n">bin_n</span> <span class="o">=</span> <span class="n">uniform_tophat_mean</span><span class="p">(</span><span class="n">bin_x</span><span class="p">,</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span><span class="n">dy</span><span class="p">)</span>
+		<span class="n">bin_edge</span> <span class="o">=</span> <span class="n">astrobin</span><span class="o">.</span><span class="n">calculate_bin_edges</span><span class="p">(</span><span class="n">bin_x</span><span class="p">)</span><span class="o">/</span><span class="n">u</span><span class="o">.</span><span class="n">Angstrom</span>
+		<span class="k">return</span> <span class="p">{</span><span class="s1">&#39;bin_y&#39;</span><span class="p">:</span><span class="n">bin_y</span><span class="p">,</span> <span class="s1">&#39;bin_x&#39;</span><span class="p">:</span><span class="n">bin_x</span><span class="p">,</span> <span class="s1">&#39;bin_edge&#39;</span><span class="p">:</span><span class="n">bin_edge</span><span class="p">,</span> <span class="s1">&#39;bin_dy&#39;</span><span class="p">:</span><span class="n">bin_dy</span><span class="p">,</span> <span class="s1">&#39;bin_n&#39;</span><span class="p">:</span><span class="n">bin_n</span><span class="p">}</span>
+
+	<span class="k">elif</span> <span class="n">binwidth</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> 
+		<span class="k">if</span> <span class="p">(</span><span class="n">binwidth</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">log</span><span class="p">):</span>
+			<span class="n">warn</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="ne">UserWarning</span><span class="p">(</span><span class="s2">&quot;Negative binwidth specified. Assuming this is log10(binwidth)&quot;</span><span class="p">))</span>
+			<span class="n">binwidth</span> <span class="o">=</span> <span class="mi">10</span><span class="o">**</span><span class="n">binwidth</span>
+		<span class="k">if</span> <span class="n">log</span><span class="p">:</span>
+			<span class="n">bin_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">x</span><span class="p">)),</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">x</span><span class="p">)),</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">binwidth</span><span class="p">))</span>
+			<span class="n">bin_x</span> <span class="o">=</span> <span class="mi">10</span><span class="o">**</span><span class="n">bin_x</span>
+		<span class="k">elif</span> <span class="ow">not</span> <span class="n">log</span><span class="p">:</span>
+			<span class="n">bin_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">x</span><span class="p">),</span><span class="nb">max</span><span class="p">(</span><span class="n">x</span><span class="p">),</span><span class="n">binwidth</span><span class="p">)</span>
+		<span class="n">bin_y</span><span class="p">,</span> <span class="n">bin_dy</span><span class="p">,</span> <span class="n">bin_n</span> <span class="o">=</span> <span class="n">uniform_tophat_mean</span><span class="p">(</span><span class="n">bin_x</span><span class="p">,</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span><span class="n">dy</span><span class="p">)</span>
+		<span class="n">bin_edge</span> <span class="o">=</span> <span class="n">astrobin</span><span class="o">.</span><span class="n">calculate_bin_edges</span><span class="p">(</span><span class="n">bin_x</span><span class="p">)</span><span class="o">/</span><span class="n">u</span><span class="o">.</span><span class="n">Angstrom</span>
+		<span class="k">return</span> <span class="p">{</span><span class="s1">&#39;bin_y&#39;</span><span class="p">:</span><span class="n">bin_y</span><span class="p">,</span> <span class="s1">&#39;bin_x&#39;</span><span class="p">:</span><span class="n">bin_x</span><span class="p">,</span> <span class="s1">&#39;bin_edge&#39;</span><span class="p">:</span><span class="n">bin_edge</span><span class="p">,</span> <span class="s1">&#39;bin_dy&#39;</span><span class="p">:</span><span class="n">bin_dy</span><span class="p">,</span> <span class="s1">&#39;bin_n&#39;</span><span class="p">:</span><span class="n">bin_n</span><span class="p">}</span></div>
+
+<div class="viewcode-block" id="uniform_tophat_mean"><a class="viewcode-back" href="../../engine.html#engine.bintools.uniform_tophat_mean">[docs]</a><span class="k">def</span> <span class="nf">uniform_tophat_mean</span><span class="p">(</span><span class="n">newx</span><span class="p">,</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;Adapted from Mike R. Line to rebin spectra</span>
+
+<span class="sd">	Takes mean of groups of points in certain wave bin </span>
+
+<span class="sd">	Parameters</span>
+<span class="sd">	----------</span>
+<span class="sd">	newx : list of float or numpy array of float</span>
+<span class="sd">	    New wavelength grid to rebin to </span>
+<span class="sd">	x : list of float or numpy array of float </span>
+<span class="sd">	    Old wavelength grid to get rid of </span>
+<span class="sd">	y : list of float or numpy array of float </span>
+<span class="sd">	    New rebinned y axis </span>
+
+<span class="sd">	Returns</span>
+<span class="sd">	-------</span>
+<span class="sd">	array of floats </span>
+<span class="sd">	    new wavelength grid </span>
+<span class="sd">	    </span>
+<span class="sd">	Examples </span>
+<span class="sd">	--------</span>
+<span class="sd">	    </span>
+<span class="sd">	&gt;&gt;&gt; from pandexo.engine.jwst import uniform_tophat_sum</span>
+<span class="sd">	&gt;&gt;&gt; oldgrid = np.linspace(1,3,100)</span>
+<span class="sd">	&gt;&gt;&gt; y = np.zeros(100)+10.0</span>
+<span class="sd">	&gt;&gt;&gt; newy = uniform_tophat_sum(np.linspace(2,3,3), oldgrid, y)</span>
+<span class="sd">	&gt;&gt;&gt; newy</span>
+<span class="sd">	array([ 240.,  250.,  130.])</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="n">newx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">newx</span><span class="p">)</span>
+	<span class="n">szmod</span><span class="o">=</span><span class="n">newx</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+	<span class="n">delta</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">szmod</span><span class="p">)</span>
+	<span class="n">ynew</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">szmod</span><span class="p">)</span>
+	<span class="n">bin_dy</span> <span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">szmod</span><span class="p">)</span>
+	<span class="n">bin_n</span> <span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">szmod</span><span class="p">)</span>
+
+	<span class="n">delta</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">=</span><span class="n">newx</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">-</span><span class="n">newx</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>  
+	<span class="n">delta</span><span class="p">[</span><span class="n">szmod</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">=</span><span class="n">delta</span><span class="p">[</span><span class="n">szmod</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> 
+    
+	<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">szmod</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+		<span class="n">i</span><span class="o">=</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span>
+		<span class="n">loc</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">((</span><span class="n">x</span> <span class="o">&gt;=</span> <span class="n">newx</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-</span><span class="mf">0.5</span><span class="o">*</span><span class="n">delta</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">x</span> <span class="o">&lt;</span> <span class="n">newx</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">+</span><span class="mf">0.5</span><span class="o">*</span><span class="n">delta</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+		<span class="c1">#make sure there are values within the slice </span>
+		<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">loc</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+			<span class="n">ynew</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">loc</span><span class="p">])</span>
+			<span class="k">if</span> <span class="n">dy</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> 
+				<span class="n">bin_dy</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dy</span><span class="p">[</span><span class="n">loc</span><span class="p">]</span><span class="o">**</span><span class="mf">2.0</span><span class="p">))</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">loc</span><span class="p">])</span>
+			<span class="n">bin_n</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">loc</span><span class="p">])</span>
+		<span class="c1">#if not give empty slice a nan</span>
+		<span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">loc</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="ow">is</span> <span class="mi">0</span> <span class="p">:</span> 
+			<span class="n">warn</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="ne">UserWarning</span><span class="p">(</span><span class="s2">&quot;Empty slice exists within specified new x, replacing value with nan&quot;</span><span class="p">))</span>
+			<span class="n">ynew</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+			<span class="n">bin_n</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span> 
+
+	<span class="c1">#fill in zeroth entry</span>
+	<span class="n">loc</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">((</span><span class="n">x</span> <span class="o">&gt;</span> <span class="n">newx</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mf">0.5</span><span class="o">*</span><span class="n">delta</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">x</span> <span class="o">&lt;</span> <span class="n">newx</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="mf">0.5</span><span class="o">*</span><span class="n">delta</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+	<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">loc</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span> 
+		<span class="n">ynew</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">loc</span><span class="p">])</span>
+		<span class="n">bin_n</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">loc</span><span class="p">])</span>
+		<span class="n">bin_dy</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dy</span><span class="p">[</span><span class="n">loc</span><span class="p">]</span><span class="o">**</span><span class="mf">2.0</span><span class="p">))</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">loc</span><span class="p">])</span>
+	<span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">loc</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="mi">0</span> <span class="p">:</span> 
+		<span class="n">ynew</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+		<span class="n">bin_n</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span> 
+		<span class="n">bin_dy</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span> 
+	<span class="k">return</span> <span class="n">ynew</span><span class="p">,</span> <span class="n">bin_dy</span><span class="p">,</span> <span class="n">bin_n</span></div>
+
+<div class="viewcode-block" id="bin_wave_to_R"><a class="viewcode-back" href="../../engine.html#engine.bintools.bin_wave_to_R">[docs]</a><span class="k">def</span> <span class="nf">bin_wave_to_R</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">R</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;Creates new wavelength axis at specified resolution</span>
+
+<span class="sd">	Parameters</span>
+<span class="sd">	----------</span>
+<span class="sd">	w : list of float or numpy array of float</span>
+<span class="sd">	    Wavelength axis to be rebinned </span>
+<span class="sd">	R : float or int </span>
+<span class="sd">	    Resolution to bin axis to </span>
+
+<span class="sd">	Returns</span>
+<span class="sd">	-------</span>
+<span class="sd">	list of float</span>
+<span class="sd">	    New wavelength axis at specified resolution</span>
+
+<span class="sd">	Examples</span>
+<span class="sd">	--------</span>
+
+<span class="sd">	&gt;&gt;&gt; newwave = bin_wave_to_R(np.linspace(1,2,1000), 10)</span>
+<span class="sd">	&gt;&gt;&gt; print((len(newwave)))</span>
+<span class="sd">	11</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="n">wave</span> <span class="o">=</span> <span class="p">[]</span>
+	<span class="n">tracker</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+	<span class="n">i</span> <span class="o">=</span> <span class="mi">1</span> 
+	<span class="n">ind</span><span class="o">=</span> <span class="mi">0</span>
+	<span class="n">firsttime</span> <span class="o">=</span> <span class="kc">True</span>
+	<span class="k">while</span><span class="p">(</span><span class="n">tracker</span><span class="o">&lt;</span><span class="nb">max</span><span class="p">(</span><span class="n">w</span><span class="p">)):</span>
+	    <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span><span class="nb">len</span><span class="p">(</span><span class="n">w</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+	        <span class="n">dlambda</span> <span class="o">=</span> <span class="n">w</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-</span><span class="n">w</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span>
+	        <span class="n">newR</span> <span class="o">=</span> <span class="n">w</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">/</span><span class="n">dlambda</span>
+	        <span class="k">if</span> <span class="p">(</span><span class="n">newR</span> <span class="o">&lt;</span> <span class="n">R</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">firsttime</span><span class="p">):</span>
+	            <span class="n">tracker</span> <span class="o">=</span> <span class="n">w</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span>
+	            <span class="n">wave</span> <span class="o">+=</span> <span class="p">[</span><span class="n">tracker</span><span class="p">]</span>
+	            <span class="n">ind</span> <span class="o">+=</span> <span class="mi">1</span>
+	            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span> 
+	            <span class="n">firsttime</span> <span class="o">=</span> <span class="kc">True</span>
+	        <span class="k">elif</span> <span class="n">newR</span> <span class="o">&lt;</span> <span class="n">R</span><span class="p">:</span>
+	            <span class="n">tracker</span> <span class="o">=</span> <span class="n">w</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span><span class="o">+</span><span class="n">dlambda</span><span class="o">/</span><span class="mf">2.0</span>
+	            <span class="n">wave</span> <span class="o">+=</span><span class="p">[</span><span class="n">tracker</span><span class="p">]</span>
+	            <span class="n">ind</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">w</span><span class="o">-</span><span class="n">tracker</span><span class="p">))</span><span class="o">.</span><span class="n">argmin</span><span class="p">()</span>
+	            <span class="n">i</span> <span class="o">=</span> <span class="n">ind</span><span class="o">+</span><span class="mi">1</span>
+	            <span class="n">firsttime</span> <span class="o">=</span> <span class="kc">True</span>
+	        <span class="k">else</span><span class="p">:</span>
+	            <span class="n">firsttime</span> <span class="o">=</span> <span class="kc">False</span>            
+	            <span class="n">i</span><span class="o">+=</span><span class="mi">1</span>    
+	    <span class="k">else</span><span class="p">:</span>
+	        <span class="n">tracker</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+	        <span class="n">wave</span> <span class="o">+=</span> <span class="p">[</span><span class="n">tracker</span><span class="p">]</span>
+	<span class="k">return</span> <span class="n">wave</span></div>
+
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Natasha Batalha;Kevin Stevenson.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
