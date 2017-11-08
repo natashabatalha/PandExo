@@ -24,6 +24,7 @@ __TEMP__ = os.environ.get("PANDEXO_TEMP", os.path.join(os.path.dirname(__file__)
 
 define("port", default=1111, help="run on the given port", type=int)
 define("debug", default=False, help="automatically detect code changes in development")
+define("workers", default=4, help="maximum number of simultaneous async tasks")
 #define("log_file_prefix", default=__LOG__ + "pandexo_logs.log", help="where to store logs")
 
 # Define a simple named tuple to keep track for submitted calculations
@@ -74,7 +75,7 @@ class BaseHandler(tornado.web.RequestHandler):
     """
     Logic to handle user information and database access might go here.
     """
-    executor = ProcessPoolExecutor(max_workers=4)
+    executor = ProcessPoolExecutor(max_workers=options.workers)
     buffer = OrderedDict()
 
     def _get_task_response(self, id):
