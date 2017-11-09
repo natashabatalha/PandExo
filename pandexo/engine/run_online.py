@@ -75,7 +75,7 @@ class BaseHandler(tornado.web.RequestHandler):
     """
     Logic to handle user information and database access might go here.
     """
-    executor = ProcessPoolExecutor(max_workers=options.workers)
+    executor = ProcessPoolExecutor(max_workers=4)
     buffer = OrderedDict()
 
     def _get_task_response(self, id):
@@ -804,6 +804,7 @@ class CalculationViewHSTHandler(BaseHandler):
 
 def main():
     tornado.options.parse_command_line()
+    BaseHandler.executor = ProcessPoolExecutor(max_workers=options.workers)
     http_server = tornado.httpserver.HTTPServer(Application())
     http_server.listen(options.port)
     tornado.ioloop.IOLoop.current().start()
