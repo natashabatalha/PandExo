@@ -55,5 +55,9 @@ setup(
           'photutils',
           'astropy',
           'synphot'
-          ]
+          ],
+    entry_points = {
+        'console_scripts':
+            ['start_pandexo=pandexo.engine.run_online:main']
+    }
 )

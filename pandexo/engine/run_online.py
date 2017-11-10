@@ -28,6 +28,7 @@ db_fort = create_engine('sqlite:///'+__FORT__)
 
 define("port", default=1111, help="run on the given port", type=int)
 define("debug", default=False, help="automatically detect code changes in development")
+define("workers", default=4, help="maximum number of simultaneous async tasks")
 #define("log_file_prefix", default=__LOG__ + "pandexo_logs.log", help="where to store logs")
 
 # Define a simple named tuple to keep track for submitted calculations
@@ -826,6 +827,7 @@ class CalculationViewHSTHandler(BaseHandler):
 
 def main():
     tornado.options.parse_command_line()
+    BaseHandler.executor = ProcessPoolExecutor(max_workers=options.workers)
     http_server = tornado.httpserver.HTTPServer(Application())
     http_server.listen(options.port)
     tornado.ioloop.IOLoop.current().start()
