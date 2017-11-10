@@ -53,6 +53,7 @@ setup(
           'pandeia.engine',
           'batman-package',
           'photutils',
-          'astropy'
+          'astropy',
+          'synphot'
           ]
 )

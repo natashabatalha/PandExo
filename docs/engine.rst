@@ -17,7 +17,15 @@ engine.justplotit
     :members:
     :undoc-members:
     :show-inheritance:
-    
+
+engine.bintools
+-----------------
+
+.. automodule:: engine.bintools
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 engine.run_online
 -----------------
 
