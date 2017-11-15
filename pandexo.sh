@@ -14,6 +14,7 @@ echo 'export PYSYN_CDBS="$USRDIR/pysynphot_data"' >>~/.bash_profile
 ############ BLOCK TO SET PANDEIA REFERENCE DATA #########################
 
 tar -xvf pandeia_data-1.1.1.tar.gz || tar -xvf pandeia_data-1.1.1.tar
+mv pandeia_data-1.1.1 $USRDIR
 echo 'export pandeia_refdata="$USRDIR/pandeia_data-1.1.1"' >>~/.bash_profile
 
 ##############Make sure your bash profile is sourced
@@ -28,7 +29,8 @@ conda config --add channels http://ssb.stsci.edu/astroconda
 ########### Instal conda/stsci specific packages
 conda install pyfftw
 
-conda install numpy scipy astropy pyfftw pysynphot photutils
+conda install numpy synphot joblib scipy astropy pyfftw pysynphot photutils
+conda install bokeh=0.12.6
 
 ######### Try multiprocessing for 2.7 users##########
 conda install multiprocessing || echo 'OKAY that Multiprocessing not found. Python 3 user'
