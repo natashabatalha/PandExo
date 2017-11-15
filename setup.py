@@ -54,7 +54,8 @@ setup(
           'batman-package',
           'photutils',
           'astropy',
-          'synphot'
+          'pysynphot',
+          'sqlalchemy'
           ],
     entry_points = {
         'console_scripts':
