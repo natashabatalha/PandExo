@@ -1,6 +1,6 @@
 import pandas as pd 
 import numpy as np 
-import synphot.binning as astrobin 
+import pysynphot.binning as astrobin 
 import warnings as warn
 import astropy.units as u
 def binning(x, y,  dy=None, binwidth=None, r=None,newx= None, log = False):
