@@ -22,9 +22,11 @@ import numpy as np
 __TEMP__ = os.environ.get("PANDEXO_TEMP", os.path.join(os.path.dirname(__file__), "temp"))
 
 #define location of fort grids
-__FORT__ = os.environ.get('FORTGRID_DIR')
-db_fort = create_engine('sqlite:///'+__FORT__)
-
+try:
+    __FORT__ = os.environ.get('FORTGRID_DIR')
+    db_fort = create_engine('sqlite:///'+__FORT__)
+except: 
+    print('FORTNEY DATABASE NOT INSTALLED')
 
 define("port", default=1111, help="run on the given port", type=int)
 define("debug", default=False, help="automatically detect code changes in development")
