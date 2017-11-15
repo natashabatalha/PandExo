@@ -113,7 +113,8 @@ def compute_full_sim(dictinput):
     
     #get stellar spectrum and in transit spec
     star_spec = create.outTrans(pandexo_input['star'])
-    both_spec = create.bothTrans(star_spec, pandexo_input['planet'])
+    #get rstar if user calling from grid 
+    both_spec = create.bothTrans(star_spec, pandexo_input['planet'], star=pandexo_input['star'])
     out_spectrum = np.array([both_spec['wave'], both_spec['flux_out_trans']])
     
     #get transit duration from phase curve or from input 

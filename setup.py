@@ -53,7 +53,8 @@ setup(
           'pandeia.engine',
           'batman-package',
           'photutils',
-          'astropy'
+          'astropy',
+          'synphot'
           ],
     entry_points = {
         'console_scripts':
