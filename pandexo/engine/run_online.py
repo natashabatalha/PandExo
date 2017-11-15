@@ -288,15 +288,12 @@ class CalculationNewHandler(BaseHandler):
         except:
             header = pd.DataFrame({
             'temp': ['NO GRID DB FOUND'],
-            'gravity': ['NO GRID DB FOUND'],
             'ray' : ['NO GRID DB FOUND'],
             'flat':['NO GRID DB FOUND']})
 
         self.render("new.html", id=id,
-                                 temp=list(map(str, header.temp.unique())),
-                                 gravity=list(map(str, header.gravity.unique())),
-                                 ray=list(map(str, header.ray.unique())),
-                                 flat=list(map(str, header.flat.unique())))
+                                 temp=list(map(str, header.temp.unique()))
+                                 )
 
     def post(self):
         """
@@ -352,15 +349,25 @@ class CalculationNewHandler(BaseHandler):
                 exodata["planet"]["w_unit"] = self.get_argument("planwunits")
                 exodata["planet"]["f_unit"] = self.get_argument("planfunits")
             elif exodata["planet"]["type"] == "constant":
-                exodata["planet"]["depth"] = float(self.get_argument("depth"))
+                exodata["star"]["radius"] = float(self.get_argument("rstar"))
+                exodata["star"]["r_unit"] = str(self.get_argument("rstar_unit"))
+                exodata["planet"]["radius"] = float(self.get_argument("refrad"))
+                exodata["planet"]["r_unit"] = str(self.get_argument("r_unit"))                                
+                if self.get_argument("constant_unit") == 'fp/f*':
+                    exodata["planet"]["temp"] = float(self.get_argument("ptemp"))
+                    exodata["planet"]["f_unit"] = 'fp/f*'
+                elif self.get_argument("constant_unit") == 'rp^2/r*^2':
+                    exodata["planet"]["f_unit"] = 'rp^2/r*^2'
             elif exodata["planet"]["type"] == "grid":
-                exodata["star"]["rstar"] = float(self.get_argument("rstar"))
-                exodata["planet"]["reference_radius"] = float(self.get_argument("refrad"))
+                exodata["star"]["radius"] = float(self.get_argument("rstar"))
+                exodata["star"]["r_unit"] = str(self.get_argument("rstar_unit"))
+                exodata["planet"]["mass"] = float(self.get_argument("pmass"))
+                exodata["planet"]["m_unit"] = str(self.get_argument("m_unit"))
+                exodata["planet"]["radius"] = float(self.get_argument("refrad"))
+                exodata["planet"]["r_unit"] = str(self.get_argument("r_unit"))
                 exodata["planet"]["temp"] = float(self.get_argument("ptemp"))
-                exodata["planet"]["gravity"] = float(self.get_argument("pgravity"))
                 exodata["planet"]["chem"] = str(self.get_argument("pchem"))
-                exodata["planet"]["ray"] = int(self.get_argument("pray"))
-                exodata["planet"]["cloud"] = int(self.get_argument("pcloud") )
+                exodata["planet"]["cloud"] = self.get_argument("cloud") 
             #baseline 
             exodata["observation"]["baseline"] = float(self.get_argument("baseline"))
             exodata["observation"]["baseline_unit"] = self.get_argument("baseline_unit")
@@ -371,6 +378,7 @@ class CalculationNewHandler(BaseHandler):
             # for phase curves user doesn't necessarily have to input a transit duration
             try:
                 exodata["planet"]["transit_duration"] = float(self.get_argument("transit_duration"))
+                exodata["planet"]["td_unit"] = str(self.get_argument("td_unit"))
             except:
                 # but if they don't.. make sure that the planet units are in seconds...
                 if exodata["planet"]["w_unit"] == 'sec':

@@ -390,3 +390,19 @@ def filters(inst):
     else:
         raise Exception("Only instruments are niriss, nirspec, miri, nircam. Pick one.") 
 
+def grid_options(grid = 'fortney'):
+    """Function to show available grid options
+
+    PandExo now supports various grid options. Currently, the only one that is availalbe 
+    is the Fortney grid for giant planets. We will be implementing others, as they 
+    become available. It will become increasingly difficult for users to see what 
+    options are availalbe to them. This function should guide users to choose 
+    the grid that best fits their needs. 
+
+    Parameters
+    ----------
+    grid : str 
+        (Optional) string which 'fortney'
+
+    """
+    return 

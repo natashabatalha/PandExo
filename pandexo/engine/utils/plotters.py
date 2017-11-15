@@ -33,7 +33,7 @@ def create_component_jwst(result_dict):
     punit = result_dict['input']['Primary/Secondary']
     p=1.0
     if punit == 'fp/f*': p = -1.0
-    else: punit = '('+punit+')^2'
+    else: punit = punit
     
     if result_dict['input']['Calculation Type'] =='phase_spec':
         x_axis_label='Time (secs)'

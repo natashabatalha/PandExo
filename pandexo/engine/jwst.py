@@ -9,7 +9,7 @@ from pandeia.engine.instrument_factory import InstrumentFactory
 from pandeia.engine.perform_calculation import perform_calculation
 from . import create_input as create
 from .compute_noise import ExtractSpec
-
+import astropy.units as u
 import pickle
 #constant parameters.. consider putting these into json file 
 #max groups in integration
@@ -121,7 +121,8 @@ def compute_full_sim(dictinput):
     if calculation == 'phase_spec': 
         transit_duration = max(both_spec['time']) - min(both_spec['time'])
     else: 
-        transit_duration = pandexo_input['planet']['transit_duration']
+        #convert to seconds, then remove quantity and convert back to float 
+        transit_duration = float((pandexo_input['planet']['transit_duration']*u.Unit(pandexo_input['planet']['td_unit'])).to(u.second)/u.second)
 
     #amount of exposure time out-of-occultation, as a fraction of in-occ time 
     try:
@@ -473,7 +474,7 @@ def compute_timing(m,transit_duration,expfact_out,noccultations):
         nint_out = min_nint_trans
    
     timing = {
-        "Transit Duration" : transit_duration/60.0/60.0,
+        "Transit Duration" : (transit_duration)/60.0/60.0,
         "Seconds per Frame" : tframe,
         "Time/Integration incl reset (sec)":clocktime_per_int,
         "APT: Num Groups per Integration" :ngroups_per_int, 

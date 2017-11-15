@@ -92,7 +92,7 @@
         <label class="col-md-3 control-label" for="mag">Magnitude</label>
         <div class="col-md-4 form-inline">
             <input type="text" class="form-control" id="mag" name="mag" style="width: 70%;">
-            <div class="input-group-btn" style="width: 20%;left: -8px;display: inline-block;">
+            <div class="input-group-btn" style="width: 20%;left: -4px;display: inline-block;">
                 <select id="ref_wave" name="ref_wave" class="form-control" data-placeholder="Select Magnitude Units">
                     <!--<option value=""></option>-->
                     <option value="1.26">J</option>
@@ -101,11 +101,7 @@
                 </select>
             </div>
             <p class="help-block">Magnitude of Stellar Target</p>
-            <style>
-                .phoenix-section .select2-selection {
-                    border-top-left-radius: 0;border-bottom-left-radius: 0;
-                }
-            </style>
+
         </div>
     </div>
 
@@ -118,19 +114,19 @@
                 <div class="radio-chooser-item">
                     <label class="radio-chooser-content" for="planetModelConstant">
                         <input type="radio" name="planetModel" id="planetModelConstant" value="constant" />
-                        <div class="radio-chooser-title">Constant Transit Depth</div>
+                        <div class="radio-chooser-title">Constant Value</div>
                     </label>
                 </div>
                 <div class="radio-chooser-item">
                     <label class="radio-chooser-content" for="planetModelUser">
                         <input type="radio" name="planetModel" id="planetModelUser" value="user" />
-                        <div class="radio-chooser-title">Upload Planet Spectrum</div>
+                        <div class="radio-chooser-title">Upload Spectrum</div>
                     </label>
                 </div>
                 <div class="radio-chooser-item">
                     <label class="radio-chooser-content" for="planetModelGrid">
                         <input type="radio" name="planetModel" id="planetModelGrid" value="grid" />
-                        <div class="radio-chooser-title">Select From Grid (Primary)</div>
+                        <div class="radio-chooser-title">Select From Grid</div>
                     </label>
                 </div>
             </div>
@@ -149,60 +145,43 @@
         </div>  
 
         <div class="col-md-3"">
-            <select id="pgravity" name="pgravity" class="form-control" data-placeholder="Select Gravity">
-                <option value=""></option> 
-                {% for i in gravity %}
-                    <option {{ escape(i) }} value={{ escape(i) }}>{{ escape(i) }}</option>
-                {% end %}               
-            </select>
-            <p class="help-block">Gravity (m/s<sup>2</sup>)</p>
-        </div>  
-
-        <div class="col-md-3"">
             <select id="pchem" name="pchem" class="form-control" data-placeholder="Select Chemistry">
                 <option value=""></option> 
-                <option value='eqchem'>Equilibrium Chemistry</option>  
-                <option value='noTiO'>Equilibrium Chemistry, w/o TiO</option>         
+                <option value='noTiO'>Equilibrium Chemistry</option>  
+                <option value='eqchem'>Equilibrium Chemistry, w/ TiO</option>         
             </select>
             <p class="help-block">Select Chemistry Type</p>
         </div>  
 
-        <div class="col-md-3 col-md-offset-3"">
-            <select id="pray" name="pray" class="form-control" data-placeholder="Rayleigh">
+        <div class="col-md-3"">
+            <select id="cloud" name="cloud" class="form-control" data-placeholder="Clouds/Scattering">
                 <option value=""></option> 
-                <option value="0">None</option>  
-                <option value="10">Weak</option>  
-                <option value="100">Medium</option>             
-                <option value="1000">Strong</option>             
+                <option value="0">Nothing</option>  
+                <option value="ray10">Weak Rayleigh</option>  
+                <option value="ray100">Medium Rayleigh</option>             
+                <option value="ray1000">Strong Rayleigh</option>             
+                <option value="flat1">Weak Cloud</option>  
+                <option value="flat10">Medium Cloud</option>             
+                <option value="flat100">Strong Cloud</option>             
             </select>
-            <p class="help-block">Rayleigh Scattering Strength</p>
+            <p class="help-block">Clouds or Scattering</p>
+        </div> 
+        
+        <div class="col-md-4 col-md-offset-3 form-inline">
+            <input type="text" class="form-control" id="pmass" name="pmass" style="width: 70%;" value="1.5">
+        <div class="input-group-btn" style="width: 20%;left: -4px;display: inline-block;">
+            <select id="m_unit" name="m_unit" class="form-control">
+                <option value='M_jup'>M<sub>J</sub></option>   
+                <option value='kilogram'>Kg</option>  
+                <option value='g'>g</option>  
+                <option value='M_earth'>M<sub>E</sub></option> 
+                <option value='M_sun'>M<sub>S</sub></option>          
+            </select>
+            </div> 
+            <p class="help-block">Planet Mass</p>
+        </div> 
         </div>  
 
-        <div class="col-md-3"">
-            <select id="pcloud" name="pcloud" class="form-control" data-placeholder="Clouds">
-                <option value=""></option> 
-                <option value="0">None</option>  
-                <option value="1">Weak</option>  
-                <option value="10">Medium</option>             
-                <option value="100">Strong</option>             
-            </select>
-            <p class="help-block">Cloud Strength</p>
-        </div> 
-        <div class="col-md-4 col-md-offset-3">
-            <div class="input-group">
-                <input type="text" class="form-control" id="rstar" name="refrad">
-                <span class="input-group-addon">Km</span>
-            </div>
-            <p class="help-block">Planet Radius</p>
-        </div>
-        <div class="col-md-4 col-md-offset-3">
-            <div class="input-group">
-                <input type="text" class="form-control" id="rstar" name="rstar">
-                <span class="input-group-addon">Km</span>
-            </div>
-            <p class="help-block">Stellar Radius</p>
-        </div>  
-    </div>   
     <div class="form-group hidden upload-planet-section">
         <div class="col-md-3 col-md-offset-3">
             <button class="btn btn-block niceFileBtn" type="button">Choose File</button>
@@ -230,12 +209,80 @@
     </div>
 
     <div class="form-group hidden constant-transit-section">
-        <div class="col-md-4 col-md-offset-3">
+         <div class="col-md-3 col-md-offset-3">
+            <select id="constant_unit" name="constant_unit" class="form-control" data-placeholder="Select Planet Model Units">
+                <option value=""></option>
+                <option value="rp^2/r*^2">(R<sub>p</sub>/R<sub>*</sub>)^2 (primary)</option>
+                <option value="fp/f*">F<sub>p</sub>/F<sub>*</sub> (secondary/phase curve)</option>
+            </select>
+         <p class="help-block">Primary or Secondary</p>
+        </div> 
+        <div class="col-md-4">
             <div class="input-group">
-                <input type="text" class="form-control" id="depth" name="depth">
-                <span class="input-group-addon">(R<sub>p</sub>/R<sub>*</sub>)<sup>2</sup></span>
+                <input type="text" class="form-control" id="ptemp" name="ptemp" value="Only for Used Secondary">
+                <span class="input-group-addon">&deg; Kelvin</span>
             </div>
-            <p class="help-block">Wavelength-independent transit depth</p>
+            <p class="help-block">Needed for secondary eclipse only</p>
+        </div> 
+    </div>
+
+    <div class="form-group hidden select-from-grid">
+        <div class="col-md-offset-3 col-md-4 form-inline">
+            <input type="text" class="form-control" id="refrad" name="refrad" style="width: 70%;" value="1.25">
+            <div class="input-group-btn" style="width: 20%;left: -4px;display: inline-block;">
+                <select id="r_unit" name="r_unit" class="form-control">
+                <option value='R_jup'>R<sub>J</sub></option>   
+                <option value='kilometer'>Km</option>  
+                <option value='m'>m</option>  
+                <option value='R_earth'>R<sub>E</sub></option> 
+                <option value='R_sun'>R<sub>S</sub></option>  
+                </select>
+            </div>
+        <p class="help-block">Planet Radius</p>
+        </div>
+
+        <div class="col-md-offset-3 col-md-4 form-inline">
+            <input type="text" class="form-control" id="rstar" name="rstar" style="width: 70%;" value="1">
+            <div class="input-group-btn" style="width: 20%;left: -4px;display: inline-block;">
+                <select id="rstar_unit" name="rstar_unit" class="form-control">
+                <option value='R_sun'>R<sub>S</sub></option>
+                <option value='kilometer'>Km</option>  
+                <option value='m'>m</option>  
+                <option value='R_earth'>R<sub>E</sub></option> 
+                <option value='R_jup'>R<sub>J</sub></option>  
+                </select>
+            </div>
+            <p class="help-block">Stellar Radius</p>
+        </div>
+    </div>
+
+    <div class="form-group hidden constant-transit-section">
+        <div class="col-md-offset-3 col-md-4 form-inline">
+            <input type="text" class="form-control" id="refrad" name="refrad" style="width: 70%;" value="1.25">
+            <div class="input-group-btn" style="width: 20%;left: -4px;display: inline-block;">
+                <select id="r_unit" name="r_unit" class="form-control">
+                <option value='R_jup'>R<sub>J</sub></option>   
+                <option value='kilometer'>Km</option>  
+                <option value='m'>m</option>  
+                <option value='R_earth'>R<sub>E</sub></option> 
+                <option value='R_sun'>R<sub>S</sub></option>  
+                </select>
+            </div>
+            <p class="help-block">Planet Radius</p>
+        </div>
+
+        <div class="col-md-offset-3 col-md-4 form-inline">
+            <input type="text" class="form-control" id="rstar" name="rstar" style="width: 70%;" value="1">
+            <div class="input-group-btn" style="width: 20%;left: -4px;display: inline-block;">
+                <select id="rstar_unit" name="rstar_unit" class="form-control">
+                <option value='R_sun'>R<sub>S</sub></option>
+                <option value='kilometer'>Km</option>  
+                <option value='m'>m</option>  
+                <option value='R_earth'>R<sub>E</sub></option> 
+                <option value='R_jup'>R<sub>J</sub></option>  
+                </select>
+            </div>
+            <p class="help-block">Stellar Radius</p>
         </div>
     </div>
 
@@ -243,10 +290,15 @@
 
     <div class="form-group">
         <label class="col-md-3 control-label" for="transit_duration">Transit Duration</label>
-        <div class="col-md-4">
-            <div class="input-group">
-                <input type="text" class="form-control" id="transit_duration" name="transit_duration">
-                <span class="input-group-addon">seconds</span>
+        <div class="col-md-4 form-inline">
+                <input type="text" class="form-control" id="transit_duration" name="transit_duration" style="width: 70%;">
+            <div class="input-group-btn" style="width: 20%;left: -4px;display: inline-block;">
+                <select id="td_unit" name="td_unit" class="form-control">
+                <option value='s'>sec</option>  
+                <option value='m'>min</option>  
+                <option value='h'>hr</option>  
+                <option value='d'>day</option>   
+                </select>
             </div>
             <p class="help-block">For phase curves, will derive duration of phase from input file.</p>
         </div>
@@ -255,12 +307,11 @@
     <div class="form-group">
         <label class="col-md-3 control-label" for="baseline">Baseline</label>
         <div class="col-md-4">
-            <input type="text" class="form-control" id="baseline" name="baseline" >
+            <input type="text" class="form-control" id="baseline" name="baseline" value = "1">
             <p class="help-block">Define length of out of transit observing time</p>
         </div>
         <div class="col-md-3">
             <select id="baseline_unit" name="baseline_unit" class="form-control" data-placeholder="Select Baseline Units">
-                <option value=""></option>
                 <option value="frac">Fraction of time: in/out</option>
                 <option value="total">Total Observing Time (seconds)</option>
             </select>
@@ -270,7 +321,7 @@
     <div class="form-group">
         <label class="col-md-3 control-label" for="numtrans">Number of Transits</label>
         <div class="col-md-4">
-            <input type="text" class="form-control" id="numtrans" name="numtrans" >
+            <input type="text" class="form-control" id="numtrans" name="numtrans" value=1>
             <p class="help-block">Or number of phase observations</p>
         </div>
     </div>
@@ -383,7 +434,6 @@
         </div>
         <div class="col-md-3">
             <select id="sat_unit" name="sat_unit" class="form-control"" data-placeholder="Select e- or % fullwell">
-            <option value=""></option>
             <option value="%">% Full Well</option>
             <option value="e">Electrons</option>
             </select>
@@ -421,7 +471,7 @@
     <div class="form-group hidden constant-noise-section">
         <div class="col-md-3 col-md-offset-3">
             <div class="input-group">
-                <input type="text" class="form-control" id="noisefloor" name="noisefloor" >
+                <input type="text" class="form-control" id="noisefloor" name="noisefloor" value="0">
                 <span class="input-group-addon">ppm</span>
             </div>
             <p class="help-block">Constant Minimum Noise</p>

@@ -10,7 +10,8 @@
                 "temp": "Kelvin",
                 "metal": "log[M/H]",
                 "logg": "log gravity cgs",
-                "rstar":null
+                "radius":null,
+                "r_unit":null
             },
 
     "planet" :{
@@ -19,6 +20,7 @@
             "w_unit": "Angs,um,nm,Hz,sec,cm",
             "f_unit": "rp^2/r*^2 or fp/r*",
             "transit_duration": "in seconds",
+            "td_unit":null,
             "depth":null, 
             "i":null, 
             "a":null, 
@@ -26,11 +28,12 @@
             "ecc":null,
             "w":null,
             "temp":null,
-            "gravity":null,
             "chem":null,
-            "ray":null,
             "cloud":null,
-            "reference_radius":null
+            "radius":null,
+            "r_unit":null,
+            "mass":null,
+            "m_unit":null
             },
 
     "observation": {
