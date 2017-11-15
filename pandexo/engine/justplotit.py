@@ -3,6 +3,7 @@ from bokeh.io import output_file as outputfile
 import pickle as pk
 import numpy as np
 from bokeh.layouts import row
+import pandas as pd
 def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', output_file = 'data.html',legend = False, 
         R=False,  num_tran = False, plot_width=800, plot_height=400,x_range=[1,10]):
     """Plots 1d simulated spectrum and rebin or rescale for more transits
@@ -142,10 +143,12 @@ def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', out
             print("Something went wrong. Cannot enter both resolution and ask to bin to new wave")
             return
             
-        #create error bars for Bokeh's multi_line
+        #create error bars for Bokeh's multi_line and drop nans 
+        data = pd.DataFrame({'x':x, 'y':y,'err':err}).dropna()
+
         y_err = []
         x_err = []
-        for px, py, yerr in zip(x, y, err):
+        for px, py, yerr in zip(data['x'], data['y'], data['err']):
             np.array(x_err.append((px, px)))
             np.array(y_err.append((py - yerr, py + yerr)))
         #initialize Figure
@@ -170,21 +173,23 @@ def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', out
                plot_width = plot_width, plot_height =plot_height,title=title,x_axis_label=x_axis_label,
               y_axis_label = y_axis_label, tools=TOOLS, background_fill_color = 'white')
         
-              
+        
         #plot model, data, and errors 
         if model:
             mxx = dict['OriginalInput']['model_wave']
             myy = dict['OriginalInput']['model_spec']
-            
             my = uniform_tophat_mean(x, mxx,myy)
-            fig1d.line(x,my, color='black',alpha=0.2, line_width = 4)
+            model = pd.DataFrame({'x':x, 'my':my}).dropna()
+            fig1d.line(model['x'],model['my'], color='black',alpha=0.2, line_width = 4)
+
+        
         if legend: 
-            fig1d.circle(x, y, color=colors[i], legend = legend_keys[i])
+            fig1d.circle(data['x'], data['y'], color=colors[i], legend = legend_keys[i])
         else: 
-            fig1d.circle(x, y, color=colors[i])
-        outx += [x]
-        outy += [y]
-        oute += [err]
+            fig1d.circle(data['x'], data['y'], color=colors[i])
+        outx += [data['x'].values]
+        outy += [data['y'].values]
+        oute += [data['err'].values]
         fig1d.multi_line(x_err, y_err,color=colors[i])
         i += 1 
     show(fig1d)
