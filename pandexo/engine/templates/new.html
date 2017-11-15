@@ -135,7 +135,7 @@
 
     <div class="form-group hidden select-from-grid">
         <div class="col-md-3 col-md-offset-3"">
-            <select id="ptemp" name="ptemp" class="form-control" data-placeholder="Select Temp (K)">
+            <select id="ptempg" name="ptempg" class="form-control" data-placeholder="Select Temp (K)">
                 <option value=""></option> 
                 {% for i in temp %}
                     <option {{ escape(i) }} value={{ escape(i) }}>{{ escape(i) }}</option>
@@ -219,7 +219,7 @@
         </div> 
         <div class="col-md-4">
             <div class="input-group">
-                <input type="text" class="form-control" id="ptemp" name="ptemp" value="Only for Used Secondary">
+                <input type="text" class="form-control" id="ptempc" name="ptempc" value="Only for Used Secondary">
                 <span class="input-group-addon">&deg; Kelvin</span>
             </div>
             <p class="help-block">Needed for secondary eclipse only</p>
@@ -228,9 +228,9 @@
 
     <div class="form-group hidden select-from-grid">
         <div class="col-md-offset-3 col-md-4 form-inline">
-            <input type="text" class="form-control" id="refrad" name="refrad" style="width: 70%;" value="1.25">
+            <input type="text" class="form-control" id="refradg" name="refradg" style="width: 70%;" value="1.25">
             <div class="input-group-btn" style="width: 20%;left: -4px;display: inline-block;">
-                <select id="r_unit" name="r_unit" class="form-control">
+                <select id="r_unitg" name="r_unitg" class="form-control">
                 <option value='R_jup'>R<sub>J</sub></option>   
                 <option value='kilometer'>Km</option>  
                 <option value='m'>m</option>  
@@ -242,9 +242,9 @@
         </div>
 
         <div class="col-md-offset-3 col-md-4 form-inline">
-            <input type="text" class="form-control" id="rstar" name="rstar" style="width: 70%;" value="1">
+            <input type="text" class="form-control" id="rstarg" name="rstarg" style="width: 70%;" value="1">
             <div class="input-group-btn" style="width: 20%;left: -4px;display: inline-block;">
-                <select id="rstar_unit" name="rstar_unit" class="form-control">
+                <select id="rstar_unitg" name="rstar_unitg" class="form-control">
                 <option value='R_sun'>R<sub>S</sub></option>
                 <option value='kilometer'>Km</option>  
                 <option value='m'>m</option>  
@@ -258,9 +258,9 @@
 
     <div class="form-group hidden constant-transit-section">
         <div class="col-md-offset-3 col-md-4 form-inline">
-            <input type="text" class="form-control" id="refrad" name="refrad" style="width: 70%;" value="1.25">
+            <input type="text" class="form-control" id="refradc" name="refradc" style="width: 70%;" value="1.25">
             <div class="input-group-btn" style="width: 20%;left: -4px;display: inline-block;">
-                <select id="r_unit" name="r_unit" class="form-control">
+                <select id="r_unitc" name="r_unitc" class="form-control">
                 <option value='R_jup'>R<sub>J</sub></option>   
                 <option value='kilometer'>Km</option>  
                 <option value='m'>m</option>  
@@ -272,9 +272,9 @@
         </div>
 
         <div class="col-md-offset-3 col-md-4 form-inline">
-            <input type="text" class="form-control" id="rstar" name="rstar" style="width: 70%;" value="1">
+            <input type="text" class="form-control" id="rstarc" name="rstarc" style="width: 70%;" value="1">
             <div class="input-group-btn" style="width: 20%;left: -4px;display: inline-block;">
-                <select id="rstar_unit" name="rstar_unit" class="form-control">
+                <select id="rstar_unitc" name="rstar_unitc" class="form-control">
                 <option value='R_sun'>R<sub>S</sub></option>
                 <option value='kilometer'>Km</option>  
                 <option value='m'>m</option>  
