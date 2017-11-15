@@ -5,10 +5,12 @@ import numpy as np
 import os
 exo_dict = jdi.load_exo_dict()
 exo_dict['observation']['sat_level'] = 80    #saturation level in percent of full well 
+exo_dict['observation']['sat_unit'] = '%' 
 exo_dict['observation']['noccultations'] = 2 #number of transits 
 exo_dict['observation']['R'] = None          #fixed binning. I usually suggest ZERO binning.. you can always bin later 
                                              #without having to redo the calcualtion
-exo_dict['observation']['fraction'] = 1.0    #fraction of time in transit versus out = in/out
+exo_dict['observation']['baseline'] = 1.0    #fraction of time in transit versus out = in/out
+exo_dict['observation']['baseline_unit'] = 'frac' 
 exo_dict['observation']['noise_floor'] = 0   #this can be a fixed level or it can be a filepath 
 exo_dict['star']['type'] = 'phoenix'        #phoenix or user (if you have your own)
 exo_dict['star']['mag'] = 8.0               #magnitude of the system
