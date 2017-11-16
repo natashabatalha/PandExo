@@ -5,7 +5,7 @@ import numpy as np
 from bokeh.layouts import row
 import pandas as pd
 def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', output_file = 'data.html',legend = False, 
-        R=False,  num_tran = False, plot_width=800, plot_height=400,x_range=[1,10]):
+        R=False,  num_tran = False, plot_width=800, plot_height=400,x_range=[1,10], plot=True):
     """Plots 1d simulated spectrum and rebin or rescale for more transits
     
     Plots 1d data points with model in the background (if wanted). Designed to read in exact 
@@ -37,6 +37,8 @@ def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', out
         (Optional) Sets the height of the plot. Default = 400 
     x_range : list of int
         (Optional) Sets x range of plot. Default = [1,10]
+    plot : bool 
+        (Optional) Supresses the plot if not wanted (Default = True)
 
     Returns
     -------
@@ -192,7 +194,8 @@ def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', out
         oute += [data['err'].values]
         fig1d.multi_line(x_err, y_err,color=colors[i])
         i += 1 
-    show(fig1d)
+    if plot:
+        show(fig1d)
     return outx,outy,oute
 
     
