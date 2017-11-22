@@ -17,11 +17,15 @@ exo_dict['star']['mag'] = 8.0               #magnitude of the system
 exo_dict['star']['ref_wave'] = 1.25         #For J mag = 1.25, H = 1.6, K =2.22.. etc (all in micron)
 exo_dict['star']['temp'] = 5500             #in K 
 exo_dict['star']['metal'] = 0.0             # as log Fe/H
-exo_dict['star']['logg'] = 4.0  
+exo_dict['star']['logg'] = 4.0
+exo_dict['star']['radius'] = 1
+exo_dict['star']['r_unit'] = 'R_sun'    
 exo_dict['planet']['type'] = 'constant'
-exo_dict['planet']['depth'] = 0.01                      #other options include "um","nm" ,"Angs", "secs" (for phase curves)
+exo_dict['planet']['radius'] = 1                      #other options include "um","nm" ,"Angs", "secs" (for phase curves)
+exo_dict['planet']['r_unit'] = 'R_jup'  
 exo_dict['planet']['transit_duration'] = 2.0*60.0*60.0 
-
+exo_dict['planet']['td_unit'] = 's'
+exo_dict['planet']['f_unit'] = 'rp^2/r*^2'
 print('Starting TEST run')
 jdi.run_pandexo(exo_dict, ['NIRSpec G140H'], save_file=False)
 print('SUCCESS') 
