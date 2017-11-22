@@ -251,6 +251,25 @@ if you are selecting G140M or G140H, this allows you to pick which one</li>
 </dd></dl>
 
 <dl class="function">
+<dt id="engine.justdoit.grid_options">
+<code class="descclassname">engine.justdoit.</code><code class="descname">grid_options</code><span class="sig-paren">(</span><em>grid=’fortney’</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/justdoit.html#grid_options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.justdoit.grid_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to show available grid options</p>
+<p>PandExo now supports various grid options. Currently, the only one that is availalbe
+is the Fortney grid for giant planets. We will be implementing others, as they
+become available. It will become increasingly difficult for users to see what
+options are availalbe to them. This function should guide users to choose
+the grid that best fits their needs.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>grid</strong> (<em>str</em>) – (Optional) string which ‘fortney’</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
 <dt id="engine.justdoit.load_exo_dict">
 <code class="descclassname">engine.justdoit.</code><code class="descname">load_exo_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/justdoit.html#load_exo_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.justdoit.load_exo_dict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Loads in empty exoplanet dictionary for pandexo input</p>
@@ -639,7 +658,7 @@ that run_pandexo assigns.</li>
 
 <dl class="function">
 <dt id="engine.justplotit.jwst_1d_spec">
-<code class="descclassname">engine.justplotit.</code><code class="descname">jwst_1d_spec</code><span class="sig-paren">(</span><em>result_dict, model=True, title=’Model + Data + Error Bars’, output_file=’data.html’, legend=False, R=False, num_tran=False, plot_width=800, plot_height=400, x_range=[1, 10]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/justplotit.html#jwst_1d_spec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.justplotit.jwst_1d_spec" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">engine.justplotit.</code><code class="descname">jwst_1d_spec</code><span class="sig-paren">(</span><em>result_dict, model=True, title=’Model + Data + Error Bars’, output_file=’data.html’, legend=False, R=False, num_tran=False, plot_width=800, plot_height=400, x_range=[1, 10], plot=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/justplotit.html#jwst_1d_spec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.justplotit.jwst_1d_spec" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plots 1d simulated spectrum and rebin or rescale for more transits</p>
 <p>Plots 1d data points with model in the background (if wanted). Designed to read in exact
 output of run_pandexo.</p>
@@ -662,6 +681,7 @@ no binning.</li>
 <li><strong>plot_width</strong> (<em>int</em>) – (Optional) Sets the width of the plot. Default = 800</li>
 <li><strong>plot_height</strong> (<em>int</em>) – (Optional) Sets the height of the plot. Default = 400</li>
 <li><strong>x_range</strong> (<em>list of int</em>) – (Optional) Sets x range of plot. Default = [1,10]</li>
+<li><strong>plot</strong> (<em>bool</em>) – (Optional) Supresses the plot if not wanted (Default = True)</li>
 </ul>
 </td>
 </tr>
@@ -882,7 +902,7 @@ that run_pandexo assigns.</li>
 
 <dl class="function">
 <dt id="engine.bintools.binning">
-<code class="descclassname">engine.bintools.</code><code class="descname">binning</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>dy=None</em>, <em>binwidth=None</em>, <em>r=None</em>, <em>newx=None</em>, <em>log=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/bintools.html#binning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.bintools.binning" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">engine.bintools.</code><code class="descname">binning</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>dy=None</em>, <em>binwidth=None</em>, <em>r=None</em>, <em>newx=None</em>, <em>log=False</em>, <em>nan=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/bintools.html#binning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.bintools.binning" title="Permalink to this definition">¶</a></dt>
 <dd><p>This contains functionality for binning spectroscopy given an x, y and set of errors.
 This is similar to IDL’s regroup but in Python (obviously). Note that y is binned as the
 mean(ordinates) instead of sum(ordinates), as you would want for cmputing flux in a set of
@@ -902,6 +922,8 @@ if there were 3 points to bin.</p>
 <li><strong>newx</strong> (<em>array</em><em>, </em><em>float</em>) – (Optional) new x axis to bin to</li>
 <li><strong>log</strong> (<em>bool</em>) – (Optional) computes equal bin spacing logarithmically, Default = False</li>
 <li><strong>sort</strong> (<em>bool</em>) – (Optional) sort into ascending order of x, default = True</li>
+<li><strong>nan</strong> (<em>bool</em>) – (Optional) if true, this returns nan values where no points exist in a given bin
+Otherwise, all nans are dropped</li>
 </ul>
 </td>
 </tr>
@@ -948,7 +970,7 @@ bin_n : number of points contained in each bin</p>
 
 <dl class="function">
 <dt id="engine.bintools.uniform_tophat_mean">
-<code class="descclassname">engine.bintools.</code><code class="descname">uniform_tophat_mean</code><span class="sig-paren">(</span><em>newx</em>, <em>x</em>, <em>y</em>, <em>dy=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/bintools.html#uniform_tophat_mean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.bintools.uniform_tophat_mean" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">engine.bintools.</code><code class="descname">uniform_tophat_mean</code><span class="sig-paren">(</span><em>newx</em>, <em>x</em>, <em>y</em>, <em>dy=None</em>, <em>nan=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/bintools.html#uniform_tophat_mean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.bintools.uniform_tophat_mean" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adapted from Mike R. Line to rebin spectra</p>
 <p>Takes mean of groups of points in certain wave bin</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -2188,6 +2210,30 @@ Recommended for transit transmisstion spectra = fml</li>
 </td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">dict</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="engine.jwst.target_acq">
+<code class="descclassname">engine.jwst.</code><code class="descname">target_acq</code><span class="sig-paren">(</span><em>instrument</em>, <em>both_spec</em>, <em>warning</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/jwst.html#target_acq"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.jwst.target_acq" title="Permalink to this definition">¶</a></dt>
+<dd><p>Contains functionality to compute optimal TA strategy</p>
+<p>Takes pandexo normalized flux from create_input and checks for saturation, or
+if SNR is below the minimum requirement for each. Then adds warnings and 2d displays
+and target acq info to final output dict</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>instrument</strong> (<em>str</em>) – possible options are niriss, nirspec, miri and nircam</li>
+<li><strong>both_spec</strong> (<em>dict</em>) – output dictionary from <strong>create_input</strong></li>
+<li><strong>warning</strong> (<em>dict</em>) – output dictionary from <strong>add_warnings</strong></li>
+<li><strong>Retruns</strong> – </li>
+<li><strong>-------</strong> – </li>
+</ul>
 </td>
 </tr>
 </tbody>

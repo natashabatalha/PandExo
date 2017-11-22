@@ -101,7 +101,7 @@
 <li class="toctree-l1"><a class="reference internal" href="#installation-for-users-with-pip">Installation for Users With PIP</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#set-environment">Set Environment</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#dependencies">Dependencies</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#id4">COORDS.PY: TypeError: ‘float’ object cannot be interpreted as an index</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id3">COORDS.PY: TypeError: ‘float’ object cannot be interpreted as an index</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="#todos">TODOS</a></li>
@@ -192,7 +192,7 @@
 </div>
 <div class="section" id="pandexo-startup-bash-script">
 <h2>PandExo startup bash script<a class="headerlink" href="#pandexo-startup-bash-script" title="Permalink to this headline">¶</a></h2>
-<p>A startup script and a python test script was created to do an automatic install of PandExo. You can download both of them from a google drive located <a class="reference external" href="https://drive.google.com/open?id=0ByRvbM3zW0d-d2xoSmNMc1RtdTQ">here</a>.</p>
+<p>A startup script (<cite>pandexo.sh</cite>) and a python test script (<cite>run_test.py</cite>) were created to do an automatic install of PandExo. You can download both of them from the PandExo <a class="reference external" href="https://github.com/natashabatalha/PandExo">GitHub</a>.</p>
 </div>
 </div>
 <div class="section" id="installation-for-users-with-conda">
@@ -277,8 +277,8 @@ SUCCESS
 </div>
 <p>Hopefully you have had success but if not the most likely error you will get is the following:</p>
 </div>
-<div class="section" id="id4">
-<h2>COORDS.PY: TypeError: ‘float’ object cannot be interpreted as an index<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id3">
+<h2>COORDS.PY: TypeError: ‘float’ object cannot be interpreted as an index<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
 <p>This is an error within Pandeia, which has not yet been fixed by STScI folk. You can easily fix it by finding where the file /pandeia/engine/coords.py is and changing line 36:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">ones</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">ny</span><span class="p">,</span> <span class="n">nx</span><span class="p">))</span>
 </pre></div>

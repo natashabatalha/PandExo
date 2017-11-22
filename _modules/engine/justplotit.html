@@ -165,8 +165,9 @@
 <span class="kn">import</span> <span class="nn">pickle</span> <span class="k">as</span> <span class="nn">pk</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">bokeh.layouts</span> <span class="k">import</span> <span class="n">row</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <div class="viewcode-block" id="jwst_1d_spec"><a class="viewcode-back" href="../../engine.html#engine.justplotit.jwst_1d_spec">[docs]</a><span class="k">def</span> <span class="nf">jwst_1d_spec</span><span class="p">(</span><span class="n">result_dict</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Model + Data + Error Bars&#39;</span><span class="p">,</span> <span class="n">output_file</span> <span class="o">=</span> <span class="s1">&#39;data.html&#39;</span><span class="p">,</span><span class="n">legend</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> 
-        <span class="n">R</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="n">num_tran</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">plot_width</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span> <span class="n">plot_height</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span><span class="n">x_range</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">10</span><span class="p">]):</span>
+        <span class="n">R</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="n">num_tran</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">plot_width</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span> <span class="n">plot_height</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span><span class="n">x_range</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">10</span><span class="p">],</span> <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Plots 1d simulated spectrum and rebin or rescale for more transits</span>
 <span class="sd">    </span>
 <span class="sd">    Plots 1d data points with model in the background (if wanted). Designed to read in exact </span>
@@ -198,6 +199,8 @@
 <span class="sd">        (Optional) Sets the height of the plot. Default = 400 </span>
 <span class="sd">    x_range : list of int</span>
 <span class="sd">        (Optional) Sets x range of plot. Default = [1,10]</span>
+<span class="sd">    plot : bool </span>
+<span class="sd">        (Optional) Supresses the plot if not wanted (Default = True)</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -304,10 +307,12 @@
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Something went wrong. Cannot enter both resolution and ask to bin to new wave&quot;</span><span class="p">)</span>
             <span class="k">return</span>
             
-        <span class="c1">#create error bars for Bokeh&#39;s multi_line</span>
+        <span class="c1">#create error bars for Bokeh&#39;s multi_line and drop nans </span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;x&#39;</span><span class="p">:</span><span class="n">x</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span><span class="n">y</span><span class="p">,</span><span class="s1">&#39;err&#39;</span><span class="p">:</span><span class="n">err</span><span class="p">})</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+
         <span class="n">y_err</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">x_err</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">px</span><span class="p">,</span> <span class="n">py</span><span class="p">,</span> <span class="n">yerr</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">err</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">px</span><span class="p">,</span> <span class="n">py</span><span class="p">,</span> <span class="n">yerr</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;err&#39;</span><span class="p">]):</span>
             <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x_err</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">px</span><span class="p">,</span> <span class="n">px</span><span class="p">)))</span>
             <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y_err</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">py</span> <span class="o">-</span> <span class="n">yerr</span><span class="p">,</span> <span class="n">py</span> <span class="o">+</span> <span class="n">yerr</span><span class="p">)))</span>
         <span class="c1">#initialize Figure</span>
@@ -332,24 +337,27 @@
                <span class="n">plot_width</span> <span class="o">=</span> <span class="n">plot_width</span><span class="p">,</span> <span class="n">plot_height</span> <span class="o">=</span><span class="n">plot_height</span><span class="p">,</span><span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span><span class="n">x_axis_label</span><span class="o">=</span><span class="n">x_axis_label</span><span class="p">,</span>
               <span class="n">y_axis_label</span> <span class="o">=</span> <span class="n">y_axis_label</span><span class="p">,</span> <span class="n">tools</span><span class="o">=</span><span class="n">TOOLS</span><span class="p">,</span> <span class="n">background_fill_color</span> <span class="o">=</span> <span class="s1">&#39;white&#39;</span><span class="p">)</span>
         
-              
+        
         <span class="c1">#plot model, data, and errors </span>
         <span class="k">if</span> <span class="n">model</span><span class="p">:</span>
             <span class="n">mxx</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;OriginalInput&#39;</span><span class="p">][</span><span class="s1">&#39;model_wave&#39;</span><span class="p">]</span>
             <span class="n">myy</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;OriginalInput&#39;</span><span class="p">][</span><span class="s1">&#39;model_spec&#39;</span><span class="p">]</span>
-            
             <span class="n">my</span> <span class="o">=</span> <span class="n">uniform_tophat_mean</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">mxx</span><span class="p">,</span><span class="n">myy</span><span class="p">)</span>
-            <span class="n">fig1d</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">my</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">line_width</span> <span class="o">=</span> <span class="mi">4</span><span class="p">)</span>
+            <span class="n">model</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;x&#39;</span><span class="p">:</span><span class="n">x</span><span class="p">,</span> <span class="s1">&#39;my&#39;</span><span class="p">:</span><span class="n">my</span><span class="p">})</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+            <span class="n">fig1d</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">model</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span><span class="n">model</span><span class="p">[</span><span class="s1">&#39;my&#39;</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">line_width</span> <span class="o">=</span> <span class="mi">4</span><span class="p">)</span>
+
+        
         <span class="k">if</span> <span class="n">legend</span><span class="p">:</span> 
-            <span class="n">fig1d</span><span class="o">.</span><span class="n">circle</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">colors</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">legend</span> <span class="o">=</span> <span class="n">legend_keys</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="n">fig1d</span><span class="o">.</span><span class="n">circle</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="n">colors</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">legend</span> <span class="o">=</span> <span class="n">legend_keys</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
         <span class="k">else</span><span class="p">:</span> 
-            <span class="n">fig1d</span><span class="o">.</span><span class="n">circle</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">colors</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-        <span class="n">outx</span> <span class="o">+=</span> <span class="p">[</span><span class="n">x</span><span class="p">]</span>
-        <span class="n">outy</span> <span class="o">+=</span> <span class="p">[</span><span class="n">y</span><span class="p">]</span>
-        <span class="n">oute</span> <span class="o">+=</span> <span class="p">[</span><span class="n">err</span><span class="p">]</span>
+            <span class="n">fig1d</span><span class="o">.</span><span class="n">circle</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="n">colors</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">outx</span> <span class="o">+=</span> <span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">]</span>
+        <span class="n">outy</span> <span class="o">+=</span> <span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">]</span>
+        <span class="n">oute</span> <span class="o">+=</span> <span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;err&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">]</span>
         <span class="n">fig1d</span><span class="o">.</span><span class="n">multi_line</span><span class="p">(</span><span class="n">x_err</span><span class="p">,</span> <span class="n">y_err</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="n">colors</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
         <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span> 
-    <span class="n">show</span><span class="p">(</span><span class="n">fig1d</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">plot</span><span class="p">:</span>
+        <span class="n">show</span><span class="p">(</span><span class="n">fig1d</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">outx</span><span class="p">,</span><span class="n">outy</span><span class="p">,</span><span class="n">oute</span></div>
 
     

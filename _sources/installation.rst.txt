@@ -22,7 +22,7 @@ Likewise, the user may wish to install specific data for use with the PySynPhot 
 
 PandExo startup bash script
 ````````````````````````````
-A startup script and a python test script was created to do an automatic install of PandExo. You can download both of them from a google drive located `here <https://drive.google.com/open?id=0ByRvbM3zW0d-d2xoSmNMc1RtdTQ>`_.
+A startup script (`pandexo.sh`) and a python test script (`run_test.py`) were created to do an automatic install of PandExo. You can download both of them from the PandExo `GitHub <https://github.com/natashabatalha/PandExo>`_.
 
 
 Installation for Users With Conda
