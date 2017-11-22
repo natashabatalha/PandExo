@@ -3,7 +3,7 @@ import numpy as np
 import pysynphot.binning as astrobin 
 import warnings as warn
 import astropy.units as u
-def binning(x, y,  dy=None, binwidth=None, r=None,newx= None, log = False):
+def binning(x, y,  dy=None, binwidth=None, r=None,newx= None, log = False, nan=False):
 	"""
 	This contains functionality for binning spectroscopy given an x, y and set of errors. 
 	This is similar to IDL's regroup but in Python (obviously). Note that y is binned as the 
@@ -30,7 +30,9 @@ def binning(x, y,  dy=None, binwidth=None, r=None,newx= None, log = False):
 		(Optional) computes equal bin spacing logarithmically, Default = False
 	sort : bool 
 		(Optional) sort into ascending order of x, default = True
-	
+	nan : bool
+		(Optional) if true, this returns nan values where no points exist in a given bin
+		Otherwise, all nans are dropped 
 
 	Returns
 	-------
@@ -82,15 +84,18 @@ def binning(x, y,  dy=None, binwidth=None, r=None,newx= None, log = False):
 
 	if newx is not None: 
 		bin_x = newx
-		bin_y, bin_dy, bin_n = uniform_tophat_mean(bin_x,x, y, dy=dy)
-		bin_edge = astrobin.calculate_bin_edges(bin_x)/u.Angstrom
-		return {'bin_y':bin_y, 'bin_x':bin_x, 'bin_edge':bin_edge, 'bin_dy':bin_dy, 'bin_n':bin_n}
+		bin_x, bin_y, bin_dy, bin_n = uniform_tophat_mean(bin_x,x, y, dy=dy,nan=nan)
+		bin_edge = astrobin.calculate_bin_edges(bin_x)
+
+		return {'bin_y':bin_y, 'bin_x':bin_x, 'bin_edge':bin_edge, 'bin_dy':bin_dy, 'bin_n':bin_n} 
 
 	elif r is not None:
 		bin_x = bin_wave_to_R(x, r)
-		bin_y, bin_dy, bin_n = uniform_tophat_mean(bin_x,x, y, dy=dy)
-		bin_edge = astrobin.calculate_bin_edges(bin_x)/u.Angstrom
-		return {'bin_y':bin_y, 'bin_x':bin_x, 'bin_edge':bin_edge, 'bin_dy':bin_dy, 'bin_n':bin_n}
+		bin_x, bin_y, bin_dy, bin_n = uniform_tophat_mean(bin_x,x, y, dy=dy,nan=nan)
+		bin_edge = astrobin.calculate_bin_edges(bin_x)
+
+		return {'bin_y':bin_y, 'bin_x':bin_x, 'bin_edge':bin_edge, 'bin_dy':bin_dy, 'bin_n':bin_n} 
+ 
 
 	elif binwidth is not None: 
 		if (binwidth < 0) and (log):
@@ -101,11 +106,14 @@ def binning(x, y,  dy=None, binwidth=None, r=None,newx= None, log = False):
 			bin_x = 10**bin_x
 		elif not log:
 			bin_x = np.arange(min(x),max(x),binwidth)
-		bin_y, bin_dy, bin_n = uniform_tophat_mean(bin_x,x, y, dy=dy)
-		bin_edge = astrobin.calculate_bin_edges(bin_x)/u.Angstrom
-		return {'bin_y':bin_y, 'bin_x':bin_x, 'bin_edge':bin_edge, 'bin_dy':bin_dy, 'bin_n':bin_n}
+		bin_x, bin_y, bin_dy, bin_n = uniform_tophat_mean(bin_x,x, y, dy=dy,nan=nan)
+		bin_edge = astrobin.calculate_bin_edges(bin_x)
 
-def uniform_tophat_mean(newx,x, y, dy=None):
+		return {'bin_y':bin_y, 'bin_x':bin_x, 'bin_edge':bin_edge, 'bin_dy':bin_dy, 'bin_n':bin_n} 
+
+
+
+def uniform_tophat_mean(newx,x, y, dy=None,nan=False):
 	"""Adapted from Mike R. Line to rebin spectra
 
 	Takes mean of groups of points in certain wave bin 
@@ -164,12 +172,20 @@ def uniform_tophat_mean(newx,x, y, dy=None):
 	if len(loc[0]) > 0: 
 		ynew[0]=np.mean(y[loc])
 		bin_n[0] = len(y[loc])
-		bin_dy[0] = np.sqrt(np.sum(dy[loc]**2.0))/len(y[loc])
-	elif len(loc)[0] is 0 : 
+		if dy is not None: 
+			bin_dy[0] = np.sqrt(np.sum(dy[loc]**2.0))/len(y[loc])
+	elif len(loc[0]) is 0 : 
 		ynew[0]=np.nan
-		bin_n[0] = np.nan 
-		bin_dy[0] = np.nan 
-	return ynew, bin_dy, bin_n
+		bin_n[0] = np.nan
+		if dy is not None:
+			bin_dy[0] = np.nan 
+	
+	#remove nans if requested
+	out = pd.DataFrame({'bin_y':ynew, 'bin_x':newx, 'bin_dy':bin_dy, 'bin_n':bin_n})
+	if ~nan:
+		out = out.dropna()
+
+	return out['bin_x'].values,out['bin_y'].values, out['bin_dy'].values, out['bin_n'].values
 
 def bin_wave_to_R(w, R):
 	"""Creates new wavelength axis at specified resolution
