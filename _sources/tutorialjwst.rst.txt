@@ -1,7 +1,13 @@
 JWST Tutorial 
 =============
 
-This tutorial can be downloaded as a iPython notebook on the PandExo Github. 
+This tutorial can be downloaded as a iPython notebook on the PandExo Github. You also always have the option of running PandExo UI by running in `bash`
+
+.. code:: bash
+
+    start_pandexo 
+
+And then going to https://locahost:1111
 
 .. code:: python
 
@@ -152,11 +158,16 @@ Change subarray:
 
     inst_dict["configuration"]["detector"]["subarray"] = 'sub512'
 
-Change the read mode 
+Don't know which options are available?? 
 
-.. code:: python 
-    
-    inst_dict["configuration"]["detector"]["readmode"] = 'nrs' 
+..code:: python 
+
+    #subarrays
+    print(jdi.subarrays('nirspec'))
+    #filters
+    print(jdi.filters('nircam'))
+    #dispersers
+    print(jdi.dispersers('nirspec'))
 
 The last thing to note is that PandExo (by Default) optimizes the amount of groups 
 that can fit into an integration. If you want to set your own number of groups you can 

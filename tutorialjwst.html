@@ -191,7 +191,11 @@
             
   <div class="section" id="jwst-tutorial">
 <h1>JWST Tutorial<a class="headerlink" href="#jwst-tutorial" title="Permalink to this headline">¶</a></h1>
-<p>This tutorial can be downloaded as a iPython notebook on the PandExo Github.</p>
+<p>This tutorial can be downloaded as a iPython notebook on the PandExo Github. You also always have the option of running PandExo UI by running in <cite>bash</cite></p>
+<div class="code bash highlight-default"><div class="highlight"><pre><span></span><span class="n">start_pandexo</span>
+</pre></div>
+</div>
+<p>And then going to <a class="reference external" href="https://locahost:1111">https://locahost:1111</a></p>
 <div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">warnings</span>
 <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
 <span class="kn">import</span> <span class="nn">pandexo.engine.justdoit</span> <span class="k">as</span> <span class="nn">jdi</span> <span class="c1"># THIS IS THE HOLY GRAIL OF PANDEXO</span>
@@ -326,10 +330,15 @@ As a first pass, I’d suggest skipping this for now. Then come back and fine tu
 <div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">inst_dict</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">][</span><span class="s2">&quot;detector&quot;</span><span class="p">][</span><span class="s2">&quot;subarray&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;sub512&#39;</span>
 </pre></div>
 </div>
-<p>Change the read mode</p>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">inst_dict</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">][</span><span class="s2">&quot;detector&quot;</span><span class="p">][</span><span class="s2">&quot;readmode&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;nrs&#39;</span>
-</pre></div>
-</div>
+<p>Don’t know which options are available??</p>
+<p>..code:: python</p>
+<blockquote>
+<div>#subarrays
+print(jdi.subarrays(‘nirspec’))
+#filters
+print(jdi.filters(‘nircam’))
+#dispersers
+print(jdi.dispersers(‘nirspec’))</div></blockquote>
 <p>The last thing to note is that PandExo (by Default) optimizes the amount of groups
 that can fit into an integration. If you want to set your own number of groups you can
 change that too.</p>
