@@ -37,7 +37,7 @@
         <link rel="search" title="Search" href="search.html"/>
     <link rel="top" title="PandExo  documentation" href="index.html"/>
         <link rel="next" title="Possible Instrument Input Params" href="jwstinput.html"/>
-        <link rel="prev" title="Installation" href="installation.html"/> 
+        <link rel="prev" title="Pre-installation Data Download" href="installation.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -88,13 +88,19 @@
             
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="includeme.html">Getting Started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Pre-installation Data Download</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html#installation-for-users-with-conda">Installation for Users With Conda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html#installation-for-users-with-pip">Installation for Users With PIP</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html#todos">TODOS</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">JWST Tutorial</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#editting-input-dictionaries">Editting Input Dictionaries</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#step-1-load-in-a-blank-exoplanet-dictionary">Step 1) Load in a blank exoplanet dictionary</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#edit-exoplanet-observation-inputs">Edit exoplanet observation inputs</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#edit-exoplanet-star-inputs">Edit exoplanet star inputs</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#edit-exoplanet-planet-inputs">Edit exoplanet planet inputs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#edit-exoplanet-host-star-inputs">Edit exoplanet host star inputs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#edit-exoplanet-inputs-using-one-of-three-options-1-user-specified-2-constant-value-3-select-from-grid">Edit exoplanet inputs using one of  three options: 1) user specified, 2) constant value, 3) select from grid</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#edit-exoplanet-planet-inputs">1) Edit exoplanet planet inputs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#users-can-also-add-in-a-constant-temperature-or-a-constant-transit-depth">2) Users can also add in a constant temperature or a constant transit depth</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#select-from-grid">3) Select from grid</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#step-2-load-in-instrument-dictionary-optional">Step 2) Load in instrument dictionary (optional)</a></li>
@@ -186,7 +192,11 @@
   <div class="section" id="jwst-tutorial">
 <h1>JWST Tutorial<a class="headerlink" href="#jwst-tutorial" title="Permalink to this headline">¶</a></h1>
 <p>This tutorial can be downloaded as a iPython notebook on the PandExo Github.</p>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandexo.engine.justdoit</span> <span class="k">as</span> <span class="nn">jdi</span> <span class="c1"># THIS IS THE HOLY GRAIL OF PANDEXO</span>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">warnings</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">pandexo.engine.justdoit</span> <span class="k">as</span> <span class="nn">jdi</span> <span class="c1"># THIS IS THE HOLY GRAIL OF PANDEXO</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">os</span>
 </pre></div>
 </div>
 <div class="section" id="editting-input-dictionaries">
@@ -212,8 +222,8 @@ result in nonsense runs</p>
 </pre></div>
 </div>
 </div>
-<div class="section" id="edit-exoplanet-star-inputs">
-<h4>Edit exoplanet star inputs<a class="headerlink" href="#edit-exoplanet-star-inputs" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="edit-exoplanet-host-star-inputs">
+<h4>Edit exoplanet host star inputs<a class="headerlink" href="#edit-exoplanet-host-star-inputs" title="Permalink to this headline">¶</a></h4>
 <p>Note… If you select ‘phoenix’ you <strong>do not</strong> have to provide a starpath,
 w_unit or f_unit, but you <strong>do</strong> have to provide a temp, metal and
 logg. If you select ‘user’ you <strong>do not</strong> need to provide a temp, metal
@@ -227,12 +237,54 @@ and logg, but you <strong>do</strong> need to provide units and starpath.</p>
 </pre></div>
 </div>
 </div>
+<div class="section" id="edit-exoplanet-inputs-using-one-of-three-options-1-user-specified-2-constant-value-3-select-from-grid">
+<h4>Edit exoplanet inputs using one of  three options: 1) user specified, 2) constant value, 3) select from grid<a class="headerlink" href="#edit-exoplanet-inputs-using-one-of-three-options-1-user-specified-2-constant-value-3-select-from-grid" title="Permalink to this headline">¶</a></h4>
+</div>
 <div class="section" id="edit-exoplanet-planet-inputs">
-<h4>Edit exoplanet planet inputs<a class="headerlink" href="#edit-exoplanet-planet-inputs" title="Permalink to this headline">¶</a></h4>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;exopath&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;/Users/nbatalh1/Desktop/Simulations/wasp12b.txt&#39;</span>
-<span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;w_unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;cm&#39;</span>                      <span class="c1">#other options include &quot;um&quot;, &quot;Angs&quot;, &quot;secs&quot; (for phase curves)</span>
+<h4>1) Edit exoplanet planet inputs<a class="headerlink" href="#edit-exoplanet-planet-inputs" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span><span class="s1">&#39;user&#39;</span>
+<span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;exopath&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;wasp12b.txt&#39;</span>
+<span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;w_unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;cm&#39;</span>                      <span class="c1">#other options include &quot;um&quot;,&quot;nm&quot; ,&quot;Angs&quot;, &quot;secs&quot; (for phase curves)</span>
 <span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;f_unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;rp^2/r*^2&#39;</span>               <span class="c1">#other options are &#39;fp/f*&#39;</span>
-<span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;transit_duration&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.0</span><span class="o">*</span><span class="mf">60.0</span><span class="o">*</span><span class="mf">60.0</span>   <span class="c1">#transit duration in seconds</span>
+<span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;transit_duration&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.0</span><span class="o">*</span><span class="mf">60.0</span><span class="o">*</span><span class="mf">60.0</span>   <span class="c1">#transit duration</span>
+<span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;td_unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;s&#39;</span>                      <span class="c1">#Any unit of time in accordance with astropy.units can be added</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="users-can-also-add-in-a-constant-temperature-or-a-constant-transit-depth">
+<h4>2) Users can also add in a constant temperature or a constant transit depth<a class="headerlink" href="#users-can-also-add-in-a-constant-temperature-or-a-constant-transit-depth" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;constant&#39;</span>
+<span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;transit_duration&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.0</span><span class="o">*</span><span class="mf">60.0</span><span class="o">*</span><span class="mf">60.0</span>   <span class="c1">#transit duration</span>
+<span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;td_unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;s&#39;</span>
+<span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;radius&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;r_unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;R_jup&#39;</span>            <span class="c1">#Any unit of distance in accordance with astropy.units can be added here</span>
+<span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;star&#39;</span><span class="p">][</span><span class="s1">&#39;radius&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;star&#39;</span><span class="p">][</span><span class="s1">&#39;r_unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;R_sun&#39;</span>              <span class="c1">#Same deal with astropy.units here</span>
+<span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;f_unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;rp^2/r*^2&#39;</span>        <span class="c1">#this is what you would do for primary transit</span>
+<span class="c1">#ORRRRR....</span>
+<span class="c1">#if you wanted to instead to secondary transit at constant temperature</span>
+<span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;f_unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;fp/f*&#39;</span>
+<span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;temp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1000</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="select-from-grid">
+<h4>3) Select from grid<a class="headerlink" href="#select-from-grid" title="Permalink to this headline">¶</a></h4>
+<p>NOTE: Currently only the fortney grid for hot Jupiters from Fortney+2010 is supported. Holler though, if you want another grid supported</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;grid&#39;</span>
+<span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;temp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1000</span>                 <span class="c1">#grid: 500, 750, 1000, 1250, 1500, 1750, 2000, 2250, 2500</span>
+<span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;chem&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;noTiO&#39;</span>              <span class="c1">#options: &#39;noTiO&#39; and &#39;eqchem&#39;, noTiO is chemical eq. without TiO</span>
+<span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;cloud&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;ray10&#39;</span>               <span class="c1">#options: nothing: &#39;0&#39;,</span>
+<span class="c1">#                                                   Weak, medium, strong scattering: ray10,ray100, ray1000</span>
+<span class="c1">#                                                   Weak, medium, strong cloud: flat1,flat10, flat100</span>
+<span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;mass&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;m_unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;M_jup&#39;</span>            <span class="c1">#Any unit of mass in accordance with astropy.units can be added here</span>
+<span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;radius&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;r_unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;R_jup&#39;</span>            <span class="c1">#Any unit of distance in accordance with astropy.units can be added here</span>
+<span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;star&#39;</span><span class="p">][</span><span class="s1">&#39;radius&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;star&#39;</span><span class="p">][</span><span class="s1">&#39;r_unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;R_sun&#39;</span>              <span class="c1">#Same deal with astropy.units here</span>
+<span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;transit_duration&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.0</span><span class="o">*</span><span class="mf">60.0</span><span class="o">*</span><span class="mf">60.0</span>   <span class="c1">#transit duration</span>
+<span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;td_unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;s&#39;</span>
 </pre></div>
 </div>
 </div>
@@ -458,7 +510,7 @@ the dictionary structure yourself.</p>
         <a href="jwstinput.html" class="btn btn-neutral float-right" title="Possible Instrument Input Params" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="installation.html" class="btn btn-neutral" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="installation.html" class="btn btn-neutral" title="Pre-installation Data Download" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
