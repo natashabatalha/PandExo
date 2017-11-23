@@ -5,8 +5,11 @@ This tutorial can be downloaded as a iPython notebook on the PandExo Github.
 
 .. code:: python
 
+    import warnings
+    warnings.filterwarnings('ignore')
     import pandexo.engine.justdoit as jdi # THIS IS THE HOLY GRAIL OF PANDEXO
-
+    import numpy as np
+    import os
 
 Editting Input Dictionaries
 ---------------------------
@@ -37,8 +40,8 @@ result in nonsense runs
     exo_dict['observation']['noise_floor'] = 0   #this can be a fixed level or it can be a filepath 
                                                  #to a wavelength dependent noise floor solution (units are ppm)
 
-Edit exoplanet star inputs
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+Edit exoplanet host star inputs
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Note… If you select ‘phoenix’ you **do not** have to provide a starpath,
 w\_unit or f\_unit, but you **do** have to provide a temp, metal and
@@ -54,15 +57,59 @@ and logg, but you **do** need to provide units and starpath.
     exo_dict['star']['metal'] = 0.0             # as log Fe/H
     exo_dict['star']['logg'] = 4.0              #log surface gravity cgs
 
-Edit exoplanet planet inputs
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Edit exoplanet inputs using one of  three options: 1) user specified, 2) constant value, 3) select from grid
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+1) Edit exoplanet planet inputs
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code:: python
 
-    exo_dict['planet']['exopath'] = '/Users/nbatalh1/Desktop/Simulations/wasp12b.txt'
-    exo_dict['planet']['w_unit'] = 'cm'                      #other options include "um", "Angs", "secs" (for phase curves)
+    exo_dict['planet']['type'] ='user'
+    exo_dict['planet']['exopath'] = 'wasp12b.txt'
+    exo_dict['planet']['w_unit'] = 'cm'                      #other options include "um","nm" ,"Angs", "secs" (for phase curves)
     exo_dict['planet']['f_unit'] = 'rp^2/r*^2'               #other options are 'fp/f*' 
-    exo_dict['planet']['transit_duration'] = 2.0*60.0*60.0   #transit duration in seconds
+    exo_dict['planet']['transit_duration'] = 2.0*60.0*60.0   #transit duration 
+    exo_dict['planet']['td_unit'] = 's'                      #Any unit of time in accordance with astropy.units can be added
+
+2) Users can also add in a constant temperature or a constant transit depth 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    exo_dict['planet']['type'] = 'constant' 
+    exo_dict['planet']['transit_duration'] = 2.0*60.0*60.0   #transit duration 
+    exo_dict['planet']['td_unit'] = 's' 
+    exo_dict['planet']['radius'] = 1
+    exo_dict['planet']['r_unit'] = 'R_jup'            #Any unit of distance in accordance with astropy.units can be added here
+    exo_dict['star']['radius'] = 1
+    exo_dict['star']['r_unit'] = 'R_sun'              #Same deal with astropy.units here
+    exo_dict['planet']['f_unit'] = 'rp^2/r*^2'        #this is what you would do for primary transit 
+    #ORRRRR....
+    #if you wanted to instead to secondary transit at constant temperature 
+    exo_dict['planet']['f_unit'] = 'fp/f*' 
+    exo_dict['planet']['temp'] = 1000
+
+3) Select from grid
+^^^^^^^^^^^^^^^^^^^
+NOTE: Currently only the fortney grid for hot Jupiters from Fortney+2010 is supported. Holler though, if you want another grid supported   
+
+.. code:: python 
+
+    exo_dict['planet']['type'] = 'grid'
+    exo_dict['planet']['temp'] = 1000                 #grid: 500, 750, 1000, 1250, 1500, 1750, 2000, 2250, 2500
+    exo_dict['planet']['chem'] = 'noTiO'              #options: 'noTiO' and 'eqchem', noTiO is chemical eq. without TiO
+    exo_dict['planet']['cloud'] = 'ray10'               #options: nothing: '0', 
+    #                                                   Weak, medium, strong scattering: ray10,ray100, ray1000
+    #                                                   Weak, medium, strong cloud: flat1,flat10, flat100
+    exo_dict['planet']['mass'] = 1
+    exo_dict['planet']['m_unit'] = 'M_jup'            #Any unit of mass in accordance with astropy.units can be added here
+    exo_dict['planet']['radius'] = 1
+    exo_dict['planet']['r_unit'] = 'R_jup'            #Any unit of distance in accordance with astropy.units can be added here
+    exo_dict['star']['radius'] = 1
+    exo_dict['star']['r_unit'] = 'R_sun'              #Same deal with astropy.units here
+    exo_dict['planet']['transit_duration'] = 2.0*60.0*60.0   #transit duration 
+    exo_dict['planet']['td_unit'] = 's' 
 
 Step 2) Load in instrument dictionary (optional)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
