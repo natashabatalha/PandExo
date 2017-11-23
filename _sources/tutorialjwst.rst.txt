@@ -9,6 +9,8 @@ This tutorial can be downloaded as a iPython notebook on the PandExo Github. You
 
 And then going to https://locahost:1111
 
+In python though, start by loading in some universal packages, as well as PandExo.
+
 .. code:: python
 
     import warnings
