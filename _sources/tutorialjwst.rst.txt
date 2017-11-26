@@ -40,13 +40,14 @@ result in nonsense runs
 
 .. code:: python
 
-    exo_dict['observation']['sat_level'] = 80    #saturation level in percent of full well 
-    exo_dict['observation']['noccultations'] = 2 #number of transits 
-    exo_dict['observation']['R'] = None          #fixed binning. I usually suggest ZERO binning.. you can always bin later 
-                                                 #without having to redo the calcualtion
-    exo_dict['observation']['fraction'] = 1.0    #fraction of time in transit versus out = in/out
-    exo_dict['observation']['noise_floor'] = 0   #this can be a fixed level or it can be a filepath 
-                                                 #to a wavelength dependent noise floor solution (units are ppm)
+    exo_dict['observation']['sat_level'] = 80                  #saturation level in percent of full well 
+    exo_dict['observation']['sat_unit'] = '%'                  # other option = 'e' for electrons
+    exo_dict['observation']['noccultations'] = 2               #number of transits 
+    exo_dict['observation']['R'] = None                        #fixed binning. I usually suggest ZERO binning.. you can always bin later 
+    exo_dict['observation']['baseline'] = 4.0*60.0*60.0        #time spent observing out of transit, make sure to speciy units
+    exo_dict['observation']['baseline_unit'] = 'total'         #total obersving time, other option 'frac' = in/out 
+    exo_dict['observation']['noise_floor'] = 0                 #this can be a fixed level or it can be a filepath 
+                                                               #to a wavelength dependent noise floor solution (units are ppm)
 
 Edit exoplanet host star inputs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
