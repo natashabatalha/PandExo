@@ -17,6 +17,15 @@ function updateStatus(statusUrl) {
     // Query the status url for information about the state of the calculation
     $.getJSON(statusUrl, function(response) {
         $('#m' + response.id).replaceWith(response.html);
+
+        // hack to make sure links are properly replaced in non-root locations
+        var calc_prefix = "/calculation/"
+        $("a[href^='/calculation/']")
+            .each(function()
+            {
+                 this.href = this.href.replace(/\/calculation\//,
+                 calc_prefix);
+            });
         if ((response.state != 'finished') && (response.state != 'cancelled')) {
             // Check in another 2 seconds
             setTimeout(function() {
