@@ -42,7 +42,8 @@
         "noccultations": 1,
         "R": null,
         "baseline": 1,
-	"baseline_unit":"frac", 
+        "baseline_unit":"frac", 
+        "target_acq":false,
         "noise_floor":0.0
         }
 }

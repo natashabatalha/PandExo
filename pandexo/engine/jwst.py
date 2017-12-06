@@ -11,6 +11,8 @@ from . import create_input as create
 from .compute_noise import ExtractSpec
 import astropy.units as u
 import pickle
+from pandeia.engine.calc_utils import build_default_calc, build_default_source
+
 #constant parameters.. consider putting these into json file 
 #max groups in integration
 max_ngroup = 65536.0 
@@ -816,7 +818,52 @@ def uniform_tophat_sum(newx,x, y):
     loc=np.where((x > newx[0]-0.5*delta[0]) & (x < newx[0]+0.5*delta[0]))
     ynew[0]=np.sum(y[loc])
     return ynew
-    
+
+def target_acq(instrument, both_spec, warning): 
+    """Contains functionality to compute optimal TA strategy 
+
+    Takes pandexo normalized flux from create_input and checks for saturation, or 
+    if SNR is below the minimum requirement for each. Then adds warnings and 2d displays 
+    and target acq info to final output dict 
+
+    Parameters
+    ----------
+    instrument : str 
+        possible options are niriss, nirspec, miri and nircam 
+    both_spec : dict
+        output dictionary from **create_input** 
+    warning : dict 
+        output dictionary from **add_warnings** 
+
+    Retruns
+    -------
+
+    """
+    out_spectrum = np.array([both_spec['wave'], both_spec['flux_out_trans']])
+
+    #this automatically builds a default calculation 
+    #I got reasonable answers for everything so all you should need to do here is swap out (instrument = 'niriss', 'nirspec','miri' or 'nircam')
+    c = build_default_calc(telescope='jwst', instrument=instrument, mode='target_acq', method='taphot')
+    c['scene'][0]['spectrum']['sed'] = {'sed_type':'input','spectrum':out_spectrum}
+    c['scene'][0]['spectrum']['normalization']['type'] = 'none'
+    rphot = perform_calculation(c, dict_report=True)
+
+    #check warnings (pandeia doesn't return values for these warnings, so try will fail if all good)
+    try: 
+        warnings['TA Satruated?'] = rphot['warnings']['saturated']
+    except:
+        warnings['TA Satruated?'] = 'All good'
+
+    try: 
+        warnings['TA SNR Threshold'] = rphot['warnings']['ta_snr_threshold']
+    except:
+        warnings['TA SNR Threshold'] = 'All good'
+
+    #build TA dict 
+    ta = {'sn':rphot['scalar']['sn'],
+            'ngroup': rphot['input']['configuration']['detector']['ngroup'], 
+            'saturation':rphot['2d']['saturation']}
+
 def as_dict(out, both_spec ,binned, timing, mag, sat_level, warnings, punit, unbinned,calculation): 
     """Format dictionary for output data 
     

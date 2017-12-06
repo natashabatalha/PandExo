@@ -373,7 +373,11 @@ class CalculationNewHandler(BaseHandler):
             #baseline 
             exodata["observation"]["baseline"] = float(self.get_argument("baseline"))
             exodata["observation"]["baseline_unit"] = self.get_argument("baseline_unit")
-
+            try:
+                exodata["observation"]["target_acq"] = self.get_argument("TA") == 'on'
+            except:
+                exodata["observation"]["target_acq"] = False
+                
             exodata["observation"]["noccultations"] = float(self.get_argument("numtrans"))
             exodata["observation"]["sat_level"] = float(self.get_argument("satlevel"))
             exodata["observation"]["sat_unit"] = self.get_argument("sat_unit")
