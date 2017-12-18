@@ -5,7 +5,7 @@ import numpy as np
 from bokeh.layouts import row
 import pandas as pd
 def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', output_file = 'data.html',legend = False, 
-        R=False,  num_tran = False, plot_width=800, plot_height=400,x_range=[1,10], plot=True):
+        R=False,  num_tran = False, plot_width=800, plot_height=400,x_range=[1,10],y_range=None, plot=True):
     """Plots 1d simulated spectrum and rebin or rescale for more transits
     
     Plots 1d data points with model in the background (if wanted). Designed to read in exact 
@@ -35,6 +35,8 @@ def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', out
         (Optional) Sets the width of the plot. Default = 800
     plot_height : int 
         (Optional) Sets the height of the plot. Default = 400 
+    y_range : list of int
+        (Optional) sets y range of plot. Defaut is +- 10% of max and min 
     x_range : list of int
         (Optional) Sets x range of plot. Default = [1,10]
     plot : bool 
@@ -159,7 +161,7 @@ def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', out
             y_axis_label = dict['input']['Primary/Secondary']
 
             if y_axis_label == 'fp/f*': p = -1.0
-            else: y_axis_label = '('+y_axis_label+')^2'
+            else: y_axis_label = y_axis_label
 
             if dict['input']['Calculation Type'] =='phase_spec':
                 x_axis_label='Time (secs)'
@@ -167,9 +169,11 @@ def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', out
             else:
                 x_axis_label='Wavelength [microns]'
             
-            ylims = [min(dict['OriginalInput']['model_spec'])- 0.1*min(dict['OriginalInput']['model_spec']),
+            if y_range!=None:
+                ylims = y_range
+            else: 
+                ylims = [min(dict['OriginalInput']['model_spec'])- 0.1*min(dict['OriginalInput']['model_spec']),
                  0.1*max(dict['OriginalInput']['model_spec'])+max(dict['OriginalInput']['model_spec'])]
-            xlims = [min(x), max(x)]
          
             fig1d = Figure(x_range=x_range, y_range = ylims, 
                plot_width = plot_width, plot_height =plot_height,title=title,x_axis_label=x_axis_label,
