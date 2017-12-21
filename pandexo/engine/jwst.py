@@ -263,6 +263,7 @@ def compute_full_sim(dictinput):
     error_spec_nfloor = add_noise_floor(noise_floor, wbin, error_spec) 
 
     #add in random noise for the simulated spectrum 
+    np.random.seed()
     rand_noise= error_spec_nfloor*(np.random.randn(len(wbin)))
     raw_spec = (photon_out_bin/to-photon_in_bin/ti)/(photon_out_bin/to)
     sim_spec = raw_spec + rand_noise 

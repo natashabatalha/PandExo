@@ -1,6 +1,6 @@
 .. warning::
     Before reading further, if you do not wish to install PandExo,\
-    there is an online version of the code here here at \
+    there is an online version of the code here at \
     `STScI's ExoCTK <https://exoctk.stsci.edu/pandexo/>`_. 
 
 Before we start, the scripts written to install PandExo assume the user has installed `Anaconda <https://www.continuum.io/downloads>`_. For diehard pip users, know that STScI tools will be only distributed on conda so PandExo will not be the only package to use it. 
