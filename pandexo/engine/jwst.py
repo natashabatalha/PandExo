@@ -507,11 +507,18 @@ def remove_QY(pandeia_dict, instrument):
         same exact dictionary with extracted_flux = extracted_flux/QY
     """
     if instrument == 'niriss':
-        qy = fits.open(os.path.join(default_refdata_directory,'jwst', instrument,'qe' ,'jwst_niriss_h2rg_qe.fits'))
+        try:
+            qy = fits.open(os.path.join(default_refdata_directory,'jwst', instrument,'qe' ,'jwst_niriss_h2rg_qe_20160902163017.fits'))
+        except: 
+            raise Exception('PANDEIA REFERENCE DATA NEEDS TO BE UPDATED')
+
         x_grid = pandeia_dict['1d']['extracted_flux'][0]
         qy_on_grid = np.interp(x_grid, qy[1].data['WAVELENGTH'], qy[1].data['CONVERSION'])
     elif instrument == 'nirspec':
-        qy = fits.open(os.path.join(default_refdata_directory,'jwst', instrument,'qe' ,'jwst_nirspec_qe.fits'))
+        try:
+            qy = fits.open(os.path.join(default_refdata_directory,'jwst', instrument,'qe' ,'jwst_nirspec_qe_20160902193401.fits'))
+        except: 
+            raise Exception('PANDEIA REFERENCE DATA NEEDS TO BE UPDATED')        
         x_grid = pandeia_dict['1d']['extracted_flux'][0]
         qy_on_grid = np.interp(x_grid, qy[1].data['WAVELENGTH'], qy[1].data['CONVERSION'])
     else:
