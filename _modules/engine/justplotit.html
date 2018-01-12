@@ -90,7 +90,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html">Pre-installation Data Download</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html#installation-for-users-with-conda">Installation for Users With Conda</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html#installation-for-users-with-pip">Installation for Users With PIP</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../installation.html#todos">TODOS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html#the-importance-of-upgrading-pandexo">The Importance of Upgrading PandExo</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorialjwst.html">JWST Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../jwstinput.html">Possible Instrument Input Params</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../jwstdict.html">Py Dict Structure of JWST Output</a></li>
@@ -167,7 +167,7 @@
 <span class="kn">from</span> <span class="nn">bokeh.layouts</span> <span class="k">import</span> <span class="n">row</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <div class="viewcode-block" id="jwst_1d_spec"><a class="viewcode-back" href="../../engine.html#engine.justplotit.jwst_1d_spec">[docs]</a><span class="k">def</span> <span class="nf">jwst_1d_spec</span><span class="p">(</span><span class="n">result_dict</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Model + Data + Error Bars&#39;</span><span class="p">,</span> <span class="n">output_file</span> <span class="o">=</span> <span class="s1">&#39;data.html&#39;</span><span class="p">,</span><span class="n">legend</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> 
-        <span class="n">R</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="n">num_tran</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">plot_width</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span> <span class="n">plot_height</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span><span class="n">x_range</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">10</span><span class="p">],</span> <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="n">R</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="n">num_tran</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">plot_width</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span> <span class="n">plot_height</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span><span class="n">x_range</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">10</span><span class="p">],</span><span class="n">y_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Plots 1d simulated spectrum and rebin or rescale for more transits</span>
 <span class="sd">    </span>
 <span class="sd">    Plots 1d data points with model in the background (if wanted). Designed to read in exact </span>
@@ -197,6 +197,8 @@
 <span class="sd">        (Optional) Sets the width of the plot. Default = 800</span>
 <span class="sd">    plot_height : int </span>
 <span class="sd">        (Optional) Sets the height of the plot. Default = 400 </span>
+<span class="sd">    y_range : list of int</span>
+<span class="sd">        (Optional) sets y range of plot. Defaut is +- 10% of max and min </span>
 <span class="sd">    x_range : list of int</span>
 <span class="sd">        (Optional) Sets x range of plot. Default = [1,10]</span>
 <span class="sd">    plot : bool </span>
@@ -321,7 +323,7 @@
             <span class="n">y_axis_label</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;Primary/Secondary&#39;</span><span class="p">]</span>
 
             <span class="k">if</span> <span class="n">y_axis_label</span> <span class="o">==</span> <span class="s1">&#39;fp/f*&#39;</span><span class="p">:</span> <span class="n">p</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span>
-            <span class="k">else</span><span class="p">:</span> <span class="n">y_axis_label</span> <span class="o">=</span> <span class="s1">&#39;(&#39;</span><span class="o">+</span><span class="n">y_axis_label</span><span class="o">+</span><span class="s1">&#39;)^2&#39;</span>
+            <span class="k">else</span><span class="p">:</span> <span class="n">y_axis_label</span> <span class="o">=</span> <span class="n">y_axis_label</span>
 
             <span class="k">if</span> <span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;Calculation Type&#39;</span><span class="p">]</span> <span class="o">==</span><span class="s1">&#39;phase_spec&#39;</span><span class="p">:</span>
                 <span class="n">x_axis_label</span><span class="o">=</span><span class="s1">&#39;Time (secs)&#39;</span>
@@ -329,9 +331,11 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">x_axis_label</span><span class="o">=</span><span class="s1">&#39;Wavelength [microns]&#39;</span>
             
-            <span class="n">ylims</span> <span class="o">=</span> <span class="p">[</span><span class="nb">min</span><span class="p">(</span><span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;OriginalInput&#39;</span><span class="p">][</span><span class="s1">&#39;model_spec&#39;</span><span class="p">])</span><span class="o">-</span> <span class="mf">0.1</span><span class="o">*</span><span class="nb">min</span><span class="p">(</span><span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;OriginalInput&#39;</span><span class="p">][</span><span class="s1">&#39;model_spec&#39;</span><span class="p">]),</span>
+            <span class="k">if</span> <span class="n">y_range</span><span class="o">!=</span><span class="kc">None</span><span class="p">:</span>
+                <span class="n">ylims</span> <span class="o">=</span> <span class="n">y_range</span>
+            <span class="k">else</span><span class="p">:</span> 
+                <span class="n">ylims</span> <span class="o">=</span> <span class="p">[</span><span class="nb">min</span><span class="p">(</span><span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;OriginalInput&#39;</span><span class="p">][</span><span class="s1">&#39;model_spec&#39;</span><span class="p">])</span><span class="o">-</span> <span class="mf">0.1</span><span class="o">*</span><span class="nb">min</span><span class="p">(</span><span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;OriginalInput&#39;</span><span class="p">][</span><span class="s1">&#39;model_spec&#39;</span><span class="p">]),</span>
                  <span class="mf">0.1</span><span class="o">*</span><span class="nb">max</span><span class="p">(</span><span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;OriginalInput&#39;</span><span class="p">][</span><span class="s1">&#39;model_spec&#39;</span><span class="p">])</span><span class="o">+</span><span class="nb">max</span><span class="p">(</span><span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;OriginalInput&#39;</span><span class="p">][</span><span class="s1">&#39;model_spec&#39;</span><span class="p">])]</span>
-            <span class="n">xlims</span> <span class="o">=</span> <span class="p">[</span><span class="nb">min</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">x</span><span class="p">)]</span>
          
             <span class="n">fig1d</span> <span class="o">=</span> <span class="n">Figure</span><span class="p">(</span><span class="n">x_range</span><span class="o">=</span><span class="n">x_range</span><span class="p">,</span> <span class="n">y_range</span> <span class="o">=</span> <span class="n">ylims</span><span class="p">,</span> 
                <span class="n">plot_width</span> <span class="o">=</span> <span class="n">plot_width</span><span class="p">,</span> <span class="n">plot_height</span> <span class="o">=</span><span class="n">plot_height</span><span class="p">,</span><span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span><span class="n">x_axis_label</span><span class="o">=</span><span class="n">x_axis_label</span><span class="p">,</span>

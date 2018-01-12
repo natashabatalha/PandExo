@@ -104,7 +104,12 @@
 <li class="toctree-l2"><a class="reference internal" href="#id3">COORDS.PY: TypeError: ‘float’ object cannot be interpreted as an index</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="#todos">TODOS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#the-importance-of-upgrading-pandexo">The Importance of Upgrading PandExo</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#verify-reference-data-is-current">Verify Reference Data is Current</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#verify-pandeia-engine-is-current">Verify pandeia.engine is Current</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#verify-pandexo-engine-is-current">Verify pandexo.engine is Current</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="tutorialjwst.html">JWST Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="jwstinput.html">Possible Instrument Input Params</a></li>
 <li class="toctree-l1"><a class="reference internal" href="jwstdict.html">Py Dict Structure of JWST Output</a></li>
@@ -184,7 +189,7 @@
 <p>ss mentioned, the user must provide their own reference data files in order for the engine to understand the instrument with which the calculations will be performed. First step to getting PandExo running is downloading four files. Download them and put them in the same directory.</p>
 <div class="section" id="jwst-reference-data">
 <h2>JWST Reference Data<a class="headerlink" href="#jwst-reference-data" title="Permalink to this headline">¶</a></h2>
-<p>For JWST, the user may download the required reference data <a class="reference external" href="http://ssb.stsci.edu/pandeia/engine/1.1.1/pandeia_data-1.1.1.tar.gz">here</a>. Unpack and store the data in a choice location.</p>
+<p>For JWST, the link to access the required reference data is located <a class="reference external" href="https://pypi.python.org/pypi/pandeia.engine/">here</a>. It should be the first link on this page. Pay attention and make sure you get the <cite>pandeia_data</cite> and not the <cite>wfirst_data</cite>!!</p>
 </div>
 <div class="section" id="stellar-seds">
 <h2>Stellar SEDs<a class="headerlink" href="#stellar-seds" title="Permalink to this headline">¶</a></h2>
@@ -228,7 +233,7 @@ SUCCESS
 <div class="section" id="installation-for-users-with-pip">
 <h1>Installation for Users With PIP<a class="headerlink" href="#installation-for-users-with-pip" title="Permalink to this headline">¶</a></h1>
 <p>You should have already downloaded the two data tar files, pandexo.sh and run_test.py. If not, go back to <cite>Pre Installation Data Download</cite>.</p>
-<p>Then, start by installing PandExo, which should automatically isntall Pandeia and other dependencies</p>
+<p>Then, start by installing PandExo, which should automatically install Pandeia and other dependencies</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>pip install pandexo.engine
 </pre></div>
 </div>
@@ -289,11 +294,25 @@ SUCCESS
 </div>
 </div>
 </div>
-<div class="section" id="todos">
-<h1>TODOS<a class="headerlink" href="#todos" title="Permalink to this headline">¶</a></h1>
-<ol class="arabic simple">
-<li>Add error messages to the pandas output page</li>
-</ol>
+<div class="section" id="the-importance-of-upgrading-pandexo">
+<h1>The Importance of Upgrading PandExo<a class="headerlink" href="#the-importance-of-upgrading-pandexo" title="Permalink to this headline">¶</a></h1>
+<p>It is crucial that your verison of PandExo remain up to date. Especially through commissioning and leading up to launch, there may be crucial changes to the code or the reference data. Updating PandExo requires three crucial steps.</p>
+<div class="section" id="verify-reference-data-is-current">
+<h2>Verify Reference Data is Current<a class="headerlink" href="#verify-reference-data-is-current" title="Permalink to this headline">¶</a></h2>
+<p>The link to the reference data is located on <a class="reference external" href="https://pypi.python.org/pypi/pandeia.engine/">Pandeia’s PyPI page</a>. Before doing a large batch of calculations, make sure that you have this version.</p>
+</div>
+<div class="section" id="verify-pandeia-engine-is-current">
+<h2>Verify pandeia.engine is Current<a class="headerlink" href="#verify-pandeia-engine-is-current" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>pip install pandeia.engine --upgrade
+</pre></div>
+</div>
+</div>
+<div class="section" id="verify-pandexo-engine-is-current">
+<h2>Verify pandexo.engine is Current<a class="headerlink" href="#verify-pandexo-engine-is-current" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>pip install pandexo.engine --upgrade
+</pre></div>
+</div>
+</div>
 </div>
 
 

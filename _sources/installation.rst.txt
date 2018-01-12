@@ -14,7 +14,7 @@ ss mentioned, the user must provide their own reference data files in order for 
 
 JWST Reference Data
 ```````````````````
-For JWST, the user may download the required reference data `here <http://ssb.stsci.edu/pandeia/engine/1.1.1/pandeia_data-1.1.1.tar.gz>`_. Unpack and store the data in a choice location.
+For JWST, the link to access the required reference data is located `here <https://pypi.python.org/pypi/pandeia.engine/>`_. It should be the first link on this page. Pay attention and make sure you get the `pandeia_data` and not the `wfirst_data`!! 
 
 Stellar SEDs 
 ````````````
@@ -69,7 +69,7 @@ Installation for Users With PIP
 
 You should have already downloaded the two data tar files, pandexo.sh and run_test.py. If not, go back to `Pre Installation Data Download`. 
 
-Then, start by installing PandExo, which should automatically isntall Pandeia and other dependencies 
+Then, start by installing PandExo, which should automatically install Pandeia and other dependencies 
 
 .. code-block:: bash
     
@@ -146,7 +146,28 @@ To this:
 
     ones = np.ones((int(ny), int(nx)))
 
-TODOS
-===== 
+The Importance of Upgrading PandExo
+===================================
 
-1. Add error messages to the pandas output page 
+It is crucial that your verison of PandExo remain up to date. Especially through commissioning and leading up to launch, there may be crucial changes to the code or the reference data. Updating PandExo requires three crucial steps. 
+
+Verify Reference Data is Current
+````````````````````````````````
+The link to the reference data is located on `Pandeia's PyPI page <https://pypi.python.org/pypi/pandeia.engine/>`_. Before doing a large batch of calculations, make sure that you have this version. 
+
+Verify pandeia.engine is Current
+````````````````````````````````
+
+.. code-block:: bash 
+
+    pip install pandeia.engine --upgrade 
+
+Verify pandexo.engine is Current 
+````````````````````````````````
+
+.. code-block:: bash 
+
+    pip install pandexo.engine --upgrade 
+
+
+

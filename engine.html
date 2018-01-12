@@ -90,7 +90,7 @@
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Pre-installation Data Download</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html#installation-for-users-with-conda">Installation for Users With Conda</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html#installation-for-users-with-pip">Installation for Users With PIP</a></li>
-<li class="toctree-l1"><a class="reference internal" href="installation.html#todos">TODOS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html#the-importance-of-upgrading-pandexo">The Importance of Upgrading PandExo</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorialjwst.html">JWST Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="jwstinput.html">Possible Instrument Input Params</a></li>
 <li class="toctree-l1"><a class="reference internal" href="jwstdict.html">Py Dict Structure of JWST Output</a></li>
@@ -658,7 +658,7 @@ that run_pandexo assigns.</li>
 
 <dl class="function">
 <dt id="engine.justplotit.jwst_1d_spec">
-<code class="descclassname">engine.justplotit.</code><code class="descname">jwst_1d_spec</code><span class="sig-paren">(</span><em>result_dict, model=True, title=’Model + Data + Error Bars’, output_file=’data.html’, legend=False, R=False, num_tran=False, plot_width=800, plot_height=400, x_range=[1, 10], plot=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/justplotit.html#jwst_1d_spec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.justplotit.jwst_1d_spec" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">engine.justplotit.</code><code class="descname">jwst_1d_spec</code><span class="sig-paren">(</span><em>result_dict, model=True, title=’Model + Data + Error Bars’, output_file=’data.html’, legend=False, R=False, num_tran=False, plot_width=800, plot_height=400, x_range=[1, 10], y_range=None, plot=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/justplotit.html#jwst_1d_spec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.justplotit.jwst_1d_spec" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plots 1d simulated spectrum and rebin or rescale for more transits</p>
 <p>Plots 1d data points with model in the background (if wanted). Designed to read in exact
 output of run_pandexo.</p>
@@ -680,6 +680,7 @@ no binning.</li>
 <li><strong>num_tran</strong> (<em>float</em>) – (Optional) Scales data by number of transits to improve error by sqrt(<cite>num_trans</cite>)</li>
 <li><strong>plot_width</strong> (<em>int</em>) – (Optional) Sets the width of the plot. Default = 800</li>
 <li><strong>plot_height</strong> (<em>int</em>) – (Optional) Sets the height of the plot. Default = 400</li>
+<li><strong>y_range</strong> (<em>list of int</em>) – (Optional) sets y range of plot. Defaut is +- 10% of max and min</li>
 <li><strong>x_range</strong> (<em>list of int</em>) – (Optional) Sets x range of plot. Default = [1,10]</li>
 <li><strong>plot</strong> (<em>bool</em>) – (Optional) Supresses the plot if not wanted (Default = True)</li>
 </ul>
