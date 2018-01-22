@@ -412,10 +412,17 @@ def create_component_hst(result_dict):
     xlims = [result_dict['planet_spec']['wmin'], result_dict['planet_spec']['wmax']]
     ylims = [np.min(binspec)-2.0*error[0], np.max(binspec)+2.0*error[0]]
     
+    eventType = result_dict['calc_start_window']['eventType'] 
+
+    if eventType=='tranist':
+        y_axis = '(Rp/R*)^2'
+    elif eventType =='eclipse':
+        y_axis='Fp/F*'
+
     plot_spectrum = Figure(plot_width=800, plot_height=300, x_range=xlims,
                                y_range=ylims, tools=TOOLS,#responsive=True,
                                  x_axis_label='Wavelength [microns]',
-                                 y_axis_label='(Rp/R*)^2', 
+                                 y_axis_label=y_axis, 
                                title="Original Model with Observation")
     
     y_err = []

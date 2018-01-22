@@ -438,7 +438,7 @@ def calc_start_window(eventType, rms, ptsOrbit, numOrbits, depth, inc, aRs, peri
     
     return {'obsphase1':obsphase1,'light_curve_rms':rms, 'obstr1':obstr1,'obsphase2':obsphase2,
             'obstr2':obstr2,'minphase':minphase,'maxphase':maxphase,'phase1':phase1,
-            'phase2':phase2,'trmodel1':trmodel1,'trmodel2':trmodel2}
+            'phase2':phase2,'trmodel1':trmodel1,'trmodel2':trmodel2,'eventType':eventType}
 
 def planet_spec(planet, star, w_unit, disperser, deptherr, nchan, smooth=None):
     '''Plot exoplanet transmission/emission spectrum
