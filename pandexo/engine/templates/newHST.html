@@ -4,6 +4,7 @@
 <link rel="stylesheet" href="http://cdn.pydata.org/bokeh/release/bokeh-0.12.6.min.css" type="text/css"/>
 <link href="{{ static_url('css/select2.min.css')}}" rel="stylesheet">
 <link href="{{ static_url('css/select2-bootstrap-theme.min.css')}}" rel="stylesheet">
+<link href="{{ static_url('css/icheck-bootstrap.min.css')}}" rel="stylesheet">
 {% end %}
 
 {% block body %}
@@ -44,17 +45,95 @@
     <hr class="col-md-11 col-md-offset-1">
 
     <div class="form-group">
-    <label class="col-md-3 control-label" for="planFile">Planet Model</label>
+        <label class="col-md-3 control-label" for="" style="top: 35px;">Planet Model</label>
+        <div class="col-md-9">
+            <div class="radio-chooser">
+                <div class="radio-chooser-item">
+                    <label class="radio-chooser-content" for="planetModelConstant">
+                        <input type="radio" name="planetModel" id="planetModelConstant" value="constant" />
+                        <div class="radio-chooser-title">Constant Value</div>
+                    </label>
+                </div>
+                <div class="radio-chooser-item">
+                    <label class="radio-chooser-content" for="planetModelUser">
+                        <input type="radio" name="planetModel" id="planetModelUser" value="user" />
+                        <div class="radio-chooser-title">Upload Spectrum</div>
+                    </label>
+                </div>
+                <div class="radio-chooser-item">
+                    <label class="radio-chooser-content" for="planetModelGrid">
+                        <input type="radio" name="planetModel" id="planetModelGrid" value="grid" />
+                        <div class="radio-chooser-title">Select From Grid</div>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group hidden select-from-grid">
+        <div class="col-md-3 col-md-offset-3"">
+            <select id="ptempg" name="ptempg" class="form-control" data-placeholder="Select Temp (K)">
+                <option value=""></option> 
+                {% for i in temp %}
+                    <option {{ escape(i) }} value={{ escape(i) }}>{{ escape(i) }}</option>
+                {% end %}               
+            </select>
+            <p class="help-block">Temperature (K)</p>
+        </div>  
+
         <div class="col-md-3">
+            <select id="pchem" name="pchem" class="form-control" data-placeholder="Select Chemistry">
+                <option value=""></option> 
+                <option value='noTiO'>Equilibrium Chemistry</option>  
+                <option value='eqchem'>Equilibrium Chemistry, w/ TiO</option>         
+            </select>
+            <p class="help-block">Select Chemistry Type</p>
+        </div>  
+
+        <div class="col-md-3">
+            <select id="cloud" name="cloud" class="form-control" data-placeholder="Clouds/Scattering">
+                <option value=""></option> 
+                <option value="0">Nothing</option>  
+                <option value="ray10">Weak Rayleigh</option>  
+                <option value="ray100">Medium Rayleigh</option>             
+                <option value="ray1000">Strong Rayleigh</option>             
+                <option value="flat1">Weak Cloud</option>  
+                <option value="flat10">Medium Cloud</option>             
+                <option value="flat100">Strong Cloud</option>             
+            </select>
+            <p class="help-block">Clouds or Scattering</p>
+        </div> 
+        
+        <div class="col-md-4 col-md-offset-3 form-inline">
+            <input type="text" class="form-control" id="pmass" name="pmass" style="width: 70%;" value="1.5">
+        <div class="input-group-btn" style="width: 20%;left: -4px;display: inline-block;">
+            <select id="m_unit" name="m_unit" class="form-control">
+                <option value='M_jup'>M<sub>J</sub></option>   
+                <option value='kilogram'>Kg</option>  
+                <option value='g'>g</option>  
+                <option value='M_earth'>M<sub>E</sub></option> 
+                <option value='M_sun'>M<sub>S</sub></option>          
+            </select>
+            </div> 
+            <p class="help-block">Planet Mass</p>
+        </div> 
+        </div>  
+
+    <div class="form-group hidden upload-planet-section">
+        <div class="col-md-3 col-md-offset-3">
             <button class="btn btn-block niceFileBtn" type="button">Choose File</button>
             <input type="file" id="planFile" name="planFile" style="display: none">
-            <p class="help-block text-center">Column 1: wave <br>Column 2: Model, no header</p>
+            <p class="help-block text-center">Column 1: wave or time <br>Column 2: Model, no header</p>
         </div>
         <div class="col-md-3">
-            <select id="planwunits" name="planwunits" class="form-control" data-placeholder="Select Wave Units">
+            <select id="planwunits" name="planwunits" class="form-control" data-placeholder="Select Wave or Time Units">
                 <option value=""></option>
+                <option value="sec">seconds</option>
                 <option value="um">micron</option>
                 <option value="nm">nanometer</option>
+                <option value="cm">centimeter</option>
+                <option value="Angs">Angstrom</option>
+                <option value="Hz">Hertz</option>                
             </select>
         </div>
         <div class="col-md-3">
@@ -63,6 +142,89 @@
                 <option value="rp^2/r*^2">(R<sub>p</sub>/R<sub>*</sub>)^2 (primary)</option>
                 <option value="fp/f*">F<sub>p</sub>/F<sub>*</sub> (secondary/phase curve)</option>
             </select>
+        </div>  
+    </div>
+
+    <div class="form-group hidden constant-transit-section">
+         <div class="col-md-3 col-md-offset-3">
+            <select id="constant_unit" name="constant_unit" class="form-control" data-placeholder="Select Planet Model Units">
+                <option value=""></option>
+                <option value="rp^2/r*^2">(R<sub>p</sub>/R<sub>*</sub>)^2 (primary)</option>
+                <option value="fp/f*">F<sub>p</sub>/F<sub>*</sub> (secondary/phase curve)</option>
+            </select>
+         <p class="help-block">Primary or Secondary</p>
+        </div> 
+        <div class="col-md-3">
+            <div class="input-group">
+                <input type="text" class="form-control" id="ptempc" name="ptempc" value="Only for Secondary">
+            </div>
+            <p class="help-block">Planet Temp(K)</p>
+        </div> 
+        <div class="col-md-3">
+            <div class="input-group">
+                <input type="text" class="form-control" id="stempc" name="stempc" value="Only for Secondary">
+            </div>
+            <p class="help-block">Stellar Temp(K)</p>
+        </div> 
+    </div>
+
+    <div class="form-group hidden select-from-grid">
+        <div class="col-md-offset-3 col-md-4 form-inline">
+            <input type="text" class="form-control" id="refradg" name="refradg" style="width: 70%;" value="1.25">
+            <div class="input-group-btn" style="width: 20%;left: -4px;display: inline-block;">
+                <select id="r_unitg" name="r_unitg" class="form-control">
+                <option value='R_jup'>R<sub>J</sub></option>   
+                <option value='kilometer'>Km</option>  
+                <option value='m'>m</option>  
+                <option value='R_earth'>R<sub>E</sub></option> 
+                <option value='R_sun'>R<sub>S</sub></option>  
+                </select>
+            </div>
+        <p class="help-block">Planet Radius</p>
+        </div>
+
+        <div class="col-md-offset-3 col-md-4 form-inline">
+            <input type="text" class="form-control" id="rstarg" name="rstarg" style="width: 70%;" value="1">
+            <div class="input-group-btn" style="width: 20%;left: -4px;display: inline-block;">
+                <select id="rstar_unitg" name="rstar_unitg" class="form-control">
+                <option value='R_sun'>R<sub>S</sub></option>
+                <option value='kilometer'>Km</option>  
+                <option value='m'>m</option>  
+                <option value='R_earth'>R<sub>E</sub></option> 
+                <option value='R_jup'>R<sub>J</sub></option>  
+                </select>
+            </div>
+            <p class="help-block">Stellar Radius</p>
+        </div>
+    </div>
+
+    <div class="form-group hidden constant-transit-section">
+        <div class="col-md-offset-3 col-md-4 form-inline">
+            <input type="text" class="form-control" id="refradc" name="refradc" style="width: 70%;" value="1.25">
+            <div class="input-group-btn" style="width: 20%;left: -4px;display: inline-block;">
+                <select id="r_unitc" name="r_unitc" class="form-control">
+                <option value='R_jup'>R<sub>J</sub></option>   
+                <option value='kilometer'>Km</option>  
+                <option value='m'>m</option>  
+                <option value='R_earth'>R<sub>E</sub></option> 
+                <option value='R_sun'>R<sub>S</sub></option>  
+                </select>
+            </div>
+            <p class="help-block">Planet Radius</p>
+        </div>
+
+        <div class="col-md-offset-3 col-md-4 form-inline">
+            <input type="text" class="form-control" id="rstarc" name="rstarc" style="width: 70%;" value="1">
+            <div class="input-group-btn" style="width: 20%;left: -4px;display: inline-block;">
+                <select id="rstar_unitc" name="rstar_unitc" class="form-control">
+                <option value='R_sun'>R<sub>S</sub></option>
+                <option value='kilometer'>Km</option>  
+                <option value='m'>m</option>  
+                <option value='R_earth'>R<sub>E</sub></option> 
+                <option value='R_jup'>R<sub>J</sub></option>  
+                </select>
+            </div>
+            <p class="help-block">Stellar Radius</p>
         </div>
     </div>
 
@@ -250,10 +412,18 @@
                 case "planetModelConstant":
                     $(".upload-planet-section").addClass("hidden");
                     $(".constant-transit-section").removeClass("hidden");
+                    $(".select-from-grid").addClass("hidden");
                     break;
                 case "planetModelUser":
                     $(".constant-transit-section").addClass("hidden");
                     $(".upload-planet-section").removeClass("hidden");
+                    $(".select-from-grid").addClass("hidden");
+                    break;
+                case "planetModelGrid":
+                    $(".constant-transit-section").addClass("hidden");
+                    $(".upload-planet-section").addClass("hidden");
+                    $(".select-from-grid").removeClass("hidden");
+                    break;
                     break;
             }
         });

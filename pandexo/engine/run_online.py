@@ -477,7 +477,17 @@ class CalculationNewHSTHandler(BaseHandler):
     a new HST calculation task to the parallelized workers.
     """
     def get(self):
-        self.render("newHST.html", id=id)
+        try: 
+            header= pd.read_sql_table('header',db_fort)
+        except:
+            header = pd.DataFrame({
+            'temp': ['NO GRID DB FOUND'],
+            'ray' : ['NO GRID DB FOUND'],
+            'flat':['NO GRID DB FOUND']})
+
+        self.render("newHST.html", id=id,
+                                 temp=list(map(str, header.temp.unique()))
+                                 )
 
     def post(self):
         """
@@ -489,14 +499,7 @@ class CalculationNewHSTHandler(BaseHandler):
         #print(self.request.body)
         
         id = str(uuid.uuid4())+'h'
-                
-        #upload planet file
-        fileinfo_plan = self.request.files['planFile'][0]
-        fname_plan = fileinfo_plan['filename']
-        extn_plan = os.path.splitext(fname_plan)[1]
-        cname_plan = id+'planet' + extn_plan
-        fh_plan = open(os.path.join(__TEMP__, cname_plan), 'wb')
-        fh_plan.write(fileinfo_plan['body'])
+
         
         with open(os.path.join(os.path.dirname(__file__), "reference",
                                "exo_input.json")) as data_file:
@@ -504,9 +507,43 @@ class CalculationNewHSTHandler(BaseHandler):
             exodata["telescope"] = 'hst'
             exodata["star"]["mag"]         = float(self.get_argument("mag"))
             exodata["star"]["ref_wave"]     = float(self.get_argument("ref_wave"))
-            exodata["planet"]["exopath"]    = os.path.join(__TEMP__, cname_plan)
-            exodata["planet"]["w_unit"]     = self.get_argument("planwunits")
-            exodata["planet"]["f_unit"]     = self.get_argument("planfunits")
+            # planet model
+            exodata["planet"]["type"] = self.get_argument("planetModel")
+
+            if exodata["planet"]["type"] == "user":
+                # process planet file
+                fileinfo_plan = self.request.files['planFile'][0]
+                fname_plan = fileinfo_plan['filename']
+                extn_plan = os.path.splitext(fname_plan)[1]
+                cname_plan = id+'planet' + extn_plan
+                fh_plan = open(os.path.join(__TEMP__, cname_plan), 'wb')
+                fh_plan.write(fileinfo_plan['body'])
+
+                exodata["planet"]["exopath"] = os.path.join(__TEMP__, cname_plan)
+                exodata["planet"]["w_unit"] = self.get_argument("planwunits")
+                exodata["planet"]["f_unit"] = self.get_argument("planfunits")
+            elif exodata["planet"]["type"] == "constant":
+                exodata["star"]["radius"] = float(self.get_argument("rstarc"))
+                exodata["star"]["r_unit"] = str(self.get_argument("rstar_unitc"))
+                exodata["planet"]["radius"] = float(self.get_argument("refradc"))
+                exodata["planet"]["r_unit"] = str(self.get_argument("r_unitc"))                                
+                if self.get_argument("constant_unit") == 'fp/f*':
+                    exodata["planet"]["temp"] = float(self.get_argument("ptempc"))
+                    exodata["star"]["temp"] = float(self.get_argument("stempc"))
+                    exodata["planet"]["f_unit"] = 'fp/f*'
+                elif self.get_argument("constant_unit") == 'rp^2/r*^2':
+                    exodata["planet"]["f_unit"] = 'rp^2/r*^2'
+            elif exodata["planet"]["type"] == "grid":
+                exodata["star"]["radius"] = float(self.get_argument("rstarg"))
+                exodata["star"]["r_unit"] = str(self.get_argument("rstar_unitg"))
+                exodata["planet"]["mass"] = float(self.get_argument("pmass"))
+                exodata["planet"]["m_unit"] = str(self.get_argument("m_unit"))
+                exodata["planet"]["radius"] = float(self.get_argument("refradg"))
+                exodata["planet"]["r_unit"] = str(self.get_argument("r_unitg"))
+                exodata["planet"]["temp"] = float(self.get_argument("ptempg"))
+                exodata["planet"]["chem"] = str(self.get_argument("pchem"))
+                exodata["planet"]["cloud"] = self.get_argument("cloud") 
+
             exodata["planet"]["depth"]      = float(self.get_argument("depth"))
             exodata["planet"]["i"]          = float(self.get_argument("i"))
             exodata["planet"]["ars"]        = float(self.get_argument("ars"))

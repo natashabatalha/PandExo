@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from .create_input import hst_spec
 
 def wfc3_GuessNOrbits(trdur):
     '''Predict number of HST orbits 
@@ -439,13 +440,15 @@ def calc_start_window(eventType, rms, ptsOrbit, numOrbits, depth, inc, aRs, peri
             'obstr2':obstr2,'minphase':minphase,'maxphase':maxphase,'phase1':phase1,
             'phase2':phase2,'trmodel1':trmodel1,'trmodel2':trmodel2}
 
-def planet_spec(specfile, w_unit, disperser, deptherr, nchan, smooth=None):
+def planet_spec(planet, star, w_unit, disperser, deptherr, nchan, smooth=None):
     '''Plot exoplanet transmission/emission spectrum
     
     Parameters
     ----------
-    specfile : str
-        filename for model spectrum [wavelength, flux]
+    planet: dict 
+        planet dictionary from exo_input
+    star : dict
+        star dictionary from exo_input
     w_unit : str
         wavelength unit (um or nm)
     disperser : 
@@ -464,15 +467,15 @@ def planet_spec(specfile, w_unit, disperser, deptherr, nchan, smooth=None):
         'error','wmin','wmax'}
      '''
     # Load model wavelengths and spectrum
-    mwave, mspec = np.loadtxt(specfile, unpack=True)
+    mwave, mspec = hst_spec(planet,star)#np.loadtxt(specfile, unpack=True)
     # Convert wavelength to microns
-    if w_unit == 'um':
-        pass
-    elif w_unit == 'nm':
-        mwave /= 1000.
-    else:
-        print(("****HALTED: Unrecognized wavelength unit: '%s'" % w_unit))
-        return
+    #if w_unit == 'um':
+    #    pass
+    #elif w_unit == 'nm':
+    #    mwave /= 1000.
+    #else:
+    #    print(("****HALTED: Unrecognized wavelength unit: '%s'" % w_unit))
+    #    return
     
     # Smooth model spectrum (optional)
     if smooth != None:
@@ -530,7 +533,7 @@ def compute_sim_hst(dictinput):
     nchan           = pandeia_input['strategy']['nchan']
     windowSize      = pandeia_input['strategy']['windowSize']
     useFirstOrbit   = pandeia_input['strategy']['useFirstOrbit']
-
+    calc_type       = pandexo_input['planet']['type']
     hmag            = pandexo_input['star']['mag']
     specfile        = pandexo_input['planet']['exopath']
     w_unit          = pandexo_input['planet']['w_unit']
@@ -553,12 +556,14 @@ def compute_sim_hst(dictinput):
         eventType       ='transit'
     elif f_unit == "fp/f*":
         eventType       ='eclipse'
+    elif calc_type == 'grid':
+        eventType = 'transit'    
     else: 
         raise Exception('Units are not correct. Pick rp^2/r*^2 or fp/f*')
     
     a = wfc3_TExoNS(dictinput)
     b = calc_start_window(eventType, a['light_curve_rms'], a['nframes_per_orb'], numorbits, depth, inc, aRs, period, windowSize, ecc, w, useFirstOrbit=useFirstOrbit)
-    c = planet_spec(specfile, w_unit, disperser, a['spec_error'], nchan,smooth=20) 
+    c = planet_spec(pandexo_input['planet'], pandexo_input['star'], w_unit, disperser, a['spec_error'], nchan,smooth=20) 
     info_div = create_out_div(a['info'], b['minphase'],b['maxphase'])
     
     return {"wfc3_TExoNS":a,"calc_start_window": b,"planet_spec":c,"info_div":info_div}
