@@ -244,8 +244,8 @@ def compute_full_sim(dictinput):
         photon_out_bin = photon_out_bin[photon_out_bin>0]
     
     if calculation == 'phase_spec':
-        to = timing["APT: Num Groups per Integration"]*tframe
-        ti = timing["APT: Num Groups per Integration"]*tframe
+        to = (timing["APT: Num Groups per Integration"]-1)*tframe
+        ti = (timing["APT: Num Groups per Integration"]-1)*tframe
     else: 
         #otherwise error propagation and account for different 
         #times in transit and out 

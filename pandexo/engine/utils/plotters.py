@@ -24,7 +24,9 @@ def create_component_jwst(result_dict):
         front-end javascript required, and `div` is a dictionary of plot
         objects.
     """  
+    timing = result_dict['timing']
     noccultations = result_dict['timing']['Number of Transits']
+    out = result_dict['PandeiaOutTrans']
     
     # select the tools we want
     TOOLS = "pan,wheel_zoom,box_zoom,resize,reset,save"
@@ -203,47 +205,44 @@ def create_component_jwst(result_dict):
 
 
     #out of transit 2d output 
-    out = result_dict['PandeiaOutTrans']
+    raw = result_dict['RawData']
     
     # Flux 1d
-    x, y = out['1d']['extracted_flux']
+    x, y = raw['wave'], raw['e_rate_out']*result_dict['timing']['Seconds per Frame']*(timing["APT: Num Groups per Integration"]-1)
     x = x[~np.isnan(y)]
     y = y[~np.isnan(y)]
 
     plot_flux_1d1 = Figure(tools=TOOLS,
                          x_axis_label='Wavelength [microns]',
-                         y_axis_label='Flux (e/s)', title="Out of Transit Flux Rate",
+                         y_axis_label='e-/integration', title="Flux Per Integration",
                          plot_width=800, plot_height=300)
     plot_flux_1d1.line(x, y, line_width = 4, alpha = .7)
-    tab1 = Panel(child=plot_flux_1d1, title="Total Flux")
+    tab1 = Panel(child=plot_flux_1d1, title="Flux per Int")
 
     # BG 1d
-    x, y = out['1d']['extracted_bg_only']
-    y = y[~np.isnan(y)]
-    x = x[~np.isnan(y)]
-    plot_bg_1d1 = Figure(tools=TOOLS,
-                         x_axis_label='Wavelength [microns]',
-                         y_axis_label='Flux (e/s)', title="Background",
-                         plot_width=800, plot_height=300)
-    plot_bg_1d1.line(x, y, line_width = 4, alpha = .7)
-    tab2 = Panel(child=plot_bg_1d1, title="Background Flux")
+    #x, y = out['1d']['extracted_bg_only']
+    #y = y[~np.isnan(y)]
+    #x = x[~np.isnan(y)]
+    #plot_bg_1d1 = Figure(tools=TOOLS,
+    #                     x_axis_label='Wavelength [microns]',
+    #                     y_axis_label='Flux (e/s)', title="Background",
+    #                     plot_width=800, plot_height=300)
+    #plot_bg_1d1.line(x, y, line_width = 4, alpha = .7)
+    #tab2 = Panel(child=plot_bg_1d1, title="Background Flux")
 
-    # SNR 1d accounting for number of occultations
-    x= out['1d']['sn'][0]
-    y = out['1d']['sn'][1]
-    x = x[~np.isnan(y)]
-    y = y[~np.isnan(y)]
-    y = y*np.sqrt(noccultations)
+    # SNR 
+    y = np.sqrt(y) #this is computing the SNR (sqrt of photons in a single integration)
+
+
     plot_snr_1d1 = Figure(tools=TOOLS,
                          x_axis_label=x_axis_label,
-                         y_axis_label='SNR', title="Pandeia SNR",
+                         y_axis_label='sqrt(e-)/integration', title="SNR per integration",
                          plot_width=800, plot_height=300)
     plot_snr_1d1.line(x, y, line_width = 4, alpha = .7)
-    tab3 = Panel(child=plot_snr_1d1, title="SNR")
+    tab3 = Panel(child=plot_snr_1d1, title="SNR per Int")
 
 
     # Error bars (ppm) 
-
     x = result_dict['FinalSpectrum']['wave']
     y = result_dict['FinalSpectrum']['error_w_floor']*1e6
     x = x[~np.isnan(y)]
@@ -253,11 +252,11 @@ def create_component_jwst(result_dict):
 
     plot_noise_1d1 = Figure(tools=TOOLS,#responsive=True,
                          x_axis_label=x_axis_label,
-                         y_axis_label='Error on Spectrum (PPM)', title="Error Curve",
+                         y_axis_label='Spectral Precision (ppm)', title="Spectral Precision",
                          plot_width=800, plot_height=300, y_range = [0,2.0*ymed])
     ymed = np.median(y)
     plot_noise_1d1.circle(x, y, line_width = 4, alpha = .7)
-    tab4 = Panel(child=plot_noise_1d1, title="Error")
+    tab4 = Panel(child=plot_noise_1d1, title="Precision")
 
     #Not happy? Need help picking a different mode? 
     plot_spectrum2 = Figure(plot_width=800, plot_height=300, x_range=xlims,y_range=ylims, tools=TOOLS,
@@ -270,7 +269,7 @@ def create_component_jwst(result_dict):
 
 
     #create set of five tabs 
-    tabs1d = Tabs(tabs=[ tab1, tab2,tab3, tab4, tab5])
+    tabs1d = Tabs(tabs=[ tab1,tab3, tab4, tab5])
 
 
 
