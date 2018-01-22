@@ -450,7 +450,13 @@ class CalculationNewHandler(BaseHandler):
             pandata["configuration"]["detector"]["ngroup"] = self.get_argument("optimize")
         
         finaldata = {"pandeia_input": pandata, "pandexo_input": exodata}
-        print(finaldata)
+
+        #PandExo stats
+        try: 
+            logs.jwst_log(finaldata)
+        except: 
+            pass
+
         task = self.executor.submit(wrapper, finaldata)
 
 
@@ -542,6 +548,11 @@ class CalculationNewHSTHandler(BaseHandler):
             pandata["strategy"]["schedulability"]           = self.get_argument("schedulability")
 
         finaldata = {"pandeia_input": pandata , "pandexo_input":exodata}
+        #PandExo stats
+        try: 
+            logs.hst_log(finaldata)
+        except: 
+            pass
 
         task = self.executor.submit(wrapper, finaldata)
 

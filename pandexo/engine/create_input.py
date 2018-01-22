@@ -250,7 +250,7 @@ def bothTrans(out_trans, planet,star=None) :
 
 
         #finally compute (rp/r*)^2
-        flux_planet = np.array(r_lambda**2/rstar**2)
+        flux_planet = np.array(r_lambda**2/rstar**2)[::-1]
         planet['w_unit'] = 'um'
         planet['f_unit'] = 'rp^2/r*^2'
     else: 
