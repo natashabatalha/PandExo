@@ -144,7 +144,7 @@
             <p class="help-block">Temperature (K)</p>
         </div>  
 
-        <div class="col-md-3"">
+        <div class="col-md-3">
             <select id="pchem" name="pchem" class="form-control" data-placeholder="Select Chemistry">
                 <option value=""></option> 
                 <option value='noTiO'>Equilibrium Chemistry</option>  
@@ -153,7 +153,7 @@
             <p class="help-block">Select Chemistry Type</p>
         </div>  
 
-        <div class="col-md-3"">
+        <div class="col-md-3">
             <select id="cloud" name="cloud" class="form-control" data-placeholder="Clouds/Scattering">
                 <option value=""></option> 
                 <option value="0">Nothing</option>  
@@ -415,7 +415,19 @@
             </select>
         </div>
     </div>
-
+    <!--
+    <div class="form-group">
+        <label class="col-md-3 control-label" for="TA">Compute Target Acq?</label>
+        <div class="col-md-4 form-inline">
+            <input type="checkbox" data-toggle="toggle" id="TA" name="TA">
+            <button type="button" class="btn btn-secondary" data-toggle="tooltip" data-placement="right" title="The APT will ask you for ngroups for target acquisition. Generally you can just use the minimum number of allowable groups. There are two exceptions to this: 1) If the minimum number of groups is saturating, which is not good and 2) 
+            if the minimum number of groups does not get above a certain SNR. Therefore, if you are observing a very bright thing or a very 
+            dim thing, you might want to run your calculation with TA on to see if you are in either of these extremes.">
+                ?
+            </button>
+        </div>
+    </div>
+    </!-->
     <div class="form-group">
         <label class="col-md-3 control-label" for="optimize">Number of Groups per Integration</label>
         <div class="col-md-4">
@@ -581,6 +593,12 @@
                 break;
         }
     }
+
+
+$(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+})
+
 </script>
 
 

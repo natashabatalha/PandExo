@@ -11,6 +11,8 @@ from . import create_input as create
 from .compute_noise import ExtractSpec
 import astropy.units as u
 import pickle
+from pandeia.engine.calc_utils import build_default_calc, build_default_source
+
 #constant parameters.. consider putting these into json file 
 #max groups in integration
 max_ngroup = 65536.0 
@@ -261,6 +263,7 @@ def compute_full_sim(dictinput):
     error_spec_nfloor = add_noise_floor(noise_floor, wbin, error_spec) 
 
     #add in random noise for the simulated spectrum 
+    np.random.seed()
     rand_noise= error_spec_nfloor*(np.random.randn(len(wbin)))
     raw_spec = (photon_out_bin/to-photon_in_bin/ti)/(photon_out_bin/to)
     sim_spec = raw_spec + rand_noise 
@@ -504,11 +507,18 @@ def remove_QY(pandeia_dict, instrument):
         same exact dictionary with extracted_flux = extracted_flux/QY
     """
     if instrument == 'niriss':
-        qy = fits.open(os.path.join(default_refdata_directory,'jwst', instrument,'qe' ,'jwst_niriss_h2rg_qe.fits'))
+        try:
+            qy = fits.open(os.path.join(default_refdata_directory,'jwst', instrument,'qe' ,'jwst_niriss_h2rg_qe_20160902163017.fits'))
+        except: 
+            raise Exception('PANDEIA REFERENCE DATA NEEDS TO BE UPDATED')
+
         x_grid = pandeia_dict['1d']['extracted_flux'][0]
         qy_on_grid = np.interp(x_grid, qy[1].data['WAVELENGTH'], qy[1].data['CONVERSION'])
     elif instrument == 'nirspec':
-        qy = fits.open(os.path.join(default_refdata_directory,'jwst', instrument,'qe' ,'jwst_nirspec_qe.fits'))
+        try:
+            qy = fits.open(os.path.join(default_refdata_directory,'jwst', instrument,'qe' ,'jwst_nirspec_qe_20160902193401.fits'))
+        except: 
+            raise Exception('PANDEIA REFERENCE DATA NEEDS TO BE UPDATED')        
         x_grid = pandeia_dict['1d']['extracted_flux'][0]
         qy_on_grid = np.interp(x_grid, qy[1].data['WAVELENGTH'], qy[1].data['CONVERSION'])
     else:
@@ -816,7 +826,52 @@ def uniform_tophat_sum(newx,x, y):
     loc=np.where((x > newx[0]-0.5*delta[0]) & (x < newx[0]+0.5*delta[0]))
     ynew[0]=np.sum(y[loc])
     return ynew
-    
+
+def target_acq(instrument, both_spec, warning): 
+    """Contains functionality to compute optimal TA strategy 
+
+    Takes pandexo normalized flux from create_input and checks for saturation, or 
+    if SNR is below the minimum requirement for each. Then adds warnings and 2d displays 
+    and target acq info to final output dict 
+
+    Parameters
+    ----------
+    instrument : str 
+        possible options are niriss, nirspec, miri and nircam 
+    both_spec : dict
+        output dictionary from **create_input** 
+    warning : dict 
+        output dictionary from **add_warnings** 
+
+    Retruns
+    -------
+
+    """
+    out_spectrum = np.array([both_spec['wave'], both_spec['flux_out_trans']])
+
+    #this automatically builds a default calculation 
+    #I got reasonable answers for everything so all you should need to do here is swap out (instrument = 'niriss', 'nirspec','miri' or 'nircam')
+    c = build_default_calc(telescope='jwst', instrument=instrument, mode='target_acq', method='taphot')
+    c['scene'][0]['spectrum']['sed'] = {'sed_type':'input','spectrum':out_spectrum}
+    c['scene'][0]['spectrum']['normalization']['type'] = 'none'
+    rphot = perform_calculation(c, dict_report=True)
+
+    #check warnings (pandeia doesn't return values for these warnings, so try will fail if all good)
+    try: 
+        warnings['TA Satruated?'] = rphot['warnings']['saturated']
+    except:
+        warnings['TA Satruated?'] = 'All good'
+
+    try: 
+        warnings['TA SNR Threshold'] = rphot['warnings']['ta_snr_threshold']
+    except:
+        warnings['TA SNR Threshold'] = 'All good'
+
+    #build TA dict 
+    ta = {'sn':rphot['scalar']['sn'],
+            'ngroup': rphot['input']['configuration']['detector']['ngroup'], 
+            'saturation':rphot['2d']['saturation']}
+
 def as_dict(out, both_spec ,binned, timing, mag, sat_level, warnings, punit, unbinned,calculation): 
     """Format dictionary for output data 
     
