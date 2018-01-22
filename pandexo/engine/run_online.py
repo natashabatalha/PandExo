@@ -17,6 +17,7 @@ from .ComputeZ import computeAlpha
 from .utils.plotters import create_component_jwst, create_component_spec, create_component_hst
 import pandas as pd 
 import numpy as np
+import logs
 
 # define location of temp files
 __TEMP__ = os.environ.get("PANDEXO_TEMP", os.path.join(os.path.dirname(__file__), "temp"))
@@ -445,7 +446,13 @@ class CalculationNewHandler(BaseHandler):
             pandata["configuration"]["detector"]["ngroup"] = self.get_argument("optimize")
         
         finaldata = {"pandeia_input": pandata, "pandexo_input": exodata}
-        print(finaldata)
+
+        #PandExo stats
+        try: 
+            logs.jwst_log(finaldata)
+        except: 
+            pass
+
         task = self.executor.submit(wrapper, finaldata)
 
 
@@ -537,6 +544,11 @@ class CalculationNewHSTHandler(BaseHandler):
             pandata["strategy"]["schedulability"]           = self.get_argument("schedulability")
 
         finaldata = {"pandeia_input": pandata , "pandexo_input":exodata}
+        #PandExo stats
+        #try: 
+        logs.hst_log(finaldata)
+        #except: 
+        #    pass
 
         task = self.executor.submit(wrapper, finaldata)
 
