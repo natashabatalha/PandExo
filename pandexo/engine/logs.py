@@ -2,10 +2,11 @@ import os
 import pandas as pd
 from sqlalchemy import *
 import datetime
-
-logs = os.environ.get('pandexo_logs')
-engine = create_engine('sqlite:///' + os.path.join(logs))
-
+try:
+    logs = os.environ.get('pandexo_logs')
+    engine = create_engine('sqlite:///' + os.path.join(logs))
+except: 
+    pass 
 def jwst_log(final):
     '''Logging for Website;Used for tracking usage;Only storing instrument data'''
     instrument = final['pandeia_input']['configuration']['instrument']['instrument']
