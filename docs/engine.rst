@@ -106,7 +106,13 @@ engine.hst_smooth
     :undoc-members:
     :show-inheritance:
 
+engine.logs
+-----------------
 
+.. automodule:: engine.logs
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
 Module contents
 ---------------

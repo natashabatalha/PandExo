@@ -17,7 +17,7 @@ from .ComputeZ import computeAlpha
 from .utils.plotters import create_component_jwst, create_component_spec, create_component_hst
 import pandas as pd 
 import numpy as np
-import logs
+from .logs import jwst_log, hst_log
 
 # define location of temp files
 __TEMP__ = os.environ.get("PANDEXO_TEMP", os.path.join(os.path.dirname(__file__), "temp"))
@@ -453,7 +453,7 @@ class CalculationNewHandler(BaseHandler):
 
         #PandExo stats
         try: 
-            logs.jwst_log(finaldata)
+            jwst_log(finaldata)
         except: 
             pass
 
@@ -587,7 +587,7 @@ class CalculationNewHSTHandler(BaseHandler):
         finaldata = {"pandeia_input": pandata , "pandexo_input":exodata}
         #PandExo stats
         try: 
-            logs.hst_log(finaldata)
+            hst_log(finaldata)
         except: 
             pass
 
