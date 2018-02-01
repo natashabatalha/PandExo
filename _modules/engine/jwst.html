@@ -90,6 +90,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html">Pre-installation Data Download</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html#installation-for-users-with-conda">Installation for Users With Conda</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html#installation-for-users-with-pip">Installation for Users With PIP</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html#troubleshooting-common-errors">Troubleshooting-Common Errors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html#the-importance-of-upgrading-pandexo">The Importance of Upgrading PandExo</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorialjwst.html">JWST Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../jwstinput.html">Possible Instrument Input Params</a></li>
@@ -406,8 +407,8 @@
         <span class="n">photon_out_bin</span> <span class="o">=</span> <span class="n">photon_out_bin</span><span class="p">[</span><span class="n">photon_out_bin</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">]</span>
     
     <span class="k">if</span> <span class="n">calculation</span> <span class="o">==</span> <span class="s1">&#39;phase_spec&#39;</span><span class="p">:</span>
-        <span class="n">to</span> <span class="o">=</span> <span class="n">timing</span><span class="p">[</span><span class="s2">&quot;APT: Num Groups per Integration&quot;</span><span class="p">]</span><span class="o">*</span><span class="n">tframe</span>
-        <span class="n">ti</span> <span class="o">=</span> <span class="n">timing</span><span class="p">[</span><span class="s2">&quot;APT: Num Groups per Integration&quot;</span><span class="p">]</span><span class="o">*</span><span class="n">tframe</span>
+        <span class="n">to</span> <span class="o">=</span> <span class="p">(</span><span class="n">timing</span><span class="p">[</span><span class="s2">&quot;APT: Num Groups per Integration&quot;</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">tframe</span>
+        <span class="n">ti</span> <span class="o">=</span> <span class="p">(</span><span class="n">timing</span><span class="p">[</span><span class="s2">&quot;APT: Num Groups per Integration&quot;</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">tframe</span>
     <span class="k">else</span><span class="p">:</span> 
         <span class="c1">#otherwise error propagation and account for different </span>
         <span class="c1">#times in transit and out </span>
@@ -943,7 +944,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">tracker</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
             <span class="n">wave</span> <span class="o">+=</span> <span class="p">[</span><span class="n">tracker</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">wave</span></div>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">wave</span><span class="p">)</span></div>
     
 <div class="viewcode-block" id="uniform_tophat_sum"><a class="viewcode-back" href="../../engine.html#engine.jwst.uniform_tophat_sum">[docs]</a><span class="k">def</span> <span class="nf">uniform_tophat_sum</span><span class="p">(</span><span class="n">newx</span><span class="p">,</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Adapted from Mike R. Line to rebin spectra</span>

@@ -95,13 +95,17 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="#installation-for-users-with-conda">Installation for Users With Conda</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#coords-py-typeerror-float-object-cannot-be-interpreted-as-an-index">COORDS.PY: TypeError: ‘float’ object cannot be interpreted as an index</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#coords-py-typeerror-float-object-cannot-be-interpreted-as-an-index">COORDS.PY: TypeError: &#8216;float&#8217; object cannot be interpreted as an index</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="#installation-for-users-with-pip">Installation for Users With PIP</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#set-environment">Set Environment</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#dependencies">Dependencies</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#id3">COORDS.PY: TypeError: ‘float’ object cannot be interpreted as an index</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#troubleshooting-common-errors">Troubleshooting-Common Errors</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#recursionerror-maximum-recursion-depth-exceeded-while-calling-a-python-object">RecursionError: maximum recursion depth exceeded while calling a Python object</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#typeerror-super-argument-1-must-be-type">TypeError: super() argument 1 must be type</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="#the-importance-of-upgrading-pandexo">The Importance of Upgrading PandExo</a><ul>
@@ -180,7 +184,7 @@
             
   <div class="admonition warning">
 <p class="first admonition-title">Warning</p>
-<p class="last">Before reading further, if you do not wish to install PandExo,there is an online version of the code here at <a class="reference external" href="https://exoctk.stsci.edu/pandexo/">STScI’s ExoCTK</a>.</p>
+<p class="last">Before reading further, if you do not wish to install PandExo,there is an online version of the code here at <a class="reference external" href="https://exoctk.stsci.edu/pandexo/">STScI&#8217;s ExoCTK</a>.</p>
 </div>
 <p>Before we start, the scripts written to install PandExo assume the user has installed <a class="reference external" href="https://www.continuum.io/downloads">Anaconda</a>. For diehard pip users, know that STScI tools will be only distributed on conda so PandExo will not be the only package to use it.</p>
 <p>If you are dead set against it you will need to follow the installation guidelines <a class="reference external" href="https://natashabatalha.github.io/PandExo/installation.html">here</a>.</p>
@@ -219,7 +223,7 @@ SUCCESS
 </div>
 <p>Hopefully you have had success but if not the most likely error you will get is the following:</p>
 <div class="section" id="coords-py-typeerror-float-object-cannot-be-interpreted-as-an-index">
-<h2>COORDS.PY: TypeError: ‘float’ object cannot be interpreted as an index<a class="headerlink" href="#coords-py-typeerror-float-object-cannot-be-interpreted-as-an-index" title="Permalink to this headline">¶</a></h2>
+<h2>COORDS.PY: TypeError: &#8216;float&#8217; object cannot be interpreted as an index<a class="headerlink" href="#coords-py-typeerror-float-object-cannot-be-interpreted-as-an-index" title="Permalink to this headline">¶</a></h2>
 <p>This is an error within Pandeia, which has not yet been fixed by STScI folk. You can easily fix it by finding where the file /pandeia/engine/coords.py is and changing line 36:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">ones</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">ny</span><span class="p">,</span> <span class="n">nx</span><span class="p">))</span>
 </pre></div>
@@ -237,7 +241,7 @@ SUCCESS
 <div class="highlight-bash"><div class="highlight"><pre><span></span>pip install pandexo.engine
 </pre></div>
 </div>
-<p>OR Download PandExo’s repository via Github:</p>
+<p>OR Download PandExo&#8217;s repository via Github:</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>git clone --recursive https://github.com/natashabatalha/pandexo
 <span class="nb">cd</span> pandexo
 python setup.py install
@@ -251,7 +255,7 @@ python setup.py install
 <span class="nb">echo</span> <span class="s1">&#39;USRDIR=/I/Want/My/Data/Here&#39;</span> &gt;&gt;~/.bash_profile
 </pre></div>
 </div>
-<p>NEXT, since pandexo.sh is set for conda users, delete everything after line 22. We will have to do these manually since we don’t have conda. Once you have done these two things you can go ahead and run:</p>
+<p>NEXT, since pandexo.sh is set for conda users, delete everything after line 22. We will have to do these manually since we don&#8217;t have conda. Once you have done these two things you can go ahead and run:</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>sh pandexo.sh
 </pre></div>
 </div>
@@ -282,14 +286,30 @@ SUCCESS
 </div>
 <p>Hopefully you have had success but if not the most likely error you will get is the following:</p>
 </div>
-<div class="section" id="id3">
-<h2>COORDS.PY: TypeError: ‘float’ object cannot be interpreted as an index<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
-<p>This is an error within Pandeia, which has not yet been fixed by STScI folk. You can easily fix it by finding where the file /pandeia/engine/coords.py is and changing line 36:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">ones</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">ny</span><span class="p">,</span> <span class="n">nx</span><span class="p">))</span>
+</div>
+<div class="section" id="troubleshooting-common-errors">
+<h1>Troubleshooting-Common Errors<a class="headerlink" href="#troubleshooting-common-errors" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="recursionerror-maximum-recursion-depth-exceeded-while-calling-a-python-object">
+<h2>RecursionError: maximum recursion depth exceeded while calling a Python object<a class="headerlink" href="#recursionerror-maximum-recursion-depth-exceeded-while-calling-a-python-object" title="Permalink to this headline">¶</a></h2>
+<p>There is a known bug with Python 3.6 and Sphinx &lt;1.6. Before updating or installing pandexo do the following:</p>
+<p>PIP USERS:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>pip install <span class="nv">sphinx</span><span class="o">==</span><span class="m">1</span>.5.6
 </pre></div>
 </div>
-<p>To this:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">ones</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">ny</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">nx</span><span class="p">)))</span>
+<p>CONDA USERS:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>conda install <span class="nv">sphinx</span><span class="o">=</span><span class="m">1</span>.5.6
+</pre></div>
+</div>
+</div>
+<div class="section" id="typeerror-super-argument-1-must-be-type">
+<h2>TypeError: super() argument 1 must be type<a class="headerlink" href="#typeerror-super-argument-1-must-be-type" title="Permalink to this headline">¶</a></h2>
+<p>This is the same error above with Sphinx, but for Python 2.7 users. The fix is the same:</p>
+<p>PIP USERS:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>pip install <span class="nv">sphinx</span><span class="o">==</span><span class="m">1</span>.5.6
+</pre></div>
+</div>
+<p>CONDA USERS:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>conda install <span class="nv">sphinx</span><span class="o">=</span><span class="m">1</span>.5.6
 </pre></div>
 </div>
 </div>
@@ -299,7 +319,7 @@ SUCCESS
 <p>It is crucial that your verison of PandExo remain up to date. Especially through commissioning and leading up to launch, there may be crucial changes to the code or the reference data. Updating PandExo requires three crucial steps.</p>
 <div class="section" id="verify-reference-data-is-current">
 <h2>Verify Reference Data is Current<a class="headerlink" href="#verify-reference-data-is-current" title="Permalink to this headline">¶</a></h2>
-<p>The link to the reference data is located on <a class="reference external" href="https://pypi.python.org/pypi/pandeia.engine/">Pandeia’s PyPI page</a>. Before doing a large batch of calculations, make sure that you have this version.</p>
+<p>The link to the reference data is located on <a class="reference external" href="https://pypi.python.org/pypi/pandeia.engine/">Pandeia&#8217;s PyPI page</a>. Before doing a large batch of calculations, make sure that you have this version.</p>
 </div>
 <div class="section" id="verify-pandeia-engine-is-current">
 <h2>Verify pandeia.engine is Current<a class="headerlink" href="#verify-pandeia-engine-is-current" title="Permalink to this headline">¶</a></h2>

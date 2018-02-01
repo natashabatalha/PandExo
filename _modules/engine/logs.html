@@ -1,0 +1,279 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>engine.logs &mdash; PandExo  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="PandExo  documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> PandExo
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../includeme.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Pre-installation Data Download</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html#installation-for-users-with-conda">Installation for Users With Conda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html#installation-for-users-with-pip">Installation for Users With PIP</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html#troubleshooting-common-errors">Troubleshooting-Common Errors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html#the-importance-of-upgrading-pandexo">The Importance of Upgrading PandExo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorialjwst.html">JWST Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../jwstinput.html">Possible Instrument Input Params</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../jwstdict.html">Py Dict Structure of JWST Output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorialhst.html">HST Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../engine.html">The Code</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">PandExo</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>engine.logs</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for engine.logs</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span> 
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">logs</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;pandexo_logs&#39;</span><span class="p">)</span>
+    <span class="n">engine</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="s1">&#39;sqlite:///&#39;</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">logs</span><span class="p">))</span>
+<span class="k">except</span><span class="p">:</span> 
+    <span class="k">pass</span> 
+<div class="viewcode-block" id="jwst_log"><a class="viewcode-back" href="../../engine.html#engine.logs.jwst_log">[docs]</a><span class="k">def</span> <span class="nf">jwst_log</span><span class="p">(</span><span class="n">final</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Logging for Website;Used for tracking usage;Only storing instrument data&#39;&#39;&#39;</span>
+    <span class="n">instrument</span> <span class="o">=</span> <span class="n">final</span><span class="p">[</span><span class="s1">&#39;pandeia_input&#39;</span><span class="p">][</span><span class="s1">&#39;configuration&#39;</span><span class="p">][</span><span class="s1">&#39;instrument&#39;</span><span class="p">][</span><span class="s1">&#39;instrument&#39;</span><span class="p">]</span>
+    <span class="n">mode</span> <span class="o">=</span> <span class="n">final</span><span class="p">[</span><span class="s1">&#39;pandeia_input&#39;</span><span class="p">][</span><span class="s1">&#39;configuration&#39;</span><span class="p">][</span><span class="s1">&#39;instrument&#39;</span><span class="p">][</span><span class="s1">&#39;mode&#39;</span><span class="p">]</span>
+    <span class="n">ff</span> <span class="o">=</span> <span class="n">final</span><span class="p">[</span><span class="s1">&#39;pandeia_input&#39;</span><span class="p">][</span><span class="s1">&#39;configuration&#39;</span><span class="p">][</span><span class="s1">&#39;instrument&#39;</span><span class="p">][</span><span class="s1">&#39;filter&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">ff</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span> <span class="n">ff</span> <span class="o">=</span> <span class="s1">&#39;None&#39;</span>
+    <span class="n">aperture</span> <span class="o">=</span> <span class="n">final</span><span class="p">[</span><span class="s1">&#39;pandeia_input&#39;</span><span class="p">][</span><span class="s1">&#39;configuration&#39;</span><span class="p">][</span><span class="s1">&#39;instrument&#39;</span><span class="p">][</span><span class="s1">&#39;aperture&#39;</span><span class="p">]</span>
+    <span class="n">disperser</span> <span class="o">=</span> <span class="n">final</span><span class="p">[</span><span class="s1">&#39;pandeia_input&#39;</span><span class="p">][</span><span class="s1">&#39;configuration&#39;</span><span class="p">][</span><span class="s1">&#39;instrument&#39;</span><span class="p">][</span><span class="s1">&#39;disperser&#39;</span><span class="p">]</span>
+    <span class="n">subarray</span> <span class="o">=</span> <span class="n">final</span><span class="p">[</span><span class="s1">&#39;pandeia_input&#39;</span><span class="p">][</span><span class="s1">&#39;configuration&#39;</span><span class="p">][</span><span class="s1">&#39;detector&#39;</span><span class="p">][</span><span class="s1">&#39;subarray&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">subarray</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span> <span class="n">subarray</span> <span class="o">=</span> <span class="s2">&quot;None&quot;</span>
+    <span class="n">calc_type</span><span class="o">=</span> <span class="n">final</span><span class="p">[</span><span class="s1">&#39;pandexo_input&#39;</span><span class="p">][</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span>
+    <span class="n">time</span> <span class="o">=</span>  <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M&quot;</span><span class="p">)</span>
+
+    <span class="n">pddb</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;instrument&#39;</span><span class="p">:[</span><span class="n">instrument</span><span class="p">],</span> <span class="s1">&#39;calc_type&#39;</span><span class="p">:[</span><span class="n">calc_type</span><span class="p">],</span>
+    	<span class="s1">&#39;mode&#39;</span><span class="p">:[</span><span class="n">mode</span><span class="p">],</span><span class="s1">&#39;ff&#39;</span><span class="p">:[</span><span class="n">ff</span><span class="p">],</span> <span class="s1">&#39;aperture&#39;</span><span class="p">:[</span><span class="n">aperture</span><span class="p">],</span><span class="s1">&#39;disperser&#39;</span><span class="p">:[</span><span class="n">disperser</span><span class="p">],</span><span class="s1">&#39;subarray&#39;</span><span class="p">:[</span><span class="n">subarray</span><span class="p">]},</span><span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="n">time</span><span class="p">])</span>
+    <span class="c1">#print(pddb)</span>
+    <span class="n">pddb</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="s1">&#39;jwst_cycle1&#39;</span><span class="p">,</span><span class="n">engine</span><span class="p">,</span><span class="n">if_exists</span><span class="o">=</span><span class="s1">&#39;append&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span></div>
+
+
+<div class="viewcode-block" id="hst_log"><a class="viewcode-back" href="../../engine.html#engine.logs.hst_log">[docs]</a><span class="k">def</span> <span class="nf">hst_log</span><span class="p">(</span><span class="n">final</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Logging for Website;Used for tracking usage;Used for tracking usage;Only storing instrument data&#39;&#39;&#39;</span>
+    <span class="n">instrument</span> <span class="o">=</span> <span class="n">final</span><span class="p">[</span><span class="s1">&#39;pandeia_input&#39;</span><span class="p">][</span><span class="s1">&#39;configuration&#39;</span><span class="p">][</span><span class="s1">&#39;instrument&#39;</span><span class="p">][</span><span class="s1">&#39;instrument&#39;</span><span class="p">]</span>
+    <span class="n">subarray</span> <span class="o">=</span> <span class="n">final</span><span class="p">[</span><span class="s1">&#39;pandeia_input&#39;</span><span class="p">][</span><span class="s1">&#39;configuration&#39;</span><span class="p">][</span><span class="s1">&#39;detector&#39;</span><span class="p">][</span><span class="s1">&#39;subarray&#39;</span><span class="p">]</span>
+    <span class="n">nsamp</span> <span class="o">=</span> <span class="n">final</span><span class="p">[</span><span class="s1">&#39;pandeia_input&#39;</span><span class="p">][</span><span class="s1">&#39;configuration&#39;</span><span class="p">][</span><span class="s1">&#39;detector&#39;</span><span class="p">][</span><span class="s1">&#39;nsamp&#39;</span><span class="p">]</span>
+    <span class="n">samp_seq</span> <span class="o">=</span> <span class="n">final</span><span class="p">[</span><span class="s1">&#39;pandeia_input&#39;</span><span class="p">][</span><span class="s1">&#39;configuration&#39;</span><span class="p">][</span><span class="s1">&#39;detector&#39;</span><span class="p">][</span><span class="s1">&#39;samp_seq&#39;</span><span class="p">]</span>
+    <span class="n">disperser</span> <span class="o">=</span> <span class="n">final</span><span class="p">[</span><span class="s1">&#39;pandeia_input&#39;</span><span class="p">][</span><span class="s2">&quot;configuration&quot;</span><span class="p">][</span><span class="s1">&#39;instrument&#39;</span><span class="p">][</span><span class="s1">&#39;disperser&#39;</span><span class="p">]</span>
+    <span class="n">scanDirection</span> <span class="o">=</span> <span class="n">final</span><span class="p">[</span><span class="s1">&#39;pandeia_input&#39;</span><span class="p">][</span><span class="s2">&quot;strategy&quot;</span><span class="p">][</span><span class="s2">&quot;scanDirection&quot;</span><span class="p">]</span>
+    <span class="n">schedulability</span> <span class="o">=</span> <span class="n">final</span><span class="p">[</span><span class="s1">&#39;pandeia_input&#39;</span><span class="p">][</span><span class="s2">&quot;strategy&quot;</span><span class="p">][</span><span class="s2">&quot;schedulability&quot;</span><span class="p">]</span>
+
+    <span class="n">calc_type</span><span class="o">=</span> <span class="n">final</span><span class="p">[</span><span class="s1">&#39;pandexo_input&#39;</span><span class="p">][</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span>
+
+
+    <span class="n">time</span> <span class="o">=</span>  <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M&quot;</span><span class="p">)</span>
+
+    <span class="n">pddb</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;instrument&#39;</span><span class="p">:[</span><span class="n">instrument</span><span class="p">],</span> <span class="s1">&#39;calc_type&#39;</span><span class="p">:[</span><span class="n">calc_type</span><span class="p">],</span>
+    	<span class="s1">&#39;nsamp&#39;</span><span class="p">:[</span><span class="n">nsamp</span><span class="p">],</span> <span class="s1">&#39;samp_seq&#39;</span><span class="p">:[</span><span class="n">samp_seq</span><span class="p">],</span><span class="s1">&#39;disperser&#39;</span><span class="p">:[</span><span class="n">disperser</span><span class="p">],</span><span class="s1">&#39;subarray&#39;</span><span class="p">:[</span><span class="n">subarray</span><span class="p">],</span><span class="s1">&#39;scanDirection&#39;</span><span class="p">:[</span><span class="n">scanDirection</span><span class="p">],</span>
+    	<span class="s1">&#39;schedulability&#39;</span><span class="p">:[</span><span class="n">schedulability</span><span class="p">]},</span><span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="n">time</span><span class="p">])</span>
+    <span class="c1">#print(pddb)</span>
+    <span class="n">pddb</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="s1">&#39;hst_cycle26&#39;</span><span class="p">,</span><span class="n">engine</span><span class="p">,</span><span class="n">if_exists</span><span class="o">=</span><span class="s1">&#39;append&#39;</span><span class="p">)</span>
+    <span class="k">return</span></div>
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Natasha Batalha;Kevin Stevenson.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

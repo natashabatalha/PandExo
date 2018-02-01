@@ -91,7 +91,8 @@
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Pre-installation Data Download</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html#installation-for-users-with-conda">Installation for Users With Conda</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html#installation-for-users-with-pip">Installation for Users With PIP</a></li>
-<li class="toctree-l1"><a class="reference internal" href="installation.html#todos">TODOS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html#troubleshooting-common-errors">Troubleshooting-Common Errors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html#the-importance-of-upgrading-pandexo">The Importance of Upgrading PandExo</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">JWST Tutorial</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#editting-input-dictionaries">Editting Input Dictionaries</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#step-1-load-in-a-blank-exoplanet-dictionary">Step 1) Load in a blank exoplanet dictionary</a><ul>
@@ -302,7 +303,7 @@ common modes. Within those templates the subarrays selected are the ones
 with the lowest frame times, and the read modes selected are the ones with one frame
 per 1 group (standard). If this suits you see Option 1 below. There is additional
 fine tuning that can be done within each of these observing modes.
-As a first pass, I’d suggest skipping this for now. Then come back and fine tune after your first run.</p>
+As a first pass, I&#8217;d suggest skipping this for now. Then come back and fine tune after your first run.</p>
 <blockquote>
 <div><ul class="simple">
 <li>NIRCam F444W</li>
@@ -332,21 +333,21 @@ As a first pass, I’d suggest skipping this for now. Then come back and fine tu
 <div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">inst_dict</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">][</span><span class="s2">&quot;detector&quot;</span><span class="p">][</span><span class="s2">&quot;subarray&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;sub512&#39;</span>
 </pre></div>
 </div>
-<p>Don’t know which options are available??</p>
+<p>Don&#8217;t know which options are available??</p>
 <p>..code:: python</p>
 <blockquote>
 <div>#subarrays
-print(jdi.subarrays(‘nirspec’))
+print(jdi.subarrays(&#8216;nirspec&#8217;))
 #filters
-print(jdi.filters(‘nircam’))
+print(jdi.filters(&#8216;nircam&#8217;))
 #dispersers
-print(jdi.dispersers(‘nirspec’))</div></blockquote>
+print(jdi.dispersers(&#8216;nirspec&#8217;))</div></blockquote>
 <p>The last thing to note is that PandExo (by Default) optimizes the amount of groups
 that can fit into an integration. If you want to set your own number of groups you can
 change that too.</p>
 <p>..code:: python</p>
 <blockquote>
-<div>inst_dict[“configuration”][“detector”][“ngroup”] = 5</div></blockquote>
+<div>inst_dict[&#8220;configuration&#8221;][&#8220;detector&#8221;][&#8220;ngroup&#8221;] = 5</div></blockquote>
 </div>
 </div>
 <div class="section" id="running-pandexo-command-line">

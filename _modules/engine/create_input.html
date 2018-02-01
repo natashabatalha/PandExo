@@ -90,6 +90,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html">Pre-installation Data Download</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html#installation-for-users-with-conda">Installation for Users With Conda</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html#installation-for-users-with-pip">Installation for Users With PIP</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html#troubleshooting-common-errors">Troubleshooting-Common Errors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html#the-importance-of-upgrading-pandexo">The Importance of Upgrading PandExo</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorialjwst.html">JWST Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../jwstinput.html">Possible Instrument Input Params</a></li>
@@ -412,7 +413,7 @@
 
 
         <span class="c1">#finally compute (rp/r*)^2</span>
-        <span class="n">flux_planet</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">r_lambda</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="n">rstar</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">flux_planet</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">r_lambda</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="n">rstar</span><span class="o">**</span><span class="mi">2</span><span class="p">)[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
         <span class="n">planet</span><span class="p">[</span><span class="s1">&#39;w_unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;um&#39;</span>
         <span class="n">planet</span><span class="p">[</span><span class="s1">&#39;f_unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;rp^2/r*^2&#39;</span>
     <span class="k">else</span><span class="p">:</span> 
@@ -477,7 +478,162 @@
                     <span class="s1">&#39;model_wave&#39;</span><span class="p">:</span><span class="n">wave_planet</span><span class="p">,</span> <span class="s1">&#39;model_spec&#39;</span><span class="p">:</span> <span class="n">flux_planet</span><span class="p">,</span> <span class="s1">&#39;frac&#39;</span><span class="p">:</span><span class="n">depth_fraction</span><span class="p">}</span> 
     <span class="k">return</span> <span class="n">results</span></div>
 
+<div class="viewcode-block" id="hst_spec"><a class="viewcode-back" href="../../engine.html#engine.create_input.hst_spec">[docs]</a><span class="k">def</span> <span class="nf">hst_spec</span><span class="p">(</span><span class="n">planet</span><span class="p">,</span><span class="n">star</span><span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Calculates in transit flux </span>
+<span class="sd">    </span>
+<span class="sd">    Takes output from `outTrans`, which is the normalized stellar flux, and </span>
+<span class="sd">    creates either a transit transmission spectrum, phase curve or emission spectrum. </span>
+<span class="sd">    Magnitude </span>
+<span class="sd">  </span>
+<span class="sd">    Parameters </span>
+<span class="sd">    ----------</span>
+<span class="sd">    planet: dict</span>
+<span class="sd">        dictionary with direction to planet spectra, wavelength and flux units</span>
+<span class="sd">    star: dict</span>
+<span class="sd">        dictionary within exo_input with stellar information. Only </span>
+<span class="sd">        used when scaling Fortney Grid spectra to get (rp/r*)^2</span>
 
+<span class="sd">    Return</span>
+<span class="sd">    ------</span>
+<span class="sd">    dict </span>
+<span class="sd">        dictionary with out of transit flux, in transit flux, original model </span>
+<span class="sd">        and corresponding wavelengths</span>
+<span class="sd">    &quot;&quot;&quot;</span> 
+    
+    <span class="k">if</span> <span class="n">planet</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span><span class="s1">&#39;user&#39;</span><span class="p">:</span>
+        <span class="n">load_file</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span><span class="n">planet</span><span class="p">[</span><span class="s1">&#39;exopath&#39;</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span> <span class="n">names</span><span class="o">=</span><span class="s1">&#39;w, f&#39;</span><span class="p">)</span>   
+        <span class="c1">#get wavelength </span>
+        <span class="n">wave_planet</span> <span class="o">=</span> <span class="n">load_file</span><span class="p">[</span><span class="s1">&#39;w&#39;</span><span class="p">]</span>
+        <span class="c1">#get planet flux </span>
+        <span class="n">flux_planet</span> <span class="o">=</span> <span class="n">load_file</span><span class="p">[</span><span class="s1">&#39;f&#39;</span><span class="p">]</span>
+        
+        <span class="c1">#sort if not in ascending order </span>
+        <span class="n">sort</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">wave_planet</span><span class="p">,</span><span class="n">flux_planet</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">sort</span><span class="o">=</span> <span class="n">sort</span><span class="p">[</span><span class="n">sort</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">argsort</span><span class="p">()]</span>
+        <span class="n">wave_planet</span> <span class="o">=</span> <span class="n">sort</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">flux_planet</span> <span class="o">=</span> <span class="n">sort</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span>
+    
+    <span class="c1">############## IF USER SELECTS CONSTANT VALUE ##################   </span>
+    <span class="k">elif</span> <span class="n">planet</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;constant&#39;</span><span class="p">:</span>
+        <span class="n">rplan</span> <span class="o">=</span> <span class="p">(</span><span class="n">planet</span><span class="p">[</span><span class="s1">&#39;radius&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">Unit</span><span class="p">(</span><span class="n">planet</span><span class="p">[</span><span class="s1">&#39;r_unit&#39;</span><span class="p">]))</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">km</span><span class="p">)</span>
+        <span class="n">rstar</span> <span class="o">=</span> <span class="p">(</span><span class="n">star</span><span class="p">[</span><span class="s1">&#39;radius&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">Unit</span><span class="p">(</span><span class="n">star</span><span class="p">[</span><span class="s1">&#39;r_unit&#39;</span><span class="p">]))</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">km</span><span class="p">)</span>
+
+        <span class="c1">#constant transit depth</span>
+        <span class="k">if</span> <span class="n">planet</span><span class="p">[</span><span class="s1">&#39;f_unit&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;rp^2/r*^2&#39;</span><span class="p">:</span>
+            <span class="n">wave_planet</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">500</span><span class="p">)</span>
+            <span class="n">planet</span><span class="p">[</span><span class="s1">&#39;depth&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">rplan</span><span class="o">**</span><span class="mi">2</span> <span class="o">/</span> <span class="n">rstar</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">flux_planet</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">500</span><span class="p">)</span><span class="o">*</span><span class="mi">0</span> <span class="o">+</span> <span class="n">planet</span><span class="p">[</span><span class="s1">&#39;depth&#39;</span><span class="p">]</span>
+            <span class="n">planet</span><span class="p">[</span><span class="s1">&#39;w_unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;um&#39;</span>
+
+        <span class="c1">#constant fp/f* (using out_trans from user)</span>
+        <span class="k">elif</span> <span class="n">planet</span><span class="p">[</span><span class="s1">&#39;f_unit&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;fp/f*&#39;</span><span class="p">:</span>
+            <span class="n">planet</span><span class="p">[</span><span class="s1">&#39;w_unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;um&#39;</span>
+            <span class="n">wave_planet</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">500</span><span class="p">)</span>
+            <span class="n">flux_star</span> <span class="o">=</span> <span class="p">(</span><span class="n">bb</span><span class="o">.</span><span class="n">blackbody_nu</span><span class="p">(</span><span class="n">wave_planet</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">micron</span><span class="p">,</span> <span class="n">star</span><span class="p">[</span><span class="s1">&#39;temp&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">K</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">sr</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">mJy</span><span class="p">)</span>
+            <span class="c1">#MAKING SURE TO ADD IN SUPID PI FOR PER STERADIAN!!!!</span>
+            <span class="n">flux_planet</span> <span class="o">=</span> <span class="p">(</span><span class="n">bb</span><span class="o">.</span><span class="n">blackbody_nu</span><span class="p">(</span><span class="n">wave_planet</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">micron</span><span class="p">,</span> <span class="n">planet</span><span class="p">[</span><span class="s1">&#39;temp&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">K</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">sr</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">mJy</span><span class="p">)</span>
+            <span class="c1"># ( bb planet / pheonix sed ) * (rp/r*)^2</span>
+            <span class="n">flux_planet</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">((</span><span class="n">flux_planet</span><span class="o">/</span><span class="n">flux_star</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">rplan</span><span class="o">/</span><span class="n">rstar</span><span class="p">)</span><span class="o">**</span><span class="mf">2.0</span><span class="p">)</span>
+
+
+    <span class="c1">############## IF USER SELECTS TO PULL FROM GRID ##################</span>
+    <span class="k">elif</span> <span class="n">planet</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span><span class="s1">&#39;grid&#39;</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">db</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="s1">&#39;sqlite:///&#39;</span><span class="o">+</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;FORTGRID_DIR&#39;</span><span class="p">))</span>
+            <span class="n">header</span><span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_sql_table</span><span class="p">(</span><span class="s1">&#39;header&#39;</span><span class="p">,</span><span class="n">db</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Fortney Grid File Path is incorrect, or not initialized&#39;</span><span class="p">)</span>
+
+        <span class="c1">#radius of star</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">rstar</span> <span class="o">=</span> <span class="p">(</span><span class="n">star</span><span class="p">[</span><span class="s1">&#39;radius&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">Unit</span><span class="p">(</span><span class="n">star</span><span class="p">[</span><span class="s1">&#39;r_unit&#39;</span><span class="p">]))</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">km</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Radius of Star not supplied for scaling. Check exo_input[&#39;star&#39;][&#39;radius&#39;]&quot;</span><span class="p">)</span>
+
+        <span class="c1">#radius of planet</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">rplan</span> <span class="o">=</span> <span class="p">(</span><span class="n">planet</span><span class="p">[</span><span class="s1">&#39;radius&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">Unit</span><span class="p">(</span><span class="n">planet</span><span class="p">[</span><span class="s1">&#39;r_unit&#39;</span><span class="p">]))</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">km</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span> 
+            <span class="n">planet</span><span class="p">[</span><span class="s1">&#39;radius&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.25</span><span class="o">*</span><span class="n">c</span><span class="o">.</span><span class="n">R_jup</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">km</span><span class="p">)</span>
+            <span class="n">rplan</span> <span class="o">=</span> <span class="n">planet</span><span class="p">[</span><span class="s1">&#39;radius&#39;</span><span class="p">]</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Default Planet Radius of 1.25 Rj given&#39;</span><span class="p">)</span>
+
+        <span class="c1">#clouds </span>
+        <span class="k">if</span> <span class="n">planet</span><span class="p">[</span><span class="s1">&#39;cloud&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;flat&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> 
+            <span class="n">planet</span><span class="p">[</span><span class="s1">&#39;flat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">planet</span><span class="p">[</span><span class="s1">&#39;cloud&#39;</span><span class="p">][</span><span class="mi">4</span><span class="p">:])</span>
+            <span class="n">planet</span><span class="p">[</span><span class="s1">&#39;ray&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span> 
+        <span class="k">elif</span> <span class="n">planet</span><span class="p">[</span><span class="s1">&#39;cloud&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;ray&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> 
+            <span class="n">planet</span><span class="p">[</span><span class="s1">&#39;ray&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">planet</span><span class="p">[</span><span class="s1">&#39;cloud&#39;</span><span class="p">][</span><span class="mi">3</span><span class="p">:])</span>
+            <span class="n">planet</span><span class="p">[</span><span class="s1">&#39;flat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span> 
+        <span class="k">elif</span> <span class="nb">int</span><span class="p">(</span><span class="n">planet</span><span class="p">[</span><span class="s1">&#39;cloud&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> 
+            <span class="n">planet</span><span class="p">[</span><span class="s1">&#39;flat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span> 
+            <span class="n">planet</span><span class="p">[</span><span class="s1">&#39;ray&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>     
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">planet</span><span class="p">[</span><span class="s1">&#39;flat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span> 
+            <span class="n">planet</span><span class="p">[</span><span class="s1">&#39;ray&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span> 
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;No cloud parameter not specified, default no clouds added&#39;</span><span class="p">)</span>
+        
+        <span class="c1">#chemistry </span>
+        <span class="k">if</span> <span class="n">planet</span><span class="p">[</span><span class="s1">&#39;chem&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;noTiO&#39;</span><span class="p">:</span> 
+            <span class="n">planet</span><span class="p">[</span><span class="s1">&#39;noTiO&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">planet</span><span class="p">[</span><span class="s1">&#39;eqchem&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span> 
+        <span class="k">if</span> <span class="n">planet</span><span class="p">[</span><span class="s1">&#39;chem&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;eqchem&#39;</span><span class="p">:</span> 
+            <span class="n">planet</span><span class="p">[</span><span class="s1">&#39;noTiO&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">planet</span><span class="p">[</span><span class="s1">&#39;eqchem&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span> 
+            <span class="c1">#grid does not allow clouds for cases with TiO</span>
+            <span class="n">planet</span><span class="p">[</span><span class="s1">&#39;flat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span> 
+            <span class="n">planet</span><span class="p">[</span><span class="s1">&#39;ray&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span> 
+
+        <span class="c1">#we are only using gravity of 25 and scaling by mass from there </span>
+        <span class="n">fort_grav</span> <span class="o">=</span> <span class="mf">25.0</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">m</span><span class="o">/</span><span class="n">u</span><span class="o">.</span><span class="n">s</span><span class="o">/</span><span class="n">u</span><span class="o">.</span><span class="n">s</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">header</span><span class="o">.</span><span class="n">loc</span><span class="p">[(</span><span class="n">header</span><span class="o">.</span><span class="n">gravity</span><span class="o">==</span><span class="n">fort_grav</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">header</span><span class="o">.</span><span class="n">temp</span><span class="o">==</span><span class="n">planet</span><span class="p">[</span><span class="s1">&#39;temp&#39;</span><span class="p">])</span>
+                           <span class="o">&amp;</span> <span class="p">(</span><span class="n">header</span><span class="o">.</span><span class="n">noTiO</span><span class="o">==</span><span class="n">planet</span><span class="p">[</span><span class="s1">&#39;noTiO&#39;</span><span class="p">])</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">header</span><span class="o">.</span><span class="n">ray</span><span class="o">==</span><span class="n">planet</span><span class="p">[</span><span class="s1">&#39;ray&#39;</span><span class="p">])</span> <span class="o">&amp;</span>
+                           <span class="p">(</span><span class="n">header</span><span class="o">.</span><span class="n">flat</span><span class="o">==</span><span class="n">planet</span><span class="p">[</span><span class="s1">&#39;flat&#39;</span><span class="p">])]</span>
+        <span class="n">wave_planet</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">read_sql_table</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">db</span><span class="p">)[</span><span class="s1">&#39;wavelength&#39;</span><span class="p">])[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">r_lambda</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">read_sql_table</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">db</span><span class="p">)[</span><span class="s1">&#39;radius&#39;</span><span class="p">])</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">km</span>
+        <span class="n">z_lambda</span> <span class="o">=</span> <span class="n">r_lambda</span><span class="o">-</span> <span class="p">(</span><span class="mf">1.25</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">R_jup</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">km</span><span class="p">)</span> <span class="c1">#all fortney models have fixed 1.25 radii</span>
+
+        <span class="c1">#scale with planetary mass </span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">mass</span> <span class="o">=</span> <span class="p">(</span><span class="n">planet</span><span class="p">[</span><span class="s1">&#39;mass&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">Unit</span><span class="p">(</span><span class="n">planet</span><span class="p">[</span><span class="s1">&#39;m_unit&#39;</span><span class="p">]))</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">kg</span><span class="p">)</span>
+            <span class="n">gravity</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">G</span><span class="o">*</span><span class="p">(</span><span class="n">mass</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">rplan</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">m</span><span class="p">))</span><span class="o">**</span><span class="mf">2.0</span> <span class="c1">#convert radius to m for gravity units</span>
+            <span class="c1">#scale lambbda (this technically ignores the fact that scaleheight is altitude dependent)</span>
+            <span class="c1">#therefore, it will not be valide for very very low gravities</span>
+            <span class="n">z_lambda</span> <span class="o">=</span> <span class="n">z_lambda</span><span class="o">*</span><span class="n">fort_grav</span><span class="o">/</span><span class="n">gravity</span>
+        <span class="k">except</span><span class="p">:</span> 
+            <span class="c1">#keep original z lambda </span>
+            <span class="n">gravity</span><span class="o">=</span><span class="mf">25.0</span>
+            <span class="n">z_lambda</span> <span class="o">=</span> <span class="n">z_lambda</span><span class="o">*</span><span class="n">fort_grav</span><span class="o">/</span><span class="n">fort_grav</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Default Planet Gravity of 25 m/s2 given&#39;</span><span class="p">)</span>  
+        
+        <span class="c1">#create new wavelength dependent R based on scaled ravity</span>
+        <span class="n">r_lambda</span> <span class="o">=</span> <span class="n">z_lambda</span> <span class="o">+</span> <span class="n">rplan</span>
+
+
+        <span class="c1">#finally compute (rp/r*)^2</span>
+        <span class="n">flux_planet</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">r_lambda</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="n">rstar</span><span class="o">**</span><span class="mi">2</span><span class="p">)[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">planet</span><span class="p">[</span><span class="s1">&#39;w_unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;um&#39;</span>
+        <span class="n">planet</span><span class="p">[</span><span class="s1">&#39;f_unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;rp^2/r*^2&#39;</span>
+    <span class="k">else</span><span class="p">:</span> 
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Incorrect Planet Type. Options are &#39;user&#39;,&#39;constant&#39;,&#39;grid&#39;&quot;</span><span class="p">)</span> 
+
+    <span class="c1">#Convert wave to micron </span>
+    <span class="k">if</span> <span class="n">planet</span><span class="p">[</span><span class="s1">&#39;w_unit&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;um&#39;</span><span class="p">:</span>
+        <span class="n">wave_planet</span> <span class="o">=</span> <span class="n">wave_planet</span>
+    <span class="k">elif</span> <span class="n">planet</span><span class="p">[</span><span class="s1">&#39;w_unit&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;nm&#39;</span><span class="p">:</span>
+        <span class="n">wave_planet</span> <span class="o">=</span> <span class="n">wave_planet</span><span class="o">*</span><span class="mf">1e-3</span>
+    <span class="k">elif</span> <span class="n">planet</span><span class="p">[</span><span class="s1">&#39;w_unit&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;cm&#39;</span><span class="p">:</span>
+        <span class="n">wave_planet</span> <span class="o">=</span> <span class="n">wave_planet</span><span class="o">*</span><span class="mf">1e4</span>
+    <span class="k">elif</span> <span class="n">planet</span><span class="p">[</span><span class="s1">&#39;w_unit&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Angs&#39;</span> <span class="p">:</span>
+        <span class="n">wave_planet</span> <span class="o">=</span> <span class="n">wave_planet</span><span class="o">*</span><span class="mf">1e-4</span>
+    <span class="k">elif</span> <span class="n">planet</span><span class="p">[</span><span class="s1">&#39;w_unit&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Hz&#39;</span> <span class="p">:</span>
+        <span class="n">wave_planet</span> <span class="o">=</span> <span class="mf">3e17</span><span class="o">/</span><span class="n">wave_planet</span>
+    <span class="k">else</span><span class="p">:</span> 
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Units are not correct. Pick um, nm, cm, Angs or sec.&#39;</span><span class="p">)</span>
+
+    
+    <span class="k">return</span> <span class="n">wave_planet</span><span class="p">,</span> <span class="n">flux_planet</span></div>
 </pre></div>
 
            </div>
