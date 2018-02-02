@@ -13,24 +13,24 @@ echo 'export PYSYN_CDBS="$USRDIR/pysynphot_data"' >>~/.bash_profile
 
 ############ BLOCK TO SET PANDEIA REFERENCE DATA #########################
 
-tar -xvf pandeia_data-1.1.1.tar.gz || tar -xvf pandeia_data-1.1.1.tar
-mv pandeia_data-1.1.1 $USRDIR
-echo 'export pandeia_refdata="$USRDIR/pandeia_data-1.1.1"' >>~/.bash_profile
+tar -xvf pandeia_data-1.2.tar.gz || tar -xvf pandeia_data-1.2.tar
+mv pandeia_data $USRDIR
+echo 'export pandeia_refdata="$USRDIR/pandeia_data"' >>~/.bash_profile
 
 ##############Make sure your bash profile is sourced
 source ~/.bash_profile
-
-######### Install PandExo Engine, which will also install Pandeia##############
-pip install pandexo.engine 
 
 ########### Configure Conda to find STScI packages ###########
 conda config --add channels http://ssb.stsci.edu/astroconda
 
 ########### Instal conda/stsci specific packages
 conda install pyfftw
-
-conda install numpy synphot joblib scipy astropy pyfftw pysynphot photutils
+conda install numpy synphot joblib scipy astropy pyfftw pysynphot photutils sphinx=1.5.6
 conda install bokeh=0.12.6
+conda install sphinx=1.5.6
+
+######### Install PandExo Engine, which will also install Pandeia##############
+pip install pandexo.engine 
 
 ######### Try multiprocessing for 2.7 users##########
 conda install multiprocessing || echo 'OKAY that Multiprocessing not found. Python 3 user'
