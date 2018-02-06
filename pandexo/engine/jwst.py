@@ -282,11 +282,11 @@ def compute_full_sim(dictinput):
     rawstuff = {
                 'electrons_out':photon_out_bin*nocc, 
                 'electrons_in':photon_in_bin*nocc,
-                'var_in':varin*nocc, 
-                'var_out':varout*nocc,
+                'var_in':var_in_bin*nocc, 
+                'var_out':var_out_bin*nocc,
                 'e_rate_out':photon_out_bin/to,
                 'e_rate_in':photon_out_bin/ti,
-                'wave':w,
+                'wave':wbin,
                 'error_no_floor':error_spec, 
                 'rn[out,in]':result['rn[out,in]'],
                 'bkg[out,in]':result['bkg[out,in]']
