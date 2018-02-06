@@ -132,19 +132,43 @@ Finally try to run the test file to see if there are any additional problems:
 
 Hopefully you have had success but if not the most likely error you will get is the following:
 
-COORDS.PY: TypeError: 'float' object cannot be interpreted as an index
-```````````````````````````````````````````````````````````````````````
-This is an error within Pandeia, which has not yet been fixed by STScI folk. You can easily fix it by finding where the file /pandeia/engine/coords.py is and changing line 36:
+Troubleshooting-Common Errors
+=============================
 
-.. code-block:: python 
-   
-    ones = np.ones((ny, nx))
+RecursionError: maximum recursion depth exceeded while calling a Python object
+``````````````````````````````````````````````````````````````````````````````
 
-To this: 
+There is a known bug with Python 3.6 and Sphinx <1.6. Before updating or installing pandexo do the following:
 
-.. code-block:: python
+PIP USERS:
 
-    ones = np.ones((int(ny), int(nx)))
+.. code-block:: bash 
+
+    pip install sphinx==1.5.6
+
+CONDA USERS:
+
+.. code-block:: bash 
+
+    conda install sphinx=1.5.6
+
+TypeError: super() argument 1 must be type
+``````````````````````````````````````````
+
+This is the same error above with Sphinx, but for Python 2.7 users. The fix is the same: 
+
+PIP USERS:
+
+.. code-block:: bash 
+
+    pip install sphinx==1.5.6
+
+CONDA USERS:
+
+.. code-block:: bash 
+
+    conda install sphinx=1.5.6
+    
 
 The Importance of Upgrading PandExo
 ===================================

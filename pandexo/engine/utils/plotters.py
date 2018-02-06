@@ -489,7 +489,7 @@ def create_component_hst(result_dict):
     
     eventType = result_dict['calc_start_window']['eventType'] 
 
-    if eventType=='tranist':
+    if eventType=='transit':
         y_axis = '(Rp/R*)^2'
     elif eventType =='eclipse':
         y_axis='Fp/F*'

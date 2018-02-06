@@ -55,7 +55,8 @@ setup(
           'photutils',
           'astropy',
           'pysynphot',
-          'sqlalchemy'
+          'sqlalchemy',
+          'sphinx==1.5'
           ],
     entry_points = {
         'console_scripts':

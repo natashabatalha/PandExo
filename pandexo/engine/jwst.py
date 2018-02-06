@@ -781,7 +781,7 @@ def bin_wave_to_R(w, R):
         else:
             tracker = max(w)
             wave += [tracker]
-    return wave
+    return np.array(wave)
     
 def uniform_tophat_sum(newx,x, y):
     """Adapted from Mike R. Line to rebin spectra
