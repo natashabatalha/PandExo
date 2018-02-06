@@ -114,21 +114,20 @@ def create_component_jwst(result_dict):
             var var_in = sdata['var_in'];
             var var_out = sdata['var_out'];
 
-            var f = wbin.get('value');
+            var wbin = wbin.get('value');
             var ntran = ntran.get('value');
-
-            var wlength = Math.pow(10.0,f);
 
             var ind = [];
             ind.push(0);
-            var start = 0;
+            var start = 1;
 
 
             for (i = 0; i < x.length-1; i++) {
-                if (x[i+1] - x[start] >= wlength) {
+                if (start == wbin) {
                     ind.push(i+1);
-                    start = i;
+                    start =0;
                 }
+                start = start+1;
             }
 
             if (ind[ind.length-1] != x.length) {
@@ -197,7 +196,7 @@ def create_component_jwst(result_dict):
 
     #var_tot = (frac/electrons_out)**2.0 * var_in + (electrons_in*frac/electrons_out**2.0)**2.0 * var_out
 
-    sliderWbin =  Slider(title="binning", value=np.log10(x[1]-x[0]), start=np.log10(x[1]-x[0]), end=np.log10(max(x)/2.0), step= .05, callback=callback)
+    sliderWbin =  Slider(title="# pixels to bin", value=1, start=1, end=20, step= 1, callback=callback)
     callback.args["wbin"] = sliderWbin
     sliderTrans =  Slider(title="Num Trans", value=noccultations, start=1, end=50, step= 1, callback=callback)
     callback.args["ntran"] = sliderTrans
@@ -249,14 +248,91 @@ def create_component_jwst(result_dict):
     y = y[~np.isnan(y)]    
     ymed = np.median(y)
 
+    source2 = ColumnDataSource(data=dict(x=x, y=y,nocc=x*0+noccultations))
+    original2 = ColumnDataSource(data=dict(x=x, y=y,nocc=x*0+noccultations))
 
     plot_noise_1d1 = Figure(tools=TOOLS,#responsive=True,
                          x_axis_label=x_axis_label,
                          y_axis_label='Spectral Precision (ppm)', title="Spectral Precision",
                          plot_width=800, plot_height=300, y_range = [0,2.0*ymed])
     ymed = np.median(y)
-    plot_noise_1d1.circle(x, y, line_width = 4, alpha = .7)
-    tab4 = Panel(child=plot_noise_1d1, title="Precision")
+    plot_noise_1d1.circle('x', 'y', line_width = 4, alpha = .7, source=source2)
+
+    callback2 = CustomJS(args=dict(source=source2, original=original2), code="""
+            // Grab some references to the data
+            var sdata = source.get('data');
+            var odata = original.get('data');
+
+            // Create copies of the original data, store them as the source data
+            sdata['x'] = odata['x'].slice(0);
+            sdata['y'] = odata['y'].slice(0);
+
+            // Create some variables referencing the source data
+            var x = sdata['x'];
+            var y = sdata['y'];
+
+            var og_ntran = sdata['nocc'];
+
+            var wbin = wbin.get('value');
+            var ntran = ntran.get('value');
+
+            var ind = [];
+            ind.push(0);
+            var start = 1;
+
+
+            for (i = 0; i < x.length-1; i++) {
+                if (start == wbin) {
+                    ind.push(i+1);
+                    start =0;
+                }
+                start = start+1;
+            }
+
+            if (ind[ind.length-1] != x.length) {
+                ind.push(x.length);
+            }
+
+            var xout = [];
+            var yout = [];
+
+            var xslice = []; 
+            var yslice = [];
+
+            function addpow(tot, num) {
+                return tot+ Math.pow(num,2);
+            }
+            function add(a, b) {
+                return a+b;
+            }
+            for (i = 0; i < ind.length-1; i++) {
+
+                xslice = x.slice(ind[i],ind[i+1]);
+                yslice = y.slice(ind[i],ind[i+1]);
+
+                xout.push(xslice.reduce(add, 0)/xslice.length);
+                yout.push(Math.sqrt(yslice.reduce(addpow, 0))/yslice.length);
+
+                xslice = [];
+                yslice = [];
+            }
+            
+            var new_err = 1.0;
+            for (i = 0; i < x.length; i++) {
+                new_err = yout[i]*Math.sqrt(og_ntran[i]/ntran);
+                x[i] = xout[i];
+                y[i] = new_err       
+            }
+
+            source.trigger('change');
+        """)    
+
+    sliderWbin2 =  Slider(title="# pixels to bin", value=1, start=1, end=20, step= 1, callback=callback2)
+    callback2.args["wbin"] = sliderWbin2   
+    sliderTrans2 =  Slider(title="Num Trans", value=noccultations, start=1, end=50, step= 1, callback=callback2)
+    callback2.args["ntran"] = sliderTrans2
+    noise_lay = column(row(sliderWbin2, sliderTrans2) , plot_noise_1d1)
+    tab4 = Panel(child=noise_lay, title="Precision")
 
     #Not happy? Need help picking a different mode? 
     plot_spectrum2 = Figure(plot_width=800, plot_height=300, x_range=xlims,y_range=ylims, tools=TOOLS,
