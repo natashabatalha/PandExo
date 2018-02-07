@@ -242,6 +242,7 @@ def compute_full_sim(dictinput):
         var_out_bin = varout
         var_out_bin = var_out_bin[photon_out_bin>0]
         photon_out_bin = photon_out_bin[photon_out_bin>0]
+        
     
     if calculation == 'phase_spec':
         to = (timing["APT: Num Groups per Integration"]-1)*tframe
@@ -422,15 +423,16 @@ def compute_timing(m,transit_duration,expfact_out,noccultations):
         #there is a hard limit to the maximum number groups. 
         #if you exceed that limit, set it to the maximum value instead.
         #also set another check for saturation
-    
+
         if ngroups_per_int > max_ngroup:
             ngroups_per_int = max_ngroup
             flag_high = "Groups/int > max num of allowed groups"
  
-        if (ngroups_per_int < mingroups) or (ngroups_per_int == np.nan):
+        if (ngroups_per_int < mingroups) | np.isnan(ngroups_per_int):
             ngroups_per_int = mingroups  
             nframes_per_int = mingroups
             flag_default = "NGROUPS<"+str(mingroups)+"SET TO NGROUPS="+str(mingroups)
+
     elif 'ngroups_per_int' in locals(): 
         #if it maxexptime_per_int been defined then set nframes per int 
         nframes_per_int = ngroups_per_int*(nframe+nskip)
@@ -442,7 +444,8 @@ def compute_timing(m,transit_duration,expfact_out,noccultations):
         ngroups_per_int = mingroups
         nframes_per_int = mingroups
         flag_default = "Something went wrong. SET TO NGROUPS="+str(mingroups)
-                
+
+          
     #the integration time is related to the number of groups and the time of each 
     #group 
     exptime_per_int = ngroups_per_int*tframe
