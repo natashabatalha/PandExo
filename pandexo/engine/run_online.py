@@ -82,7 +82,7 @@ class BaseHandler(tornado.web.RequestHandler):
     """
     Logic to handle user information and database access might go here.
     """
-    executor = ProcessPoolExecutor(max_workers=4)
+    executor = ProcessPoolExecutor(max_workers=16)
     buffer = OrderedDict()
 
     def _get_task_response(self, id):
@@ -201,7 +201,7 @@ class BaseHandler(tornado.web.RequestHandler):
                                           cookie=self.get_cookie("pandexo_user"))
 
         # Only allow 100 tasks **globally**. This will delete old tasks first.
-        if len(self.buffer) > 15:
+        if len(self.buffer) > 100:
             self.buffer.popitem(last=False)
             
 
