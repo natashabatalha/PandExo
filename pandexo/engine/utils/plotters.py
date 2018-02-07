@@ -196,7 +196,7 @@ def create_component_jwst(result_dict):
 
     #var_tot = (frac/electrons_out)**2.0 * var_in + (electrons_in*frac/electrons_out**2.0)**2.0 * var_out
 
-    sliderWbin =  Slider(title="# pixels to bin", value=1, start=1, end=20, step= 1, callback=callback)
+    sliderWbin =  Slider(title="# pixels to bin", value=1, start=1, end=50, step= 1, callback=callback)
     callback.args["wbin"] = sliderWbin
     sliderTrans =  Slider(title="Num Trans", value=noccultations, start=1, end=50, step= 1, callback=callback)
     callback.args["ntran"] = sliderTrans
@@ -327,7 +327,7 @@ def create_component_jwst(result_dict):
             source.trigger('change');
         """)    
 
-    sliderWbin2 =  Slider(title="# pixels to bin", value=1, start=1, end=20, step= 1, callback=callback2)
+    sliderWbin2 =  Slider(title="# pixels to bin", value=1, start=1, end=50, step= 1, callback=callback2)
     callback2.args["wbin"] = sliderWbin2   
     sliderTrans2 =  Slider(title="Num Trans", value=noccultations, start=1, end=50, step= 1, callback=callback2)
     callback2.args["ntran"] = sliderTrans2
