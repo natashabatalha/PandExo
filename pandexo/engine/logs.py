@@ -2,13 +2,14 @@ import os
 import pandas as pd
 from sqlalchemy import *
 import datetime
-try:
-    logs = os.environ.get('pandexo_logs')
-    engine = create_engine('sqlite:///' + os.path.join(logs))
-except: 
-    pass 
+
 def jwst_log(final):
     '''Logging for Website;Used for tracking usage;Only storing instrument data'''
+    try:
+        logs = os.environ.get('pandexo_logs')
+        engine = create_engine('sqlite:///' + os.path.join(logs))
+    except: 
+        pass 
     instrument = final['pandeia_input']['configuration']['instrument']['instrument']
     mode = final['pandeia_input']['configuration']['instrument']['mode']
     ff = final['pandeia_input']['configuration']['instrument']['filter']
@@ -30,6 +31,11 @@ def jwst_log(final):
 
 def hst_log(final):
     '''Logging for Website;Used for tracking usage;Used for tracking usage;Only storing instrument data'''
+    try:
+        logs = os.environ.get('pandexo_logs')
+        engine = create_engine('sqlite:///' + os.path.join(logs))
+    except: 
+        pass 
     instrument = final['pandeia_input']['configuration']['instrument']['instrument']
     subarray = final['pandeia_input']['configuration']['detector']['subarray']
     nsamp = final['pandeia_input']['configuration']['detector']['nsamp']
