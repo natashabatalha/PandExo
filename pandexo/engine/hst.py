@@ -428,7 +428,7 @@ def calc_start_window(eventType, rms, ptsOrbit, numOrbits, depth, inc, aRs, peri
     trmodel2    = m.light_curve(params)
     obsphase1   = []
     obsphase2   = []
-    for i in range(numOrbits):
+    for i in range(int(numOrbits)):
         obsphase1   = np.r_[obsphase1, np.linspace(minphase+hstperiod/period*i,minphase+hstperiod/period*i+hstperiod/period/2,ptsOrbit)]
         obsphase2   = np.r_[obsphase2, np.linspace(maxphase+hstperiod/period*i,maxphase+hstperiod/period*i+hstperiod/period/2,ptsOrbit)]
     m           = batman.TransitModel(params, obsphase1)
@@ -562,7 +562,7 @@ def compute_sim_hst(dictinput):
         raise Exception('Units are not correct. Pick rp^2/r*^2 or fp/f*')
     
     a = wfc3_TExoNS(dictinput)
-    b = calc_start_window(eventType, a['light_curve_rms'], a['nframes_per_orb'], numorbits, depth, inc, aRs, period, windowSize, ecc, w, useFirstOrbit=useFirstOrbit)
+    b = calc_start_window(eventType, a['light_curve_rms'], a['nframes_per_orb'], a['info']['Number of HST orbits'], depth, inc, aRs, period, windowSize, ecc, w, useFirstOrbit=useFirstOrbit)
     c = planet_spec(pandexo_input['planet'], pandexo_input['star'], w_unit, disperser, a['spec_error'], nchan,smooth=20) 
     info_div = create_out_div(a['info'], b['minphase'],b['maxphase'])
     
