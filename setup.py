@@ -53,7 +53,7 @@ setup(
           'pandeia.engine',
           'batman-package',
           'photutils',
-          'astropy',
+          'astropy==2.0.2',
           'pysynphot',
           'sqlalchemy',
           'sphinx==1.5'
