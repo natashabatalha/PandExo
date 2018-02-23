@@ -153,7 +153,7 @@ def compute_full_sim(dictinput):
         print("Optimization Reqested: Computing Duty Cycle")
         m = {"maxexptime_per_int":compute_maxexptime_per_int(pandeia_input, sat_level) , 
             "tframe":tframe,"nframe":nframe,"mingroups":mingroups,"nskip":nskip}
-        print("Finished Duty Cycle Calc", print(m["maxexptime_per_int"]))
+        print("Finished Duty Cycle Calc")
 
     #calculate all timing info
     timing, flags = compute_timing(m,transit_duration,expfact_out,noccultations)
