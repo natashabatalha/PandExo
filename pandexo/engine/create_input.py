@@ -25,7 +25,11 @@ def outTrans(input) :
     dict 
         contains wave and flux_out_trans
     """ 
-    
+
+    ref_wave = float(input['ref_wave'])
+    mag = float(input['mag'])
+
+    ################# USER ####################################
     if input['type'] == 'user':
         star = np.genfromtxt(input['starpath'], dtype=(float, float), names='w, f') #pyfits.getdata(input['starpath'],1)
         #get flux 
@@ -38,80 +42,83 @@ def outTrans(input) :
         sort= sort[sort[:,0].argsort()]
         wave = sort[:,0]
         flux = sort[:,1] 
-        sp=np.nan
-        
+        if input['w_unit'] == 'um':
+            PANDEIA_WAVEUNITS = 'um'
+            
+        elif input['w_unit'] == 'nm':
+            PANDEIA_WAVEUNITS = 'nm'
+      
+        elif input['w_unit'] == 'cm' :
+            PANDEIA_WAVEUNITS = 'cm'
+     
+        elif input['w_unit'] == 'Angs' :
+            PANDEIA_WAVEUNITS = 'angstrom'
+
+        elif input['w_unit'] == 'Hz' :
+            PANDEIA_WAVEUNITS = 'Hz'
+
+        else: 
+            raise Exception('Units are not correct. Pick um, nm, cm, hz, or Angs')        
+
+        #convert to photons/s/nm/m^2 for flux normalization based on 
+        #http://www.gemini.edu/sciops/instruments/integration-time-calculators/itc-help/source-definition
+        if input['f_unit'] == 'Jy':
+            PANDEIA_FLUXUNITS = 'jy' 
+        elif input['f_unit'] == 'FLAM' :
+            PANDEIA_FLUXUNITS = 'FLAM'
+        else: 
+            raise Exception('Units are not correct. Pick FLAM or Jy')
+
+        sp = psyn.ArraySpectrum(wave, flux, waveunits=PANDEIA_WAVEUNITS, fluxunits=PANDEIA_FLUXUNITS)        #Convert evrything to nanometer for converstion based on gemini.edu  
+        sp.convert("nm")
+        sp.convert('jy')
+
+    ############ PHOENIX ################################################
     elif input['type'] =='phoenix':
         #make sure metal is not out of bounds
         if input['metal'] > 0.5: input['metal'] = 0.5
         sp = psyn.Icat("phoenix", input['temp'], input['metal'], input['logg'])
-        sp.convert("microns")
+        sp.convert("nm")
         sp.convert("jy")
         wave = sp.wave
         flux = sp.flux
-        input['w_unit'] ='um'
-        input['f_unit'] = 'Jy'
+        input['w_unit'] ='nm'
+        input['f_unit'] = 'jy'
         
     else: 
         raise Exception('Wrong input type for stellar spectra')
-        
-    ref_wave = float(input['ref_wave'])
-    ref_wave = ref_wave*1e3
     
-    
-        #Convert evrything to nanometer for converstion based on gemini.edu  
-    if input['w_unit'] == 'um':
-        wave = wave*1e3
-        
-    elif input['w_unit'] == 'nm':
-        wave = wave
-  
-    elif input['w_unit'] == 'cm' :
-        wave = wave*1e7
- 
-    elif input['w_unit'] == 'Angs' :
-        wave = wave*1e-1
 
-    elif input['w_unit'] == 'Hz' :
-        wave = 3e17/wave
+    ############ NORMALIZATION ################################################
+    refdata = os.environ.get("pandeia_refdata")
 
-    else: 
-        raise Exception('Units are not correct. Pick um, nm, cm or Angs')
+    all_bps = {"H": 'bessell_h_004_syn.fits',
+                 "J":'bessell_j_003_syn.fits' ,
+                 "K": 'bessell_k_003_syn.fits'}
 
-    #convert to photons/s/nm/m^2 for flux normalization based on 
-    #http://www.gemini.edu/sciops/instruments/integration-time-calculators/itc-help/source-definition
-    if input['f_unit'] == 'Jy':
-        flux = flux*1.509e7/wave #eq. C
-        
-    elif input['f_unit'] == 'W/m2/um':
-        flux = flux*wave/1.988e-13 #eq. D 
-    elif input['f_unit'] == 'FLAM' :
-        flux = flux*wave/1.988e-14 #eq. E
-    elif input['f_unit'] == 'erg/s/cm2/Hz':
-        flux = flux*1.509e30/wave #*4.0*np.pi
-    else: 
-        raise Exception('Units are not correct. Pick W/m2/um, FLAM, Jy, or erg/s/cm2/Hz')
-    
-    #normalize to specific mag 
-    
-    mag = float(input['mag'])
-    norm_flux = np.interp(ref_wave, wave, flux) 
-
-    #get zero point for J H and K 
-    if (ref_wave <= 1.3e3) & (ref_wave >= 1.2e3):
-        zeropoint = 1.97e7
-    elif (ref_wave <= 1.7e3) & (ref_wave >= 1.6e3):
-        zeropoint = 9.6e6
-    elif (ref_wave <= 2.3e3) & (ref_wave >= 2.1e3):
-        zeropoint = 4.5e6
+    if (ref_wave <= 1.3) & (ref_wave >= 1.2):
+        filt = 'J'
+    elif (ref_wave <= 1.7) & (ref_wave >= 1.6):
+        filt = 'H'
+    elif (ref_wave <= 2.3) & (ref_wave >= 2.1):
+        filt = 'K'
     else:
         raise Exception('Only J H and K zeropoints are included')
 
-    flux = flux/norm_flux*zeropoint*10**(-mag/2.5)
-    
-    #return to Pandeia units... milliJy and micron 
-    flux_out_trans = flux*wave/1.509e7*1e3 #inverse of eq. C times 1e3 to get to milliJy instead of Jy 
-    wave = wave*1e-3  #nm to micron
+    bp_path = os.path.join(refdata, "normalization", "bandpass", all_bps[filt])
+    bp = psyn.FileBandpass(bp_path)
 
+    sp.convert('angstroms')
+    bp.convert('angstroms')
+
+    rn_sp = sp.renorm(mag, 'vegamag', bp)
+
+
+    rn_sp.convert("microns")
+    rn_sp.convert("mjy")
+
+    flux_out_trans = rn_sp.flux
+    wave = rn_sp.wave
     return {'flux_out_trans': flux_out_trans, 'wave': wave,'phoenix':sp} 
 
 
