@@ -43,8 +43,8 @@ def compute_full_sim(dictinput):
     Examples
     --------  
       
-    >>> from pandexo.engine.jwst import compute_full_sim 
-    >>> from pandexo.engine.justplotit import jwst_1d_spec
+    >>> from .pandexo.engine.jwst import compute_full_sim 
+    >>> from .pandexo.engine.justplotit import jwst_1d_spec
     >>> a = compute_full_sim({"pandeia_input": pandeiadict, "pandexo_input":exodict})
     >>> jwst_1d_spec(a)
     .. image:: 1d_spec.png
@@ -137,8 +137,10 @@ def compute_full_sim(dictinput):
             expfact_out = pandexo_input['observation']['baseline'] 
         elif pandexo_input['observation']['baseline_unit'] =='total':
             expfact_out = transit_duration/( pandexo_input['observation']['baseline'] - transit_duration)
+        elif pandexo_input['observation']['baseline_unit'] =='total_hrs':
+            expfact_out = transit_duration/( pandexo_input['observation']['baseline']*3600.0 - transit_duration)
         else: 
-            raise Exception("Wrong units for baseine: either 'frac' or 'total' accepted")
+            raise Exception("Wrong units for baseine: either 'frac' or 'total' or 'total_hrs' accepted")
 
     #add to pandeia input 
     pandeia_input['scene'][0]['spectrum']['sed']['spectrum'] = out_spectrum
@@ -151,7 +153,7 @@ def compute_full_sim(dictinput):
         print("Optimization Reqested: Computing Duty Cycle")
         m = {"maxexptime_per_int":compute_maxexptime_per_int(pandeia_input, sat_level) , 
             "tframe":tframe,"nframe":nframe,"mingroups":mingroups,"nskip":nskip}
-        print("Finished Duty Cycle Calc")
+        print("Finished Duty Cycle Calc", print(m["maxexptime_per_int"]))
 
     #calculate all timing info
     timing, flags = compute_timing(m,transit_duration,expfact_out,noccultations)
@@ -336,17 +338,20 @@ def compute_maxexptime_per_int(pandeia_input, sat_level):
     
     report = perform_calculation(pandeia_input, dict_report=False)
     report_dict = report.as_dict() 
+    
+    # count rate on the detector in e-/second/pixel
+    #det = report_dict['2d']['detector']
+    det = report.signal.rate_plus_bg_list[0]['fp_pix']
 
-    
-    # count rate on the detector in e-/second 
-    det = report_dict['2d']['detector']
-    
     timeinfo = report_dict['information']['exposure_specification']
     #totaltime = timeinfo['tgroup']*timeinfo['ngroup']*timeinfo['nint']
     
     maxdetvalue = np.max(det)
+
+
     #maximum time before saturation per integration 
     #based on user specified saturation level
+
     try:
         maxexptime_per_int = sat_level/maxdetvalue
     except: 
@@ -386,7 +391,7 @@ def compute_timing(m,transit_duration,expfact_out,noccultations):
     Examples
     --------
     >>> timing, flags = compute_timing(m, 2*60.0*60.0, 1.0, 1.0)
-    >>> print(timing.keys())
+    >>> print((list(timing.keys())))
     ['Number of Transits', 'Num Integrations Out of Transit', 'Num Integrations In Transit', 
     'APT: Num Groups per Integration', 'Seconds per Frame', 'Observing Efficiency (%)', 'On Source Time(sec)', 
     'Exposure Time Per Integration (secs)', 'Reset time Plus 30 min TA time (hrs)',
@@ -754,7 +759,7 @@ def bin_wave_to_R(w, R):
     --------
     
     >>> newwave = bin_wave_to_R(np.linspace(1,2,1000), 10)
-    >>> print(len(newwave))
+    >>> print((len(newwave)))
     11
     """
     wave = []
@@ -808,7 +813,7 @@ def uniform_tophat_sum(newx,x, y):
     Examples 
     --------
         
-    >>> from pandexo.engine.jwst import uniform_tophat_sum
+    >>> from .pandexo.engine.jwst import uniform_tophat_sum
     >>> oldgrid = np.linspace(1,3,100)
     >>> y = np.zeros(100)+10.0
     >>> newy = uniform_tophat_sum(np.linspace(2,3,3), oldgrid, y)
@@ -970,3 +975,4 @@ def as_dict(out, both_spec ,binned, timing, mag, sat_level, warnings, punit, unb
     return final_dict
 
     
+
