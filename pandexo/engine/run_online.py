@@ -201,7 +201,7 @@ class BaseHandler(tornado.web.RequestHandler):
                                           cookie=self.get_cookie("pandexo_user"))
 
         # Only allow 100 tasks **globally**. This will delete old tasks first.
-        if len(self.buffer) > 3:
+        if len(self.buffer) > 100:
             self.buffer.popitem(last=False)
             
 
