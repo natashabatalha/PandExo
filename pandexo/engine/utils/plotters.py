@@ -29,7 +29,7 @@ def create_component_jwst(result_dict):
     out = result_dict['PandeiaOutTrans']
     
     # select the tools we want
-    TOOLS = "pan,wheel_zoom,box_zoom,resize,reset,save"
+    TOOLS = "pan,wheel_zoom,box_zoom,reset,save"
 
     #Define units for x and y axis
     punit = result_dict['input']['Primary/Secondary']
@@ -355,7 +355,7 @@ def create_component_jwst(result_dict):
     
     xr, yr = data.shape
     
-    plot_detector_2d = Figure(tools="pan,wheel_zoom,box_zoom,resize,reset,hover,save",
+    plot_detector_2d = Figure(tools="pan,wheel_zoom,box_zoom,reset,hover,save",
                          x_range=[0, yr], y_range=[0, xr],
                          x_axis_label='Pixel', y_axis_label='Spatial',
                          title="2D Detector Image",
@@ -426,7 +426,7 @@ def create_component_spec(result_dict):
     num = -1
     color = ["red", "blue", "green", "purple", "black", "yellow", "orange", "pink","cyan","brown"]
 
-    TOOLS = "pan,wheel_zoom,box_zoom,resize,reset,save"
+    TOOLS = "pan,wheel_zoom,box_zoom,reset,save"
         
     plot1 = Figure(plot_width=800, plot_height=350,  tools=TOOLS, responsive =False,
                                  x_axis_label='Wavelength [um]', x_axis_type="log",
@@ -473,7 +473,7 @@ def create_component_hst(result_dict):
         front-end javascript required, and `div` is a dictionary of plot
         objects.
     """                                   
-    TOOLS = "pan,wheel_zoom,box_zoom,resize,reset,save"
+    TOOLS = "pan,wheel_zoom,box_zoom,reset,save"
 
     #plot planet spectrum
     mwave = result_dict['planet_spec']['model_wave']

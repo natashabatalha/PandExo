@@ -65,7 +65,7 @@ def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', out
     outx=[]
     outy=[]
     oute=[]
-    TOOLS = "pan,wheel_zoom,box_zoom,resize,reset,save"
+    TOOLS = "pan,wheel_zoom,box_zoom,reset,save"
     outputfile(output_file)
     colors = ['black','blue','red','orange','yellow','purple','pink','cyan','grey','brown']
     #make sure its iterable
@@ -362,7 +362,7 @@ def jwst_1d_flux(result_dict, plot=True, output_file= 'flux.html'):
     --------
     jwst_1d_spec, jwst_1d_bkg, jwst_noise, jwst_1d_snr, jwst_2d_det, jwst_2d_sat
     """
-    TOOLS = "pan,wheel_zoom,box_zoom,resize,reset,save"
+    TOOLS = "pan,wheel_zoom,box_zoom,reset,save"
     out = result_dict['PandeiaOutTrans']
     
     # Flux 1d
@@ -406,7 +406,7 @@ def jwst_1d_snr(result_dict, plot=True, output_file='snr.html'):
     --------
     jwst_1d_bkg, jwst_noise, jwst_1d_flux, jwst_1d_spec, jwst_2d_det, jwst_2d_sat
     """    
-    TOOLS = "pan,wheel_zoom,box_zoom,resize,reset,save"
+    TOOLS = "pan,wheel_zoom,box_zoom,reset,save"
     # Flux 1d
     x= result_dict['RawData']['wave']
     electrons_out = result_dict['RawData']['electrons_out']
@@ -448,7 +448,7 @@ def jwst_1d_bkg(result_dict, plot=True, output_file='bkg.html'):
     --------
     jwst_1d_spec, jwst_noise, jwst_1d_flux, jwst_1d_snr, jwst_2d_det, jwst_2d_sat
     """    
-    TOOLS = "pan,wheel_zoom,box_zoom,resize,reset,save"
+    TOOLS = "pan,wheel_zoom,box_zoom,reset,save"
     # BG 1d
     out = result_dict['PandeiaOutTrans']
     x, y = out['1d']['extracted_bg_only']
@@ -488,7 +488,7 @@ def jwst_noise(result_dict, plot=True, output_file= 'noise.html'):
     --------
     jwst_1d_spec, jwst_1d_bkg, jwst_1d_flux, jwst_1d_snr, jwst_2d_det, jwst_2d_sat
     """  
-    TOOLS = "pan,wheel_zoom,box_zoom,resize,reset,save"    #saturation
+    TOOLS = "pan,wheel_zoom,box_zoom,reset,save"    #saturation
 
     x = result_dict['FinalSpectrum']['wave']
     y = result_dict['FinalSpectrum']['error_w_floor']*1e6
@@ -532,14 +532,14 @@ def jwst_2d_det(result_dict, plot=True, output_file='det2d.html'):
     jwst_1d_spec, jwst_1d_bkg, jwst_1d_flux, jwst_1d_snr, jwst_noise, jwst_2d_sat
 
     """
-    TOOLS = "pan,wheel_zoom,box_zoom,resize,reset,save"
+    TOOLS = "pan,wheel_zoom,box_zoom,reset,save"
     out = result_dict['PandeiaOutTrans']
     data = out['2d']['detector']
 
     
     xr, yr = data.shape
     
-    plot_detector_2d = Figure(tools="pan,wheel_zoom,box_zoom,resize,reset,hover,save",
+    plot_detector_2d = Figure(tools="pan,wheel_zoom,box_zoom,reset,hover,save",
                          x_range=[0, yr], y_range=[0, xr],
                          x_axis_label='Pixel', y_axis_label='Spatial',
                          title="2D Detector Image",
@@ -577,7 +577,7 @@ def jwst_2d_sat(result_dict, plot=True, output_file='sat2d.html'):
     --------
     jwst_1d_spec, jwst_1d_bkg, jwst_1d_flux, jwst_1d_snr, jwst_2d_det, jwst_noise
     """
-    TOOLS = "pan,wheel_zoom,box_zoom,resize,reset,save"    #saturation
+    TOOLS = "pan,wheel_zoom,box_zoom,reset,save"    #saturation
     out = result_dict['PandeiaOutTrans']
     data = out['2d']['saturation']
     xr, yr = data.shape
@@ -625,7 +625,7 @@ def hst_spec(result_dict, plot=True, output_file ='hstspec.html', model = True):
     --------
     hst_time
     """
-    TOOLS = "pan,wheel_zoom,box_zoom,resize,reset,save"
+    TOOLS = "pan,wheel_zoom,box_zoom,reset,save"
     #plot planet spectrum
     mwave = result_dict['planet_spec']['model_wave']
     mspec = result_dict['planet_spec']['model_spec']
@@ -692,7 +692,7 @@ def hst_time(result_dict, plot=True, output_file ='hsttime.html', model = True):
     --------
     hst_spec
     """
-    TOOLS = "pan,wheel_zoom,box_zoom,resize,reset,save"
+    TOOLS = "pan,wheel_zoom,box_zoom,reset,save"
     #earliest and latest start times 
     obsphase1 = result_dict['calc_start_window']['obsphase1']
     obstr1 = result_dict['calc_start_window']['obstr1']
