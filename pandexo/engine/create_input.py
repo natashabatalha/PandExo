@@ -1,4 +1,3 @@
-import pysynphot as psyn
 import numpy as np 
 import pickle
 import pandas as pd
@@ -7,7 +6,11 @@ import astropy.units as u
 import astropy.constants as c
 import os 
 from  astropy.modeling import blackbody as bb
-
+import warnings
+with warnings.catch_warnings():
+    warnings.filterwarnings("ignore")
+    import pysynphot as psyn
+    
 def outTrans(input) :
     """Compute out of transit spectra
     
