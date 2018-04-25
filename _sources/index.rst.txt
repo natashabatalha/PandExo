@@ -23,6 +23,7 @@ Contents:
    
    includeme 
    installation
+   installation_windows
    tutorialjwst
    jwstinput
    jwstdict

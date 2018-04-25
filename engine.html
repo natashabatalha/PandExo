@@ -92,6 +92,7 @@
 <li class="toctree-l1"><a class="reference internal" href="installation.html#installation-for-users-with-pip">Installation for Users With PIP</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html#troubleshooting-common-errors">Troubleshooting-Common Errors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html#the-importance-of-upgrading-pandexo">The Importance of Upgrading PandExo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation_windows.html">Windows Installing Guide for PandExo</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorialjwst.html">JWST Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="jwstinput.html">Possible Instrument Input Params</a></li>
 <li class="toctree-l1"><a class="reference internal" href="jwstdict.html">Py Dict Structure of JWST Output</a></li>
@@ -2038,7 +2039,7 @@ better JWST recommendations are made.</p>
 </table>
 <p class="rubric">Examples</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">newwave</span> <span class="o">=</span> <span class="n">bin_wave_to_R</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1000</span><span class="p">),</span> <span class="mi">10</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">newwave</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">newwave</span><span class="p">)))</span>
 <span class="go">11</span>
 </pre></div>
 </div>
@@ -2065,8 +2066,8 @@ parameters. {&#8220;pandeia_input&#8221;:dict1, &#8220;pandexo_input&#8221;:dict
 </tbody>
 </table>
 <p class="rubric">Examples</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pandexo.engine.jwst</span> <span class="k">import</span> <span class="n">compute_full_sim</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pandexo.engine.justplotit</span> <span class="k">import</span> <span class="n">jwst_1d_spec</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">.pandexo.engine.jwst</span> <span class="k">import</span> <span class="n">compute_full_sim</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">.pandexo.engine.justplotit</span> <span class="k">import</span> <span class="n">jwst_1d_spec</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">compute_full_sim</span><span class="p">({</span><span class="s2">&quot;pandeia_input&quot;</span><span class="p">:</span> <span class="n">pandeiadict</span><span class="p">,</span> <span class="s2">&quot;pandexo_input&quot;</span><span class="p">:</span><span class="n">exodict</span><span class="p">})</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">jwst_1d_spec</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
 <span class="go">.. image:: 1d_spec.png</span>
@@ -2158,7 +2159,7 @@ JWST terminology:</p>
 </table>
 <p class="rubric">Examples</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">timing</span><span class="p">,</span> <span class="n">flags</span> <span class="o">=</span> <span class="n">compute_timing</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="mf">60.0</span><span class="o">*</span><span class="mf">60.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">timing</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">((</span><span class="nb">list</span><span class="p">(</span><span class="n">timing</span><span class="o">.</span><span class="n">keys</span><span class="p">())))</span>
 <span class="go">[&#39;Number of Transits&#39;, &#39;Num Integrations Out of Transit&#39;, &#39;Num Integrations In Transit&#39;,</span>
 <span class="go">&#39;APT: Num Groups per Integration&#39;, &#39;Seconds per Frame&#39;, &#39;Observing Efficiency (%)&#39;, &#39;On Source Time(sec)&#39;,</span>
 <span class="go">&#39;Exposure Time Per Integration (secs)&#39;, &#39;Reset time Plus 30 min TA time (hrs)&#39;,</span>
@@ -2298,7 +2299,7 @@ and target acq info to final output dict</p>
 </tbody>
 </table>
 <p class="rubric">Examples</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pandexo.engine.jwst</span> <span class="k">import</span> <span class="n">uniform_tophat_sum</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">.pandexo.engine.jwst</span> <span class="k">import</span> <span class="n">uniform_tophat_sum</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">oldgrid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">100</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="o">+</span><span class="mf">10.0</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">newy</span> <span class="o">=</span> <span class="n">uniform_tophat_sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">oldgrid</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>

@@ -92,6 +92,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html#installation-for-users-with-pip">Installation for Users With PIP</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html#troubleshooting-common-errors">Troubleshooting-Common Errors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html#the-importance-of-upgrading-pandexo">The Importance of Upgrading PandExo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation_windows.html">Windows Installing Guide for PandExo</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorialjwst.html">JWST Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../jwstinput.html">Possible Instrument Input Params</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../jwstdict.html">Py Dict Structure of JWST Output</a></li>
@@ -165,13 +166,14 @@
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="o">*</span>
 <span class="kn">import</span> <span class="nn">datetime</span>
-<span class="k">try</span><span class="p">:</span>
-    <span class="n">logs</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;pandexo_logs&#39;</span><span class="p">)</span>
-    <span class="n">engine</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="s1">&#39;sqlite:///&#39;</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">logs</span><span class="p">))</span>
-<span class="k">except</span><span class="p">:</span> 
-    <span class="k">pass</span> 
+
 <div class="viewcode-block" id="jwst_log"><a class="viewcode-back" href="../../engine.html#engine.logs.jwst_log">[docs]</a><span class="k">def</span> <span class="nf">jwst_log</span><span class="p">(</span><span class="n">final</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;Logging for Website;Used for tracking usage;Only storing instrument data&#39;&#39;&#39;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">logs</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;pandexo_logs&#39;</span><span class="p">)</span>
+        <span class="n">engine</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="s1">&#39;sqlite:///&#39;</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">logs</span><span class="p">))</span>
+    <span class="k">except</span><span class="p">:</span> 
+        <span class="k">pass</span> 
     <span class="n">instrument</span> <span class="o">=</span> <span class="n">final</span><span class="p">[</span><span class="s1">&#39;pandeia_input&#39;</span><span class="p">][</span><span class="s1">&#39;configuration&#39;</span><span class="p">][</span><span class="s1">&#39;instrument&#39;</span><span class="p">][</span><span class="s1">&#39;instrument&#39;</span><span class="p">]</span>
     <span class="n">mode</span> <span class="o">=</span> <span class="n">final</span><span class="p">[</span><span class="s1">&#39;pandeia_input&#39;</span><span class="p">][</span><span class="s1">&#39;configuration&#39;</span><span class="p">][</span><span class="s1">&#39;instrument&#39;</span><span class="p">][</span><span class="s1">&#39;mode&#39;</span><span class="p">]</span>
     <span class="n">ff</span> <span class="o">=</span> <span class="n">final</span><span class="p">[</span><span class="s1">&#39;pandeia_input&#39;</span><span class="p">][</span><span class="s1">&#39;configuration&#39;</span><span class="p">][</span><span class="s1">&#39;instrument&#39;</span><span class="p">][</span><span class="s1">&#39;filter&#39;</span><span class="p">]</span>
@@ -193,6 +195,11 @@
 
 <div class="viewcode-block" id="hst_log"><a class="viewcode-back" href="../../engine.html#engine.logs.hst_log">[docs]</a><span class="k">def</span> <span class="nf">hst_log</span><span class="p">(</span><span class="n">final</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;Logging for Website;Used for tracking usage;Used for tracking usage;Only storing instrument data&#39;&#39;&#39;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">logs</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;pandexo_logs&#39;</span><span class="p">)</span>
+        <span class="n">engine</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="s1">&#39;sqlite:///&#39;</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">logs</span><span class="p">))</span>
+    <span class="k">except</span><span class="p">:</span> 
+        <span class="k">pass</span> 
     <span class="n">instrument</span> <span class="o">=</span> <span class="n">final</span><span class="p">[</span><span class="s1">&#39;pandeia_input&#39;</span><span class="p">][</span><span class="s1">&#39;configuration&#39;</span><span class="p">][</span><span class="s1">&#39;instrument&#39;</span><span class="p">][</span><span class="s1">&#39;instrument&#39;</span><span class="p">]</span>
     <span class="n">subarray</span> <span class="o">=</span> <span class="n">final</span><span class="p">[</span><span class="s1">&#39;pandeia_input&#39;</span><span class="p">][</span><span class="s1">&#39;configuration&#39;</span><span class="p">][</span><span class="s1">&#39;detector&#39;</span><span class="p">][</span><span class="s1">&#39;subarray&#39;</span><span class="p">]</span>
     <span class="n">nsamp</span> <span class="o">=</span> <span class="n">final</span><span class="p">[</span><span class="s1">&#39;pandeia_input&#39;</span><span class="p">][</span><span class="s1">&#39;configuration&#39;</span><span class="p">][</span><span class="s1">&#39;detector&#39;</span><span class="p">][</span><span class="s1">&#39;nsamp&#39;</span><span class="p">]</span>

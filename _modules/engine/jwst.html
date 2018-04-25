@@ -92,6 +92,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html#installation-for-users-with-pip">Installation for Users With PIP</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html#troubleshooting-common-errors">Troubleshooting-Common Errors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html#the-importance-of-upgrading-pandexo">The Importance of Upgrading PandExo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation_windows.html">Windows Installing Guide for PandExo</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorialjwst.html">JWST Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../jwstinput.html">Possible Instrument Input Params</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../jwstdict.html">Py Dict Structure of JWST Output</a></li>
@@ -206,8 +207,8 @@
 <span class="sd">    Examples</span>
 <span class="sd">    --------  </span>
 <span class="sd">      </span>
-<span class="sd">    &gt;&gt;&gt; from pandexo.engine.jwst import compute_full_sim </span>
-<span class="sd">    &gt;&gt;&gt; from pandexo.engine.justplotit import jwst_1d_spec</span>
+<span class="sd">    &gt;&gt;&gt; from .pandexo.engine.jwst import compute_full_sim </span>
+<span class="sd">    &gt;&gt;&gt; from .pandexo.engine.justplotit import jwst_1d_spec</span>
 <span class="sd">    &gt;&gt;&gt; a = compute_full_sim({&quot;pandeia_input&quot;: pandeiadict, &quot;pandexo_input&quot;:exodict})</span>
 <span class="sd">    &gt;&gt;&gt; jwst_1d_spec(a)</span>
 <span class="sd">    .. image:: 1d_spec.png</span>
@@ -300,8 +301,10 @@
             <span class="n">expfact_out</span> <span class="o">=</span> <span class="n">pandexo_input</span><span class="p">[</span><span class="s1">&#39;observation&#39;</span><span class="p">][</span><span class="s1">&#39;baseline&#39;</span><span class="p">]</span> 
         <span class="k">elif</span> <span class="n">pandexo_input</span><span class="p">[</span><span class="s1">&#39;observation&#39;</span><span class="p">][</span><span class="s1">&#39;baseline_unit&#39;</span><span class="p">]</span> <span class="o">==</span><span class="s1">&#39;total&#39;</span><span class="p">:</span>
             <span class="n">expfact_out</span> <span class="o">=</span> <span class="n">transit_duration</span><span class="o">/</span><span class="p">(</span> <span class="n">pandexo_input</span><span class="p">[</span><span class="s1">&#39;observation&#39;</span><span class="p">][</span><span class="s1">&#39;baseline&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">transit_duration</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">pandexo_input</span><span class="p">[</span><span class="s1">&#39;observation&#39;</span><span class="p">][</span><span class="s1">&#39;baseline_unit&#39;</span><span class="p">]</span> <span class="o">==</span><span class="s1">&#39;total_hrs&#39;</span><span class="p">:</span>
+            <span class="n">expfact_out</span> <span class="o">=</span> <span class="n">transit_duration</span><span class="o">/</span><span class="p">(</span> <span class="n">pandexo_input</span><span class="p">[</span><span class="s1">&#39;observation&#39;</span><span class="p">][</span><span class="s1">&#39;baseline&#39;</span><span class="p">]</span><span class="o">*</span><span class="mf">3600.0</span> <span class="o">-</span> <span class="n">transit_duration</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span> 
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Wrong units for baseine: either &#39;frac&#39; or &#39;total&#39; accepted&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Wrong units for baseine: either &#39;frac&#39; or &#39;total&#39; or &#39;total_hrs&#39; accepted&quot;</span><span class="p">)</span>
 
     <span class="c1">#add to pandeia input </span>
     <span class="n">pandeia_input</span><span class="p">[</span><span class="s1">&#39;scene&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;spectrum&#39;</span><span class="p">][</span><span class="s1">&#39;sed&#39;</span><span class="p">][</span><span class="s1">&#39;spectrum&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">out_spectrum</span>
@@ -405,6 +408,7 @@
         <span class="n">var_out_bin</span> <span class="o">=</span> <span class="n">varout</span>
         <span class="n">var_out_bin</span> <span class="o">=</span> <span class="n">var_out_bin</span><span class="p">[</span><span class="n">photon_out_bin</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">photon_out_bin</span> <span class="o">=</span> <span class="n">photon_out_bin</span><span class="p">[</span><span class="n">photon_out_bin</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">]</span>
+        
     
     <span class="k">if</span> <span class="n">calculation</span> <span class="o">==</span> <span class="s1">&#39;phase_spec&#39;</span><span class="p">:</span>
         <span class="n">to</span> <span class="o">=</span> <span class="p">(</span><span class="n">timing</span><span class="p">[</span><span class="s2">&quot;APT: Num Groups per Integration&quot;</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">tframe</span>
@@ -445,11 +449,11 @@
     <span class="n">rawstuff</span> <span class="o">=</span> <span class="p">{</span>
                 <span class="s1">&#39;electrons_out&#39;</span><span class="p">:</span><span class="n">photon_out_bin</span><span class="o">*</span><span class="n">nocc</span><span class="p">,</span> 
                 <span class="s1">&#39;electrons_in&#39;</span><span class="p">:</span><span class="n">photon_in_bin</span><span class="o">*</span><span class="n">nocc</span><span class="p">,</span>
-                <span class="s1">&#39;var_in&#39;</span><span class="p">:</span><span class="n">varin</span><span class="o">*</span><span class="n">nocc</span><span class="p">,</span> 
-                <span class="s1">&#39;var_out&#39;</span><span class="p">:</span><span class="n">varout</span><span class="o">*</span><span class="n">nocc</span><span class="p">,</span>
+                <span class="s1">&#39;var_in&#39;</span><span class="p">:</span><span class="n">var_in_bin</span><span class="o">*</span><span class="n">nocc</span><span class="p">,</span> 
+                <span class="s1">&#39;var_out&#39;</span><span class="p">:</span><span class="n">var_out_bin</span><span class="o">*</span><span class="n">nocc</span><span class="p">,</span>
                 <span class="s1">&#39;e_rate_out&#39;</span><span class="p">:</span><span class="n">photon_out_bin</span><span class="o">/</span><span class="n">to</span><span class="p">,</span>
                 <span class="s1">&#39;e_rate_in&#39;</span><span class="p">:</span><span class="n">photon_out_bin</span><span class="o">/</span><span class="n">ti</span><span class="p">,</span>
-                <span class="s1">&#39;wave&#39;</span><span class="p">:</span><span class="n">w</span><span class="p">,</span>
+                <span class="s1">&#39;wave&#39;</span><span class="p">:</span><span class="n">wbin</span><span class="p">,</span>
                 <span class="s1">&#39;error_no_floor&#39;</span><span class="p">:</span><span class="n">error_spec</span><span class="p">,</span> 
                 <span class="s1">&#39;rn[out,in]&#39;</span><span class="p">:</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;rn[out,in]&#39;</span><span class="p">],</span>
                 <span class="s1">&#39;bkg[out,in]&#39;</span><span class="p">:</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;bkg[out,in]&#39;</span><span class="p">]</span>
@@ -498,17 +502,20 @@
     
     <span class="n">report</span> <span class="o">=</span> <span class="n">perform_calculation</span><span class="p">(</span><span class="n">pandeia_input</span><span class="p">,</span> <span class="n">dict_report</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="n">report_dict</span> <span class="o">=</span> <span class="n">report</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span> 
+    
+    <span class="c1"># count rate on the detector in e-/second/pixel</span>
+    <span class="c1">#det = report_dict[&#39;2d&#39;][&#39;detector&#39;]</span>
+    <span class="n">det</span> <span class="o">=</span> <span class="n">report</span><span class="o">.</span><span class="n">signal</span><span class="o">.</span><span class="n">rate_plus_bg_list</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;fp_pix&#39;</span><span class="p">]</span>
 
-    
-    <span class="c1"># count rate on the detector in e-/second </span>
-    <span class="n">det</span> <span class="o">=</span> <span class="n">report_dict</span><span class="p">[</span><span class="s1">&#39;2d&#39;</span><span class="p">][</span><span class="s1">&#39;detector&#39;</span><span class="p">]</span>
-    
     <span class="n">timeinfo</span> <span class="o">=</span> <span class="n">report_dict</span><span class="p">[</span><span class="s1">&#39;information&#39;</span><span class="p">][</span><span class="s1">&#39;exposure_specification&#39;</span><span class="p">]</span>
     <span class="c1">#totaltime = timeinfo[&#39;tgroup&#39;]*timeinfo[&#39;ngroup&#39;]*timeinfo[&#39;nint&#39;]</span>
     
     <span class="n">maxdetvalue</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">det</span><span class="p">)</span>
+
+
     <span class="c1">#maximum time before saturation per integration </span>
     <span class="c1">#based on user specified saturation level</span>
+
     <span class="k">try</span><span class="p">:</span>
         <span class="n">maxexptime_per_int</span> <span class="o">=</span> <span class="n">sat_level</span><span class="o">/</span><span class="n">maxdetvalue</span>
     <span class="k">except</span><span class="p">:</span> 
@@ -548,7 +555,7 @@
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 <span class="sd">    &gt;&gt;&gt; timing, flags = compute_timing(m, 2*60.0*60.0, 1.0, 1.0)</span>
-<span class="sd">    &gt;&gt;&gt; print(timing.keys())</span>
+<span class="sd">    &gt;&gt;&gt; print((list(timing.keys())))</span>
 <span class="sd">    [&#39;Number of Transits&#39;, &#39;Num Integrations Out of Transit&#39;, &#39;Num Integrations In Transit&#39;, </span>
 <span class="sd">    &#39;APT: Num Groups per Integration&#39;, &#39;Seconds per Frame&#39;, &#39;Observing Efficiency (%)&#39;, &#39;On Source Time(sec)&#39;, </span>
 <span class="sd">    &#39;Exposure Time Per Integration (secs)&#39;, &#39;Reset time Plus 30 min TA time (hrs)&#39;,</span>
@@ -585,15 +592,16 @@
         <span class="c1">#there is a hard limit to the maximum number groups. </span>
         <span class="c1">#if you exceed that limit, set it to the maximum value instead.</span>
         <span class="c1">#also set another check for saturation</span>
-    
+
         <span class="k">if</span> <span class="n">ngroups_per_int</span> <span class="o">&gt;</span> <span class="n">max_ngroup</span><span class="p">:</span>
             <span class="n">ngroups_per_int</span> <span class="o">=</span> <span class="n">max_ngroup</span>
             <span class="n">flag_high</span> <span class="o">=</span> <span class="s2">&quot;Groups/int &gt; max num of allowed groups&quot;</span>
  
-        <span class="k">if</span> <span class="p">(</span><span class="n">ngroups_per_int</span> <span class="o">&lt;</span> <span class="n">mingroups</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">ngroups_per_int</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">ngroups_per_int</span> <span class="o">&lt;</span> <span class="n">mingroups</span><span class="p">)</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">ngroups_per_int</span><span class="p">):</span>
             <span class="n">ngroups_per_int</span> <span class="o">=</span> <span class="n">mingroups</span>  
             <span class="n">nframes_per_int</span> <span class="o">=</span> <span class="n">mingroups</span>
             <span class="n">flag_default</span> <span class="o">=</span> <span class="s2">&quot;NGROUPS&lt;&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">mingroups</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;SET TO NGROUPS=&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">mingroups</span><span class="p">)</span>
+
     <span class="k">elif</span> <span class="s1">&#39;ngroups_per_int&#39;</span> <span class="ow">in</span> <span class="nb">locals</span><span class="p">():</span> 
         <span class="c1">#if it maxexptime_per_int been defined then set nframes per int </span>
         <span class="n">nframes_per_int</span> <span class="o">=</span> <span class="n">ngroups_per_int</span><span class="o">*</span><span class="p">(</span><span class="n">nframe</span><span class="o">+</span><span class="n">nskip</span><span class="p">)</span>
@@ -605,7 +613,8 @@
         <span class="n">ngroups_per_int</span> <span class="o">=</span> <span class="n">mingroups</span>
         <span class="n">nframes_per_int</span> <span class="o">=</span> <span class="n">mingroups</span>
         <span class="n">flag_default</span> <span class="o">=</span> <span class="s2">&quot;Something went wrong. SET TO NGROUPS=&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">mingroups</span><span class="p">)</span>
-                
+
+          
     <span class="c1">#the integration time is related to the number of groups and the time of each </span>
     <span class="c1">#group </span>
     <span class="n">exptime_per_int</span> <span class="o">=</span> <span class="n">ngroups_per_int</span><span class="o">*</span><span class="n">tframe</span>
@@ -914,7 +923,7 @@
 <span class="sd">    --------</span>
 <span class="sd">    </span>
 <span class="sd">    &gt;&gt;&gt; newwave = bin_wave_to_R(np.linspace(1,2,1000), 10)</span>
-<span class="sd">    &gt;&gt;&gt; print(len(newwave))</span>
+<span class="sd">    &gt;&gt;&gt; print((len(newwave)))</span>
 <span class="sd">    11</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">wave</span> <span class="o">=</span> <span class="p">[]</span>
@@ -968,7 +977,7 @@
 <span class="sd">    Examples </span>
 <span class="sd">    --------</span>
 <span class="sd">        </span>
-<span class="sd">    &gt;&gt;&gt; from pandexo.engine.jwst import uniform_tophat_sum</span>
+<span class="sd">    &gt;&gt;&gt; from .pandexo.engine.jwst import uniform_tophat_sum</span>
 <span class="sd">    &gt;&gt;&gt; oldgrid = np.linspace(1,3,100)</span>
 <span class="sd">    &gt;&gt;&gt; y = np.zeros(100)+10.0</span>
 <span class="sd">    &gt;&gt;&gt; newy = uniform_tophat_sum(np.linspace(2,3,3), oldgrid, y)</span>
@@ -1130,6 +1139,7 @@
     <span class="k">return</span> <span class="n">final_dict</span></div>
 
     
+
 </pre></div>
 
            </div>

@@ -1,0 +1,350 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Windows Installing Guide for PandExo &mdash; PandExo  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="PandExo  documentation" href="index.html"/>
+        <link rel="next" title="JWST Tutorial" href="tutorialjwst.html"/>
+        <link rel="prev" title="Pre-installation Data Download" href="installation.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> PandExo
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="includeme.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Pre-installation Data Download</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html#installation-for-users-with-conda">Installation for Users With Conda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html#installation-for-users-with-pip">Installation for Users With PIP</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html#troubleshooting-common-errors">Troubleshooting-Common Errors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html#the-importance-of-upgrading-pandexo">The Importance of Upgrading PandExo</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Windows Installing Guide for PandExo</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#step-1">Step 1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#step-2">Step 2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#step-3">Step 3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#step-4">Step 4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#step-5">Step 5</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#step-6">Step 6</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#step-7-setting-reference-data">Step 7: Setting Reference Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#step-7-installing-needed-packages">Step 7: Installing needed Packages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#step-8-run-test">Step 8: Run Test</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorialjwst.html">JWST Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="jwstinput.html">Possible Instrument Input Params</a></li>
+<li class="toctree-l1"><a class="reference internal" href="jwstdict.html">Py Dict Structure of JWST Output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorialhst.html">HST Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="engine.html">The Code</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">PandExo</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Windows Installing Guide for PandExo</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/installation_windows.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="windows-installing-guide-for-pandexo">
+<h1>Windows Installing Guide for PandExo<a class="headerlink" href="#windows-installing-guide-for-pandexo" title="Permalink to this headline">¶</a></h1>
+<p>Created by J. N. van Haastere (Physics and Astronomy Bachelorstudent)
+Univesity of Amsterdam and VU University Amsterdam</p>
+<div class="section" id="step-1">
+<h2>Step 1<a class="headerlink" href="#step-1" title="Permalink to this headline">¶</a></h2>
+<p>You may want to uninstall older python versions to prevent troubles along the way.</p>
+</div>
+<div class="section" id="step-2">
+<h2>Step 2<a class="headerlink" href="#step-2" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="https://www.anaconda.com/download/">Download most recent Anaconda version</a> (tested with Python 3.6.4 64 bit)</p>
+</div>
+<div class="section" id="step-3">
+<h2>Step 3<a class="headerlink" href="#step-3" title="Permalink to this headline">¶</a></h2>
+<p>Install Anaconda as main python and add to path environment</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If succesfully installed you can open CMD and type <cite>&gt;&gt;python</cite> and <cite>&gt;&gt;quit()</cite> to check version</p>
+</div>
+</div>
+<div class="section" id="step-4">
+<h2>Step 4<a class="headerlink" href="#step-4" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="https://www.visualstudio.com/downloads/#build-tools-for-visual-studio-2017">Install Build Tools for Visual Studio 2017</a>.</p>
+</div>
+<div class="section" id="step-5">
+<h2>Step 5<a class="headerlink" href="#step-5" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="https://natashabatalha.github.io/PandExo/installation.html">Follow PandExo Installation guide in getting files</a></p>
+<ul class="simple">
+<li>get pandeia_data      (pandeia_data-1.2.tar.gz)</li>
+<li>get pysynphot_data        (synphot5.tar.gz)</li>
+<li>get PandExo github folder (pandexo-master.zip)</li>
+</ul>
+</div>
+<div class="section" id="step-6">
+<h2>Step 6<a class="headerlink" href="#step-6" title="Permalink to this headline">¶</a></h2>
+<p>Open pandexo.sh in your favorite text editor (eg. Notepad++) and read through installation steps. Below we will follow these steps but with Windows commands.</p>
+</div>
+<div class="section" id="step-7-setting-reference-data">
+<h2>Step 7: Setting Reference Data<a class="headerlink" href="#step-7-setting-reference-data" title="Permalink to this headline">¶</a></h2>
+<p>Using an achiver (eg. Winrar, 7Zip) extract Pandeia and Pysynphot data in two seperate folders.</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>C:/Users/USERNAME/pandeia_data
+C:/Users/USERNAME/pysynphot_data
+</pre></div>
+</div>
+<p>Check the variable names</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="nb">echo</span> <span class="s1">&#39;export VARIABLE_NAME = &quot;..&quot;&#39;</span>
+</pre></div>
+</div>
+<p>In case nothing changes these should be <cite>PYSYN_CDBS</cite> &amp; <cite>pandeia_refdata</cite></p>
+<p>Set these in Windows environment variables / registry using SETX. Open CMD or Anaconda Prompt and run:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>SETX PYSYN_CDBS <span class="s1">&#39;C:/Users/USERNAME/pysynphot_data&#39;</span>
+SETX pandeia_refdata <span class="s1">&#39;C:/Users/USERNAME/pysynphot_data&#39;</span>
+</pre></div>
+</div>
+<p>You can check this step by opening a new CMD and run &gt; SET</p>
+</div>
+<div class="section" id="step-7-installing-needed-packages">
+<h2>Step 7: Installing needed Packages<a class="headerlink" href="#step-7-installing-needed-packages" title="Permalink to this headline">¶</a></h2>
+<p>Add conda channel, in CMD:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>conda config --add channels http://ssb.stsci.edu/astroconda
+</pre></div>
+</div>
+<p>Check needed packages, at the moment:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>numpy synphot joblib scipy <span class="nv">astropy</span><span class="o">==</span><span class="m">2</span>.0.2 pyfftw pysynphot photutils <span class="nv">sphinx</span><span class="o">=</span><span class="m">1</span>.5.6 <span class="nv">bokeh</span><span class="o">=</span><span class="m">0</span>.12.6
+</pre></div>
+</div>
+<p>All but <cite>Pyfftw</cite> can be installed using:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>conda install PACKAGE
+</pre></div>
+</div>
+<p>or</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>pip install PACKAGE
+</pre></div>
+</div>
+<p>If they fail check in the error if you are missing a certain .dll or look online.</p>
+<p>For <cite>Pyfftw</cite> get a prebuiled wheel from <a class="reference external" href="https://bintray.com/hgomersall/generic/PyFFTW-development-builds/view#files">here</a>.</p>
+<p>Get a matching cp36-cp36 for your python version.
+For Python 3.6.4 64-bit I used:</p>
+<p>-<cite>pyFFTW-0.10.5.dev0+d45d7fe-cp36-cp36m-win_amd64.whl</cite></p>
+<p>Navigate to download folder and install</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="nb">cd</span> <span class="s1">&#39;C:\Users\USERNAME\Downloads&#39;</span>
+pip install pyFFTW-0.10.5.dev0+d45d7fe-cp36-cp36m-win_amd64.whl
+</pre></div>
+</div>
+<p>With your fingers crossed, install PandExo Engine</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>pip install pandexo.engine
+</pre></div>
+</div>
+<p>Probabily fail, look what I/you missed and try again. <a class="reference external" href="https://natashabatalha.github.io/PandExo/installation.html#troubleshooting-common-errors">Troubleshooting here</a>.</p>
+</div>
+<div class="section" id="step-8-run-test">
+<h2>Step 8: Run Test<a class="headerlink" href="#step-8-run-test" title="Permalink to this headline">¶</a></h2>
+<p>Navigate to your pandexo-master and run the run_test. Check in the <a class="reference external" href="https://natashabatalha.github.io/PandExo/installation.html#pandexo-startup-bash-script">installation</a> guide on the exact expected output.</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="nb">cd</span> <span class="s1">&#39;...&#39;</span>
+python run_test.py
+</pre></div>
+</div>
+<p>Congrats on being persevering/stubborn enough to get it on to work on Windows!
+There are some test Jupyter files to try out in <cite>pandexo-master/notebooks</cite></p>
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="tutorialjwst.html" class="btn btn-neutral float-right" title="JWST Tutorial" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="installation.html" class="btn btn-neutral" title="Pre-installation Data Download" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Natasha Batalha;Kevin Stevenson.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

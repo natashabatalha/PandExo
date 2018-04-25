@@ -92,6 +92,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html#installation-for-users-with-pip">Installation for Users With PIP</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html#troubleshooting-common-errors">Troubleshooting-Common Errors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html#the-importance-of-upgrading-pandexo">The Importance of Upgrading PandExo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation_windows.html">Windows Installing Guide for PandExo</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorialjwst.html">JWST Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../jwstinput.html">Possible Instrument Input Params</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../jwstdict.html">Py Dict Structure of JWST Output</a></li>
@@ -188,7 +189,11 @@
 <span class="sd">    dict </span>
 <span class="sd">        contains wave and flux_out_trans</span>
 <span class="sd">    &quot;&quot;&quot;</span> 
-    
+
+    <span class="n">ref_wave</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="nb">input</span><span class="p">[</span><span class="s1">&#39;ref_wave&#39;</span><span class="p">])</span>
+    <span class="n">mag</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="nb">input</span><span class="p">[</span><span class="s1">&#39;mag&#39;</span><span class="p">])</span>
+
+    <span class="c1">################# USER ####################################</span>
     <span class="k">if</span> <span class="nb">input</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;user&#39;</span><span class="p">:</span>
         <span class="n">star</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span><span class="nb">input</span><span class="p">[</span><span class="s1">&#39;starpath&#39;</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span> <span class="n">names</span><span class="o">=</span><span class="s1">&#39;w, f&#39;</span><span class="p">)</span> <span class="c1">#pyfits.getdata(input[&#39;starpath&#39;],1)</span>
         <span class="c1">#get flux </span>
@@ -201,80 +206,83 @@
         <span class="n">sort</span><span class="o">=</span> <span class="n">sort</span><span class="p">[</span><span class="n">sort</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">argsort</span><span class="p">()]</span>
         <span class="n">wave</span> <span class="o">=</span> <span class="n">sort</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">flux</span> <span class="o">=</span> <span class="n">sort</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span> 
-        <span class="n">sp</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span>
-        
+        <span class="k">if</span> <span class="nb">input</span><span class="p">[</span><span class="s1">&#39;w_unit&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;um&#39;</span><span class="p">:</span>
+            <span class="n">PANDEIA_WAVEUNITS</span> <span class="o">=</span> <span class="s1">&#39;um&#39;</span>
+            
+        <span class="k">elif</span> <span class="nb">input</span><span class="p">[</span><span class="s1">&#39;w_unit&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;nm&#39;</span><span class="p">:</span>
+            <span class="n">PANDEIA_WAVEUNITS</span> <span class="o">=</span> <span class="s1">&#39;nm&#39;</span>
+      
+        <span class="k">elif</span> <span class="nb">input</span><span class="p">[</span><span class="s1">&#39;w_unit&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;cm&#39;</span> <span class="p">:</span>
+            <span class="n">PANDEIA_WAVEUNITS</span> <span class="o">=</span> <span class="s1">&#39;cm&#39;</span>
+     
+        <span class="k">elif</span> <span class="nb">input</span><span class="p">[</span><span class="s1">&#39;w_unit&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Angs&#39;</span> <span class="p">:</span>
+            <span class="n">PANDEIA_WAVEUNITS</span> <span class="o">=</span> <span class="s1">&#39;angstrom&#39;</span>
+
+        <span class="k">elif</span> <span class="nb">input</span><span class="p">[</span><span class="s1">&#39;w_unit&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Hz&#39;</span> <span class="p">:</span>
+            <span class="n">PANDEIA_WAVEUNITS</span> <span class="o">=</span> <span class="s1">&#39;Hz&#39;</span>
+
+        <span class="k">else</span><span class="p">:</span> 
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Units are not correct. Pick um, nm, cm, hz, or Angs&#39;</span><span class="p">)</span>        
+
+        <span class="c1">#convert to photons/s/nm/m^2 for flux normalization based on </span>
+        <span class="c1">#http://www.gemini.edu/sciops/instruments/integration-time-calculators/itc-help/source-definition</span>
+        <span class="k">if</span> <span class="nb">input</span><span class="p">[</span><span class="s1">&#39;f_unit&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Jy&#39;</span><span class="p">:</span>
+            <span class="n">PANDEIA_FLUXUNITS</span> <span class="o">=</span> <span class="s1">&#39;jy&#39;</span> 
+        <span class="k">elif</span> <span class="nb">input</span><span class="p">[</span><span class="s1">&#39;f_unit&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;FLAM&#39;</span> <span class="p">:</span>
+            <span class="n">PANDEIA_FLUXUNITS</span> <span class="o">=</span> <span class="s1">&#39;FLAM&#39;</span>
+        <span class="k">else</span><span class="p">:</span> 
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Units are not correct. Pick FLAM or Jy&#39;</span><span class="p">)</span>
+
+        <span class="n">sp</span> <span class="o">=</span> <span class="n">psyn</span><span class="o">.</span><span class="n">ArraySpectrum</span><span class="p">(</span><span class="n">wave</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="n">waveunits</span><span class="o">=</span><span class="n">PANDEIA_WAVEUNITS</span><span class="p">,</span> <span class="n">fluxunits</span><span class="o">=</span><span class="n">PANDEIA_FLUXUNITS</span><span class="p">)</span>        <span class="c1">#Convert evrything to nanometer for converstion based on gemini.edu  </span>
+        <span class="n">sp</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s2">&quot;nm&quot;</span><span class="p">)</span>
+        <span class="n">sp</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s1">&#39;jy&#39;</span><span class="p">)</span>
+
+    <span class="c1">############ PHOENIX ################################################</span>
     <span class="k">elif</span> <span class="nb">input</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span><span class="s1">&#39;phoenix&#39;</span><span class="p">:</span>
         <span class="c1">#make sure metal is not out of bounds</span>
         <span class="k">if</span> <span class="nb">input</span><span class="p">[</span><span class="s1">&#39;metal&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">:</span> <span class="nb">input</span><span class="p">[</span><span class="s1">&#39;metal&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>
         <span class="n">sp</span> <span class="o">=</span> <span class="n">psyn</span><span class="o">.</span><span class="n">Icat</span><span class="p">(</span><span class="s2">&quot;phoenix&quot;</span><span class="p">,</span> <span class="nb">input</span><span class="p">[</span><span class="s1">&#39;temp&#39;</span><span class="p">],</span> <span class="nb">input</span><span class="p">[</span><span class="s1">&#39;metal&#39;</span><span class="p">],</span> <span class="nb">input</span><span class="p">[</span><span class="s1">&#39;logg&#39;</span><span class="p">])</span>
-        <span class="n">sp</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s2">&quot;microns&quot;</span><span class="p">)</span>
+        <span class="n">sp</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s2">&quot;nm&quot;</span><span class="p">)</span>
         <span class="n">sp</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s2">&quot;jy&quot;</span><span class="p">)</span>
         <span class="n">wave</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">wave</span>
         <span class="n">flux</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">flux</span>
-        <span class="nb">input</span><span class="p">[</span><span class="s1">&#39;w_unit&#39;</span><span class="p">]</span> <span class="o">=</span><span class="s1">&#39;um&#39;</span>
-        <span class="nb">input</span><span class="p">[</span><span class="s1">&#39;f_unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Jy&#39;</span>
+        <span class="nb">input</span><span class="p">[</span><span class="s1">&#39;w_unit&#39;</span><span class="p">]</span> <span class="o">=</span><span class="s1">&#39;nm&#39;</span>
+        <span class="nb">input</span><span class="p">[</span><span class="s1">&#39;f_unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;jy&#39;</span>
         
     <span class="k">else</span><span class="p">:</span> 
         <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Wrong input type for stellar spectra&#39;</span><span class="p">)</span>
-        
-    <span class="n">ref_wave</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="nb">input</span><span class="p">[</span><span class="s1">&#39;ref_wave&#39;</span><span class="p">])</span>
-    <span class="n">ref_wave</span> <span class="o">=</span> <span class="n">ref_wave</span><span class="o">*</span><span class="mf">1e3</span>
     
-    
-        <span class="c1">#Convert evrything to nanometer for converstion based on gemini.edu  </span>
-    <span class="k">if</span> <span class="nb">input</span><span class="p">[</span><span class="s1">&#39;w_unit&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;um&#39;</span><span class="p">:</span>
-        <span class="n">wave</span> <span class="o">=</span> <span class="n">wave</span><span class="o">*</span><span class="mf">1e3</span>
-        
-    <span class="k">elif</span> <span class="nb">input</span><span class="p">[</span><span class="s1">&#39;w_unit&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;nm&#39;</span><span class="p">:</span>
-        <span class="n">wave</span> <span class="o">=</span> <span class="n">wave</span>
-  
-    <span class="k">elif</span> <span class="nb">input</span><span class="p">[</span><span class="s1">&#39;w_unit&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;cm&#39;</span> <span class="p">:</span>
-        <span class="n">wave</span> <span class="o">=</span> <span class="n">wave</span><span class="o">*</span><span class="mf">1e7</span>
- 
-    <span class="k">elif</span> <span class="nb">input</span><span class="p">[</span><span class="s1">&#39;w_unit&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Angs&#39;</span> <span class="p">:</span>
-        <span class="n">wave</span> <span class="o">=</span> <span class="n">wave</span><span class="o">*</span><span class="mf">1e-1</span>
 
-    <span class="k">elif</span> <span class="nb">input</span><span class="p">[</span><span class="s1">&#39;w_unit&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Hz&#39;</span> <span class="p">:</span>
-        <span class="n">wave</span> <span class="o">=</span> <span class="mf">3e17</span><span class="o">/</span><span class="n">wave</span>
+    <span class="c1">############ NORMALIZATION ################################################</span>
+    <span class="n">refdata</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;pandeia_refdata&quot;</span><span class="p">)</span>
 
-    <span class="k">else</span><span class="p">:</span> 
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Units are not correct. Pick um, nm, cm or Angs&#39;</span><span class="p">)</span>
+    <span class="n">all_bps</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;H&quot;</span><span class="p">:</span> <span class="s1">&#39;bessell_h_004_syn.fits&#39;</span><span class="p">,</span>
+                 <span class="s2">&quot;J&quot;</span><span class="p">:</span><span class="s1">&#39;bessell_j_003_syn.fits&#39;</span> <span class="p">,</span>
+                 <span class="s2">&quot;K&quot;</span><span class="p">:</span> <span class="s1">&#39;bessell_k_003_syn.fits&#39;</span><span class="p">}</span>
 
-    <span class="c1">#convert to photons/s/nm/m^2 for flux normalization based on </span>
-    <span class="c1">#http://www.gemini.edu/sciops/instruments/integration-time-calculators/itc-help/source-definition</span>
-    <span class="k">if</span> <span class="nb">input</span><span class="p">[</span><span class="s1">&#39;f_unit&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Jy&#39;</span><span class="p">:</span>
-        <span class="n">flux</span> <span class="o">=</span> <span class="n">flux</span><span class="o">*</span><span class="mf">1.509e7</span><span class="o">/</span><span class="n">wave</span> <span class="c1">#eq. C</span>
-        
-    <span class="k">elif</span> <span class="nb">input</span><span class="p">[</span><span class="s1">&#39;f_unit&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;W/m2/um&#39;</span><span class="p">:</span>
-        <span class="n">flux</span> <span class="o">=</span> <span class="n">flux</span><span class="o">*</span><span class="n">wave</span><span class="o">/</span><span class="mf">1.988e-13</span> <span class="c1">#eq. D </span>
-    <span class="k">elif</span> <span class="nb">input</span><span class="p">[</span><span class="s1">&#39;f_unit&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;FLAM&#39;</span> <span class="p">:</span>
-        <span class="n">flux</span> <span class="o">=</span> <span class="n">flux</span><span class="o">*</span><span class="n">wave</span><span class="o">/</span><span class="mf">1.988e-14</span> <span class="c1">#eq. E</span>
-    <span class="k">elif</span> <span class="nb">input</span><span class="p">[</span><span class="s1">&#39;f_unit&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;erg/s/cm2/Hz&#39;</span><span class="p">:</span>
-        <span class="n">flux</span> <span class="o">=</span> <span class="n">flux</span><span class="o">*</span><span class="mf">1.509e30</span><span class="o">/</span><span class="n">wave</span> <span class="c1">#*4.0*np.pi</span>
-    <span class="k">else</span><span class="p">:</span> 
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Units are not correct. Pick W/m2/um, FLAM, Jy, or erg/s/cm2/Hz&#39;</span><span class="p">)</span>
-    
-    <span class="c1">#normalize to specific mag </span>
-    
-    <span class="n">mag</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="nb">input</span><span class="p">[</span><span class="s1">&#39;mag&#39;</span><span class="p">])</span>
-    <span class="n">norm_flux</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">ref_wave</span><span class="p">,</span> <span class="n">wave</span><span class="p">,</span> <span class="n">flux</span><span class="p">)</span> 
-
-    <span class="c1">#get zero point for J H and K </span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">ref_wave</span> <span class="o">&lt;=</span> <span class="mf">1.3e3</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">ref_wave</span> <span class="o">&gt;=</span> <span class="mf">1.2e3</span><span class="p">):</span>
-        <span class="n">zeropoint</span> <span class="o">=</span> <span class="mf">1.97e7</span>
-    <span class="k">elif</span> <span class="p">(</span><span class="n">ref_wave</span> <span class="o">&lt;=</span> <span class="mf">1.7e3</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">ref_wave</span> <span class="o">&gt;=</span> <span class="mf">1.6e3</span><span class="p">):</span>
-        <span class="n">zeropoint</span> <span class="o">=</span> <span class="mf">9.6e6</span>
-    <span class="k">elif</span> <span class="p">(</span><span class="n">ref_wave</span> <span class="o">&lt;=</span> <span class="mf">2.3e3</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">ref_wave</span> <span class="o">&gt;=</span> <span class="mf">2.1e3</span><span class="p">):</span>
-        <span class="n">zeropoint</span> <span class="o">=</span> <span class="mf">4.5e6</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">ref_wave</span> <span class="o">&lt;=</span> <span class="mf">1.3</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">ref_wave</span> <span class="o">&gt;=</span> <span class="mf">1.2</span><span class="p">):</span>
+        <span class="n">filt</span> <span class="o">=</span> <span class="s1">&#39;J&#39;</span>
+    <span class="k">elif</span> <span class="p">(</span><span class="n">ref_wave</span> <span class="o">&lt;=</span> <span class="mf">1.7</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">ref_wave</span> <span class="o">&gt;=</span> <span class="mf">1.6</span><span class="p">):</span>
+        <span class="n">filt</span> <span class="o">=</span> <span class="s1">&#39;H&#39;</span>
+    <span class="k">elif</span> <span class="p">(</span><span class="n">ref_wave</span> <span class="o">&lt;=</span> <span class="mf">2.3</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">ref_wave</span> <span class="o">&gt;=</span> <span class="mf">2.1</span><span class="p">):</span>
+        <span class="n">filt</span> <span class="o">=</span> <span class="s1">&#39;K&#39;</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Only J H and K zeropoints are included&#39;</span><span class="p">)</span>
 
-    <span class="n">flux</span> <span class="o">=</span> <span class="n">flux</span><span class="o">/</span><span class="n">norm_flux</span><span class="o">*</span><span class="n">zeropoint</span><span class="o">*</span><span class="mi">10</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="n">mag</span><span class="o">/</span><span class="mf">2.5</span><span class="p">)</span>
-    
-    <span class="c1">#return to Pandeia units... milliJy and micron </span>
-    <span class="n">flux_out_trans</span> <span class="o">=</span> <span class="n">flux</span><span class="o">*</span><span class="n">wave</span><span class="o">/</span><span class="mf">1.509e7</span><span class="o">*</span><span class="mf">1e3</span> <span class="c1">#inverse of eq. C times 1e3 to get to milliJy instead of Jy </span>
-    <span class="n">wave</span> <span class="o">=</span> <span class="n">wave</span><span class="o">*</span><span class="mf">1e-3</span>  <span class="c1">#nm to micron</span>
+    <span class="n">bp_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">refdata</span><span class="p">,</span> <span class="s2">&quot;normalization&quot;</span><span class="p">,</span> <span class="s2">&quot;bandpass&quot;</span><span class="p">,</span> <span class="n">all_bps</span><span class="p">[</span><span class="n">filt</span><span class="p">])</span>
+    <span class="n">bp</span> <span class="o">=</span> <span class="n">psyn</span><span class="o">.</span><span class="n">FileBandpass</span><span class="p">(</span><span class="n">bp_path</span><span class="p">)</span>
 
+    <span class="n">sp</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s1">&#39;angstroms&#39;</span><span class="p">)</span>
+    <span class="n">bp</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s1">&#39;angstroms&#39;</span><span class="p">)</span>
+
+    <span class="n">rn_sp</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">renorm</span><span class="p">(</span><span class="n">mag</span><span class="p">,</span> <span class="s1">&#39;vegamag&#39;</span><span class="p">,</span> <span class="n">bp</span><span class="p">)</span>
+
+
+    <span class="n">rn_sp</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s2">&quot;microns&quot;</span><span class="p">)</span>
+    <span class="n">rn_sp</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s2">&quot;mjy&quot;</span><span class="p">)</span>
+
+    <span class="n">flux_out_trans</span> <span class="o">=</span> <span class="n">rn_sp</span><span class="o">.</span><span class="n">flux</span>
+    <span class="n">wave</span> <span class="o">=</span> <span class="n">rn_sp</span><span class="o">.</span><span class="n">wave</span>
     <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;flux_out_trans&#39;</span><span class="p">:</span> <span class="n">flux_out_trans</span><span class="p">,</span> <span class="s1">&#39;wave&#39;</span><span class="p">:</span> <span class="n">wave</span><span class="p">,</span><span class="s1">&#39;phoenix&#39;</span><span class="p">:</span><span class="n">sp</span><span class="p">}</span> </div>
 
 
