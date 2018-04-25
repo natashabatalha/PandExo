@@ -96,7 +96,7 @@ For `Pyfftw` get a prebuiled wheel from `here <https://bintray.com/hgomersall/ge
 Get a matching cp36-cp36 for your python version.
 For Python 3.6.4 64-bit I used:
 
--`pyFFTW-0.10.5.dev0+d45d7fe-cp36-cp36m-win_amd64.whl`
+- `pyFFTW-0.10.5.dev0+d45d7fe-cp36-cp36m-win_amd64.whl`
 
 Navigate to download folder and install
 
