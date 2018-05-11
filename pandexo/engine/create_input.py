@@ -69,8 +69,11 @@ def outTrans(input) :
             PANDEIA_FLUXUNITS = 'jy' 
         elif input['f_unit'] == 'FLAM' :
             PANDEIA_FLUXUNITS = 'FLAM'
+        elif input['f_unit'] == 'erg/cm2/s/Hz':
+            flux = flux*1e23
+            PANDEIA_FLUXUNITS = 'jy' 
         else: 
-            raise Exception('Units are not correct. Pick FLAM or Jy')
+            raise Exception('Units are not correct. Pick FLAM or Jy or erg/cm2/s/Hz')
 
         sp = psyn.ArraySpectrum(wave, flux, waveunits=PANDEIA_WAVEUNITS, fluxunits=PANDEIA_FLUXUNITS)        #Convert evrything to nanometer for converstion based on gemini.edu  
         sp.convert("nm")
