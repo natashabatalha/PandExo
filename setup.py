@@ -40,9 +40,9 @@ except ImportError:
 # also be placed in the setup.cfg, as will be demonstrated in a future update
 # to this sample package.
 setup(
-    setup_requires=['d2to1>=0.2.11', 'stsci.distutils>=0.3.7'],
+    setup_requires=[ 'stsci.distutils>=0.3.7'],
     namespace_packages=['pandexo'], packages=['pandexo'],
-    d2to1=True,
+    #d2to1=True,
     install_requires=[
           'numpy>=1.12.1',
           'bokeh==0.12.6',
