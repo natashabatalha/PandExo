@@ -5,6 +5,8 @@
 <link href="{{ static_url('css/select2.min.css')}}" rel="stylesheet">
 <link href="{{ static_url('css/select2-bootstrap-theme.min.css')}}" rel="stylesheet">
 <link href="{{ static_url('css/icheck-bootstrap.min.css')}}" rel="stylesheet">
+<link href="{{ static_url('css/test.css')}}" rel="stylesheet">
+
 {% end %}
 
 {% block body %}
@@ -64,6 +66,7 @@
                 <option value=""></option>
                 <option value="Jy">Jy</option>
                 <option value="FLAM">erg/cm2/s/Angs</option>
+                <option value="erg/cm2/s/Hz">erg/cm2/s/Hz</option>
             </select>
         </div>
     </div>
@@ -363,23 +366,23 @@
             <div class="col-md-6" style="padding-left: 0;">
                 <select id="nirspecmode" name="nirspecmode" class="form-control" data-placeholder="Select NIRSpec Mode">
                     <option value=""></option>
-                    <option value="g140mf070lp">G140 R=1000 f070lp</option>
-                    <option value="g140hf070lp">G140 R=2700 f070lp</option>
-                    <option value="g140mf100lp">G140 R=1000 f100lp</option>
-                    <option value="g140hf100lp">G140 R=2700 f100lp</option>
-                    <option value="g235mf170lp">G235 R=1000 f170lp</option>
-                    <option value="g235hf170lp">G235 R=2700 f170lp</option>
-                    <option value="g395mf290lp">G395 R=1000 f290lp</option>
-                    <option value="g395hf290lp">G395 R=2700 f290lp</option>
+                    <option value="g140mf070lp">G140M R=1000 f070lp</option>
+                    <option value="g140hf070lp">G140H R=2700 f070lp</option>
+                    <option value="g140mf100lp">G140M R=1000 f100lp</option>
+                    <option value="g140hf100lp">G140H R=2700 f100lp</option>
+                    <option value="g235mf170lp">G235M R=1000 f170lp</option>
+                    <option value="g235hf170lp">G235H R=2700 f170lp</option>
+                    <option value="g395mf290lp">G395M R=1000 f290lp</option>
+                    <option value="g395hf290lp">G395H R=2700 f290lp</option>
                     <option value="prismclear">Prism R=100 No filter</option>
                 </select>
             </div>
             <div class="col-md-6" style="padding-right: 0;">
                 <select id="nirspecsubarray" name="nirspecsubarray" class="form-control" data-placeholder="Select NIRSpec Subarray">
                     <option value=""></option>
+                    <option value="sub2048">S1600A1 SUB2048</option>
                     <option value="sub1024a">S1600A1 SUB1024A</option>
                     <option value="sub1024b">S1600A1 SUB1024B</option>
-                    <option value="sub2048">S1600A1 SUB2048</option>
                     <option value="sub512">S1600A1 SUB512</option>
                 </select>
             </div>
