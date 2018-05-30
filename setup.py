@@ -42,7 +42,7 @@ except ImportError:
 setup(
 
     name='pandexo.engine', 
-    version = '1.1.1',
+    version = '1.1.2',
     summary = 'pandexo transiting exoplanet simulator',
     description_file = 'README.rst',
     author = 'Natasha Batalha at Space Telescope Science Institute',
