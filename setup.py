@@ -40,15 +40,56 @@ except ImportError:
 # also be placed in the setup.cfg, as will be demonstrated in a future update
 # to this sample package.
 setup(
-    setup_requires=[ 'stsci.distutils>=0.3.7'],
-    namespace_packages=['pandexo'], packages=['pandexo'],
-    #d2to1=True,
+
+    name='pandexo.engine', 
+    version = '1.1.1',
+    summary = 'pandexo transiting exoplanet simulator',
+    description_file = 'README.rst',
+    author = 'Natasha Batalha at Space Telescope Science Institute',
+    author_email = 'natasha.e.batalha@gmail.com',
+    home_page = 'https://natashabatalha.github.io/PandExo',
+    license = 'GPL',
+    url = 'https://github.com/natashabatalha/PandExo',
+    classifiers = [
+                  'Intended Audience :: Science/Research',
+                  'License :: OSI Approved :: BSD License', 
+                  'Operating System :: OS Independent' , 
+                  'Programming Language :: Python',
+                  'Programming Language :: Python :: 3',
+                  'Topic :: Scientific/Engineering :: Astronomy',
+                  'Topic :: Software Development :: Libraries :: Python Modules'
+  ],
+  packages =[
+              'pandexo',
+              'pandexo.engine',
+              'pandexo.engine.reference',
+              'pandexo.engine.static',
+              'pandexo.engine.static.css',
+              'pandexo.engine.static.fonts',
+              'pandexo.engine.static.img',
+              'pandexo.engine.static.js',
+              'pandexo.engine.temp',
+              'pandexo.engine.templates',
+              'pandexo.engine.utils'
+          ],
+  package_dir ={
+            'engine': 'pandexo/engine'
+  },
+  include_package_data=True,
+  #package_data = {
+  #            'engine' : ['templates','*.html'],
+  #            'engine': ['reference','*.json'],
+  #            'engine': ['static','css','*'],
+  #            'engine': ['static','fonts','*'],
+  #            'engine': ['static','img','*'],
+  #            'engine': ['static','js','*']
+  #},
+
     install_requires=[
           'numpy>=1.12.1',
           'bokeh==0.12.6',
           'tornado',
           'pandas',
-#          'multiprocessing',
           'joblib',
           'pandeia.engine',
           'batman-package',
@@ -61,5 +102,7 @@ setup(
     entry_points = {
         'console_scripts':
             ['start_pandexo=pandexo.engine.run_online:main']
-    }
+    }, 
+    zip_safe = False,
+
 )

@@ -27,7 +27,6 @@ conda config --add channels http://ssb.stsci.edu/astroconda
 conda install pyfftw
 conda install numpy synphot joblib scipy astropy==2.0.2 pyfftw pysynphot photutils sphinx=1.5.6
 conda install bokeh=0.12.6
-conda install sphinx=1.5.6
 
 ######### Install PandExo Engine, which will also install Pandeia##############
 pip install pandexo.engine 

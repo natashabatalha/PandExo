@@ -2,8 +2,6 @@ language: python
 
 matrix:
   include:
-    # All the versions of Python.
-    # NOTE: travis is having conda issues with py2 right now...
     - python: 2.7
     - python: 3.6
 
