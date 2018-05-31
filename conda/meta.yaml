@@ -31,8 +31,6 @@ requirements:
     - tornado
     - pandas
     - joblib
-    - pandeia.engine
-    - batman-package
     - photutils
     - astropy ==2.0.2
     - pysynphot
@@ -45,8 +43,6 @@ requirements:
     - tornado
     - pandas
     - joblib
-    - pandeia.engine
-    - batman-package
     - photutils
     - astropy ==2.0.2
     - pysynphot
