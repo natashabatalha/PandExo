@@ -1,0 +1,83 @@
+{% set name = "pandexo.engine" %}
+{% set version = "1.1.2" %}
+{% set file_ext = "tar.gz" %}
+{% set hash_type = "sha256" %}
+{% set hash_value = "7199c175117e5170da13d3f613b804b93da41853dedcc3c9cbf4a62feaec68d4" %}
+
+package:
+  name: '{{ name|lower }}'
+  version: {{ environ['VERSION'] }}
+
+source:
+  fn: '{{ name }}-{{ version }}.{{ file_ext }}'
+  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.{{ file_ext }}
+  '{{ hash_type }}': '{{ hash_value }}'
+
+build:
+  number: 0
+  script_env:
+   - VERSION
+   - CONDA_BLD_PATH
+  entry_points:
+    - start_pandexo=pandexo.engine.run_online:main
+  script: python setup.py install --single-version-externally-managed --record=record.txt
+
+requirements:
+  host:
+    - python
+    - setuptools
+    - numpy >=1.12.1
+    - bokeh ==0.12.6
+    - tornado
+    - pandas
+    - joblib
+    - pandeia.engine
+    - batman-package
+    - photutils
+    - astropy ==2.0.2
+    - pysynphot
+    - sqlalchemy
+    - sphinx ==1.5
+  run:
+    - python
+    - numpy >=1.12.1
+    - bokeh ==0.12.6
+    - tornado
+    - pandas
+    - joblib
+    - pandeia.engine
+    - batman-package
+    - photutils
+    - astropy ==2.0.2
+    - pysynphot
+    - sqlalchemy
+    - sphinx ==1.5
+
+test:
+  imports:
+    - pandexo
+    - pandexo.engine
+    - pandexo.engine.reference
+    - pandexo.engine.static
+    - pandexo.engine.static.css
+    - pandexo.engine.static.fonts
+    - pandexo.engine.static.img
+    - pandexo.engine.static.js
+    - pandexo.engine.temp
+    - pandexo.engine.templates
+    - pandexo.engine.utils
+  commands:
+    - start_pandexo --help
+
+about:
+  home: https://github.com/natashabatalha/PandExo
+  license: BSD License
+  license_family: BSD
+  license_file: ''
+  summary: Summary of the package
+  description: ''
+  doc_url: ''
+  dev_url: ''
+
+extra:
+  recipe-maintainers: ''
