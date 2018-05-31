@@ -20,7 +20,6 @@ build:
    - CONDA_BLD_PATH
   entry_points:
     - start_pandexo=pandexo.engine.run_online:main
-  script: python setup.py install --single-version-externally-managed --record=record.txt
 
 requirements:
   host:
@@ -35,7 +34,7 @@ requirements:
     - astropy ==2.0.2
     - pysynphot
     - sqlalchemy
-    - sphinx ==1.5
+    - sphinx
   run:
     - python
     - numpy >=1.12.1
@@ -47,7 +46,7 @@ requirements:
     - astropy ==2.0.2
     - pysynphot
     - sqlalchemy
-    - sphinx ==1.5
+    - sphinx
 
 test:
   imports:
