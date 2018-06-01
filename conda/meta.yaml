@@ -61,8 +61,6 @@ test:
     - pandexo.engine.temp
     - pandexo.engine.templates
     - pandexo.engine.utils
-  commands:
-    - start_pandexo --help
 
 about:
   home: https://github.com/natashabatalha/PandExo

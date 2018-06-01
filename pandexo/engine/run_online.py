@@ -13,7 +13,7 @@ from concurrent.futures import ProcessPoolExecutor
 from .pandexo import wrapper
 from tornado.options import define, options
 import pickle
-from .utils.plotters import create_component_jwst, create_component_spec, create_component_hst
+from .utils.plotters import create_component_jwst, create_component_hst
 import pandas as pd 
 import numpy as np
 from .logs import jwst_log, hst_log
@@ -49,21 +49,16 @@ class Application(tornado.web.Application):
             (r"/", HomeHandler),
             (r"/about", AboutHandler),
             (r"/dashboard", DashboardHandler),
-            (r"/dashboardspec", DashboardSpecHandler),
             (r"/dashboardhst", DashboardHSTHandler),
             (r"/tables", TablesHandler),
             (r"/helpfulplots", HelpfulPlotsHandler),
             (r"/calculation/new", CalculationNewHandler),
             (r"/calculation/newHST", CalculationNewHSTHandler),
-            (r"/calculation/newspec", CalculationNewSpecHandler),
             (r"/calculation/status/([^/]+)", CalculationStatusHandler),
             (r"/calculation/statushst/([^/]+)", CalculationStatusHSTHandler),
-            (r"/calculation/statusspec/([^/]+)", CalculationStatusSpecHandler),
             (r"/calculation/view/([^/]+)", CalculationViewHandler),
             (r"/calculation/viewhst/([^/]+)", CalculationViewHSTHandler),
-            (r"/calculation/viewspec/([^/]+)", CalculationViewSpecHandler),
             (r"/calculation/download/([^/]+)", CalculationDownloadHandler),
-            (r"/calculation/downloadspec/([^/]+)", CalculationDownloadSpecHandler),
             (r"/calculation/downloadpandin/([^/]+)", CalculationDownloadPandInHandler)
         ]
         settings = dict(
@@ -110,33 +105,7 @@ class BaseHandler(tornado.web.RequestHandler):
             self.render_string("calc_row.html", response=response))
         return response
 
-    def _get_task_response_spec(self, id):
-        """
-        Simple function to grab a calculation that's stored in the buffer,
-        and return a dictionary/json-like response to the front-end.
-        """
-        calc_task = self.buffer.get(id)
-        task = calc_task.task
-
-        response = {'id': id,
-                    'name': calc_task.name,
-                    'count': calc_task.count}
-
-        if task.running():
-            response['state'] = 'running'
-            response['code'] = 202
-        elif task.done():
-            response['state'] = 'finished'
-        elif task.cancelled():
-            response['state'] = 'cancelled'
-        else:
-            response['state'] = 'pending'
-
-        response['html'] = tornado.escape.to_basestring(
-            self.render_string("calc_rowspec.html", response=response))
-
-        return response
-
+ 
     def _get_task_response_hst(self, id):
         """
         Simple function to grab a calculation that's stored in the buffer,
@@ -265,18 +234,6 @@ class DashboardHSTHandler(BaseHandler):
         self.render("dashboardhst.html", calculations=task_responses[::-1])
 
 
-
-class DashboardSpecHandler(BaseHandler):
-    """
-    Request handler for the dashboard page. This will retrieve and render
-    the html template, along with the list of current task objects.
-    """
-    def get(self):
-        task_responses = [self._get_task_response_spec(id) for id, nt in
-                          list(self.buffer.items())
-                          if ((nt.cookie == self.get_cookie("pandexo_user"))
-                          & (id[len(id)-1]=='s'))]
-        self.render("dashboardspec.html", calculations=task_responses[::-1])
 
 
 class CalculationNewHandler(BaseHandler):
@@ -603,103 +560,6 @@ class CalculationNewHSTHandler(BaseHandler):
         self.redirect("../dashboardhst")
         
             
-class CalculationNewSpecHandler(BaseHandler):
-    """
-    This request handler deals with processing the form data and submitting
-    a new calculation task to the parallelized workers.
-    """
-    def get(self):
-        self.render("newspec.html", id=id)
-
-    def post(self):
-        """
-        The post method contains the retured data from the form data (
-        accessed by using `self.get_argument(...)` for specific arguments,
-        or `self.request.body` to grab the entire returned object.
-        """
-        
-        #print(self.request.body)
-        
-        id = str(uuid.uuid4())+'s'
-        finaldata= {}      
-        mols = {}
-        mols['H2'] = 0.0
-        mols['He'] = 0.0
-        try: 
-            mols[self.get_argument("mol1")] = float(self.get_argument("mol1_vmr"))
-        except:
-            if self.get_argument("mol1_vmr").replace(' ','').lower() == 'bkg': 
-                mols[self.get_argument("mol1")] = self.get_argument("mol1_vmr")
-        try: 
-            mols[self.get_argument("mol2")] = float(self.get_argument("mol2_vmr"))
-        except:
-            if self.get_argument("mol2_vmr").replace(' ','').lower() == 'bkg': 
-                mols[self.get_argument("mol2")] = self.get_argument("mol2_vmr")
-        try: 
-            mols[self.get_argument("mol3")] = float(self.get_argument("mol3_vmr"))
-        except:
-            if self.get_argument("mol3_vmr").replace(' ','').lower() == 'bkg': 
-                mols[self.get_argument("mol3")] = self.get_argument("mol3_vmr")
-        try: 
-            mols[self.get_argument("mol4")] = float(self.get_argument("mol4_vmr"))
-        except:
-            if self.get_argument("mol4_vmr").replace(' ','').lower() == 'bkg': 
-                mols[self.get_argument("mol4")] = self.get_argument("mol4_vmr")
-        try: 
-            mols[self.get_argument("mol5")] = float(self.get_argument("mol5_vmr"))
-        except:
-            if self.get_argument("mol5_vmr").replace(' ','').lower() == 'bkg': 
-                mols[self.get_argument("mol5")] = self.get_argument("mol5_vmr")
-        try: 
-            mols[self.get_argument("mol6")] = float(self.get_argument("mol6_vmr"))
-        except:
-            if self.get_argument("mol6_vmr").replace(' ','').lower() == 'bkg': 
-                mols[self.get_argument("mol6")] = self.get_argument("mol6_vmr")
-        try: 
-            mols[self.get_argument("mol7")] = float(self.get_argument("mol7_vmr"))
-        except:
-            if self.get_argument("mol7_vmr").replace(' ','').lower() == 'bkg': 
-                mols[self.get_argument("mol7")] = self.get_argument("mol7_vmr")
-        try: 
-            mols[self.get_argument("mol8")] = float(self.get_argument("mol8_vmr"))
-        except:
-            if self.get_argument("mol8_vmr").replace(' ','').lower() == 'bkg': 
-                mols[self.get_argument("mol8")] = self.get_argument("mol8_vmr")
-        try: 
-            mols[self.get_argument("mol9")] = float(self.get_argument("mol9_vmr"))
-        except:
-            if self.get_argument("mol9_vmr").replace(' ','').lower() == 'bkg': 
-                mols[self.get_argument("mol9")] = self.get_argument("mol9_vmr")
-        try: 
-            mols[self.get_argument("mol10")] = float(self.get_argument("mol10_vmr"))
-        except:
-            if self.get_argument("mol10_vmr").replace(' ','').lower() == 'bkg': 
-                mols[self.get_argument("mol10")] = self.get_argument("mol10_vmr")
-        
-
-        finaldata["mols"] = mols
-        finaldata['T'] = float(self.get_argument("T"))
-        finaldata['g'] = float(self.get_argument("g"))
-        finaldata['Rp'] = float(self.get_argument("Rp"))
-        finaldata['R*'] = float(self.get_argument("R*"))
-        finaldata['P'] = float(self.get_argument("P"))
-        finaldata['P0'] = float(self.get_argument("P0"))
-        try: 
-            finaldata['fracH2He'] = float(self.get_argument("fracH2He"))
-        except: 
-            finaldata['fracH2He'] = 0.0
-        finaldata['taueq'] = 0.56
-        task = self.executor.submit(computeAlpha, finaldata)
-
-        self._add_task(id, self.get_argument("calcName"), task)
-
-        response = self._get_task_response_spec(id)
-        response['info'] = {}
-        response['location'] = '/calculation/statusspec/{}'.format(id)
-        
-        
-        self.write(dict(response))
-        self.redirect("../dashboardspec")
 
 
 class CalculationStatusHandler(BaseHandler):
@@ -714,17 +574,6 @@ class CalculationStatusHandler(BaseHandler):
 
         self.write(dict(response))
 
-class CalculationStatusSpecHandler(BaseHandler):
-    """
-    Handlers returning the status of a particular Spec calculation task.
-    """
-    def get(self, id):
-        response = self._get_task_response_spec(id)
-
-        if self.request.connection.stream.closed():
-            return
-
-        self.write(dict(response)) 
         
 class CalculationStatusHSTHandler(BaseHandler):
     """
@@ -771,38 +620,7 @@ class CalculationDownloadHandler(BaseHandler):
                 os.remove(os.path.join(__TEMP__,i))
         self.finish()
 
-class CalculationDownloadSpecHandler(BaseHandler):
-    """
-    Handlers returning the downloaded data of a particular calculation task.
-    Handlers returning the status of a particular calculation task.
-    """
-    def get(self, id):
-        result = self._get_task_result(id)
-  
-        if self.request.connection.stream.closed():
-            return
-        file_name = "spec-calculation" +id+".p"
- 
-        with open(os.path.join(__TEMP__,file_name), "wb") as f:
-            pickle.dump(result, f)
- 
-        buf_size = 4096
-        self.set_header('Content-Type', 'application/octet-stream')
-        self.set_header('Content-Disposition',
-                        'attachment; filename=' + file_name)
- 
-        with open(os.path.join(__TEMP__,file_name), "rb") as f:
-            while True:
-                data = f.read(buf_size)
-                if not data:
-                    break
-                self.write(data)
-        
-        allfiles = os.listdir(__TEMP__)
-        for i in allfiles:
-            if i.find(id) != -1:
-                os.remove(os.path.join(__TEMP__,i))
-        self.finish()
+
 
 class CalculationDownloadPandInHandler(BaseHandler):
     """
@@ -864,16 +682,7 @@ class CalculationViewHandler(BaseHandler):
 
         self.render("view.html", script=script, div=div, id=id)
 
-class CalculationViewSpecHandler(BaseHandler):
-    """
-    This handler deals with passing the results from Pandeia to the
-    `create_component_spec` function which generates the Bokeh interative plots.
-    """
-    def get(self, id):
-        result = self._get_task_result(id)
-        script, div = create_component_spec(result)
 
-        self.render("viewspec.html", script=script, div=div, id=id)
 
 class CalculationViewHSTHandler(BaseHandler):
     """

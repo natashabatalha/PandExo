@@ -406,55 +406,7 @@ def create_component_jwst(result_dict):
 
     return result_comp
     
-def create_component_spec(result_dict):
-    """Generate front end plots of modeling
-    
-    Function that is responsible for generating the front-end spectra plots.
-    
-    Parameters
-    ----------
-    result_dict : dict 
-        the dictionary returned from a PandExo run
 
-    Returns
-    -------
-    tuple
-        A tuple containing `(script, div)`, where the `script` is the
-        front-end javascript required, and `div` is a dictionary of plot
-        objects.
-    """  
-    num = -1
-    color = ["red", "blue", "green", "purple", "black", "yellow", "orange", "pink","cyan","brown"]
-
-    TOOLS = "pan,wheel_zoom,box_zoom,reset,save"
-        
-    plot1 = Figure(plot_width=800, plot_height=350,  tools=TOOLS, responsive =False,
-                                 x_axis_label='Wavelength [um]', x_axis_type="log",
-                                 y_axis_label='Alpha Lambda', y_range = [min(result_dict['alpha']), max(result_dict['alpha'])]) 
-    plot1.line(result_dict['w'], result_dict['alpha'], alpha = 0.5, line_width = 3)    
-    
-    plot2 = Figure(plot_width=800, plot_height=350,  tools=TOOLS, responsive =False, y_axis_type="log",
-                                 x_axis_label='Wavelength [um]', x_axis_type="log",
-                                 y_axis_label='Weighted Cross Section', y_range = [1e-29, 1e-17])
-    alpha = result_dict['alpha']
-    squig =  result_dict['mols']    
-    xsec = result_dict['xsec'] 
-    waves = result_dict['w']                       
-    for i in squig.keys():  
-        if i=="H2":
-            num +=1
-            plot2.line(waves,squig[i]*xsec[i][alpha> 0.0]*squig["H2"], color = color[num], legend = i)
-        elif i=="He":
-            num +=1
-            plot2.line(waves,squig[i]*xsec[i][alpha> 0.0]*squig["H2"], color = color[num], legend = i)
-        else:
-            num +=1
-            plot2.line(waves,squig[i]*xsec[i][alpha> 0.0], color = color[num], legend = i)            
-                             
-                          
-    result_comp =   components({'plot1':plot1, 
-                              'plot2': plot2})
-    return result_comp 
 
 def create_component_hst(result_dict):
     """Generate front end plots HST
