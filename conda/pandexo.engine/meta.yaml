@@ -6,7 +6,7 @@
 
 package:
   name: '{{ name|lower }}'
-  version: {{ environ['VERSION'] }}
+  version: '{{ version }}'
 
 source:
   fn: '{{ name }}-{{ version }}.{{ file_ext }}'
@@ -15,9 +15,6 @@ source:
 
 build:
   number: 0
-  script_env:
-   - VERSION
-   - CONDA_BLD_PATH
   entry_points:
     - start_pandexo=pandexo.engine.run_online:main
   script: python setup.py install --single-version-externally-managed --record=record.txt
@@ -47,7 +44,7 @@ requirements:
     - astropy ==2.0.2
     - pysynphot
     - sqlalchemy
-    - sphinx 
+    - sphinx
 
 test:
   imports:
