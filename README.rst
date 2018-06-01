@@ -28,3 +28,7 @@ Requires
 ~~~~~~~~
 
 - Python >2.7, that's it 
+
+
+.. image:: https://zenodo.org/badge/67237418.svg
+   :target: https://zenodo.org/badge/latestdoi/67237418
