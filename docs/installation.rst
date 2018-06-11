@@ -170,6 +170,26 @@ CONDA USERS:
     conda install sphinx=1.5.6
     
 
+Using Astropy-3 instead of Astropy-2
+````````````````````````````````````
+
+To allow PandExo to use Astropy-3 instead of Astropy-2, which is required by Pandeia, follow these instructions:
+
+After installing `pandeia.engine`, edit the file
+
+$HOME/anaconda3/lib/python3.6/site-packages/pandeia/engine/sed.py
+
+On `line 8`, comment out
+
+`from astropy.analytic_functions import blackbody_nu`
+
+and add
+
+`from astropy.modeling.blackbody import blackbody_nu`
+
+Pandeia requires Astropy-2; but this fix will let PandExo use `pandeia.engine` with Astropy-3
+
+
 The Importance of Upgrading PandExo
 ===================================
 
@@ -192,6 +212,3 @@ Verify pandexo.engine is Current
 .. code-block:: bash 
 
     pip install pandexo.engine --upgrade 
-
-
-
