@@ -162,8 +162,7 @@
            <div itemprop="articleBody">
             
   <h1>Source code for engine.create_input</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">pysynphot</span> <span class="k">as</span> <span class="nn">psyn</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span> 
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span> 
 <span class="kn">import</span> <span class="nn">pickle</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="o">*</span>   
@@ -171,7 +170,11 @@
 <span class="kn">import</span> <span class="nn">astropy.constants</span> <span class="k">as</span> <span class="nn">c</span>
 <span class="kn">import</span> <span class="nn">os</span> 
 <span class="kn">from</span>  <span class="nn">astropy.modeling</span> <span class="k">import</span> <span class="n">blackbody</span> <span class="k">as</span> <span class="n">bb</span>
-
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+    <span class="kn">import</span> <span class="nn">pysynphot</span> <span class="k">as</span> <span class="nn">psyn</span>
+    
 <div class="viewcode-block" id="outTrans"><a class="viewcode-back" href="../../engine.html#engine.create_input.outTrans">[docs]</a><span class="k">def</span> <span class="nf">outTrans</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span> <span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Compute out of transit spectra</span>
 <span class="sd">    </span>
@@ -230,8 +233,11 @@
             <span class="n">PANDEIA_FLUXUNITS</span> <span class="o">=</span> <span class="s1">&#39;jy&#39;</span> 
         <span class="k">elif</span> <span class="nb">input</span><span class="p">[</span><span class="s1">&#39;f_unit&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;FLAM&#39;</span> <span class="p">:</span>
             <span class="n">PANDEIA_FLUXUNITS</span> <span class="o">=</span> <span class="s1">&#39;FLAM&#39;</span>
+        <span class="k">elif</span> <span class="nb">input</span><span class="p">[</span><span class="s1">&#39;f_unit&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;erg/cm2/s/Hz&#39;</span><span class="p">:</span>
+            <span class="n">flux</span> <span class="o">=</span> <span class="n">flux</span><span class="o">*</span><span class="mf">1e23</span>
+            <span class="n">PANDEIA_FLUXUNITS</span> <span class="o">=</span> <span class="s1">&#39;jy&#39;</span> 
         <span class="k">else</span><span class="p">:</span> 
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Units are not correct. Pick FLAM or Jy&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Units are not correct. Pick FLAM or Jy or erg/cm2/s/Hz&#39;</span><span class="p">)</span>
 
         <span class="n">sp</span> <span class="o">=</span> <span class="n">psyn</span><span class="o">.</span><span class="n">ArraySpectrum</span><span class="p">(</span><span class="n">wave</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="n">waveunits</span><span class="o">=</span><span class="n">PANDEIA_WAVEUNITS</span><span class="p">,</span> <span class="n">fluxunits</span><span class="o">=</span><span class="n">PANDEIA_FLUXUNITS</span><span class="p">)</span>        <span class="c1">#Convert evrything to nanometer for converstion based on gemini.edu  </span>
         <span class="n">sp</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s2">&quot;nm&quot;</span><span class="p">)</span>

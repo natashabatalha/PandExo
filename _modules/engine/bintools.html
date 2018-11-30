@@ -164,7 +164,10 @@
   <h1>Source code for engine.bintools</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span> 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span> 
-<span class="kn">import</span> <span class="nn">pysynphot.binning</span> <span class="k">as</span> <span class="nn">astrobin</span> 
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
+	<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+	<span class="kn">import</span> <span class="nn">pysynphot.binning</span> <span class="k">as</span> <span class="nn">astrobin</span> 
 <span class="kn">import</span> <span class="nn">warnings</span> <span class="k">as</span> <span class="nn">warn</span>
 <span class="kn">import</span> <span class="nn">astropy.units</span> <span class="k">as</span> <span class="nn">u</span>
 <div class="viewcode-block" id="binning"><a class="viewcode-back" href="../../engine.html#engine.bintools.binning">[docs]</a><span class="k">def</span> <span class="nf">binning</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span>  <span class="n">dy</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">binwidth</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">newx</span><span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">log</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">nan</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>

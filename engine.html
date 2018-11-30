@@ -108,7 +108,6 @@
 <li class="toctree-l2"><a class="reference internal" href="#module-engine.jwst">engine.jwst</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-engine.load_modes">engine.load_modes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-engine.pandexo">engine.pandexo</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-engine.ComputeZ">engine.ComputeZ</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-engine.elements">engine.elements</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#requirements">Requirements</a></li>
 </ul>
@@ -1082,19 +1081,6 @@ Handlers returning the status of a particular calculation task.</p>
 </dd></dl>
 
 <dl class="class">
-<dt id="engine.run_online.CalculationDownloadSpecHandler">
-<em class="property">class </em><code class="descclassname">engine.run_online.</code><code class="descname">CalculationDownloadSpecHandler</code><span class="sig-paren">(</span><em>application</em>, <em>request</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/run_online.html#CalculationDownloadSpecHandler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.run_online.CalculationDownloadSpecHandler" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#engine.run_online.BaseHandler" title="engine.run_online.BaseHandler"><code class="xref py py-class docutils literal"><span class="pre">engine.run_online.BaseHandler</span></code></a></p>
-<p>Handlers returning the downloaded data of a particular calculation task.
-Handlers returning the status of a particular calculation task.</p>
-<dl class="method">
-<dt id="engine.run_online.CalculationDownloadSpecHandler.get">
-<code class="descname">get</code><span class="sig-paren">(</span><em>id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/run_online.html#CalculationDownloadSpecHandler.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.run_online.CalculationDownloadSpecHandler.get" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
 <dt id="engine.run_online.CalculationNewHSTHandler">
 <em class="property">class </em><code class="descclassname">engine.run_online.</code><code class="descname">CalculationNewHSTHandler</code><span class="sig-paren">(</span><em>application</em>, <em>request</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/run_online.html#CalculationNewHSTHandler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.run_online.CalculationNewHSTHandler" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#engine.run_online.BaseHandler" title="engine.run_online.BaseHandler"><code class="xref py py-class docutils literal"><span class="pre">engine.run_online.BaseHandler</span></code></a></p>
@@ -1137,27 +1123,6 @@ or <cite>self.request.body</cite> to grab the entire returned object.</p>
 </dd></dl>
 
 <dl class="class">
-<dt id="engine.run_online.CalculationNewSpecHandler">
-<em class="property">class </em><code class="descclassname">engine.run_online.</code><code class="descname">CalculationNewSpecHandler</code><span class="sig-paren">(</span><em>application</em>, <em>request</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/run_online.html#CalculationNewSpecHandler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.run_online.CalculationNewSpecHandler" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#engine.run_online.BaseHandler" title="engine.run_online.BaseHandler"><code class="xref py py-class docutils literal"><span class="pre">engine.run_online.BaseHandler</span></code></a></p>
-<p>This request handler deals with processing the form data and submitting
-a new calculation task to the parallelized workers.</p>
-<dl class="method">
-<dt id="engine.run_online.CalculationNewSpecHandler.get">
-<code class="descname">get</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/run_online.html#CalculationNewSpecHandler.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.run_online.CalculationNewSpecHandler.get" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="engine.run_online.CalculationNewSpecHandler.post">
-<code class="descname">post</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/run_online.html#CalculationNewSpecHandler.post"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.run_online.CalculationNewSpecHandler.post" title="Permalink to this definition">¶</a></dt>
-<dd><p>The post method contains the retured data from the form data (
-accessed by using <cite>self.get_argument(...)</cite> for specific arguments,
-or <cite>self.request.body</cite> to grab the entire returned object.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
 <dt id="engine.run_online.CalculationStatusHSTHandler">
 <em class="property">class </em><code class="descclassname">engine.run_online.</code><code class="descname">CalculationStatusHSTHandler</code><span class="sig-paren">(</span><em>application</em>, <em>request</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/run_online.html#CalculationStatusHSTHandler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.run_online.CalculationStatusHSTHandler" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#engine.run_online.BaseHandler" title="engine.run_online.BaseHandler"><code class="xref py py-class docutils literal"><span class="pre">engine.run_online.BaseHandler</span></code></a></p>
@@ -1177,18 +1142,6 @@ or <cite>self.request.body</cite> to grab the entire returned object.</p>
 <dl class="method">
 <dt id="engine.run_online.CalculationStatusHandler.get">
 <code class="descname">get</code><span class="sig-paren">(</span><em>id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/run_online.html#CalculationStatusHandler.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.run_online.CalculationStatusHandler.get" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="engine.run_online.CalculationStatusSpecHandler">
-<em class="property">class </em><code class="descclassname">engine.run_online.</code><code class="descname">CalculationStatusSpecHandler</code><span class="sig-paren">(</span><em>application</em>, <em>request</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/run_online.html#CalculationStatusSpecHandler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.run_online.CalculationStatusSpecHandler" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#engine.run_online.BaseHandler" title="engine.run_online.BaseHandler"><code class="xref py py-class docutils literal"><span class="pre">engine.run_online.BaseHandler</span></code></a></p>
-<p>Handlers returning the status of a particular Spec calculation task.</p>
-<dl class="method">
-<dt id="engine.run_online.CalculationStatusSpecHandler.get">
-<code class="descname">get</code><span class="sig-paren">(</span><em>id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/run_online.html#CalculationStatusSpecHandler.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.run_online.CalculationStatusSpecHandler.get" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -1256,19 +1209,6 @@ or <cite>self.request.body</cite> to grab the entire returned object.</p>
 </dd></dl>
 
 <dl class="class">
-<dt id="engine.run_online.CalculationViewSpecHandler">
-<em class="property">class </em><code class="descclassname">engine.run_online.</code><code class="descname">CalculationViewSpecHandler</code><span class="sig-paren">(</span><em>application</em>, <em>request</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/run_online.html#CalculationViewSpecHandler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.run_online.CalculationViewSpecHandler" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#engine.run_online.BaseHandler" title="engine.run_online.BaseHandler"><code class="xref py py-class docutils literal"><span class="pre">engine.run_online.BaseHandler</span></code></a></p>
-<p>This handler deals with passing the results from Pandeia to the
-<cite>create_component_spec</cite> function which generates the Bokeh interative plots.</p>
-<dl class="method">
-<dt id="engine.run_online.CalculationViewSpecHandler.get">
-<code class="descname">get</code><span class="sig-paren">(</span><em>id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/run_online.html#CalculationViewSpecHandler.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.run_online.CalculationViewSpecHandler.get" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
 <dt id="engine.run_online.DashboardHSTHandler">
 <em class="property">class </em><code class="descclassname">engine.run_online.</code><code class="descname">DashboardHSTHandler</code><span class="sig-paren">(</span><em>application</em>, <em>request</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/run_online.html#DashboardHSTHandler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.run_online.DashboardHSTHandler" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#engine.run_online.BaseHandler" title="engine.run_online.BaseHandler"><code class="xref py py-class docutils literal"><span class="pre">engine.run_online.BaseHandler</span></code></a></p>
@@ -1290,19 +1230,6 @@ the html template, along with the list of current task objects.</p>
 <dl class="method">
 <dt id="engine.run_online.DashboardHandler.get">
 <code class="descname">get</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/run_online.html#DashboardHandler.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.run_online.DashboardHandler.get" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="engine.run_online.DashboardSpecHandler">
-<em class="property">class </em><code class="descclassname">engine.run_online.</code><code class="descname">DashboardSpecHandler</code><span class="sig-paren">(</span><em>application</em>, <em>request</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/run_online.html#DashboardSpecHandler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.run_online.DashboardSpecHandler" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#engine.run_online.BaseHandler" title="engine.run_online.BaseHandler"><code class="xref py py-class docutils literal"><span class="pre">engine.run_online.BaseHandler</span></code></a></p>
-<p>Request handler for the dashboard page. This will retrieve and render
-the html template, along with the list of current task objects.</p>
-<dl class="method">
-<dt id="engine.run_online.DashboardSpecHandler.get">
-<code class="descname">get</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/run_online.html#DashboardSpecHandler.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.run_online.DashboardSpecHandler.get" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -2422,60 +2349,6 @@ to create input dictionaries and <strong>run_online</strong> contains web forms 
 </dl>
 </div>
 </dd></dl>
-
-</div>
-<div class="section" id="module-engine.ComputeZ">
-<span id="engine-computez"></span><h2>engine.ComputeZ<a class="headerlink" href="#module-engine.ComputeZ" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
-<dt id="engine.ComputeZ.addBackground">
-<code class="descclassname">engine.ComputeZ.</code><code class="descname">addBackground</code><span class="sig-paren">(</span><em>molDict</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/ComputeZ.html#addBackground"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.ComputeZ.addBackground" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="engine.ComputeZ.computeAlpha">
-<code class="descclassname">engine.ComputeZ.</code><code class="descname">computeAlpha</code><span class="sig-paren">(</span><em>molDict</em>, <em>plot=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/ComputeZ.html#computeAlpha"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.ComputeZ.computeAlpha" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="engine.ComputeZ.computeJac">
-<code class="descclassname">engine.ComputeZ.</code><code class="descname">computeJac</code><span class="sig-paren">(</span><em>molDict</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/ComputeZ.html#computeJac"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.ComputeZ.computeJac" title="Permalink to this definition">¶</a></dt>
-<dd><p>Function to construct Jacobian of equation alpha <a class="reference external" href="http://arxiv.org/pdf/1511.09443v2.pdf">http://arxiv.org/pdf/1511.09443v2.pdf</a>
-eqn. 4</p>
-<dl class="docutils">
-<dt>Inputs:</dt>
-<dd>T, mu, g, beta: float
-xsec: dict of cross sections
-squig: dict of mixing ratios</dd>
-</dl>
-</dd></dl>
-
-<dl class="function">
-<dt id="engine.ComputeZ.computeMu">
-<code class="descclassname">engine.ComputeZ.</code><code class="descname">computeMu</code><span class="sig-paren">(</span><em>squig</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/ComputeZ.html#computeMu"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.ComputeZ.computeMu" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute mean molecular weight of an atmosphere</p>
-<dl class="docutils">
-<dt>Input:</dt>
-<dd>Dict of molecules with mixing ratios
-i.e. {&#8220;H2O&#8221;: 0.98, &#8220;H2&#8221;:0.2}</dd>
-<dt>Output:</dt>
-<dd>mean molecular weight, float</dd>
-</dl>
-</dd></dl>
-
-<dl class="function">
-<dt id="engine.ComputeZ.computeZSum">
-<code class="descclassname">engine.ComputeZ.</code><code class="descname">computeZSum</code><span class="sig-paren">(</span><em>xsec</em>, <em>squig</em>, <em>waves</em>, <em>plot2</em>, <em>plot</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/ComputeZ.html#computeZSum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.ComputeZ.computeZSum" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="engine.ComputeZ.find_nearest">
-<code class="descclassname">engine.ComputeZ.</code><code class="descname">find_nearest</code><span class="sig-paren">(</span><em>array</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/ComputeZ.html#find_nearest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.ComputeZ.find_nearest" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="engine.ComputeZ.readXSecs">
-<code class="descclassname">engine.ComputeZ.</code><code class="descname">readXSecs</code><span class="sig-paren">(</span><em>molDict</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/ComputeZ.html#readXSecs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.ComputeZ.readXSecs" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 
 </div>
 <div class="section" id="module-engine.elements">

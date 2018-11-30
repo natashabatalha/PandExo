@@ -177,8 +177,7 @@
 <span class="kn">from</span> <span class="nn">.pandexo</span> <span class="k">import</span> <span class="n">wrapper</span>
 <span class="kn">from</span> <span class="nn">tornado.options</span> <span class="k">import</span> <span class="n">define</span><span class="p">,</span> <span class="n">options</span>
 <span class="kn">import</span> <span class="nn">pickle</span>
-<span class="kn">from</span> <span class="nn">.ComputeZ</span> <span class="k">import</span> <span class="n">computeAlpha</span>
-<span class="kn">from</span> <span class="nn">.utils.plotters</span> <span class="k">import</span> <span class="n">create_component_jwst</span><span class="p">,</span> <span class="n">create_component_spec</span><span class="p">,</span> <span class="n">create_component_hst</span>
+<span class="kn">from</span> <span class="nn">.utils.plotters</span> <span class="k">import</span> <span class="n">create_component_jwst</span><span class="p">,</span> <span class="n">create_component_hst</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span> 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">.logs</span> <span class="k">import</span> <span class="n">jwst_log</span><span class="p">,</span> <span class="n">hst_log</span>
@@ -214,21 +213,16 @@
             <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">HomeHandler</span><span class="p">),</span>
             <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/about&quot;</span><span class="p">,</span> <span class="n">AboutHandler</span><span class="p">),</span>
             <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/dashboard&quot;</span><span class="p">,</span> <span class="n">DashboardHandler</span><span class="p">),</span>
-            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/dashboardspec&quot;</span><span class="p">,</span> <span class="n">DashboardSpecHandler</span><span class="p">),</span>
             <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/dashboardhst&quot;</span><span class="p">,</span> <span class="n">DashboardHSTHandler</span><span class="p">),</span>
             <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/tables&quot;</span><span class="p">,</span> <span class="n">TablesHandler</span><span class="p">),</span>
             <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/helpfulplots&quot;</span><span class="p">,</span> <span class="n">HelpfulPlotsHandler</span><span class="p">),</span>
             <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/calculation/new&quot;</span><span class="p">,</span> <span class="n">CalculationNewHandler</span><span class="p">),</span>
             <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/calculation/newHST&quot;</span><span class="p">,</span> <span class="n">CalculationNewHSTHandler</span><span class="p">),</span>
-            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/calculation/newspec&quot;</span><span class="p">,</span> <span class="n">CalculationNewSpecHandler</span><span class="p">),</span>
             <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/calculation/status/([^/]+)&quot;</span><span class="p">,</span> <span class="n">CalculationStatusHandler</span><span class="p">),</span>
             <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/calculation/statushst/([^/]+)&quot;</span><span class="p">,</span> <span class="n">CalculationStatusHSTHandler</span><span class="p">),</span>
-            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/calculation/statusspec/([^/]+)&quot;</span><span class="p">,</span> <span class="n">CalculationStatusSpecHandler</span><span class="p">),</span>
             <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/calculation/view/([^/]+)&quot;</span><span class="p">,</span> <span class="n">CalculationViewHandler</span><span class="p">),</span>
             <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/calculation/viewhst/([^/]+)&quot;</span><span class="p">,</span> <span class="n">CalculationViewHSTHandler</span><span class="p">),</span>
-            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/calculation/viewspec/([^/]+)&quot;</span><span class="p">,</span> <span class="n">CalculationViewSpecHandler</span><span class="p">),</span>
             <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/calculation/download/([^/]+)&quot;</span><span class="p">,</span> <span class="n">CalculationDownloadHandler</span><span class="p">),</span>
-            <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/calculation/downloadspec/([^/]+)&quot;</span><span class="p">,</span> <span class="n">CalculationDownloadSpecHandler</span><span class="p">),</span>
             <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/calculation/downloadpandin/([^/]+)&quot;</span><span class="p">,</span> <span class="n">CalculationDownloadPandInHandler</span><span class="p">)</span>
         <span class="p">]</span>
         <span class="n">settings</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
@@ -275,33 +269,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">render_string</span><span class="p">(</span><span class="s2">&quot;calc_row.html&quot;</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="n">response</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">response</span>
 
-    <span class="k">def</span> <span class="nf">_get_task_response_spec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Simple function to grab a calculation that&#39;s stored in the buffer,</span>
-<span class="sd">        and return a dictionary/json-like response to the front-end.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">calc_task</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
-        <span class="n">task</span> <span class="o">=</span> <span class="n">calc_task</span><span class="o">.</span><span class="n">task</span>
-
-        <span class="n">response</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="nb">id</span><span class="p">,</span>
-                    <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">calc_task</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-                    <span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="n">calc_task</span><span class="o">.</span><span class="n">count</span><span class="p">}</span>
-
-        <span class="k">if</span> <span class="n">task</span><span class="o">.</span><span class="n">running</span><span class="p">():</span>
-            <span class="n">response</span><span class="p">[</span><span class="s1">&#39;state&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;running&#39;</span>
-            <span class="n">response</span><span class="p">[</span><span class="s1">&#39;code&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">202</span>
-        <span class="k">elif</span> <span class="n">task</span><span class="o">.</span><span class="n">done</span><span class="p">():</span>
-            <span class="n">response</span><span class="p">[</span><span class="s1">&#39;state&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;finished&#39;</span>
-        <span class="k">elif</span> <span class="n">task</span><span class="o">.</span><span class="n">cancelled</span><span class="p">():</span>
-            <span class="n">response</span><span class="p">[</span><span class="s1">&#39;state&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;cancelled&#39;</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">response</span><span class="p">[</span><span class="s1">&#39;state&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;pending&#39;</span>
-
-        <span class="n">response</span><span class="p">[</span><span class="s1">&#39;html&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tornado</span><span class="o">.</span><span class="n">escape</span><span class="o">.</span><span class="n">to_basestring</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">render_string</span><span class="p">(</span><span class="s2">&quot;calc_rowspec.html&quot;</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="n">response</span><span class="p">))</span>
-
-        <span class="k">return</span> <span class="n">response</span>
-
+ 
     <span class="k">def</span> <span class="nf">_get_task_response_hst</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Simple function to grab a calculation that&#39;s stored in the buffer,</span>
@@ -430,18 +398,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">&quot;dashboardhst.html&quot;</span><span class="p">,</span> <span class="n">calculations</span><span class="o">=</span><span class="n">task_responses</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span></div></div>
 
 
-
-<div class="viewcode-block" id="DashboardSpecHandler"><a class="viewcode-back" href="../../engine.html#engine.run_online.DashboardSpecHandler">[docs]</a><span class="k">class</span> <span class="nc">DashboardSpecHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Request handler for the dashboard page. This will retrieve and render</span>
-<span class="sd">    the html template, along with the list of current task objects.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="DashboardSpecHandler.get"><a class="viewcode-back" href="../../engine.html#engine.run_online.DashboardSpecHandler.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">task_responses</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_task_response_spec</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span> <span class="k">for</span> <span class="nb">id</span><span class="p">,</span> <span class="n">nt</span> <span class="ow">in</span>
-                          <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
-                          <span class="k">if</span> <span class="p">((</span><span class="n">nt</span><span class="o">.</span><span class="n">cookie</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cookie</span><span class="p">(</span><span class="s2">&quot;pandexo_user&quot;</span><span class="p">))</span>
-                          <span class="o">&amp;</span> <span class="p">(</span><span class="nb">id</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;s&#39;</span><span class="p">))]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">&quot;dashboardspec.html&quot;</span><span class="p">,</span> <span class="n">calculations</span><span class="o">=</span><span class="n">task_responses</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span></div></div>
 
 
 <div class="viewcode-block" id="CalculationNewHandler"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationNewHandler">[docs]</a><span class="k">class</span> <span class="nc">CalculationNewHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
@@ -768,103 +724,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;../dashboardhst&quot;</span><span class="p">)</span></div></div>
         
             
-<div class="viewcode-block" id="CalculationNewSpecHandler"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationNewSpecHandler">[docs]</a><span class="k">class</span> <span class="nc">CalculationNewSpecHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    This request handler deals with processing the form data and submitting</span>
-<span class="sd">    a new calculation task to the parallelized workers.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="CalculationNewSpecHandler.get"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationNewSpecHandler.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">&quot;newspec.html&quot;</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="CalculationNewSpecHandler.post"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationNewSpecHandler.post">[docs]</a>    <span class="k">def</span> <span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        The post method contains the retured data from the form data (</span>
-<span class="sd">        accessed by using `self.get_argument(...)` for specific arguments,</span>
-<span class="sd">        or `self.request.body` to grab the entire returned object.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        
-        <span class="c1">#print(self.request.body)</span>
-        
-        <span class="nb">id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span><span class="o">+</span><span class="s1">&#39;s&#39;</span>
-        <span class="n">finaldata</span><span class="o">=</span> <span class="p">{}</span>      
-        <span class="n">mols</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="n">mols</span><span class="p">[</span><span class="s1">&#39;H2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
-        <span class="n">mols</span><span class="p">[</span><span class="s1">&#39;He&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
-        <span class="k">try</span><span class="p">:</span> 
-            <span class="n">mols</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol1&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol1_vmr&quot;</span><span class="p">))</span>
-        <span class="k">except</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol1_vmr&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;bkg&#39;</span><span class="p">:</span> 
-                <span class="n">mols</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol1&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol1_vmr&quot;</span><span class="p">)</span>
-        <span class="k">try</span><span class="p">:</span> 
-            <span class="n">mols</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol2&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol2_vmr&quot;</span><span class="p">))</span>
-        <span class="k">except</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol2_vmr&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;bkg&#39;</span><span class="p">:</span> 
-                <span class="n">mols</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol2&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol2_vmr&quot;</span><span class="p">)</span>
-        <span class="k">try</span><span class="p">:</span> 
-            <span class="n">mols</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol3&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol3_vmr&quot;</span><span class="p">))</span>
-        <span class="k">except</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol3_vmr&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;bkg&#39;</span><span class="p">:</span> 
-                <span class="n">mols</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol3&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol3_vmr&quot;</span><span class="p">)</span>
-        <span class="k">try</span><span class="p">:</span> 
-            <span class="n">mols</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol4&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol4_vmr&quot;</span><span class="p">))</span>
-        <span class="k">except</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol4_vmr&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;bkg&#39;</span><span class="p">:</span> 
-                <span class="n">mols</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol4&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol4_vmr&quot;</span><span class="p">)</span>
-        <span class="k">try</span><span class="p">:</span> 
-            <span class="n">mols</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol5&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol5_vmr&quot;</span><span class="p">))</span>
-        <span class="k">except</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol5_vmr&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;bkg&#39;</span><span class="p">:</span> 
-                <span class="n">mols</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol5&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol5_vmr&quot;</span><span class="p">)</span>
-        <span class="k">try</span><span class="p">:</span> 
-            <span class="n">mols</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol6&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol6_vmr&quot;</span><span class="p">))</span>
-        <span class="k">except</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol6_vmr&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;bkg&#39;</span><span class="p">:</span> 
-                <span class="n">mols</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol6&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol6_vmr&quot;</span><span class="p">)</span>
-        <span class="k">try</span><span class="p">:</span> 
-            <span class="n">mols</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol7&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol7_vmr&quot;</span><span class="p">))</span>
-        <span class="k">except</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol7_vmr&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;bkg&#39;</span><span class="p">:</span> 
-                <span class="n">mols</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol7&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol7_vmr&quot;</span><span class="p">)</span>
-        <span class="k">try</span><span class="p">:</span> 
-            <span class="n">mols</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol8&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol8_vmr&quot;</span><span class="p">))</span>
-        <span class="k">except</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol8_vmr&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;bkg&#39;</span><span class="p">:</span> 
-                <span class="n">mols</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol8&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol8_vmr&quot;</span><span class="p">)</span>
-        <span class="k">try</span><span class="p">:</span> 
-            <span class="n">mols</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol9&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol9_vmr&quot;</span><span class="p">))</span>
-        <span class="k">except</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol9_vmr&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;bkg&#39;</span><span class="p">:</span> 
-                <span class="n">mols</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol9&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol9_vmr&quot;</span><span class="p">)</span>
-        <span class="k">try</span><span class="p">:</span> 
-            <span class="n">mols</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol10&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol10_vmr&quot;</span><span class="p">))</span>
-        <span class="k">except</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol10_vmr&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;bkg&#39;</span><span class="p">:</span> 
-                <span class="n">mols</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol10&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;mol10_vmr&quot;</span><span class="p">)</span>
-        
-
-        <span class="n">finaldata</span><span class="p">[</span><span class="s2">&quot;mols&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mols</span>
-        <span class="n">finaldata</span><span class="p">[</span><span class="s1">&#39;T&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">))</span>
-        <span class="n">finaldata</span><span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;g&quot;</span><span class="p">))</span>
-        <span class="n">finaldata</span><span class="p">[</span><span class="s1">&#39;Rp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;Rp&quot;</span><span class="p">))</span>
-        <span class="n">finaldata</span><span class="p">[</span><span class="s1">&#39;R*&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;R*&quot;</span><span class="p">))</span>
-        <span class="n">finaldata</span><span class="p">[</span><span class="s1">&#39;P&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;P&quot;</span><span class="p">))</span>
-        <span class="n">finaldata</span><span class="p">[</span><span class="s1">&#39;P0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;P0&quot;</span><span class="p">))</span>
-        <span class="k">try</span><span class="p">:</span> 
-            <span class="n">finaldata</span><span class="p">[</span><span class="s1">&#39;fracH2He&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;fracH2He&quot;</span><span class="p">))</span>
-        <span class="k">except</span><span class="p">:</span> 
-            <span class="n">finaldata</span><span class="p">[</span><span class="s1">&#39;fracH2He&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
-        <span class="n">finaldata</span><span class="p">[</span><span class="s1">&#39;taueq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.56</span>
-        <span class="n">task</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">executor</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">computeAlpha</span><span class="p">,</span> <span class="n">finaldata</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">_add_task</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argument</span><span class="p">(</span><span class="s2">&quot;calcName&quot;</span><span class="p">),</span> <span class="n">task</span><span class="p">)</span>
-
-        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_task_response_spec</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
-        <span class="n">response</span><span class="p">[</span><span class="s1">&#39;info&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="n">response</span><span class="p">[</span><span class="s1">&#39;location&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;/calculation/statusspec/</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
-        
-        
-        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">response</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;../dashboardspec&quot;</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="CalculationStatusHandler"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationStatusHandler">[docs]</a><span class="k">class</span> <span class="nc">CalculationStatusHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
@@ -879,17 +738,6 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">response</span><span class="p">))</span></div></div>
 
-<div class="viewcode-block" id="CalculationStatusSpecHandler"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationStatusSpecHandler">[docs]</a><span class="k">class</span> <span class="nc">CalculationStatusSpecHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Handlers returning the status of a particular Spec calculation task.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="CalculationStatusSpecHandler.get"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationStatusSpecHandler.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
-        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_task_response_spec</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">closed</span><span class="p">():</span>
-            <span class="k">return</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">response</span><span class="p">))</span> </div></div>
         
 <div class="viewcode-block" id="CalculationStatusHSTHandler"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationStatusHSTHandler">[docs]</a><span class="k">class</span> <span class="nc">CalculationStatusHSTHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -936,38 +784,7 @@
                 <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">__TEMP__</span><span class="p">,</span><span class="n">i</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">finish</span><span class="p">()</span></div></div>
 
-<div class="viewcode-block" id="CalculationDownloadSpecHandler"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationDownloadSpecHandler">[docs]</a><span class="k">class</span> <span class="nc">CalculationDownloadSpecHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Handlers returning the downloaded data of a particular calculation task.</span>
-<span class="sd">    Handlers returning the status of a particular calculation task.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="CalculationDownloadSpecHandler.get"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationDownloadSpecHandler.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_task_result</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
-  
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">closed</span><span class="p">():</span>
-            <span class="k">return</span>
-        <span class="n">file_name</span> <span class="o">=</span> <span class="s2">&quot;spec-calculation&quot;</span> <span class="o">+</span><span class="nb">id</span><span class="o">+</span><span class="s2">&quot;.p&quot;</span>
- 
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">__TEMP__</span><span class="p">,</span><span class="n">file_name</span><span class="p">),</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
- 
-        <span class="n">buf_size</span> <span class="o">=</span> <span class="mi">4096</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_header</span><span class="p">(</span><span class="s1">&#39;Content-Type&#39;</span><span class="p">,</span> <span class="s1">&#39;application/octet-stream&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_header</span><span class="p">(</span><span class="s1">&#39;Content-Disposition&#39;</span><span class="p">,</span>
-                        <span class="s1">&#39;attachment; filename=&#39;</span> <span class="o">+</span> <span class="n">file_name</span><span class="p">)</span>
- 
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">__TEMP__</span><span class="p">,</span><span class="n">file_name</span><span class="p">),</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-                <span class="n">data</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">buf_size</span><span class="p">)</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="p">:</span>
-                    <span class="k">break</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-        
-        <span class="n">allfiles</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">__TEMP__</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">allfiles</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
-                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">__TEMP__</span><span class="p">,</span><span class="n">i</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">finish</span><span class="p">()</span></div></div>
+
 
 <div class="viewcode-block" id="CalculationDownloadPandInHandler"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationDownloadPandInHandler">[docs]</a><span class="k">class</span> <span class="nc">CalculationDownloadPandInHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -1029,16 +846,7 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">&quot;view.html&quot;</span><span class="p">,</span> <span class="n">script</span><span class="o">=</span><span class="n">script</span><span class="p">,</span> <span class="n">div</span><span class="o">=</span><span class="n">div</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="p">)</span></div></div>
 
-<div class="viewcode-block" id="CalculationViewSpecHandler"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationViewSpecHandler">[docs]</a><span class="k">class</span> <span class="nc">CalculationViewSpecHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    This handler deals with passing the results from Pandeia to the</span>
-<span class="sd">    `create_component_spec` function which generates the Bokeh interative plots.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="CalculationViewSpecHandler.get"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationViewSpecHandler.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_task_result</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
-        <span class="n">script</span><span class="p">,</span> <span class="n">div</span> <span class="o">=</span> <span class="n">create_component_spec</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">&quot;viewspec.html&quot;</span><span class="p">,</span> <span class="n">script</span><span class="o">=</span><span class="n">script</span><span class="p">,</span> <span class="n">div</span><span class="o">=</span><span class="n">div</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="p">)</span></div></div>
 
 <div class="viewcode-block" id="CalculationViewHSTHandler"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationViewHSTHandler">[docs]</a><span class="k">class</span> <span class="nc">CalculationViewHSTHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>

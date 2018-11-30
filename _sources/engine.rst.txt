@@ -82,13 +82,6 @@ engine.pandexo
     :undoc-members:
     :show-inheritance:
     
-engine.ComputeZ
----------------
-
-.. automodule:: engine.ComputeZ
-    :members:
-    :undoc-members:
-    :show-inheritance:
 
 engine.elements
 ---------------
