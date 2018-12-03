@@ -13,7 +13,7 @@ Pre-installation Data Download
 ss mentioned, the user must provide their own reference data files in order for the engine to understand the instrument with which the calculations will be performed. First step to getting PandExo running is downloading four files. Download them and put them in the same directory. 
 
 JWST Reference Data
-```````````````````
+````````````````````
 For JWST, the link to access the required reference data is located `here <https://pypi.python.org/pypi/pandeia.engine/>`_. It should be the first link on this page. Pay attention and make sure you get the `pandeia_data` and not the `wfirst_data`!! 
 
 Stellar SEDs 
@@ -25,8 +25,8 @@ PandExo startup bash script
 A startup script (`pandexo.sh`) and a python test script (`run_test.py`) were created to do an automatic install of PandExo. You can download both of them from the PandExo `GitHub <https://github.com/natashabatalha/PandExo>`_.
 
 
-Installation for Users With Conda
-====================================
+Installation with Conda
+=======================
 
 Open up the file `pandexo.sh`. There are two lines in the beginning which tell PandExo where your reference data will go. Currently this script is set to unpack and store the reference files in your HOME directory. 
 
@@ -47,6 +47,7 @@ Then run
     End In Transit
     SUCCESS
 
+
 Hopefully you have had success but if not the most likely error you will get is the following:
 
 COORDS.PY: TypeError: 'float' object cannot be interpreted as an index
@@ -64,10 +65,10 @@ To this:
     ones = np.ones((int(ny), int(nx)))
 
 
-Installation for Users With PIP or Conda
-========================================
+Installation with Pip
+=====================
 
-You should have already downloaded the two data tar files, pandexo.sh and run_test.py. If not, go back to `Pre Installation Data Download`. 
+This option is less optimal because of some of the dependencies.. But, it can be done/
 
 Then, start by installing PandExo, which should automatically install Pandeia and other dependencies 
 
@@ -75,10 +76,6 @@ Then, start by installing PandExo, which should automatically install Pandeia an
     
     pip install pandexo.engine
 
-OR Conda 
-.. code-block:: bash
-
-    conda install -c natashabatalha pandexo.engine
 
 OR Download PandExo's repository via Github: 
 

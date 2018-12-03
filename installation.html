@@ -94,11 +94,11 @@
 <li class="toctree-l2"><a class="reference internal" href="#pandexo-startup-bash-script">PandExo startup bash script</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="#installation-for-users-with-conda">Installation for Users With Conda</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="#installation-with-conda">Installation with Conda</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#coords-py-typeerror-float-object-cannot-be-interpreted-as-an-index">COORDS.PY: TypeError: &#8216;float&#8217; object cannot be interpreted as an index</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="#installation-for-users-with-pip-or-conda">Installation for Users With PIP or Conda</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="#installation-with-pip">Installation with Pip</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#set-environment">Set Environment</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#dependencies">Dependencies</a></li>
 </ul>
@@ -205,8 +205,8 @@
 <p>A startup script (<cite>pandexo.sh</cite>) and a python test script (<cite>run_test.py</cite>) were created to do an automatic install of PandExo. You can download both of them from the PandExo <a class="reference external" href="https://github.com/natashabatalha/PandExo">GitHub</a>.</p>
 </div>
 </div>
-<div class="section" id="installation-for-users-with-conda">
-<h1>Installation for Users With Conda<a class="headerlink" href="#installation-for-users-with-conda" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="installation-with-conda">
+<h1>Installation with Conda<a class="headerlink" href="#installation-with-conda" title="Permalink to this headline">¶</a></h1>
 <p>Open up the file <cite>pandexo.sh</cite>. There are two lines in the beginning which tell PandExo where your reference data will go. Currently this script is set to unpack and store the reference files in your HOME directory.</p>
 <p>If you are not okay with it, <strong>change</strong> $HOME in the first two lines of pandexo.sh to whatever you want the data to be.</p>
 <p>Then run</p>
@@ -235,17 +235,13 @@ SUCCESS
 </div>
 </div>
 </div>
-<div class="section" id="installation-for-users-with-pip-or-conda">
-<h1>Installation for Users With PIP or Conda<a class="headerlink" href="#installation-for-users-with-pip-or-conda" title="Permalink to this headline">¶</a></h1>
-<p>You should have already downloaded the two data tar files, pandexo.sh and run_test.py. If not, go back to <cite>Pre Installation Data Download</cite>.</p>
+<div class="section" id="installation-with-pip">
+<h1>Installation with Pip<a class="headerlink" href="#installation-with-pip" title="Permalink to this headline">¶</a></h1>
+<p>This option is less optimal because of some of the dependencies.. But, it can be done/</p>
 <p>Then, start by installing PandExo, which should automatically install Pandeia and other dependencies</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>pip install pandexo.engine
 </pre></div>
 </div>
-<p>OR Conda
-.. code-block:: bash</p>
-<blockquote>
-<div>conda install -c natashabatalha pandexo.engine</div></blockquote>
 <p>OR Download PandExo&#8217;s repository via Github:</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>git clone --recursive https://github.com/natashabatalha/pandexo
 <span class="nb">cd</span> pandexo
