@@ -64,8 +64,8 @@ To this:
     ones = np.ones((int(ny), int(nx)))
 
 
-Installation for Users With PIP
-===============================
+Installation for Users With PIP or Conda
+========================================
 
 You should have already downloaded the two data tar files, pandexo.sh and run_test.py. If not, go back to `Pre Installation Data Download`. 
 
@@ -74,6 +74,11 @@ Then, start by installing PandExo, which should automatically install Pandeia an
 .. code-block:: bash
     
     pip install pandexo.engine
+
+OR Conda 
+.. code-block:: bash
+
+    conda install -c natashabatalha pandexo.engine
 
 OR Download PandExo's repository via Github: 
 

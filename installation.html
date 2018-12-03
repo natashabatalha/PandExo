@@ -36,7 +36,7 @@
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
     <link rel="top" title="PandExo  documentation" href="index.html"/>
-        <link rel="next" title="JWST Tutorial" href="tutorialjwst.html"/>
+        <link rel="next" title="Windows Installing Guide for PandExo" href="installation_windows.html"/>
         <link rel="prev" title="Getting Started" href="includeme.html"/> 
 
   
@@ -98,7 +98,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#coords-py-typeerror-float-object-cannot-be-interpreted-as-an-index">COORDS.PY: TypeError: &#8216;float&#8217; object cannot be interpreted as an index</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="#installation-for-users-with-pip">Installation for Users With PIP</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="#installation-for-users-with-pip-or-conda">Installation for Users With PIP or Conda</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#set-environment">Set Environment</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#dependencies">Dependencies</a></li>
 </ul>
@@ -114,6 +114,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#verify-pandexo-engine-is-current">Verify pandexo.engine is Current</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="installation_windows.html">Windows Installing Guide for PandExo</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorialjwst.html">JWST Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="jwstinput.html">Possible Instrument Input Params</a></li>
 <li class="toctree-l1"><a class="reference internal" href="jwstdict.html">Py Dict Structure of JWST Output</a></li>
@@ -234,13 +235,17 @@ SUCCESS
 </div>
 </div>
 </div>
-<div class="section" id="installation-for-users-with-pip">
-<h1>Installation for Users With PIP<a class="headerlink" href="#installation-for-users-with-pip" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="installation-for-users-with-pip-or-conda">
+<h1>Installation for Users With PIP or Conda<a class="headerlink" href="#installation-for-users-with-pip-or-conda" title="Permalink to this headline">¶</a></h1>
 <p>You should have already downloaded the two data tar files, pandexo.sh and run_test.py. If not, go back to <cite>Pre Installation Data Download</cite>.</p>
 <p>Then, start by installing PandExo, which should automatically install Pandeia and other dependencies</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>pip install pandexo.engine
 </pre></div>
 </div>
+<p>OR Conda
+.. code-block:: bash</p>
+<blockquote>
+<div>conda install -c natashabatalha pandexo.engine</div></blockquote>
 <p>OR Download PandExo&#8217;s repository via Github:</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>git clone --recursive https://github.com/natashabatalha/pandexo
 <span class="nb">cd</span> pandexo
@@ -345,7 +350,7 @@ SUCCESS
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="tutorialjwst.html" class="btn btn-neutral float-right" title="JWST Tutorial" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="installation_windows.html" class="btn btn-neutral float-right" title="Windows Installing Guide for PandExo" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="includeme.html" class="btn btn-neutral" title="Getting Started" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
