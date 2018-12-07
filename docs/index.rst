@@ -3,8 +3,17 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-PandExo: An Exoplanet ETC 
-==================================
+.. raw:: html
+
+   <div align="center">
+   <img src="_images/logo.png" width="450px">
+   </img>
+   <br/>
+   </div>
+   <br/><br/>
+
+The Documentation
+=================
 
 Tools to help the community with planning exoplanet observations.
 

@@ -20,7 +20,8 @@
                     }
                 }
             ],
-    "background": "medium",
+    "background_level": "medium",
+    "background":"ecliptic",
     "calculation":{
         "effects": {
                 "background": true,

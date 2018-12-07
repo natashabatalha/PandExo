@@ -1,63 +1,65 @@
-JWST Tutorial 
+JWST Tutorial
 =============
 
-This tutorial can be downloaded as a iPython notebook on the PandExo Github. You also always have the option of running PandExo UI by running in `bash`
+Here you will learn how to:
 
-.. code:: bash
+-  set planet properties
+-  set stellar properties
+-  run default instrument modes
+-  adjust instrument modes
+-  run pandexo
 
-    start_pandexo 
-
-And then going to https://locahost:1111
-
-In python though, start by loading in some universal packages, as well as PandExo.
-
-.. code:: python
+.. code:: ipython3
 
     import warnings
     warnings.filterwarnings('ignore')
     import pandexo.engine.justdoit as jdi # THIS IS THE HOLY GRAIL OF PANDEXO
     import numpy as np
     import os
+    #pip install pandexo.engine --upgrade
 
-Editting Input Dictionaries
----------------------------
-
-Step 1) Load in a blank exoplanet dictionary
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Setting up a run
+----------------
 
 To start, load in a blank exoplanet dictionary with empty keys. You will
 fill these out for yourself in the next step.
 
-.. code:: python
+.. code:: ipython3
 
     exo_dict = jdi.load_exo_dict()
+    print(exo_dict.keys())
+    #print(exo_dict['star']['w_unit'])
 
 Edit exoplanet observation inputs
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Editting each keys are annoying. But, do this carefully or it could
 result in nonsense runs
 
-.. code:: python
+.. code:: ipython3
 
-    exo_dict['observation']['sat_level'] = 80                  #saturation level in percent of full well 
-    exo_dict['observation']['sat_unit'] = '%'                  # other option = 'e' for electrons
-    exo_dict['observation']['noccultations'] = 2               #number of transits 
-    exo_dict['observation']['R'] = None                        #fixed binning. I usually suggest ZERO binning.. you can always bin later 
-    exo_dict['observation']['baseline'] = 4.0*60.0*60.0        #time spent observing out of transit, make sure to speciy units
-    exo_dict['observation']['baseline_unit'] = 'total'         #total obersving time, other option 'frac' = in/out 
-    exo_dict['observation']['noise_floor'] = 0                 #this can be a fixed level or it can be a filepath 
-                                                               #to a wavelength dependent noise floor solution (units are ppm)
+    exo_dict['observation']['sat_level'] = 80    #saturation level in percent of full well 
+    exo_dict['observation']['sat_unit'] = '%'
+    exo_dict['observation']['noccultations'] = 2 #number of transits 
+    exo_dict['observation']['R'] = None          #fixed binning. I usually suggest ZERO binning.. you can always bin later 
+                                                 #without having to redo the calcualtion
+    exo_dict['observation']['baseline_unit'] = 'total'  #Defines how you specify out of transit observing time
+                                                        #'frac' : fraction of time in transit versus out = in/out 
+                                                        #'total' : total observing time (seconds)
+    exo_dict['observation']['baseline'] = 4.0*60.0*60.0 #in accordance with what was specified above (total observing time)
+    
+    exo_dict['observation']['noise_floor'] = 0   #this can be a fixed level or it can be a filepath 
+                                                 #to a wavelength dependent noise floor solution (units are ppm)
 
 Edit exoplanet host star inputs
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Note… If you select ‘phoenix’ you **do not** have to provide a starpath,
-w\_unit or f\_unit, but you **do** have to provide a temp, metal and
-logg. If you select ‘user’ you **do not** need to provide a temp, metal
-and logg, but you **do** need to provide units and starpath.
+w_unit or f_unit, but you **do** have to provide a temp, metal and logg.
+If you select ‘user’ you **do not** need to provide a temp, metal and
+logg, but you **do** need to provide units and starpath.
 
-.. code:: python
+.. code:: ipython3
 
     exo_dict['star']['type'] = 'phoenix'        #phoenix or user (if you have your own)
     exo_dict['star']['mag'] = 8.0               #magnitude of the system
@@ -66,27 +68,31 @@ and logg, but you **do** need to provide units and starpath.
     exo_dict['star']['metal'] = 0.0             # as log Fe/H
     exo_dict['star']['logg'] = 4.0              #log surface gravity cgs
 
-Edit exoplanet inputs using one of  three options: 1) user specified, 2) constant value, 3) select from grid
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Edit exoplanet inputs using one of three options
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-1) Edit exoplanet planet inputs
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+1) user specified
+2) constant value
+3) select from grid
 
-.. code:: python
+1) Edit exoplanet planet inputs if using your own model
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-    exo_dict['planet']['type'] ='user'
+.. code:: ipython3
+
+    exo_dict['planet']['type'] ='user'                       #tells pandexo you are uploading your own spectrum
     exo_dict['planet']['exopath'] = 'wasp12b.txt'
-    exo_dict['planet']['w_unit'] = 'cm'                      #other options include "um","nm" ,"Angs", "secs" (for phase curves)
+    exo_dict['planet']['w_unit'] = 'cm'                      #other options include "um","nm" ,"Angs", "sec" (for phase curves)
     exo_dict['planet']['f_unit'] = 'rp^2/r*^2'               #other options are 'fp/f*' 
     exo_dict['planet']['transit_duration'] = 2.0*60.0*60.0   #transit duration 
     exo_dict['planet']['td_unit'] = 's'                      #Any unit of time in accordance with astropy.units can be added
 
-2) Users can also add in a constant temperature or a constant transit depth 
+2) Users can also add in a constant temperature or a constant transit depth
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. code:: python
+.. code:: ipython3
 
-    exo_dict['planet']['type'] = 'constant' 
+    exo_dict['planet']['type'] = 'constant'                  #tells pandexo you want a fixed transit depth
     exo_dict['planet']['transit_duration'] = 2.0*60.0*60.0   #transit duration 
     exo_dict['planet']['td_unit'] = 's' 
     exo_dict['planet']['radius'] = 1
@@ -94,6 +100,7 @@ Edit exoplanet inputs using one of  three options: 1) user specified, 2) constan
     exo_dict['star']['radius'] = 1
     exo_dict['star']['r_unit'] = 'R_sun'              #Same deal with astropy.units here
     exo_dict['planet']['f_unit'] = 'rp^2/r*^2'        #this is what you would do for primary transit 
+    
     #ORRRRR....
     #if you wanted to instead to secondary transit at constant temperature 
     exo_dict['planet']['f_unit'] = 'fp/f*' 
@@ -101,11 +108,13 @@ Edit exoplanet inputs using one of  three options: 1) user specified, 2) constan
 
 3) Select from grid
 ^^^^^^^^^^^^^^^^^^^
-NOTE: Currently only the fortney grid for hot Jupiters from Fortney+2010 is supported. Holler though, if you want another grid supported   
 
-.. code:: python 
+NOTE: Currently only the fortney grid for hot Jupiters from Fortney+2010
+is supported. Holler though, if you want another grid supported
 
-    exo_dict['planet']['type'] = 'grid'
+.. code:: ipython3
+
+    exo_dict['planet']['type'] = 'grid'                #tells pandexo you want to pull from the grid
     exo_dict['planet']['temp'] = 1000                 #grid: 500, 750, 1000, 1250, 1500, 1750, 2000, 2250, 2500
     exo_dict['planet']['chem'] = 'noTiO'              #options: 'noTiO' and 'eqchem', noTiO is chemical eq. without TiO
     exo_dict['planet']['cloud'] = 'ray10'               #options: nothing: '0', 
@@ -120,102 +129,123 @@ NOTE: Currently only the fortney grid for hot Jupiters from Fortney+2010 is supp
     exo_dict['planet']['transit_duration'] = 2.0*60.0*60.0   #transit duration 
     exo_dict['planet']['td_unit'] = 's' 
 
-Step 2) Load in instrument dictionary (optional)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Load in instrument dictionary (OPTIONAL)
+----------------------------------------
 
-Step 2 is optional because PandExo has templates for the most 
-common modes. Within those templates the subarrays selected are the ones 
-with the lowest frame times, and the read modes selected are the ones with one frame
-per 1 group (standard). If this suits you see Option 1 below. There is additional 
-fine tuning that can be done within each of these observing modes.  
-As a first pass, I'd suggest skipping this for now. Then come back and fine tune after your first run. 
+Step 2 is optional because PandExo has the functionality to
+automatically load in instrument dictionaries. Skip this if you plan on
+observing with one of the following and want to use the subarray with
+the smallest frame time and the readout mode with 1 frame/1 group
+(standard): - NIRCam F444W - NIRSpec Prism - NIRSpec G395M - NIRSpec
+G395H - NIRSpec G235H - NIRSpec G235M - NIRCam F322W - NIRSpec G140M -
+NIRSpec G140H - MIRI LRS - NIRISS SOSS
 
-    - NIRCam F444W 
-    - NIRSpec Prism 
-    - NIRSpec G395M 
-    - NIRSpec G395H 
-    - NIRSpec G235H 
-    - NIRSpec G235M 
-    - NIRCam F322W2 
-    - NIRSpec G140M 
-    - NIRSpec G140H 
-    - MIRI LRS 
-    - NIRISS SOSS
+.. code:: ipython3
 
-.. code:: python
+    #jdi.print_instruments()
+    result = jdi.run_pandexo(exo_dict,['NIRCam F322W2'])
 
-    jdi.print_instruments()
+.. code:: ipython3
 
-::
+    inst_dict = jdi.load_mode_dict('NIRSpec G140H')
+    
+    #loading in instrument dictionaries allow you to personalize some of  
+    #the fields that are predefined in the templates. The templates have 
+    #the subbarays with the lowest frame times and the readmodes with 1 frame per group. 
+    #if that is not what you want. change these fields
+    
+    #Try printing this out to get a feel for how it is structured: 
+    
+    print(inst_dict['configuration'])
 
-    Choose from the following:
-    ['NIRCam F444W', 'NIRSpec Prism', 'NIRSpec G395M', 'NIRCam F322W2', 'NIRSpec G395H', 'NIRSpec G235H', 'NIRSpec G235M', 'NIRSpec G140M', 'NIRSpec G140H', 'MIRI LRS', 'NIRISS SOSS', 'WFC3 G141']
+.. code:: ipython3
 
-.. code:: python
+    #Another way to display this is to print out the keys 
+    inst_dict.keys()
 
-    inst_dict = jdi.load_mode_dict('NIRSpec Prism')
+Don’t know what instrument options there are?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Change subarray: 
+.. code:: ipython3
 
-.. code:: python
-
-    inst_dict["configuration"]["detector"]["subarray"] = 'sub512'
-
-Don't know which options are available?? 
-
-..code:: python 
-
-    #subarrays
+    print("SUBARRAYS")
     print(jdi.subarrays('nirspec'))
-    #filters
+    
+    print("FILTERS")
     print(jdi.filters('nircam'))
-    #dispersers
+    
+    print("DISPERSERS")
     print(jdi.dispersers('nirspec'))
 
-The last thing to note is that PandExo (by Default) optimizes the amount of groups 
-that can fit into an integration. If you want to set your own number of groups you can 
-change that too. 
+.. code:: ipython3
 
-..code:: python 
+    #you can try personalizing some of these fields
+    
+    inst_dict["configuration"]["detector"]["ngroup"] = 'optimize'   #running "optimize" will select the maximum 
+                                                                    #possible groups before saturation. 
+                                                                    #You can also write in any integer between 2-65536
+    
+    inst_dict["configuration"]["detector"]["subarray"] = 'substrip256'   #change the subbaray
+    
 
-    inst_dict["configuration"]["detector"]["ngroup"] = 5
 
-Running PandExo Command Line
-----------------------------
+Adjusting the Background Level
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You may want to think about adjusting the background level of your
+observation, based on the position of your target. PandExo two options
+and three levels for the position:
+
+-  ``ecliptic`` or ``minzodi``
+-  ``low``, ``medium``, ``high``
+
+.. code:: ipython3
+
+    inst_dict['background'] = 'ecliptic'
+    inst_dict['background_level'] = 'high'
+
+Running NIRISS SOSS Order 2
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+PandExo only will extract a single order at a time. By default, it is
+set to extract Order 1. Below you can see how to extract the second
+order.
+
+**NOTE!** Users should be careful with this calculation. Saturation will
+be limited by the **first** order. Therefore, I suggest running one
+calculation with ``ngroup='optmize'`` for Order 1. This will give you an
+idea of a good number of groups to use. Then, you can use that in this
+order 2 calculation.
+
+.. code:: ipython3
+
+    inst_dict = jdi.load_mode_dict('NIRISS SOSS')
+    inst_dict['strategy']['order'] = 2
+    inst_dict['configuration']['detector']['subarray'] = 'substrip256'
+    ngroup_from_order1_run = 2
+    inst_dict["configuration"]["detector"]["ngroup"] = ngroup_from_order1_run
+
+Running PandExo
+---------------
 
 You have **four options** for running PandExo. All of them are accessed
-through attribute **jdi.run\_pandexo**. See examples below.
+through attribute **jdi.run_pandexo**. See examples below.
 
-``jdi.run_pandexo(exo, inst, param_space = 0, param_range = 0,save_file = True, output_path=os.getcwd(), output_file = '')``
+``jdi.run_pandexo(exo, inst, param_space = 0, param_range = 0,save_file = True,                             output_path=os.getcwd(), output_file = '')``
 
 Option 1- Run single instrument mode, single planet
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If you forget which instruments are available run
-**jdi.print\_instruments()** and pick one
+**jdi.print_isntruments()** and pick one
 
-.. code:: python
+.. code:: ipython3
 
     jdi.print_instruments()
 
-::
-
-    Choose from the following:
-    ['NIRCam F444W', 'NIRSpec Prism', 'NIRSpec G395M', 'NIRCam F322W2', 'NIRSpec G395H', 'NIRSpec G235H', 'NIRSpec G235M', 'NIRSpec G140M', 'NIRSpec G140H', 'MIRI LRS', 'NIRISS SOSS_Or1', 'NIRISS SOSS_Or2', 'WFC3 G141']
-
-.. code:: python
+.. code:: ipython3
 
     result = jdi.run_pandexo(exo_dict,['NIRCam F322W2'])
-
-::
-
-    Running Single Case for: NIRCam F322W2
-    Computing Duty Cycle
-    Finished Duty Cucle Calc
-    Starting Out of Transit Simulation
-    End out of Transit
-    Starting In Transit Simulation
-    End In Transit
 
 Option 2- Run single instrument mode (with user dict), single planet
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -224,40 +254,30 @@ This is the same thing as option 1 but instead of feeding it a list of
 keys, you can feed it a instrument dictionary (this is for users who
 wanted to simulate something NOT pre defined within pandexo)
 
-.. code:: python
+.. code:: ipython3
 
     inst_dict = jdi.load_mode_dict('NIRSpec G140H')
     #personalize subarray
     inst_dict["configuration"]["detector"]["subarray"] = 'sub2048'
     result = jdi.run_pandexo(exo_dict, inst_dict)
 
-::
-
-    Running Single Case w/ User Instrument Dict
-    Computing Duty Cycle
-    Finished Duty Cucle Calc
-    Starting Out of Transit Simulation
-    End out of Transit
-    Starting In Transit Simulation
-    End In Transit
-
 Option 3- Run several modes, single planet
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Use several modes from **print\_isntruments()** options.
+Use several modes from **print_isntruments()** options.
 
-.. code:: python
+.. code:: ipython3
 
     #choose select 
-    result = jdi.run_pandexo(exo_dict,['NIRCam F444W','NIRCam F322W2','MIRI LRS'],
-                   output_path = '/Users/nbatalh1/Desktop/JWSTFUN')
+    result = jdi.run_pandexo(exo_dict,['NIRSpec G140M','NIRSpec G235M','NIRSpec G395M'],
+                   output_file='three_nirspec_modes.p')
     #run all 
-    result = jdi.run_pandexo(exo_dict, ['RUN ALL'], save_file = False)
+    #result = jdi.run_pandexo(exo_dict, ['RUN ALL'], save_file = False)
 
 Option 4- Run single mode, several planet cases
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Use a single modes from **print\_instruments()** options. But explore
+Use a single modes from **print_isntruments()** options. But explore
 parameter space with respect to **any** parameter in the exo dict. The
 example below shows how to loop over several planet models
 
@@ -265,25 +285,25 @@ You can loop through anything in the exoplanet dictionary. It will be
 planet, star or observation followed by whatever you want to loop
 through in that set.
 
-i.e. planet+exopath, star+temp, star+metal, star+logg,
-observation+sat\_level.. etc
+i.e. planet+exopath, star+temp, star+metal, star+logg,
+observation+sat_level.. etc
 
-.. code:: python
+.. code:: ipython3
 
     #looping over different exoplanet models 
     jdi.run_pandexo(exo_dict, ['NIRCam F444W'], param_space = 'planet+exopath',
-                    param_range = os.listdir('/Users/nbatalha1/all_my_models_here'),
-                   output_path = '/Users/nbatalh1/Desktop/JWSTFUN')
-
+                    param_range = os.listdir('/path/to/location/of/models'),
+                   output_path = '/path/to/output/simulations')
+    
     #looping over different stellar temperatures 
     jdi.run_pandexo(exo_dict, ['NIRCam F444W'], param_space = 'star+temp',
                     param_range = np.linspace(5000,8000,2),
-                   output_path = '/Users/nbatalh1/Desktop/JWSTFUN')
-
+                   output_path = '/path/to/output/simulations')
+    
     #looping over different saturation levels
     jdi.run_pandexo(exo_dict, ['NIRCam F444W'], param_space = 'observation+sat_level',
                     param_range = np.linspace(.5,1,5),
-                   output_path = '/Users/nbatalh1/Desktop/JWSTFUN')
+                   output_path = '/path/to/output/simulations')
 
 Running PandExo GUI
 -------------------
@@ -291,14 +311,12 @@ The same interface that is available online is also available for use on your ma
 Using the GUI is very simple and good alternative if editing the input dictionaries is 
 confusing. 
 
-.. code:: python 
+.. code:: bash 
 
-    import pandexo.engine.run_online as ro
-    ro.main()
+    start_pandexo
 
 Then open up your favorite internet browser and go to: http://localhost:1111
-
-.. note:: Some WebApp functions may not be available. For example, the precomputed noise simulations and transmission and emission modeling are only available online. 
+ 
                    
 Analyzing Output
 ----------------
