@@ -1,3 +1,6 @@
+JWST Tutorial
+=============
+
 Here you will learn how to:
 
 -  set planet properties
@@ -15,8 +18,8 @@ Here you will learn how to:
     import os
     #pip install pandexo.engine --upgrade
 
-Load blank exo dictionary
--------------------------
+Setting up a run
+----------------
 
 To start, load in a blank exoplanet dictionary with empty keys. You will
 fill these out for yourself in the next step.
