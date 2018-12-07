@@ -43,5 +43,6 @@ Requires
 .. image:: https://zenodo.org/badge/67237418.svg
    :target: https://zenodo.org/badge/latestdoi/67237418
 
+
    .. image:: https://travis-ci.org/natashabatalha/PandExo.svg?branch=master
     :target: https://travis-ci.org/natashabatalha/PandExo
