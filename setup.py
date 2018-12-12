@@ -97,7 +97,7 @@ setup(
           'astropy==2.0.2',
           'pysynphot',
           'sqlalchemy',
-          'sphinx==1.5'
+          'sphinx==1.5.6'
           ],
     entry_points = {
         'console_scripts':
