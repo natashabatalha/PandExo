@@ -86,18 +86,18 @@ setup(
   #},
 
     install_requires=[
-          'numpy>=1.12.1',
-          'bokeh==0.12.6',
+          'numpy',
+          'bokeh',
           'tornado',
           'pandas',
           'joblib',
           'pandeia.engine',
           'batman-package',
           'photutils',
-          'astropy==2.0.2',
+          'astropy',
           'pysynphot',
           'sqlalchemy',
-          'sphinx==1.5.6'
+          'sphinx'
           ],
     entry_points = {
         'console_scripts':
