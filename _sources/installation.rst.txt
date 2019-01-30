@@ -3,81 +3,61 @@
     there is an online version of the code here at \
     `STScI's ExoCTK <https://exoctk.stsci.edu/pandexo/>`_. 
 
-Before we start, the scripts written to install PandExo assume the user has installed `Anaconda <https://www.continuum.io/downloads>`_. For diehard pip users, know that STScI tools will be only distributed on conda so PandExo will not be the only package to use it. 
-
-If you are dead set against it you will need to follow the installation guidelines `here <https://natashabatalha.github.io/PandExo/installation.html>`_. 
 
 Pre-installation Data Download
 ==============================
 
-ss mentioned, the user must provide their own reference data files in order for the engine to understand the instrument with which the calculations will be performed. First step to getting PandExo running is downloading four files. Download them and put them in the same directory. 
+PandExo requires: JWST instrument info and stellar SEDs. Users must set up these two environment variables before proceeding.
 
 JWST Reference Data
 ````````````````````
-For JWST, the link to access the required reference data is located `here <https://pypi.python.org/pypi/pandeia.engine/>`_. It should be the first link on this page. Pay attention and make sure you get the `pandeia_data` and not the `wfirst_data`!! 
+For JWST, the link to access the required reference data is located `here <http://ssb.stsci.edu/pandeia/engine/1.3/pandeia_data-1.3.tar.gz>`_. It is important to make sure that the version number of `PandExo` matches the version number of your reference data (currently V1.3).
 
-Stellar SEDs 
-````````````
-Likewise, the user may wish to install specific data for use with the PySynPhot package Pandeia uses. We will only be using the Phoenix stellar atlas, which can be downloaded `here <ftp://ftp.stsci.edu/cdbs/tarfiles/synphot5.tar.gz>`_. 
-
-PandExo startup bash script
-````````````````````````````
-A startup script (`pandexo.sh`) and a python test script (`run_test.py`) were created to do an automatic install of PandExo. You can download both of them from the PandExo `GitHub <https://github.com/natashabatalha/PandExo>`_.
-
-
-Installation with Conda
-=======================
-
-Open up the file `pandexo.sh`. There are two lines in the beginning which tell PandExo where your reference data will go. Currently this script is set to unpack and store the reference files in your HOME directory. 
-
-If you are not okay with it, **change** $HOME in the first two lines of pandexo.sh to whatever you want the data to be.
-
-Then run
+Then, create environment variable: 
 
 .. code-block:: bash 
 
-    sh pandexo.sh
-    Starting TEST run
-    Running Single Case for: NIRSpec G140H
-    Optimization Reqested: Computing Duty Cycle
-    Finished Duty Cycle Calc
-    Starting Out of Transit Simulation
-    End out of Transit
-    Starting In Transit Simulation
-    End In Transit
-    SUCCESS
+    echo 'export pandeia_refdata="$USRDIR/pandeia_data"' >>~/.bash_profile
+
+Stellar SEDs 
+````````````
+Likewise, the user may wish to install specific data for use with the PySynPhot package Pandeia uses. We will only be using the Phoenix stellar atlas, which can be downloaded `here <ftp://ftp.stsci.edu/cdbs/tarfiles/synphot5.tar.gz>`_.
+
+More reference files can be downloaded via ftp: 
+
+- ftp archive.stsci.edu
+- username "anonymous"
+- password is your e-mail address
+- cd pub/hst/pysynphot
+- download desired files. 
+
+*Note* that the tar.gz files downloaded from the STScI anonymous FTP site will untar into the directory structure "grp/hst/cdbs", with the actual data files in an assortment of directories under "cdbs". pysynphot (and pandeia) expect that the "PYSYN_CDBS" environment variable will point to the "cdbs" directory. As such, you can either move the files out of "grp/hst/" to wherever you would like to store them, or point "PYSYN_CDBS" to "/path/to/data/files/grp/hst/cdbs" in order to allow pysynphot and pandeia to properly detect the reference files.
+
+Finally, create your environment variable:
+
+.. code-block:: bash 
+
+    echo 'export PYSYN_CDBS="$USRDIR/path/to/data/files/grp/hst/cdbs"' >>~/.bash_profile
 
 
-Hopefully you have had success but if not the most likely error you will get is the following:
+Installation with Pip or Git
+============================
 
-COORDS.PY: TypeError: 'float' object cannot be interpreted as an index
-```````````````````````````````````````````````````````````````````````
-This is an error within Pandeia, which has not yet been fixed by STScI folk. You can easily fix it by finding where the file /pandeia/engine/coords.py is and changing line 36:
-
-.. code-block:: python 
-   
-    ones = np.ones((ny, nx))
-
-To this: 
-
-.. code-block:: python
-
-    ones = np.ones((int(ny), int(nx)))
-
-
-Installation with Pip
-=====================
-
-This option is less optimal because of some of the dependencies.. But, it can be done/
-
-Then, start by installing PandExo, which should automatically install Pandeia and other dependencies 
+Install STScI specific packages
 
 .. code-block:: bash
-    
+
+    conda config --add channels http://ssb.stsci.edu/astroconda
+    conda install pyfftw
+
+Now, install `pandexo`. 
+
+.. code-block:: bash
+
     pip install pandexo.engine
 
 
-OR Download PandExo's repository via Github: 
+OR Download PandExo's repository via Github. The Github also has helpful notebooks for getting started!
 
 .. code-block:: bash
 
@@ -85,39 +65,12 @@ OR Download PandExo's repository via Github:
     cd pandexo
     python setup.py install
 
-Set Environment
-```````````````
-Open up the file `pandexo.sh`. The first two lines in the beginning tell PandExo where your reference data will go via the variable `$USRDIR`. Currently `$USRDIR` is equal to your HOME directory, meaning your big data files will be untarred there. 
 
-If you are not okay with it, **change** $HOME in the first two lines of pandexo.sh to whatever you want the data to be. It should look like this: 
 
-.. code-block:: bash 
-
-    USRDIR=/I/Want/My/Data/Here
-    echo 'USRDIR=/I/Want/My/Data/Here' >>~/.bash_profile
-
-NEXT, since pandexo.sh is set for conda users, delete everything after line 22. We will have to do these manually since we don't have conda. Once you have done these two things you can go ahead and run: 
-
-.. code-block:: bash 
-
-    sh pandexo.sh
-
-Dependencies
-````````````
-PyFFTW is needed to run PandExo. In order to run PyFFTW you need to also isntall fftw. To do so, it is necessary to do so through Homebrew, if you do not have conda. 
-
-.. code-block:: bash 
-
-    brew install fftw
-    pip install pyfftw  
-
-Lastly, Python 2.7 users will need to install multiprocessing: 
-
-.. code-block:: bash 
-    
-    pip install multiprocessing
-
-Finally try to run the test file to see if there are any additional problems: 
+Final Test for Success
+======================
+ 
+There is a `run_test.py` in the `github`. Test that you're code is working: 
 
 .. code-block:: bash 
 
@@ -132,13 +85,29 @@ Finally try to run the test file to see if there are any additional problems:
     End In Transit
     SUCCESS
 
-Hopefully you have had success but if not the most likely error you will get is the following:
 
 Troubleshooting-Common Errors
 =============================
 
+PyFFTW
+````````
+PyFFTW is needed to run PandExo. In order to run PyFFTW you need to also isntall fftw. To do so, it is necessary to do so through Homebrew, if you do not have conda. 
+
+.. code-block:: bash 
+
+    brew install fftw
+    pip install pyfftw 
+
+Multiprocessing
+````````````````
+Python 2.7 users might need to install multiprocessing
+
+.. code-block:: bash 
+    
+    pip install multiprocessing
+
 RecursionError: maximum recursion depth exceeded while calling a Python object
-``````````````````````````````````````````````````````````````````````````````
+````````````````````````````````````````````````````````````````````````````````
 
 There is a known bug with Python 3.6 and Sphinx <1.6. Before updating or installing pandexo do the following:
 
@@ -155,7 +124,7 @@ CONDA USERS:
     conda install sphinx=1.5.6
 
 TypeError: super() argument 1 must be type
-``````````````````````````````````````````
+````````````````````````````````````````````
 
 This is the same error above with Sphinx, but for Python 2.7 users. The fix is the same: 
 

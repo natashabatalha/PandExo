@@ -91,19 +91,13 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Pre-installation Data Download</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#jwst-reference-data">JWST Reference Data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#stellar-seds">Stellar SEDs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#pandexo-startup-bash-script">PandExo startup bash script</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="#installation-with-conda">Installation with Conda</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#coords-py-typeerror-float-object-cannot-be-interpreted-as-an-index">COORDS.PY: TypeError: &#8216;float&#8217; object cannot be interpreted as an index</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="#installation-with-pip">Installation with Pip</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#set-environment">Set Environment</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#dependencies">Dependencies</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="#installation-with-pip-or-git">Installation with Pip or Git</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#final-test-for-success">Final Test for Success</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#troubleshooting-common-errors">Troubleshooting-Common Errors</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#pyfftw">PyFFTW</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#multiprocessing">Multiprocessing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#recursionerror-maximum-recursion-depth-exceeded-while-calling-a-python-object">RecursionError: maximum recursion depth exceeded while calling a Python object</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#typeerror-super-argument-1-must-be-type">TypeError: super() argument 1 must be type</a></li>
 </ul>
@@ -115,11 +109,7 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="installation_windows.html">Windows Installing Guide for PandExo</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorialjwst.html">Load blank exo dictionary</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorialjwst.html#load-in-instrument-dictionary-optional">Load in instrument dictionary (OPTIONAL)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorialjwst.html#running-pandexo">Running PandExo</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorialjwst.html#running-pandexo-gui">Running PandExo GUI</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorialjwst.html#analyzing-output">Analyzing Output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorialjwst.html">JWST Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="jwstinput.html">Possible Instrument Input Params</a></li>
 <li class="toctree-l1"><a class="reference internal" href="jwstdict.html">Py Dict Structure of JWST Output</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorialhst.html">HST Tutorial</a></li>
@@ -191,92 +181,56 @@
 <p class="first admonition-title">Warning</p>
 <p class="last">Before reading further, if you do not wish to install PandExo,there is an online version of the code here at <a class="reference external" href="https://exoctk.stsci.edu/pandexo/">STScI&#8217;s ExoCTK</a>.</p>
 </div>
-<p>Before we start, the scripts written to install PandExo assume the user has installed <a class="reference external" href="https://www.continuum.io/downloads">Anaconda</a>. For diehard pip users, know that STScI tools will be only distributed on conda so PandExo will not be the only package to use it.</p>
-<p>If you are dead set against it you will need to follow the installation guidelines <a class="reference external" href="https://natashabatalha.github.io/PandExo/installation.html">here</a>.</p>
 <div class="section" id="pre-installation-data-download">
 <h1>Pre-installation Data Download<a class="headerlink" href="#pre-installation-data-download" title="Permalink to this headline">¶</a></h1>
-<p>ss mentioned, the user must provide their own reference data files in order for the engine to understand the instrument with which the calculations will be performed. First step to getting PandExo running is downloading four files. Download them and put them in the same directory.</p>
+<p>PandExo requires: JWST instrument info and stellar SEDs. Users must set up these two environment variables before proceeding.</p>
 <div class="section" id="jwst-reference-data">
 <h2>JWST Reference Data<a class="headerlink" href="#jwst-reference-data" title="Permalink to this headline">¶</a></h2>
-<p>For JWST, the link to access the required reference data is located <a class="reference external" href="https://pypi.python.org/pypi/pandeia.engine/">here</a>. It should be the first link on this page. Pay attention and make sure you get the <cite>pandeia_data</cite> and not the <cite>wfirst_data</cite>!!</p>
+<p>For JWST, the link to access the required reference data is located <a class="reference external" href="http://ssb.stsci.edu/pandeia/engine/1.3/pandeia_data-1.3.tar.gz">here</a>. It is important to make sure that the version number of <cite>PandExo</cite> matches the version number of your reference data (currently V1.3).</p>
+<p>Then, create environment variable:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="nb">echo</span> <span class="s1">&#39;export pandeia_refdata=&quot;$USRDIR/pandeia_data&quot;&#39;</span> &gt;&gt;~/.bash_profile
+</pre></div>
+</div>
 </div>
 <div class="section" id="stellar-seds">
 <h2>Stellar SEDs<a class="headerlink" href="#stellar-seds" title="Permalink to this headline">¶</a></h2>
 <p>Likewise, the user may wish to install specific data for use with the PySynPhot package Pandeia uses. We will only be using the Phoenix stellar atlas, which can be downloaded <a class="reference external" href="ftp://ftp.stsci.edu/cdbs/tarfiles/synphot5.tar.gz">here</a>.</p>
-</div>
-<div class="section" id="pandexo-startup-bash-script">
-<h2>PandExo startup bash script<a class="headerlink" href="#pandexo-startup-bash-script" title="Permalink to this headline">¶</a></h2>
-<p>A startup script (<cite>pandexo.sh</cite>) and a python test script (<cite>run_test.py</cite>) were created to do an automatic install of PandExo. You can download both of them from the PandExo <a class="reference external" href="https://github.com/natashabatalha/PandExo">GitHub</a>.</p>
-</div>
-</div>
-<div class="section" id="installation-with-conda">
-<h1>Installation with Conda<a class="headerlink" href="#installation-with-conda" title="Permalink to this headline">¶</a></h1>
-<p>Open up the file <cite>pandexo.sh</cite>. There are two lines in the beginning which tell PandExo where your reference data will go. Currently this script is set to unpack and store the reference files in your HOME directory.</p>
-<p>If you are not okay with it, <strong>change</strong> $HOME in the first two lines of pandexo.sh to whatever you want the data to be.</p>
-<p>Then run</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>sh pandexo.sh
-Starting TEST run
-Running Single Case <span class="k">for</span>: NIRSpec G140H
-Optimization Reqested: Computing Duty Cycle
-Finished Duty Cycle Calc
-Starting Out of Transit Simulation
-End out of Transit
-Starting In Transit Simulation
-End In Transit
-SUCCESS
-</pre></div>
-</div>
-<p>Hopefully you have had success but if not the most likely error you will get is the following:</p>
-<div class="section" id="coords-py-typeerror-float-object-cannot-be-interpreted-as-an-index">
-<h2>COORDS.PY: TypeError: &#8216;float&#8217; object cannot be interpreted as an index<a class="headerlink" href="#coords-py-typeerror-float-object-cannot-be-interpreted-as-an-index" title="Permalink to this headline">¶</a></h2>
-<p>This is an error within Pandeia, which has not yet been fixed by STScI folk. You can easily fix it by finding where the file /pandeia/engine/coords.py is and changing line 36:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">ones</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">ny</span><span class="p">,</span> <span class="n">nx</span><span class="p">))</span>
-</pre></div>
-</div>
-<p>To this:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">ones</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">ny</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">nx</span><span class="p">)))</span>
+<p>More reference files can be downloaded via ftp:</p>
+<ul class="simple">
+<li>ftp archive.stsci.edu</li>
+<li>username &#8220;anonymous&#8221;</li>
+<li>password is your e-mail address</li>
+<li>cd pub/hst/pysynphot</li>
+<li>download desired files.</li>
+</ul>
+<p><em>Note</em> that the tar.gz files downloaded from the STScI anonymous FTP site will untar into the directory structure &#8220;grp/hst/cdbs&#8221;, with the actual data files in an assortment of directories under &#8220;cdbs&#8221;. pysynphot (and pandeia) expect that the &#8220;PYSYN_CDBS&#8221; environment variable will point to the &#8220;cdbs&#8221; directory. As such, you can either move the files out of &#8220;grp/hst/&#8221; to wherever you would like to store them, or point &#8220;PYSYN_CDBS&#8221; to &#8220;/path/to/data/files/grp/hst/cdbs&#8221; in order to allow pysynphot and pandeia to properly detect the reference files.</p>
+<p>Finally, create your environment variable:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="nb">echo</span> <span class="s1">&#39;export PYSYN_CDBS=&quot;$USRDIR/path/to/data/files/grp/hst/cdbs&quot;&#39;</span> &gt;&gt;~/.bash_profile
 </pre></div>
 </div>
 </div>
 </div>
-<div class="section" id="installation-with-pip">
-<h1>Installation with Pip<a class="headerlink" href="#installation-with-pip" title="Permalink to this headline">¶</a></h1>
-<p>This option is less optimal because of some of the dependencies.. But, it can be done/</p>
-<p>Then, start by installing PandExo, which should automatically install Pandeia and other dependencies</p>
+<div class="section" id="installation-with-pip-or-git">
+<h1>Installation with Pip or Git<a class="headerlink" href="#installation-with-pip-or-git" title="Permalink to this headline">¶</a></h1>
+<p>Install STScI specific packages</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>conda config --add channels http://ssb.stsci.edu/astroconda
+conda install pyfftw
+</pre></div>
+</div>
+<p>Now, install <cite>pandexo</cite>.</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>pip install pandexo.engine
 </pre></div>
 </div>
-<p>OR Download PandExo&#8217;s repository via Github:</p>
+<p>OR Download PandExo&#8217;s repository via Github. The Github also has helpful notebooks for getting started!</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>git clone --recursive https://github.com/natashabatalha/pandexo
 <span class="nb">cd</span> pandexo
 python setup.py install
 </pre></div>
 </div>
-<div class="section" id="set-environment">
-<h2>Set Environment<a class="headerlink" href="#set-environment" title="Permalink to this headline">¶</a></h2>
-<p>Open up the file <cite>pandexo.sh</cite>. The first two lines in the beginning tell PandExo where your reference data will go via the variable <cite>$USRDIR</cite>. Currently <cite>$USRDIR</cite> is equal to your HOME directory, meaning your big data files will be untarred there.</p>
-<p>If you are not okay with it, <strong>change</strong> $HOME in the first two lines of pandexo.sh to whatever you want the data to be. It should look like this:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="nv">USRDIR</span><span class="o">=</span>/I/Want/My/Data/Here
-<span class="nb">echo</span> <span class="s1">&#39;USRDIR=/I/Want/My/Data/Here&#39;</span> &gt;&gt;~/.bash_profile
-</pre></div>
 </div>
-<p>NEXT, since pandexo.sh is set for conda users, delete everything after line 22. We will have to do these manually since we don&#8217;t have conda. Once you have done these two things you can go ahead and run:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>sh pandexo.sh
-</pre></div>
-</div>
-</div>
-<div class="section" id="dependencies">
-<h2>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h2>
-<p>PyFFTW is needed to run PandExo. In order to run PyFFTW you need to also isntall fftw. To do so, it is necessary to do so through Homebrew, if you do not have conda.</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>brew install fftw
-pip install pyfftw
-</pre></div>
-</div>
-<p>Lastly, Python 2.7 users will need to install multiprocessing:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>pip install multiprocessing
-</pre></div>
-</div>
-<p>Finally try to run the test file to see if there are any additional problems:</p>
+<div class="section" id="final-test-for-success">
+<h1>Final Test for Success<a class="headerlink" href="#final-test-for-success" title="Permalink to this headline">¶</a></h1>
+<p>There is a <cite>run_test.py</cite> in the <cite>github</cite>. Test that you&#8217;re code is working:</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>python run_test.py
 Starting TEST run
 Running Single Case <span class="k">for</span>: NIRSpec G140H
@@ -289,11 +243,24 @@ End In Transit
 SUCCESS
 </pre></div>
 </div>
-<p>Hopefully you have had success but if not the most likely error you will get is the following:</p>
-</div>
 </div>
 <div class="section" id="troubleshooting-common-errors">
 <h1>Troubleshooting-Common Errors<a class="headerlink" href="#troubleshooting-common-errors" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="pyfftw">
+<h2>PyFFTW<a class="headerlink" href="#pyfftw" title="Permalink to this headline">¶</a></h2>
+<p>PyFFTW is needed to run PandExo. In order to run PyFFTW you need to also isntall fftw. To do so, it is necessary to do so through Homebrew, if you do not have conda.</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>brew install fftw
+pip install pyfftw
+</pre></div>
+</div>
+</div>
+<div class="section" id="multiprocessing">
+<h2>Multiprocessing<a class="headerlink" href="#multiprocessing" title="Permalink to this headline">¶</a></h2>
+<p>Python 2.7 users might need to install multiprocessing</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>pip install multiprocessing
+</pre></div>
+</div>
+</div>
 <div class="section" id="recursionerror-maximum-recursion-depth-exceeded-while-calling-a-python-object">
 <h2>RecursionError: maximum recursion depth exceeded while calling a Python object<a class="headerlink" href="#recursionerror-maximum-recursion-depth-exceeded-while-calling-a-python-object" title="Permalink to this headline">¶</a></h2>
 <p>There is a known bug with Python 3.6 and Sphinx &lt;1.6. Before updating or installing pandexo do the following:</p>
