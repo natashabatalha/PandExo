@@ -338,12 +338,16 @@ def wfc3_TExoNS(dictinput):
             "Recommended scan rate (arcsec/s)": scanRate,
             "Scan height (pixels)": scanHeight,
             "Maximum pixel fluence (electrons)": fluence,
+            "exposure time": exptime,
             "Estimated duty cycle (outside of Earth occultation)": dutyCycle,
             "Transit depth uncertainty(ppm)": deptherr,
             "Number of channels": nchan,
             "Number of Transits": numTr}
 
-    return {"spec_error": deptherr/1e6, "light_curve_rms": chanrms/1e6, "nframes_per_orb": ptsOrbit, "info": info}
+    return {"spec_error": deptherr/1e6,
+            "light_curve_rms": chanrms/1e6,
+            "nframes_per_orb": ptsOrbit,
+            "info": info}
 
 
 def calc_start_window(eventType, rms, ptsOrbit, numOrbits, depth, inc, aRs, period, windowSize, ecc=0, w=90., duration=None, offset=0., useFirstOrbit=False):
@@ -462,7 +466,7 @@ def calc_start_window(eventType, rms, ptsOrbit, numOrbits, depth, inc, aRs, peri
 
     return {'obsphase1': obsphase1, 'light_curve_rms': rms, 'obstr1': obstr1, 'obsphase2': obsphase2,
             'obstr2': obstr2, 'minphase': minphase, 'maxphase': maxphase, 'phase1': phase1,
-            'phase2': phase2, 'trmodel1': trmodel1, 'trmodel2': trmodel2, 'eventType': eventType}
+            'phase2': phase2, 'trmodel1': trmodel1, 'trmodel2': trmodel2, 'eventType': eventType, 'planet period':period}
 
 
 def planet_spec(planet, star, w_unit, disperser, deptherr, nchan, smooth=None):
@@ -535,6 +539,43 @@ def planet_spec(planet, star, w_unit, disperser, deptherr, nchan, smooth=None):
             'error': deptherr, 'wmin': wmin, 'wmax': wmax}
 
 
+def compute_sim_lightcurve(exposureDict, lightCurveDict, calRamp=False):
+    """simulate the
+
+    :param exposureDict:
+    :param lightCurveDict:
+    :param calRamp:
+
+    """
+    from .RECTE import RECTE
+    fluence = exposureDict['info']["Maximum pixel fluence (electrons)"]
+    exptime = exposureDict['info']['exposure time']
+    obst1 = (lightCurveDict['obsphase1'] -
+          lightCurveDict['obsphase1'][0]) *\
+          lightCurveDict['planet period'] * 86400 # in seconds
+    obst2 = (lightCurveDict['obsphase2'] -
+          lightCurveDict['obsphase2'][0]) *\
+          lightCurveDict['planet period'] * 86400 # in seconds
+    counts1 = lightCurveDict['obstr1'] * fluence
+    counts2 = lightCurveDict['obstr2'] * fluence
+    if calRamp:
+        counts1 = RECTE(counts1 / exptime,
+                       obst1,
+                       exptime)
+        counts2 = RECTE(counts2 / exptime,
+                       obst2,
+                       exptime)
+    count_noise = lightCurveDict['light_curve_rms'] * fluence
+    resultDict = lightCurveDict.copy()
+    resultDict['counts1'] = counts1
+    resultDict['counts2'] = counts2
+    resultDict['count_noise'] = count_noise
+    resultDict['ramp_included'] = calRamp
+    resultDict['model_counts1'] = resultDict['trmodel1'] * fluence
+    resultDict['model_counts2'] = resultDict['trmodel2'] * fluence
+    return resultDict
+
+
 def compute_sim_hst(dictinput):
     """Sets up HST simulations
 
@@ -556,6 +597,12 @@ def compute_sim_hst(dictinput):
 
     disperser = pandeia_input['configuration']['instrument']['disperser'].lower(
     )
+    # add a switch for ramp calculation
+    calRamp = pandeia_input['strategy']['calculateRamp']
+    if not pandeia_input['strategy']['useFirstOrbit']:
+        print("Dropping first orbit designed by observation strategy")
+        print("Do not calculate ramp profile")
+        calRamp = False
     numorbits = pandeia_input['strategy']['norbits']
     nchan = pandeia_input['strategy']['nchan']
     windowSize = pandeia_input['strategy']['windowSize']
@@ -594,8 +641,12 @@ def compute_sim_hst(dictinput):
     c = planet_spec(pandexo_input['planet'], pandexo_input['star'],
                     w_unit, disperser, a['spec_error'], nchan, smooth=20)
     info_div = create_out_div(a['info'], b['minphase'], b['maxphase'])
-
-    return {"wfc3_TExoNS": a, "calc_start_window": b, "planet_spec": c, "info_div": info_div}
+    simLightCurve = compute_sim_lightcurve(a, b, calRamp=calRamp)
+    return {"wfc3_TExoNS": a,
+            "calc_start_window": b,
+            "planet_spec": c,
+            "light_curve": simLightCurve,
+            "info_div": info_div}
 
 
 def create_out_div(input_dict, minphase, maxphase):
