@@ -540,11 +540,33 @@ def planet_spec(planet, star, w_unit, disperser, deptherr, nchan, smooth=None):
 
 
 def compute_sim_lightcurve(exposureDict, lightCurveDict, calRamp=False):
-    """simulate the
+    """Compute simulated HST light curves
 
-    :param exposureDict:
-    :param lightCurveDict:
-    :param calRamp:
+    Function to take the fluence and error estimates from wfc3_TExoNS
+    and the model light curve from calc_start_window to simulate observed
+    light curves. Ramp effect systemacts simulated by RECTE can be
+    included by turning on the calRamp switch
+
+    Parameters
+    ----------
+    exposureDict : dict
+    Includes information for the observation. This dictionary is
+    returned by function wfc3_TExoNS. Relevant keys in the dictionary
+    are ['info']["Maximum pixel fluence (electrons)"] and
+    ['info']['exposure time']
+
+    lightCurveDict : dict
+    Includes the model light curve. The light curves are estimed by
+    calc_start_window
+
+    calRamp : bool (default: False)
+    Switch to turn on/off RECTE ramp calculation. Calculate realistic
+    ramp effect systematics when the switch is turned on.
+
+    Returns
+    -------
+    dict
+    Resulting light curve (unit: e/pixel) for the earliest and latest time
 
     """
     from .RECTE import RECTE
@@ -558,6 +580,7 @@ def compute_sim_lightcurve(exposureDict, lightCurveDict, calRamp=False):
           lightCurveDict['planet period'] * 86400 # in seconds
     counts1 = lightCurveDict['obstr1'] * fluence
     counts2 = lightCurveDict['obstr2'] * fluence
+    # use RECTE to calculate the ramp if calRamp option is turned on
     if calRamp:
         counts1 = RECTE(counts1 / exptime,
                        obst1,

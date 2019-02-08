@@ -749,7 +749,7 @@ def hst_time(result_dict, plot=True, output_file ='hsttime.html', model = True):
 
 
 def hst_simulated_lightcurve(result_dict, plot=True, output_file ='hsttime.html', model = True):
-    """Plot earliest and latest start times for hst observation
+    """Plot simulated HST light curves (in fluece) for earliest and latest start times
 
     Parameters
     ----------
@@ -767,12 +767,12 @@ def hst_simulated_lightcurve(result_dict, plot=True, output_file ='hsttime.html'
     ------
     obsphase1 : numpy array
         earliest start time
-    obstr1 : numpy array
-        white light curve
+    counts1 : numpy array
+        white light curve in fluence (e/pixel)
     obsphase2 : numpy array
         latest start time
-    obstr2 : numpy array
-        white light curve
+    counts2 : numpy array
+        white light curve in fluence (e/pixel)
     rms : numpy array
         1D rms noise
 
@@ -781,16 +781,12 @@ def hst_simulated_lightcurve(result_dict, plot=True, output_file ='hsttime.html'
     hst_spec
     """
     TOOLS = "pan,wheel_zoom,box_zoom,reset,save"
-    #earliest and latest start times
+    # earliest and latest start times
     obsphase1 = result_dict['light_curve']['obsphase1']
-    obstr1 = result_dict['light_curve']['obstr1']
     rms = result_dict['light_curve']['light_curve_rms']
     obsphase2 = result_dict['light_curve']['obsphase2']
-    obstr2 = result_dict['light_curve']['obstr2']
     phase1 = result_dict['light_curve']['phase1']
     phase2 = result_dict['light_curve']['phase2']
-    trmodel1 = result_dict['light_curve']['trmodel1']
-    trmodel2 = result_dict['light_curve']['trmodel2']
     counts1 = result_dict['light_curve']['counts1']
     counts2 = result_dict['light_curve']['counts2']
     count_noise = result_dict['light_curve']['count_noise']
@@ -823,16 +819,18 @@ def hst_simulated_lightcurve(result_dict, plot=True, output_file ='hsttime.html'
                                  y_axis_label='Flux [electrons/pixel]',
                                title="Earliest Start Time" + title_description)
 
-    if model: early.line(phase1, model_counts1, color='black',alpha=0.5, line_width = 4)
+    if model:
+        early.line(phase1, model_counts1, color='black', alpha=0.5, line_width=4)
     early.circle(obsphase1, counts1, line_width=3, line_alpha=0.6)
     early.multi_line(x_err1, y_err1)
 
     late = Figure(plot_width=400, plot_height=300,
-                                tools=TOOLS,#responsive=True,
-                                 x_axis_label='Orbital Phase',
-                                 y_axis_label='Flux [electrons/pixel]',
-                               title="Latest Start Time" + title_description)
-    if model: late.line(phase2, model_counts2, color='black',alpha=0.5, line_width = 3)
+                  tools=TOOLS,  # responsive=True,
+                  x_axis_label='Orbital Phase',
+                  y_axis_label='Flux [electrons/pixel]',
+                  title="Latest Start Time" + title_description)
+    if model:
+        late.line(phase2, model_counts2, color='black', alpha=0.5, line_width=3)
     late.circle(obsphase2, counts2, line_width=3, line_alpha=0.6)
     late.multi_line(x_err2, y_err2)
 
@@ -841,7 +839,5 @@ def hst_simulated_lightcurve(result_dict, plot=True, output_file ='hsttime.html'
     if plot:
         outputfile(output_file)
         show(start_time)
-
-
 
     return obsphase1, counts1, obsphase2, counts2, rms
