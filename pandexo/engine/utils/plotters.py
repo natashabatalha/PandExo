@@ -463,7 +463,7 @@ def create_component_hst(result_dict):
     plot_spectrum.multi_line(x_err, y_err)
     
     
-    #earliest and latest start times 
+    #earliest and latest start times without ramp
     obsphase1 = result_dict['calc_start_window']['obsphase1']
     obstr1 = result_dict['calc_start_window']['obstr1']
     rms = result_dict['calc_start_window']['light_curve_rms']
@@ -508,9 +508,71 @@ def create_component_hst(result_dict):
     late.multi_line(x_err2, y_err2)
         
     start_time = row(early, late)
+    tab1b = Panel(child=start_time, title="Timing")
+    
+    #now create plot that has optional ramp
+    obsphase1 = result_dict['light_curve']['obsphase1']
+    rms = result_dict['light_curve']['light_curve_rms']
+    obsphase2 = result_dict['light_curve']['obsphase2']
+    phase1 = result_dict['light_curve']['phase1']
+    phase2 = result_dict['light_curve']['phase2']
+    counts1 = result_dict['light_curve']['counts1']
+    counts2 = result_dict['light_curve']['counts2']
+    count_noise = result_dict['light_curve']['count_noise']
+    ramp_included = result_dict['light_curve']['ramp_included']
+    model_counts1 = result_dict['light_curve']['model_counts1']
+    model_counts2 = result_dict['light_curve']['model_counts2']
+
+    if isinstance(count_noise, float):
+        rms = np.zeros(len(counts1)) + count_noise
+    y_err1 = []
+    x_err1 = []
+    for px, py, yerr in zip(obsphase1, counts1, rms):
+        np.array(x_err1.append((px, px)))
+        np.array(y_err1.append((py - yerr, py + yerr)))
+
+    y_err2 = []
+    x_err2 = []
+    for px, py, yerr in zip(obsphase2, counts2, rms):
+        np.array(x_err2.append((px, px)))
+        np.array(y_err2.append((py - yerr, py + yerr)))
+
+    if ramp_included:
+        title_description = " (Ramp Included)"
+    else:
+        title_description =" (Ramp Removed)"
+
+    early = Figure(plot_width=400, plot_height=300,
+                               tools=TOOLS,#responsive=True,
+                                 x_axis_label='Orbital Phase',
+                                 y_axis_label='Flux [electrons/pixel]',
+                               title="Earliest Start Time" + title_description)
+
+
+    early.line(phase1, model_counts1, color='black', alpha=0.5, line_width=4)
+    early.circle(obsphase1, counts1, line_width=3, line_alpha=0.6)
+    early.multi_line(x_err1, y_err1)
+
+    late = Figure(plot_width=400, plot_height=300,
+                  tools=TOOLS,  # responsive=True,
+                  x_axis_label='Orbital Phase',
+                  y_axis_label='Flux [electrons/pixel]',
+                  title="Latest Start Time" + title_description)
+
+    late.line(phase2, model_counts2, color='black', alpha=0.5, line_width=3)
+    late.circle(obsphase2, counts2, line_width=3, line_alpha=0.6)
+    late.multi_line(x_err2, y_err2)
+
+    start_time = row(early, late)
+
+
+    tab2b = Panel(child=start_time, title="Electrons")
+
+    tabs2d = Tabs(tabs=[ tab1b, tab2b])
+    
     
     result_comp = components({'plot_spectrum':plot_spectrum, 
-                              'start_time':start_time})
+                              'start_time':tabs2d})
 
     return result_comp
 

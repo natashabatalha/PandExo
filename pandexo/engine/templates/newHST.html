@@ -73,51 +73,51 @@
     <div class="form-group hidden select-from-grid">
         <div class="col-md-3 col-md-offset-3"">
             <select id="ptempg" name="ptempg" class="form-control" data-placeholder="Select Temp (K)">
-                <option value=""></option> 
+                <option value=""></option>
                 {% for i in temp %}
                     <option {{ escape(i) }} value={{ escape(i) }}>{{ escape(i) }}</option>
-                {% end %}               
+                {% end %}
             </select>
             <p class="help-block">Temperature (K)</p>
-        </div>  
+        </div>
 
         <div class="col-md-3">
             <select id="pchem" name="pchem" class="form-control" data-placeholder="Select Chemistry">
-                <option value=""></option> 
-                <option value='noTiO'>Equilibrium Chemistry</option>  
-                <option value='eqchem'>Equilibrium Chemistry, w/ TiO</option>         
+                <option value=""></option>
+                <option value='noTiO'>Equilibrium Chemistry</option>
+                <option value='eqchem'>Equilibrium Chemistry, w/ TiO</option>
             </select>
             <p class="help-block">Select Chemistry Type</p>
-        </div>  
+        </div>
 
         <div class="col-md-3">
             <select id="cloud" name="cloud" class="form-control" data-placeholder="Clouds/Scattering">
-                <option value=""></option> 
-                <option value="0">Nothing</option>  
-                <option value="ray10">Weak Rayleigh</option>  
-                <option value="ray100">Medium Rayleigh</option>             
-                <option value="ray1000">Strong Rayleigh</option>             
-                <option value="flat1">Weak Cloud</option>  
-                <option value="flat10">Medium Cloud</option>             
-                <option value="flat100">Strong Cloud</option>             
+                <option value=""></option>
+                <option value="0">Nothing</option>
+                <option value="ray10">Weak Rayleigh</option>
+                <option value="ray100">Medium Rayleigh</option>
+                <option value="ray1000">Strong Rayleigh</option>
+                <option value="flat1">Weak Cloud</option>
+                <option value="flat10">Medium Cloud</option>
+                <option value="flat100">Strong Cloud</option>
             </select>
             <p class="help-block">Clouds or Scattering</p>
-        </div> 
-        
+        </div>
+
         <div class="col-md-4 col-md-offset-3 form-inline">
             <input type="text" class="form-control" id="pmass" name="pmass" style="width: 70%;" value="1.5">
         <div class="input-group-btn" style="width: 20%;left: -4px;display: inline-block;">
             <select id="m_unit" name="m_unit" class="form-control">
-                <option value='M_jup'>M<sub>J</sub></option>   
-                <option value='kilogram'>Kg</option>  
-                <option value='g'>g</option>  
-                <option value='M_earth'>M<sub>E</sub></option> 
-                <option value='M_sun'>M<sub>S</sub></option>          
+                <option value='M_jup'>M<sub>J</sub></option>
+                <option value='kilogram'>Kg</option>
+                <option value='g'>g</option>
+                <option value='M_earth'>M<sub>E</sub></option>
+                <option value='M_sun'>M<sub>S</sub></option>
             </select>
-            </div> 
+            </div>
             <p class="help-block">Planet Mass</p>
-        </div> 
-        </div>  
+        </div>
+        </div>
 
     <div class="form-group hidden upload-planet-section">
         <div class="col-md-3 col-md-offset-3">
@@ -133,7 +133,7 @@
                 <option value="nm">nanometer</option>
                 <option value="cm">centimeter</option>
                 <option value="Angs">Angstrom</option>
-                <option value="Hz">Hertz</option>                
+                <option value="Hz">Hertz</option>
             </select>
         </div>
         <div class="col-md-3">
@@ -142,7 +142,7 @@
                 <option value="rp^2/r*^2">(R<sub>p</sub>/R<sub>*</sub>)^2 (primary)</option>
                 <option value="fp/f*">F<sub>p</sub>/F<sub>*</sub> (secondary/phase curve)</option>
             </select>
-        </div>  
+        </div>
     </div>
 
     <div class="form-group hidden constant-transit-section">
@@ -153,19 +153,19 @@
                 <option value="fp/f*">F<sub>p</sub>/F<sub>*</sub> (secondary/phase curve)</option>
             </select>
          <p class="help-block">Primary or Secondary</p>
-        </div> 
+        </div>
         <div class="col-md-3">
             <div class="input-group">
                 <input type="text" class="form-control" id="ptempc" name="ptempc" value="Only for Secondary">
             </div>
             <p class="help-block">Planet Temp(K)</p>
-        </div> 
+        </div>
         <div class="col-md-3">
             <div class="input-group">
                 <input type="text" class="form-control" id="stempc" name="stempc" value="Only for Secondary">
             </div>
             <p class="help-block">Stellar Temp(K)</p>
-        </div> 
+        </div>
     </div>
 
     <div class="form-group hidden select-from-grid">
@@ -173,11 +173,11 @@
             <input type="text" class="form-control" id="refradg" name="refradg" style="width: 70%;" value="1.25">
             <div class="input-group-btn" style="width: 20%;left: -4px;display: inline-block;">
                 <select id="r_unitg" name="r_unitg" class="form-control">
-                <option value='R_jup'>R<sub>J</sub></option>   
-                <option value='kilometer'>Km</option>  
-                <option value='m'>m</option>  
-                <option value='R_earth'>R<sub>E</sub></option> 
-                <option value='R_sun'>R<sub>S</sub></option>  
+                <option value='R_jup'>R<sub>J</sub></option>
+                <option value='kilometer'>Km</option>
+                <option value='m'>m</option>
+                <option value='R_earth'>R<sub>E</sub></option>
+                <option value='R_sun'>R<sub>S</sub></option>
                 </select>
             </div>
         <p class="help-block">Planet Radius</p>
@@ -188,10 +188,10 @@
             <div class="input-group-btn" style="width: 20%;left: -4px;display: inline-block;">
                 <select id="rstar_unitg" name="rstar_unitg" class="form-control">
                 <option value='R_sun'>R<sub>S</sub></option>
-                <option value='kilometer'>Km</option>  
-                <option value='m'>m</option>  
-                <option value='R_earth'>R<sub>E</sub></option> 
-                <option value='R_jup'>R<sub>J</sub></option>  
+                <option value='kilometer'>Km</option>
+                <option value='m'>m</option>
+                <option value='R_earth'>R<sub>E</sub></option>
+                <option value='R_jup'>R<sub>J</sub></option>
                 </select>
             </div>
             <p class="help-block">Stellar Radius</p>
@@ -203,11 +203,11 @@
             <input type="text" class="form-control" id="refradc" name="refradc" style="width: 70%;" value="1.25">
             <div class="input-group-btn" style="width: 20%;left: -4px;display: inline-block;">
                 <select id="r_unitc" name="r_unitc" class="form-control">
-                <option value='R_jup'>R<sub>J</sub></option>   
-                <option value='kilometer'>Km</option>  
-                <option value='m'>m</option>  
-                <option value='R_earth'>R<sub>E</sub></option> 
-                <option value='R_sun'>R<sub>S</sub></option>  
+                <option value='R_jup'>R<sub>J</sub></option>
+                <option value='kilometer'>Km</option>
+                <option value='m'>m</option>
+                <option value='R_earth'>R<sub>E</sub></option>
+                <option value='R_sun'>R<sub>S</sub></option>
                 </select>
             </div>
             <p class="help-block">Planet Radius</p>
@@ -218,10 +218,10 @@
             <div class="input-group-btn" style="width: 20%;left: -4px;display: inline-block;">
                 <select id="rstar_unitc" name="rstar_unitc" class="form-control">
                 <option value='R_sun'>R<sub>S</sub></option>
-                <option value='kilometer'>Km</option>  
-                <option value='m'>m</option>  
-                <option value='R_earth'>R<sub>E</sub></option> 
-                <option value='R_jup'>R<sub>J</sub></option>  
+                <option value='kilometer'>Km</option>
+                <option value='m'>m</option>
+                <option value='R_earth'>R<sub>E</sub></option>
+                <option value='R_jup'>R<sub>J</sub></option>
                 </select>
             </div>
             <p class="help-block">Stellar Radius</p>
@@ -236,12 +236,12 @@
             <input type="text" class="form-control" id="period" name="period">
             <p class="help-block">Orbital period in days.</p>
         </div>
-        
+
         <div class="col-md-3">
             <input type="text" class="form-control" id="transit_duration" name="transit_duration">
             <p class="help-block">Full transit/eclipse duration in days.</p>
         </div>
-        
+
         <div class="col-md-3">
             <input type="text" class="form-control" id="depth" name="depth">
             <p class="help-block">Approximate transit/eclipse depth for plotting purposes.</p>
@@ -253,7 +253,7 @@
             <input type="text" class="form-control" id="i" name="i">
             <p class="help-block">Orbital inclination in degrees.</p>
         </div>
-    
+
         <div class="col-md-3">
             <input type="text" class="form-control" id="ars" name="ars">
             <p class="help-block">Semi-major axis in units of stellar radii (a/R<sub>*</sub>).</p>
@@ -273,19 +273,19 @@
     </div>
 
     <hr class="col-md-11 col-md-offset-1">
-    
+
     <div class="form-group">
         <label class="col-md-3 control-label" for="obsParams">Observation Parameters</label>
         <div class="col-md-3">
             <input type="text" class="form-control" id="norbits" name="norbits" >
             <p class="help-block">Number of HST orbits per visit. Leave blank to let the program determine this value.</p>
         </div>
-    
+
         <div class="col-md-3">
             <input type="text" class="form-control" id="noccultations" name="noccultations" >
             <p class="help-block">Number of transits/eclipses.</p>
         </div>
-    
+
         <div class="col-md-3">
             <input type="text" class="form-control" id="nchan" name="nchan" >
             <p class="help-block">Number of spectrophotometric channels.</p>
@@ -331,7 +331,7 @@
                 <option value="g750">G750</option>
             </select>
         </div>
-        
+
         <div class="col-md-3" id="WFC3">
             <select id="wfc3mode" name="wfc3mode" class="form-control" data-placeholder="Select WFC3 Disperser">
                 <option value=""></option>
@@ -372,7 +372,7 @@
             <select id="scanDirection" name="scanDirection" class="form-control" data-placeholder="Select WFC3 Scan Direction">
                 <option value=""></option>
                 <option value="Forward">Forward</option>
-                <option value="Round Trip">Round Trip</option>          
+                <option value="Round Trip">Round Trip</option>
             </select>
             <select id="schedulability" name="schedulability" class="form-control" data-placeholder="Select WFC3 Schedulability">
                 <option value=""></option>
@@ -380,6 +380,16 @@
                 <option value="100">100 (Large Programs)</option>
             </select>
             <p class="help-block">Choosing 'Optimal' lets the program determine the optimal values.</p>
+        </div>
+    </div>
+
+
+    <div class="form-group">
+        <label class="col-md-3 control-label" for="ramp">Ramp Effects?</label>
+        <div class="col-md-3">
+
+              <input type="checkbox" data-toggle="toggle" id="ramp" name="ramp" class="form-control">
+
         </div>
     </div>
 
@@ -392,10 +402,10 @@
 </form>
 {% end %}
 
-{% block js %}        
+{% block js %}
 <script src="{{ static_url('js/starter.formhst.js') }}"></script>
 <script src="{{ static_url('js/select2.min.js') }}"></script>
-        
+
 <script type="text/javascript">
     $(document).ready(function(){
         $("select").select2({
@@ -473,7 +483,7 @@
             document.getElementById("phoenix").style.display = "none";
         }
     }
-</script>      
+</script>
 
 
 <script type="text/javascript" src="http://cdn.pydata.org/bokeh/release/bokeh-0.12.6.min.js"></script>
