@@ -91,7 +91,7 @@ setup(
           'tornado',
           'pandas',
           'joblib',
-          'pandeia.engine',
+          'pandeia.engine==1.3.0',
           'batman-package',
           'photutils',
           'astropy',
