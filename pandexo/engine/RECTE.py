@@ -25,40 +25,55 @@ def RECTE(
     """This function calculates HST/WFC3/IR ramp effect profile based on
 the charge trapping explanation developed in Zhou et al. (2017).
 
-    :param cRates: intrinsic count rate of each exposures, unit: e/s
-    :type cRates: numpy.array
-    :param tExp: time stamps for the exposures, unit: seconds
-    :type tExp: numpy.array
-    :param exptime: (default 180 seconds) exposure time
-    :type exptime: numpy.array or float
-    :param trap_pop_s: (default 0) number of occupied slow population
+    Parameters
+    ----------
+    cRates : numpy.array
+		intrinsic count rate of each exposures, unit: e/s
+
+    tExp : numpy.array
+		time stamps for the exposures, unit: seconds
+
+    exptime : numpy.array or float
+		(default 180 seconds) exposure time
+
+    trap_pop_s : float or numpy.array
+		(default 0) number of occupied slow population
         charge traps before the very beginning of the observation
-    :type trap_pop_s: float or numpy.array
-    :param trap_pop_f: (default 0) number of occupied fast population
+
+	trap_pop_f: float or numpy.array
+		(default 0) number of occupied fast population
         charge traps before the very beginning of the observation
-    :type trap_pop_f: float or numpy.array
-    :param dTrap_s: (default [0]) number of additional charges trapped
+
+    dTrap_s: float or numpy.array
+		(default [0]) number of additional charges trapped
         by slow population traps during earth occultation
-    :type dTrap_s: float or numpy.array
-    :param dTrap_f: (default [0]) number of additional charges trapped
+
+    dTrap_f : float or numpy.array
+		(default [0]) number of additional charges trapped
         by fast population traps during earth occultation
-    :type dTrap_f: float or numpy.array
-    :param dt0: (default 0) exposure time before the very beginning
+
+    dt0: float
+		(default 0) exposure time before the very beginning
         of the observation. It could be due to guidence adjustment
-    :type dt0: float
-    :param lost: (default 0, no lost) fraction of trapped electrons that are
+
+    lost: float
+		(default 0, no lost) fraction of trapped electrons that are
         not eventually detected
-    :type lost: float
-    :param mode: (default scanning, scanning or staring, or others),
+
+    mode : string
+		(default scanning, scanning or staring, or others),
         for scanning mode observation , the pixel no longer receive
         photons during the overhead time, in staring mode,
         the pixel keps receiving elctrons
-    :type mode: string
 
-    :returns: observed counts
-    :rtype: numpy.array
+	Returns
+	-------
+	numpy.array
+		observed counts
 
-    :Example:
+
+    Example
+	-------
 
     see Examples and Cookbook
 
