@@ -811,7 +811,7 @@ def hst_simulated_lightcurve(result_dict, plot=True, output_file ='hsttime.html'
     if ramp_included:
         title_description = " (Ramp Included)"
     else:
-        " (Ramp Removed)"
+        title_description =" (Ramp Removed)"
 
     early = Figure(plot_width=400, plot_height=300,
                                tools=TOOLS,#responsive=True,
