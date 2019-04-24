@@ -622,6 +622,7 @@ def compute_sim_hst(dictinput):
     )
     # add a switch for ramp calculation
     calRamp = pandeia_input['strategy']['calculateRamp']
+
     if not pandeia_input['strategy']['useFirstOrbit']:
         print("Dropping first orbit designed by observation strategy")
         print("Do not calculate ramp profile")
