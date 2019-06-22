@@ -539,7 +539,17 @@ class CalculationNewHSTHandler(BaseHandler):
             except:
                 pandata["strategy"]["windowSize"]        = 20.
             pandata["strategy"]["schedulability"]           = self.get_argument("schedulability")
+        try:
+            calc_ramp = self.get_argument("ramp")
 
+            calc_ramp = True
+        except: 
+            calc_ramp = False
+
+
+        pandata['strategy']['calculateRamp'] = calc_ramp
+
+		
         finaldata = {"pandeia_input": pandata , "pandexo_input":exodata}
         #PandExo stats
         try: 
