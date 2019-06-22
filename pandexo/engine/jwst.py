@@ -224,15 +224,17 @@ def compute_full_sim(dictinput):
     #bin the data according to user input 
     if R != None: 
         wbin = bin_wave_to_R(w, R)
+
         photon_out_bin = uniform_tophat_sum(wbin, w,extracted_flux_out)
-        wbin = wbin[photon_out_bin > 0 ]
         photon_in_bin = uniform_tophat_sum(wbin,w, extracted_flux_inn)
-        photon_in_bin = photon_in_bin[photon_out_bin > 0 ]
         var_in_bin = uniform_tophat_sum(wbin, w,varin)
-        var_in_bin = var_in_bin[photon_out_bin > 0 ]
         var_out_bin = uniform_tophat_sum(wbin,w, varout)
+
+        wbin = wbin[photon_out_bin > 0 ]
+        photon_in_bin = photon_in_bin[photon_out_bin > 0 ]
+        var_in_bin = var_in_bin[photon_out_bin > 0 ]
         var_out_bin = var_out_bin[photon_out_bin > 0 ]
-        photon_out_bin = photon_out_bin
+        photon_out_bin = photon_out_bin[photon_out_bin>0]
     else: 
         wbin = w
         photon_out_bin = extracted_flux_out
