@@ -7,8 +7,8 @@ import pickle as pkl
 from joblib import Parallel, delayed
 import multiprocessing
 import json
-
-num_cores = multiprocessing.cpu_count()
+from .exomast import get_target_data
+user_cores = multiprocessing.cpu_count()
 
 ALL = {"WFC3 G141":False,
        "MIRI LRS":False,
@@ -31,11 +31,16 @@ def print_instruments():
     print(ALL.keys())
     return
 
-def load_exo_dict():
+def load_exo_dict(planet_name=None):
     """Loads in empty exoplanet dictionary for pandexo input
 
     Loads in empty exoplanet dictionary so that the user can manually edit different planet
     parameters. Must be done for every bash run. User must edit each keys within the dictionary.
+    
+    Parameters
+    ----------
+    planet_name : str 
+        (Optional) Planet name e.g. 'HD 189733 b' or 'HD189733b'
 
     Returns
     -------
@@ -50,6 +55,34 @@ def load_exo_dict():
     with open(os.path.join(os.path.dirname(__file__), "reference",
                                "exo_input.json")) as data_file:
         pandexo_input = json.load(data_file)
+
+    if not isinstance(planet_name, type(None)): 
+        planet_data = get_target_data(planet_name)[0] 
+               
+        pandexo_input['star']['type'] = 'phoenix' 
+        pandexo_input['star']['temp'] = planet_data['Teff']
+        pandexo_input['star']['metal'] = planet_data['Fe/H'] 
+        pandexo_input['star']['logg'] = planet_data['stellar_gravity'] 
+        
+        mags = [planet_data['Jmag'], planet_data['Hmag'], planet_data['Kmag']]
+        ind = [[m,ref] for m,ref in zip(mags, [1.26, 1.60, 2.22]) if not isinstance(m,type(None))] 
+        if len(ind)==0: raise Exception("No J, H or K magnitude data for this target")
+        
+        pandexo_input["star"]["mag"] = ind[0][0]
+        pandexo_input["star"]["ref_wave"] = ind[0][1]
+        #optinoal star radius
+        pandexo_input["star"]["radius"] = planet_data['Rs']  
+        pandexo_input["star"]["r_unit"] = 'R_sun'  
+
+       #optional planet radius/mass
+        pandexo_input["planet"]["radius"] = planet_data['Rp']  
+        pandexo_input["planet"]["r_unit"] = 'R_jupiter'
+        pandexo_input["planet"]["mass"] = planet_data['Mp'] 
+        pandexo_input["planet"]["m_unit"] = 'M_jupiter'
+
+        pandexo_input["planet"]["transit_duration"] = planet_data['transit_duration'] 
+        pandexo_input["planet"]["td_unit"] = planet_data['transit_duration_unit']
+
     return pandexo_input
 
 def load_mode_dict(inst):
@@ -184,7 +217,7 @@ def run_inst_space(inst,exo):
 
 
 def run_pandexo(exo, inst, param_space = 0, param_range = 0,save_file = True,
-                            output_path=os.getcwd(), output_file = ''):
+                            output_path=os.getcwd(), output_file = '',num_cores=user_cores):
     """Submits multiple runs of pandexo in parallel.
 
     Functionality: program contains functionality for running single or
