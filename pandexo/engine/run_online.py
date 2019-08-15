@@ -17,6 +17,8 @@ from .utils.plotters import create_component_jwst, create_component_hst
 import pandas as pd 
 import numpy as np
 from .logs import jwst_log, hst_log
+from .exomast import get_target_data
+import requests
 
 # define location of temp files
 __TEMP__ = os.environ.get("PANDEXO_TEMP", os.path.join(os.path.dirname(__file__), "temp"))
@@ -220,6 +222,7 @@ class DashboardHandler(BaseHandler):
         
         self.render("dashboard.html", calculations=task_responses[::-1])
 
+
 class DashboardHSTHandler(BaseHandler):
     """
     Request handler for the dashboard page. This will retrieve and render
@@ -249,9 +252,12 @@ class CalculationNewHandler(BaseHandler):
             'temp': ['NO GRID DB FOUND'],
             'ray' : ['NO GRID DB FOUND'],
             'flat':['NO GRID DB FOUND']})
+        all_planets =  requests.get("https://exoplanetarchive.ipac.caltech.edu/cgi-bin/nstedAPI/nph-nstedAPI?table=exoplanets&select=pl_name&format=csv")  
+        all_planets = all_planets.text.replace(' ','').split('\n')[1:]
 
         self.render("new.html", id=id,
-                                 temp=list(map(str, header.temp.unique()))
+                                 temp=list(map(str, header.temp.unique())), 
+                                 planets=all_planets
                                  )
 
     def post(self):
@@ -272,8 +278,68 @@ class CalculationNewHandler(BaseHandler):
             exodata["telescope"] = 'jwst'
             exodata["calculation"] = 'fml'  # always for online form
 
+
+            #planet properties 
+            properties = self.get_argument("properties")
+            if properties=="user":
+                #star
+
+                exodata["star"]["temp"] = float(self.get_argument("temp"))
+                exodata["star"]["logg"] = float(self.get_argument("logg"))
+                exodata["star"]["metal"] = float(self.get_argument("metal"))  
+                exodata["star"]["mag"] = float(self.get_argument("mag"))
+                exodata["star"]["ref_wave"] = float(self.get_argument("ref_wave"))
+
+                #optinoal star radius
+                exodata["star"]["radius"] = float(self.get_argument("rstarc"))
+                exodata["star"]["r_unit"] = str(self.get_argument("rstar_unitc"))
+ 
+                #optional planet radius
+                exodata["planet"]["radius"] = float(self.get_argument("refradc"))
+                exodata["planet"]["r_unit"] = str(self.get_argument("r_unitc")) 
+
+                #transit duration
+                # for phase curves user doesn't necessarily have to input a transit duration
+                try:
+                    exodata["planet"]["transit_duration"] = float(self.get_argument("transit_duration"))
+                    exodata["planet"]["td_unit"] = str(self.get_argument("td_unit"))
+                except:
+                    # but if they don't.. make sure that the planet units are in seconds...
+                    if self.get_argument("planwunits") == 'sec':
+                        exodata["planet"]["transit_duration"] = 0.0
+                    else: 
+                        raise Exception("Need transit duraiton or input phase curve file")
+
+            elif properties=="exomast":
+                planet_name = self.get_argument("planetname")
+                planet_data = get_target_data(planet_name)[0]
+
+                #star
+                exodata["star"]["temp"] = planet_data['Teff']
+                exodata["star"]["logg"] = planet_data['stellar_gravity']
+                exodata["star"]["metal"] = planet_data['Fe/H'] 
+                mags = [planet_data['Jmag'], planet_data['Hmag'], planet_data['Kmag']]
+                ind = [[m,ref] for m,ref in zip(mags, [1.26, 1.60, 2.22]) if not isinstance(m,type(None))] 
+                if len(ind)==0: raise Exception("No J, H or K magnitude data for this target")
+                exodata["star"]["mag"] = ind[0][0]
+                exodata["star"]["ref_wave"] = ind[0][1]
+
+                #optinoal star radius
+                exodata["star"]["radius"] = planet_data['Rs']  
+                exodata["star"]["r_unit"] = 'R_sun'  
+ 
+                #optional planet radius/mass
+                exodata["planet"]["radius"] = planet_data['Rp']  
+                exodata["planet"]["r_unit"] = 'R_jupiter'
+                exodata["planet"]["mass"] = planet_data['Mp'] 
+                exodata["planet"]["m_unit"] = 'M_jupiter'
+
+                exodata["planet"]["transit_duration"] = planet_data['transit_duration'] 
+                exodata["planet"]["td_unit"] = planet_data['transit_duration_unit'] 
+
             # stellar model
             exodata["star"]["type"] = self.get_argument("stellarModel")
+
             if exodata["star"]["type"] == "user":
                 # process star file
                 fileinfo_star = self.request.files['starFile'][0]
@@ -286,12 +352,7 @@ class CalculationNewHandler(BaseHandler):
                 exodata["star"]["starpath"] = os.path.join(__TEMP__, cname_star)
                 exodata["star"]["f_unit"] = self.get_argument("starfunits")
                 exodata["star"]["w_unit"] = self.get_argument("starwunits")
-            elif exodata["star"]["type"] =="phoenix":
-                exodata["star"]["temp"] = float(self.get_argument("temp"))
-                exodata["star"]["logg"] = float(self.get_argument("logg"))
-                exodata["star"]["metal"] = float(self.get_argument("metal"))
-            exodata["star"]["mag"] = float(self.get_argument("mag"))
-            exodata["star"]["ref_wave"] = float(self.get_argument("ref_wave"))
+ 
 
             # planet model
             exodata["planet"]["type"] = self.get_argument("planetModel")
@@ -307,23 +368,13 @@ class CalculationNewHandler(BaseHandler):
                 exodata["planet"]["exopath"] = os.path.join(__TEMP__, cname_plan)
                 exodata["planet"]["w_unit"] = self.get_argument("planwunits")
                 exodata["planet"]["f_unit"] = self.get_argument("planfunits")
-            elif exodata["planet"]["type"] == "constant":
-                exodata["star"]["radius"] = float(self.get_argument("rstarc"))
-                exodata["star"]["r_unit"] = str(self.get_argument("rstar_unitc"))
-                exodata["planet"]["radius"] = float(self.get_argument("refradc"))
-                exodata["planet"]["r_unit"] = str(self.get_argument("r_unitc"))                                
+            elif exodata["planet"]["type"] == "constant":                               
                 if self.get_argument("constant_unit") == 'fp/f*':
                     exodata["planet"]["temp"] = float(self.get_argument("ptempc"))
                     exodata["planet"]["f_unit"] = 'fp/f*'
                 elif self.get_argument("constant_unit") == 'rp^2/r*^2':
                     exodata["planet"]["f_unit"] = 'rp^2/r*^2'
             elif exodata["planet"]["type"] == "grid":
-                exodata["star"]["radius"] = float(self.get_argument("rstarg"))
-                exodata["star"]["r_unit"] = str(self.get_argument("rstar_unitg"))
-                exodata["planet"]["mass"] = float(self.get_argument("pmass"))
-                exodata["planet"]["m_unit"] = str(self.get_argument("m_unit"))
-                exodata["planet"]["radius"] = float(self.get_argument("refradg"))
-                exodata["planet"]["r_unit"] = str(self.get_argument("r_unitg"))
                 exodata["planet"]["temp"] = float(self.get_argument("ptempg"))
                 exodata["planet"]["chem"] = str(self.get_argument("pchem"))
                 exodata["planet"]["cloud"] = self.get_argument("cloud") 
@@ -338,17 +389,7 @@ class CalculationNewHandler(BaseHandler):
             exodata["observation"]["noccultations"] = float(self.get_argument("numtrans"))
             exodata["observation"]["sat_level"] = float(self.get_argument("satlevel"))
             exodata["observation"]["sat_unit"] = self.get_argument("sat_unit")
-            # for phase curves user doesn't necessarily have to input a transit duration
-            try:
-                exodata["planet"]["transit_duration"] = float(self.get_argument("transit_duration"))
-                exodata["planet"]["td_unit"] = str(self.get_argument("td_unit"))
-            except:
-                # but if they don't.. make sure that the planet units are in seconds...
-                if exodata["planet"]["w_unit"] == 'sec':
-                    exodata["planet"]["transit_duration"] = 0.0
-                else: 
-                    print("Need to give transit duration")
-                    raise 
+
                 
             # noise floor, set to 0.0 of no values are input
             try:
@@ -412,7 +453,7 @@ class CalculationNewHandler(BaseHandler):
             jwst_log(finaldata)
         except: 
             pass
-
+        print(exodata)
         task = self.executor.submit(wrapper, finaldata)
 
 
