@@ -326,7 +326,7 @@ class CalculationNewHandler(BaseHandler):
                 exodata["star"]["temp"] = planet_data['Teff']
                 exodata["star"]["logg"] = planet_data['stellar_gravity']
                 exodata["star"]["metal"] = planet_data['Fe/H'] 
-                exodata["star"]["mag"] = Simbad.query_object(name)['FLUX_J'][0]
+                exodata["star"]["mag"] = Simbad.query_object(planet_name[:-1])['FLUX_J'][0]
                 exodata["star"]["ref_wave"] = 1.25
 
                 #optinoal star radius
@@ -490,7 +490,7 @@ class CalculationNewHSTHandler(BaseHandler):
             'flat':['NO GRID DB FOUND']})
         all_planets =  requests.get("https://exoplanetarchive.ipac.caltech.edu/cgi-bin/nstedAPI/nph-nstedAPI?table=exoplanets&select=pl_name&format=csv")  
         all_planets = all_planets.text.replace(' ','').split('\n')[1:]
-        self.render("newHST1.html", id=id,
+        self.render("newHST.html", id=id,
                                  temp=list(map(str, header.temp.unique())),
                                  planets=all_planets
                                  )
@@ -506,7 +506,6 @@ class CalculationNewHSTHandler(BaseHandler):
         
         id = str(uuid.uuid4())+'h'
 
-        
         with open(os.path.join(os.path.dirname(__file__), "reference",
                                "exo_input.json")) as data_file:
             exodata = json.load(data_file)
@@ -515,13 +514,14 @@ class CalculationNewHSTHandler(BaseHandler):
 
             #planet properties 
             properties = self.get_argument("properties")
+            
             if properties=="user":
 
                 #star
                 exodata["star"]["jmag"]         = float(self.get_argument("Jmag"))
                 try:
                     #only needed for higher accuracy
-                    exodata["star"]["hmag"]     = float(self.get_argument("ref_wave"))
+                    exodata["star"]["hmag"]     = float(self.get_argument("Hmag"))
                 except: 
                     exodata["star"]["hmag"]     = None
 
@@ -551,8 +551,8 @@ class CalculationNewHSTHandler(BaseHandler):
                     exodata["planet"]["w"]      = 90.
                 exodata["planet"]["transit_duration"]   = float(self.get_argument("transit_duration"))
 
-
-            elif properties=="exomast":
+            
+            if properties=="exomast":
 
                 planet_name = self.get_argument("planetname")
                 planet_data = get_target_data(planet_name)[0]
@@ -560,9 +560,9 @@ class CalculationNewHSTHandler(BaseHandler):
                 #star
                 exodata["star"]["temp"] = planet_data['Teff']
 
-                hmag = Simbad.query_object(planet_name[:-1])['FLUX_H'][0]
                 jmag = Simbad.query_object(planet_name[:-1])['FLUX_J'][0]
-                
+                hmag = Simbad.query_object(planet_name[:-1])['FLUX_H'][0]
+
                 exodata["star"]["jmag"] = jmag
                 exodata["star"]["hmag"] = hmag
 
@@ -667,8 +667,13 @@ class CalculationNewHSTHandler(BaseHandler):
 
 
         pandata['strategy']['calculateRamp'] = calc_ramp
-        inst_dict['strategy']['targetFluence'] = float(self.get_argument("targetFluence"))
+        pandata['strategy']['targetFluence'] = float(self.get_argument("targetFluence"))
 		
+        #import pickle as pk 
+        #a = pk.load(open('/Users/natashabatalha/Desktop/JWST/testing/ui.pk','rb'))
+        #pandata = a['pandeia_input']
+        #exodata  = a['pandexo_input']
+
         finaldata = {"pandeia_input": pandata , "pandexo_input":exodata}
         #PandExo stats
         try: 

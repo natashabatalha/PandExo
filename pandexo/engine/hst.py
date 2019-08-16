@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
 from .create_input import hst_spec
+import batman
+from .RECTE import RECTE
 
 
 def wfc3_GuessNOrbits(trdur):
@@ -416,9 +418,6 @@ def calc_start_window(eventType, rms, ptsOrbit, numOrbits, depth, inc, aRs, peri
     float
         maxphase--latest observation start phase
     '''
-    import matplotlib.pyplot as plt
-    import batman
-
     hstperiod = 96./60/24                 # HST orbital period, days
     punc = windowSize/120./24/period  # Half start window size, in phase
     cosi = np.cos(inc*np.pi/180)     # Cosine of the inclination
@@ -592,7 +591,6 @@ def compute_sim_lightcurve(exposureDict, lightCurveDict, calRamp=False):
     Resulting light curve (unit: e/pixel) for the earliest and latest time
 
     """
-    from .RECTE import RECTE
     fluence = exposureDict['info']["Maximum pixel fluence (electrons)"]
     exptime = exposureDict['info']['exposure time']
     obst1 = (lightCurveDict['obsphase1'] -
@@ -641,8 +639,8 @@ def compute_sim_hst(dictinput):
     pandexo_input = dictinput['pandexo_input']
     pandeia_input = dictinput['pandeia_input']
 
-    disperser = pandeia_input['configuration']['instrument']['disperser'].lower(
-    )
+    disperser = pandeia_input['configuration']['instrument']['disperser'].lower()
+
     # add a switch for ramp calculation
     calRamp = pandeia_input['strategy']['calculateRamp']
 
@@ -684,8 +682,9 @@ def compute_sim_hst(dictinput):
         raise Exception('Units are not correct. Pick rp^2/r*^2 or fp/f*')
 
     a = wfc3_TExoNS(dictinput)
-    b = calc_start_window(eventType, a['light_curve_rms'], a['nframes_per_orb'], a['info']
-                          ['Number of HST orbits'], depth, inc, aRs, period, windowSize, ecc, w, useFirstOrbit=useFirstOrbit)
+
+    b = calc_start_window(eventType, a['light_curve_rms'], a['nframes_per_orb'], a['info']['Number of HST orbits'], 
+        depth, inc, aRs, period, windowSize, ecc, w, useFirstOrbit=useFirstOrbit)
     c = planet_spec(pandexo_input['planet'], pandexo_input['star'],
                     w_unit, disperser, a['spec_error'], nchan, smooth=20)
     info_div = create_out_div(a['info'], b['minphase'], b['maxphase'])
