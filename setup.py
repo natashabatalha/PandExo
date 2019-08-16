@@ -42,7 +42,7 @@ except ImportError:
 setup(
 
     name='pandexo.engine',
-    version='1.3',
+    version='1.4',
     summary='pandexo transiting exoplanet simulator',
     description_file='README.rst',
     author='Natasha Batalha at Space Telescope Science Institute',
@@ -97,7 +97,6 @@ setup(
           'astropy',
           'pysynphot',
           'sqlalchemy',
-          'sphinx==1.5.6'
           'astroquery'
           ],
     entry_points = {
