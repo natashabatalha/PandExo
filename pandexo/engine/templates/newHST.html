@@ -23,24 +23,133 @@
 
     <hr class="col-md-11 col-md-offset-1">
 
-    <div class="form-group stellar-mag-section">
-        <label class="col-md-3 control-label" for="ref_wave">Stellar Magnitude</label>
-        <div class="col-md-4 form-inline">
-            <input type="text" class="form-control" id="mag" name="mag" style="width: 70%;">
-            <div class="input-group-btn" style="width: 20%;left: -8px;display: inline-block;">
-                <select id="ref_wave" name="ref_wave" class="form-control" data-placeholder="Select Magnitude Units">
-                    <!--<option value=""></option>-->
-                    <option value="1.60">H</option>
-                </select>
+    <div class="form-group">
+        <label class="col-md-3 control-label" for="" style="top: 35px;">Star/Planet Properties</label>
+        <div class="col-md-9">
+            <div class="radio-chooser">
+                <div class="radio-chooser-item">
+                    <label class="radio-chooser-content" for="ResolveTarget">
+                        <input type="radio" name="properties" id="ResolveTarget" value="exomast" />
+                        <div class="radio-chooser-title">Load Target Properties</div>
+                    </label>
+                </div>
+                <div class="radio-chooser-item">
+                    <label class="radio-chooser-content" for="UserDefine">
+                        <input type="radio" name="properties" id="UserDefine" value="user" />
+                        <div class="radio-chooser-title">User Defined Properties</div>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div> 
+
+    <div class="form-group hidden define-properties">
+        <div class="col-md-offset-3 col-md-3">
+            <div class="input-group">
+                <input type="text" class="form-control" id="Jmag" name="Jmag">
+                <span class="input-group-addon">J</span>
             </div>
             <p class="help-block">Magnitude for the Host Star</p>
-            <style>
-                .stellar-mag-section .select2-selection {
-                    border-top-left-radius: 0;border-bottom-left-radius: 0;
-                }
-            </style>
+        </div>
+
+        <div class="col-md-3">
+            <div class="input-group">
+                <input type="text" class="form-control" id="Hmag" name="Hmag" value="Optional">
+                <span class="input-group-addon">H</span>
+            </div>
+            <p class="help-block">Color correction for higher accuracy</p>
+        </div> 
+
+        <div class="col-md-3">
+            <div class="input-group">
+                <input type="text" class="form-control" id="stempc" name="stempc" value="Only for Secondary Eclipse">
+            </div>
+            <p class="help-block">Stellar Teff(K)</p>
+        </div>
+
+    </div>
+
+
+    <div class="form-group hidden define-properties">
+        <div class="col-md-offset-3 col-md-3 form-inline">
+            <input type="text" class="form-control" id="refradc" name="refradc" style="width: 60%;" value="1.25">
+            <div class="input-group-btn" style="width: 30%;left: -4px;display: inline-block;">
+                <select id="r_unitc" name="r_unitc" class="form-control">
+                <option value='R_jup'>R<sub>J</sub></option>
+                <option value='kilometer'>Km</option>
+                <option value='m'>m</option>
+                <option value='R_earth'>R<sub>E</sub></option>
+                <option value='R_sun'>R<sub>S</sub></option>
+                </select>
+            </div>
+            <p class="help-block">Planet Radius</p>
+        </div>
+
+        <div class="col-md-3 form-inline">
+            <input type="text" class="form-control" id="rstarc" name="rstarc" style="width: 60%;" value="1">
+            <div class="input-group-btn" style="width: 30%;left: -4px;display: inline-block;">
+                <select id="rstar_unitc" name="rstar_unitc" class="form-control">
+                <option value='R_sun'>R<sub>S</sub></option>
+                <option value='kilometer'>Km</option>
+                <option value='m'>m</option>
+                <option value='R_earth'>R<sub>E</sub></option>
+                <option value='R_jup'>R<sub>J</sub></option>
+                </select>
+            </div>
+            <p class="help-block">Stellar Radius</p>
         </div>
     </div>
+
+    <div class="form-group hidden define-properties">
+        <div class="col-md-offset-3 col-md-3">
+            <input type="text" class="form-control" id="period" name="period">
+            <p class="help-block">Orbital period in days.</p>
+        </div>
+
+        <div class="col-md-3">
+            <input type="text" class="form-control" id="transit_duration" name="transit_duration">
+            <p class="help-block">Full transit/eclipse duration in days.</p>
+        </div>
+
+        <!--div class="col-md-3">
+            <input type="text" class="form-control" id="depth" name="depth">
+            <p class="help-block">Approximate transit/eclipse depth for plotting purposes.</p>
+        </div-->
+
+        <div class="col-md-3">
+            <input type="text" class="form-control" id="i" name="i">
+            <p class="help-block">Orbital inclination in degrees.</p>
+        </div>
+
+        <div class="col-md-3 col-md-offset-3">
+            <input type="text" class="form-control" id="ars" name="ars">
+            <p class="help-block">Semi-major axis in units of stellar radii (a/R<sub>*</sub>).</p>
+        </div>
+
+        <div class="col-md-3">
+            <input type="text" class="form-control" id="ecc" name="ecc">
+            <p class="help-block">Orbital eccentricity.</p>
+        </div>
+
+        <div class="col-md-3">
+            <input type="text" class="form-control" id="w" name="w">
+            <p class="help-block">Longitude of periastron in degrees.<br>Leave blank if eccentricity is zero.</p>
+        </div>
+    </div>
+
+
+    <div class="form-group hidden resolve-target">
+        <div class="col-md-3 col-md-offset-3">
+            <select id="planetname" name="planetname" class="form-control" data-placeholder="Select Planet">
+                <option value=""></option> 
+                {% for i in planets %}
+                    <option {{ escape(i) }} value={{ escape(i) }}>{{ escape(i) }}</option>
+                {% end %}               
+            </select>
+            <p class="help-block">Search Planet Name</p>
+    </div>
+    </div>
+
 
     <hr class="col-md-11 col-md-offset-1">
 
@@ -160,116 +269,6 @@
             </div>
             <p class="help-block">Planet Temp(K)</p>
         </div>
-        <div class="col-md-3">
-            <div class="input-group">
-                <input type="text" class="form-control" id="stempc" name="stempc" value="Only for Secondary">
-            </div>
-            <p class="help-block">Stellar Temp(K)</p>
-        </div>
-    </div>
-
-    <div class="form-group hidden select-from-grid">
-        <div class="col-md-offset-3 col-md-4 form-inline">
-            <input type="text" class="form-control" id="refradg" name="refradg" style="width: 70%;" value="1.25">
-            <div class="input-group-btn" style="width: 20%;left: -4px;display: inline-block;">
-                <select id="r_unitg" name="r_unitg" class="form-control">
-                <option value='R_jup'>R<sub>J</sub></option>
-                <option value='kilometer'>Km</option>
-                <option value='m'>m</option>
-                <option value='R_earth'>R<sub>E</sub></option>
-                <option value='R_sun'>R<sub>S</sub></option>
-                </select>
-            </div>
-        <p class="help-block">Planet Radius</p>
-        </div>
-
-        <div class="col-md-offset-3 col-md-4 form-inline">
-            <input type="text" class="form-control" id="rstarg" name="rstarg" style="width: 70%;" value="1">
-            <div class="input-group-btn" style="width: 20%;left: -4px;display: inline-block;">
-                <select id="rstar_unitg" name="rstar_unitg" class="form-control">
-                <option value='R_sun'>R<sub>S</sub></option>
-                <option value='kilometer'>Km</option>
-                <option value='m'>m</option>
-                <option value='R_earth'>R<sub>E</sub></option>
-                <option value='R_jup'>R<sub>J</sub></option>
-                </select>
-            </div>
-            <p class="help-block">Stellar Radius</p>
-        </div>
-    </div>
-
-    <div class="form-group hidden constant-transit-section">
-        <div class="col-md-offset-3 col-md-4 form-inline">
-            <input type="text" class="form-control" id="refradc" name="refradc" style="width: 70%;" value="1.25">
-            <div class="input-group-btn" style="width: 20%;left: -4px;display: inline-block;">
-                <select id="r_unitc" name="r_unitc" class="form-control">
-                <option value='R_jup'>R<sub>J</sub></option>
-                <option value='kilometer'>Km</option>
-                <option value='m'>m</option>
-                <option value='R_earth'>R<sub>E</sub></option>
-                <option value='R_sun'>R<sub>S</sub></option>
-                </select>
-            </div>
-            <p class="help-block">Planet Radius</p>
-        </div>
-
-        <div class="col-md-offset-3 col-md-4 form-inline">
-            <input type="text" class="form-control" id="rstarc" name="rstarc" style="width: 70%;" value="1">
-            <div class="input-group-btn" style="width: 20%;left: -4px;display: inline-block;">
-                <select id="rstar_unitc" name="rstar_unitc" class="form-control">
-                <option value='R_sun'>R<sub>S</sub></option>
-                <option value='kilometer'>Km</option>
-                <option value='m'>m</option>
-                <option value='R_earth'>R<sub>E</sub></option>
-                <option value='R_jup'>R<sub>J</sub></option>
-                </select>
-            </div>
-            <p class="help-block">Stellar Radius</p>
-        </div>
-    </div>
-
-    <hr class="col-md-11 col-md-offset-1">
-
-    <div class="form-group">
-        <label class="col-md-3 control-label" for="planetParams">Planet Parameters</label>
-        <div class="col-md-3">
-            <input type="text" class="form-control" id="period" name="period">
-            <p class="help-block">Orbital period in days.</p>
-        </div>
-
-        <div class="col-md-3">
-            <input type="text" class="form-control" id="transit_duration" name="transit_duration">
-            <p class="help-block">Full transit/eclipse duration in days.</p>
-        </div>
-
-        <div class="col-md-3">
-            <input type="text" class="form-control" id="depth" name="depth">
-            <p class="help-block">Approximate transit/eclipse depth for plotting purposes.</p>
-        </div>
-
-        <div class="clearfix"></div>
-
-        <div class="col-md-3 col-md-offset-3">
-            <input type="text" class="form-control" id="i" name="i">
-            <p class="help-block">Orbital inclination in degrees.</p>
-        </div>
-
-        <div class="col-md-3">
-            <input type="text" class="form-control" id="ars" name="ars">
-            <p class="help-block">Semi-major axis in units of stellar radii (a/R<sub>*</sub>).</p>
-        </div>
-
-        <div class="clearfix"></div>
-
-        <div class="col-md-3 col-md-offset-3">
-            <input type="text" class="form-control" id="ecc" name="ecc">
-            <p class="help-block">Orbital eccentricity.</p>
-        </div>
-
-        <div class="col-md-3">
-            <input type="text" class="form-control" id="w" name="w">
-            <p class="help-block">Longitude of periastron in degrees.<br>Leave blank if eccentricity is zero.</p>
-        </div>
     </div>
 
     <hr class="col-md-11 col-md-offset-1">
@@ -307,6 +306,12 @@
             </select>
             <p class="help-block">Use the first orbit.</p>
         </div>
+
+        <div class="col-md-3">
+            <input type="text" class="form-control" id="targetFluence" name="targetFluence" value="30000" >
+            <p class="help-block">Target fluence in electrons per pixel.</p>
+        </div>
+
     </div>
 
     <hr class="col-md-11 col-md-offset-1">
@@ -419,6 +424,14 @@
             $(".radio-chooser-item").removeClass("radio-chooser-selected");
             $(this).parent().addClass("radio-chooser-selected");
             switch ( $(this).find("input").attr("id") ) {
+                case "UserDefine":
+                    $(".resolve-target").addClass("hidden");
+                    $(".define-properties").removeClass("hidden");
+                    break;
+                case "ResolveTarget":
+                    $(".resolve-target").removeClass("hidden");
+                    $(".define-properties").addClass("hidden");
+                    break;
                 case "planetModelConstant":
                     $(".upload-planet-section").addClass("hidden");
                     $(".constant-transit-section").removeClass("hidden");
