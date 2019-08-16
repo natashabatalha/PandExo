@@ -8,6 +8,9 @@ from joblib import Parallel, delayed
 import multiprocessing
 import json
 from .exomast import get_target_data
+from astroquery.simbad import Simbad
+import astropy.units as u
+
 user_cores = multiprocessing.cpu_count()
 
 ALL = {"WFC3 G141":False,
@@ -63,26 +66,47 @@ def load_exo_dict(planet_name=None):
         pandexo_input['star']['temp'] = planet_data['Teff']
         pandexo_input['star']['metal'] = planet_data['Fe/H'] 
         pandexo_input['star']['logg'] = planet_data['stellar_gravity'] 
+        Simbad.add_votable_fields('flux(H)')
+        Simbad.add_votable_fields('flux(J)')
+        jmag = Simbad.query_object(planet_name[:-1])['FLUX_J'][0]
+        hmag = Simbad.query_object(planet_name[:-1])['FLUX_H'][0]
         
-        mags = [planet_data['Jmag'], planet_data['Hmag'], planet_data['Kmag']]
-        ind = [[m,ref] for m,ref in zip(mags, [1.26, 1.60, 2.22]) if not isinstance(m,type(None))] 
-        if len(ind)==0: raise Exception("No J, H or K magnitude data for this target")
-        
-        pandexo_input["star"]["mag"] = ind[0][0]
-        pandexo_input["star"]["ref_wave"] = ind[0][1]
+        pandexo_input["star"]["mag"] = jmag
+        pandexo_input["star"]["ref_wave"] = 1.25
+        pandexo_input["star"]["jmag"] = jmag
+        pandexo_input["star"]["hmag"] = hmag
         #optinoal star radius
         pandexo_input["star"]["radius"] = planet_data['Rs']  
-        pandexo_input["star"]["r_unit"] = 'R_sun'  
+        pandexo_input["star"]["r_unit"] = planet_data['Rs_unit'][0]+ planet_data['Rs_unit'][1:].lower()   
 
        #optional planet radius/mass
         pandexo_input["planet"]["radius"] = planet_data['Rp']  
-        pandexo_input["planet"]["r_unit"] = 'R_jupiter'
+        pandexo_input["planet"]["r_unit"] = planet_data['Rp_unit'][0]+ planet_data['Rp_unit'][1:].lower() 
         pandexo_input["planet"]["mass"] = planet_data['Mp'] 
-        pandexo_input["planet"]["m_unit"] = 'M_jupiter'
+        pandexo_input["planet"]["m_unit"] = planet_data['Mp_unit'][0]+ planet_data['Mp_unit'][1:].lower()  
 
         pandexo_input["planet"]["transit_duration"] = planet_data['transit_duration'] 
         pandexo_input["planet"]["td_unit"] = planet_data['transit_duration_unit']
+        depth = pandexo_input["planet"]["radius"]**2 / ((pandexo_input["star"]["radius"]
+                                                    *u.Unit(pandexo_input["star"]["r_unit"]) )
+                                                        .to(u.Unit(pandexo_input["planet"]["r_unit"]))).value**2
+        pandexo_input["planet"]["depth"]      = depth
+        if planet_data['inclination'] == None:   
+            inc = 90
+        else: 
+            inc = planet_data['inclination']
 
+        pandexo_input["planet"]["i"]          = inc
+        pandexo_input["planet"]["ars"]        = planet_data['a/Rs'] 
+        period = planet_data['orbital_period'] 
+        period_unit = planet_data['orbital_period_unit'] 
+        pandexo_input["planet"]["period"]     = (period*u.Unit(period_unit)).to(u.Unit('day')).value
+        pandexo_input["planet"]["ecc"]        = planet_data['eccentricity'] 
+        pandexo_input["planet"]["ecc"]        = planet_data['eccentricity'] 
+        try:
+            pandexo_input["planet"]["w"]      = float(planet_data['omega'] )
+        except: 
+            pandexo_input["planet"]["w"]      = 90.
     return pandexo_input
 
 def load_mode_dict(inst):

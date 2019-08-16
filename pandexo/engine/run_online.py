@@ -596,7 +596,7 @@ class CalculationNewHSTHandler(BaseHandler):
                 exodata["planet"]["period"]     = (period*u.Unit(period_unit)).to(u.Unit('day')).value
                 exodata["planet"]["ecc"]        = planet_data['eccentricity'] 
                 try:
-                    exodata["planet"]["w"]      = float(self.get_argument("w"))
+                    exodata["planet"]["w"]      = float(planet_data['omega'] )
                 except: 
                     exodata["planet"]["w"]      = 90.
             # planet model
