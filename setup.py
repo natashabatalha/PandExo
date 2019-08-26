@@ -18,7 +18,8 @@ except ImportError:
     from ez_setup import use_setuptools
     use_setuptools()
     from setuptools import setup
-
+import sys 
+PY_V = sys.version_info
 # The standard setup() call.  Notice, however, that most of the arguments
 # normally passed to setup() are absent.  They will instead be read from the
 # setup.cfg file using d2to1.
@@ -39,10 +40,15 @@ except ImportError:
 # use_2to3 and zip_safe are common options support by setuptools; these can
 # also be placed in the setup.cfg, as will be demonstrated in a future update
 # to this sample package.
+
+if sys.version_info < (3,0): 
+    pandas_version = '0.24.0'
+else:
+    pandas_version = '0.25.0'
 setup(
 
     name='pandexo.engine',
-    version='1.3',
+    version='1.4',
     summary='pandexo transiting exoplanet simulator',
     description_file='README.rst',
     author='Natasha Batalha at Space Telescope Science Institute',
@@ -87,17 +93,17 @@ setup(
 
     install_requires=[
           'numpy',
-          'bokeh',
+          'bokeh==0.12.6',
           'tornado',
-          'pandas',
+          'pandas=='+pandas_version,
           'joblib',
-          'pandeia.engine==1.3.0',
+          'pandeia.engine==1.4.0',
           'batman-package',
           'photutils',
           'astropy',
           'pysynphot',
           'sqlalchemy',
-          'sphinx==1.5.6'
+          'astroquery'
           ],
     entry_points = {
         'console_scripts':

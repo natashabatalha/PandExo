@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
 from .create_input import hst_spec
+import batman
+from .RECTE import RECTE
 
 
 def wfc3_GuessNOrbits(trdur):
@@ -31,13 +33,13 @@ def wfc3_GuessNOrbits(trdur):
     return norbits
 
 
-def wfc3_GuessParams(hmag, disperser, scanDirection, subarray, obsTime, maxScanHeight=180., maxExptime=150.):
+def wfc3_GuessParams(jmag, disperser, scanDirection, subarray, obsTime, maxScanHeight=180., maxExptime=150., targetFluence=30000., hmag=None):
     '''Predict nsamp and samp_seq when values not provided by the user.
 
     Parameters
     ----------
-    hmag : float
-        H-band magnitude
+    jmag : float
+        J-band magnitude
     disperser : str
         grism ('G141' or 'G102')
     scanDirection : str
@@ -50,6 +52,10 @@ def wfc3_GuessParams(hmag, disperser, scanDirection, subarray, obsTime, maxScanH
         (optional) maximum scan height in pixels
     maxExptime : float
         (Optional) default=150.0, maximum exposure time in seconds
+    targetFluence : float
+        (Optional) Desired fluence in electrons per pixel
+    hmag : float
+        (Optional) H-band magnitude
 
     Returns
     -------
@@ -63,8 +69,8 @@ def wfc3_GuessParams(hmag, disperser, scanDirection, subarray, obsTime, maxScanH
     maxDutyCycle = 0
     for samp_seq in allsampseq:
         for nsamp in allnsamp:
-            exptime, tottime, scanRate, scanHeight, fluence = wfc3_obs(hmag, disperser, scanDirection,
-                                                                       subarray, nsamp, samp_seq)
+            exptime, tottime, scanRate, scanHeight, fluence = wfc3_obs(jmag, disperser, scanDirection,
+                                                                       subarray, nsamp, samp_seq, targetFluence, hmag)
             # Compute duty cycle and compare
             # Exposure time should be less than 2.5 minutes to achieve good time resolution
             ptsOrbit = np.floor(obsTime/tottime)
@@ -77,13 +83,13 @@ def wfc3_GuessParams(hmag, disperser, scanDirection, subarray, obsTime, maxScanH
     return bestnsamp, bestsampseq
 
 
-def wfc3_obs(hmag, disperser, scanDirection, subarray, nsamp, samp_seq):
+def wfc3_obs(jmag, disperser, scanDirection, subarray, nsamp, samp_seq, targetFluence=30000., hmag=None):
     '''Determine the recommended exposure time, scan rate, scan height, and overheads.
 
     Parameters
     ----------
-    hmag : float
-        H-band magnitude
+    jmag : float
+        J-band magnitude
     disperser : str
         Grism ('G141' or 'G102')
     scanDirection : str
@@ -94,6 +100,10 @@ def wfc3_obs(hmag, disperser, scanDirection, subarray, nsamp, samp_seq):
         Number of up-the-ramp samples (1..15)
     samp_seq : str
         Time between non-destructive reads ('SPARS5', 'SPARS10', or 'SPARS25')
+    targetFluence : float
+        (Optional) Desired fluence in electrons per pixel
+    hmag : float
+        (Optional) H-band magnitude
 
     Returns
     -------
@@ -133,12 +143,18 @@ def wfc3_obs(hmag, disperser, scanDirection, subarray, nsamp, samp_seq):
             return
 
     # Recommended scan rate
-    scanRate = np.round(1.9*10**(-0.4*(hmag-5.9)), 3)  # arcsec/s
+    if hmag == None:
+        hmag = jmag
+    #scanRate = np.round(1.9*10**(-0.4*(hmag-5.9)), 3)  # arcsec/s
+    #scanRate = np.round(2363./targetFluence*10**(-0.4*(jmag-9.75)), 3) # arcsec/s
+    scanRate = (2491./targetFluence)*10**(-0.4*(jmag-9.75)) - (161/targetFluence)*10**(-0.4*(jmag-hmag))
     if disperser == 'g102':
         # G102/G141 flux ratio is ~0.8
         scanRate *= 0.8
     # Max fluence in electrons/pixel
-    fluence = (5.5/scanRate)*10**(-0.4*(hmag-15))*2.4  # electrons
+    #fluence = (5.5/scanRate)*10**(-0.4*(hmag-15))*2.4  # electrons
+    #fluence = (2363./scanRate)*10**(-0.4*(jmag-9.75))  # electrons
+    fluence = (2491./scanRate)*10**(-0.4*(jmag-9.75)) - (161/scanRate)*10**(-0.4*(jmag-hmag))
     if disperser == 'g102':
         # WFC3_ISR_2012-08 states that the G102/G141 scale factor is 0.96 DN/electron
         fluence *= 0.96
@@ -194,13 +210,17 @@ def wfc3_TExoNS(dictinput):
     float
         chanrms--light curve root mean squarerms
     float
-        ptsOrbit--number of HST orbits per visit
+        ptsOrbit--number of HST frames per orbit
     '''
     pandeia_input = dictinput['pandeia_input']
     pandexo_input = dictinput['pandexo_input']
-
-    #Assumptions: H-band
-    hmag = pandexo_input['star']['mag']
+    
+    jmag = pandexo_input['star']['jmag']
+    try:
+        hmag = pandexo_input['star']['hmag']
+    except:
+        hmag = jmag
+        print("Hmag not found. Assuming no color dependence in the stellar type.")
     trdur = pandexo_input['planet']['transit_duration']
     numTr = pandexo_input['observation']['noccultations']
 
@@ -209,6 +229,11 @@ def wfc3_TExoNS(dictinput):
     nchan = pandeia_input['strategy']['nchan']
     norbits = pandeia_input['strategy']['norbits']
     useFirstOrbit = pandeia_input['strategy']['useFirstOrbit']
+    try:
+        targetFluence = pandeia_input['strategy']['targetFluence']
+    except:
+        targetFluence = 30000.
+        print("Assuming a target fluence of 30,000 electrons.")
     disperser = pandeia_input['configuration']['instrument']['disperser'].lower(
     )
     subarray = pandeia_input['configuration']['detector']['subarray'].lower()
@@ -221,14 +246,14 @@ def wfc3_TExoNS(dictinput):
         pass
 
     if disperser == 'g141':
-        # Define reference Hmag, flux, variance, and exposure time for GJ1214
-        refmag = 9.094
+        # Define reference Jmag, flux, variance, and exposure time for GJ1214
+        refmag = 9.750
         refflux = 2.32e8
         refvar = 2.99e8
         refexptime = 88.436
     elif disperser == 'g102':
-        # Define reference Hmag, flux, variance, and exposure time for WASP12
-        refmag = 10.228
+        # Define reference Jmag, flux, variance, and exposure time for WASP12
+        refmag = 10.477
         refflux = 8.26e7
         refvar = 9.75e7
         refexptime = 103.129
@@ -266,12 +291,11 @@ def wfc3_TExoNS(dictinput):
 
     if nsamp == 0 or nsamp == None or samp_seq == None or samp_seq == "none":
         # Estimate reasonable values
-        nsamp, samp_seq = wfc3_GuessParams(
-            hmag, disperser, scanDirection, subarray, obsTime, maxExptime)
+        nsamp, samp_seq = wfc3_GuessParams(jmag, disperser, scanDirection, subarray, obsTime, maxScanHeight, maxExptime, targetFluence, hmag)
 
     # Calculate observation parameters
-    exptime, tottime, scanRate, scanHeight, fluence = wfc3_obs(hmag, disperser, scanDirection,
-                                                               subarray, nsamp, samp_seq)
+    exptime, tottime, scanRate, scanHeight, fluence = wfc3_obs(jmag, disperser, scanDirection, subarray,
+                                                               nsamp, samp_seq, targetFluence, hmag=hmag)
     if scanHeight > maxScanHeight:
         print(("****WARNING: Computed scan height exceeds maximum recommended height of %0.0f pixels." % maxScanHeight))
     if exptime > maxExptime:
@@ -321,7 +345,7 @@ def wfc3_TExoNS(dictinput):
     ptsOutTr = (ptsOrbit-1) * (norbits-1) - ptsInTr
 
     # Compute transit depth uncertainty per spectrophotometric channel
-    ratio = 10**((refmag - hmag)/2.5)
+    ratio = 10**((refmag - jmag)/2.5)
     flux = ratio*refflux*exptime/refexptime
     fluxvar = ratio*refvar*exptime/refexptime
     chanflux = flux/nchan
@@ -335,6 +359,7 @@ def wfc3_TExoNS(dictinput):
             "Use first orbit":   useFirstOrbit,
             "WFC3 parameters: NSAMP": nsamp,
             "WFC3 parameters: SAMP_SEQ": samp_seq.upper(),
+            "Scan Direction": scanDirection,
             "Recommended scan rate (arcsec/s)": scanRate,
             "Scan height (pixels)": scanHeight,
             "Maximum pixel fluence (electrons)": fluence,
@@ -393,9 +418,6 @@ def calc_start_window(eventType, rms, ptsOrbit, numOrbits, depth, inc, aRs, peri
     float
         maxphase--latest observation start phase
     '''
-    import matplotlib.pyplot as plt
-    import batman
-
     hstperiod = 96./60/24                 # HST orbital period, days
     punc = windowSize/120./24/period  # Half start window size, in phase
     cosi = np.cos(inc*np.pi/180)     # Cosine of the inclination
@@ -569,7 +591,6 @@ def compute_sim_lightcurve(exposureDict, lightCurveDict, calRamp=False):
     Resulting light curve (unit: e/pixel) for the earliest and latest time
 
     """
-    from .RECTE import RECTE
     fluence = exposureDict['info']["Maximum pixel fluence (electrons)"]
     exptime = exposureDict['info']['exposure time']
     obst1 = (lightCurveDict['obsphase1'] -
@@ -618,8 +639,8 @@ def compute_sim_hst(dictinput):
     pandexo_input = dictinput['pandexo_input']
     pandeia_input = dictinput['pandeia_input']
 
-    disperser = pandeia_input['configuration']['instrument']['disperser'].lower(
-    )
+    disperser = pandeia_input['configuration']['instrument']['disperser'].lower()
+
     # add a switch for ramp calculation
     calRamp = pandeia_input['strategy']['calculateRamp']
 
@@ -632,7 +653,8 @@ def compute_sim_hst(dictinput):
     windowSize = pandeia_input['strategy']['windowSize']
     useFirstOrbit = pandeia_input['strategy']['useFirstOrbit']
     calc_type = pandexo_input['planet']['type']
-    hmag = pandexo_input['star']['mag']
+    jmag = pandexo_input['star']['jmag']
+    hmag = pandexo_input['star']['hmag']
     specfile = pandexo_input['planet']['exopath']
     w_unit = pandexo_input['planet']['w_unit']
     f_unit = pandexo_input['planet']['f_unit']
@@ -660,8 +682,9 @@ def compute_sim_hst(dictinput):
         raise Exception('Units are not correct. Pick rp^2/r*^2 or fp/f*')
 
     a = wfc3_TExoNS(dictinput)
-    b = calc_start_window(eventType, a['light_curve_rms'], a['nframes_per_orb'], a['info']
-                          ['Number of HST orbits'], depth, inc, aRs, period, windowSize, ecc, w, useFirstOrbit=useFirstOrbit)
+
+    b = calc_start_window(eventType, a['light_curve_rms'], a['nframes_per_orb'], a['info']['Number of HST orbits'], 
+        depth, inc, aRs, period, windowSize, ecc, w, useFirstOrbit=useFirstOrbit)
     c = planet_spec(pandexo_input['planet'], pandexo_input['star'],
                     w_unit, disperser, a['spec_error'], nchan, smooth=20)
     info_div = create_out_div(a['info'], b['minphase'], b['maxphase'])
