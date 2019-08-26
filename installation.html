@@ -186,8 +186,14 @@
 <p>PandExo requires: JWST instrument info and stellar SEDs. Users must set up these two environment variables before proceeding.</p>
 <div class="section" id="jwst-reference-data">
 <h2>JWST Reference Data<a class="headerlink" href="#jwst-reference-data" title="Permalink to this headline">¶</a></h2>
-<p>For JWST, the link to access the required reference data is located <a class="reference external" href="http://ssb.stsci.edu/pandeia/engine/1.3/pandeia_data-1.3.tar.gz">here</a>. It is important to make sure that the version number of <cite>PandExo</cite> matches the version number of your reference data (currently V1.3).</p>
-<p>Then, create environment variable:</p>
+<p>JWST Reference data has been updated to 1.4!</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Reference data for OLD 1.3 is NOT backwards compatible with PandExo/Pandeia 1.4. The old reference data
+can be found <a class="reference external" href="http://ssb.stsci.edu/pandeia/engine/1.3/pandeia_data-1.3.tar.gz">here</a> if you still wish to use PandExo v1.3. It is important to make sure that the version number of <cite>PandExo</cite> matches the version number of your reference data.</p>
+</div>
+<p>The new reference data is located <a class="reference external" href="https://stsci.app.box.com/v/pandeia-refdata-v1p4">here for V1p4</a>. Hopefully backwards compatibility issues will subside as Pandeia becomes more mature.</p>
+<p>After you have downloaded the reference data, create environment variable:</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span><span class="nb">echo</span> <span class="s1">&#39;export pandeia_refdata=&quot;$USRDIR/pandeia_data&quot;&#39;</span> &gt;&gt;~/.bash_profile
 </pre></div>
 </div>

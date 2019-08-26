@@ -11,9 +11,16 @@ PandExo requires: JWST instrument info and stellar SEDs. Users must set up these
 
 JWST Reference Data
 ````````````````````
-For JWST, the link to access the required reference data is located `here <http://ssb.stsci.edu/pandeia/engine/1.3/pandeia_data-1.3.tar.gz>`_. It is important to make sure that the version number of `PandExo` matches the version number of your reference data (currently V1.3).
+JWST Reference data has been updated to 1.4!
 
-Then, create environment variable: 
+.. warning::
+    Reference data for OLD 1.3 is NOT backwards compatible with PandExo/Pandeia 1.4. The old reference data 
+    can be found `here <http://ssb.stsci.edu/pandeia/engine/1.3/pandeia_data-1.3.tar.gz>`_ if you still wish to use PandExo v1.3. It is important to make sure that the version number of `PandExo` matches the version number of your reference data.
+
+The new reference data is located `here for V1p4 <https://stsci.app.box.com/v/pandeia-refdata-v1p4>`_. Hopefully backwards compatibility issues will subside as Pandeia becomes more mature.
+
+
+After you have downloaded the reference data, create environment variable: 
 
 .. code-block:: bash 
 

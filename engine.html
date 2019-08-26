@@ -88,8 +88,8 @@
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="includeme.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Pre-installation Data Download</a></li>
-<li class="toctree-l1"><a class="reference internal" href="installation.html#installation-for-users-with-conda">Installation for Users With Conda</a></li>
-<li class="toctree-l1"><a class="reference internal" href="installation.html#installation-for-users-with-pip">Installation for Users With PIP</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html#installation-with-pip-or-git">Installation with Pip or Git</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html#final-test-for-success">Final Test for Success</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html#troubleshooting-common-errors">Troubleshooting-Common Errors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html#the-importance-of-upgrading-pandexo">The Importance of Upgrading PandExo</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation_windows.html">Windows Installing Guide for PandExo</a></li>
@@ -273,7 +273,7 @@ the grid that best fits their needs.</p>
 
 <dl class="function">
 <dt id="engine.justdoit.load_exo_dict">
-<code class="descclassname">engine.justdoit.</code><code class="descname">load_exo_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/justdoit.html#load_exo_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.justdoit.load_exo_dict" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">engine.justdoit.</code><code class="descname">load_exo_dict</code><span class="sig-paren">(</span><em>planet_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/justdoit.html#load_exo_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.justdoit.load_exo_dict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Loads in empty exoplanet dictionary for pandexo input</p>
 <p>Loads in empty exoplanet dictionary so that the user can manually edit different planet
 parameters. Must be done for every bash run. User must edit each keys within the dictionary.</p>
@@ -281,9 +281,11 @@ parameters. Must be done for every bash run. User must edit each keys within the
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Empty dictionary to be filled out by the user before running PandExo</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>planet_name</strong> (<em>str</em>) &#8211; (Optional) Planet name e.g. &#8216;HD 189733 b&#8217; or &#8216;HD189733b&#8217;</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">dict</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Empty dictionary to be filled out by the user before running PandExo</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">dict</td>
 </tr>
 </tbody>
 </table>
@@ -355,7 +357,7 @@ looped through.</p>
 
 <dl class="function">
 <dt id="engine.justdoit.run_pandexo">
-<code class="descclassname">engine.justdoit.</code><code class="descname">run_pandexo</code><span class="sig-paren">(</span><em>exo</em>, <em>inst</em>, <em>param_space=0</em>, <em>param_range=0</em>, <em>save_file=True</em>, <em>output_path='/Users/natashabatalha/Desktop/JWST/pandexo/docs'</em>, <em>output_file=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/justdoit.html#run_pandexo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.justdoit.run_pandexo" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">engine.justdoit.</code><code class="descname">run_pandexo</code><span class="sig-paren">(</span><em>exo</em>, <em>inst</em>, <em>param_space=0</em>, <em>param_range=0</em>, <em>save_file=True</em>, <em>output_path='/Users/natashabatalha/Desktop/JWST/pandexo/docs'</em>, <em>output_file=''</em>, <em>num_cores=8</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/justdoit.html#run_pandexo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.justdoit.run_pandexo" title="Permalink to this definition">¶</a></dt>
 <dd><p>Submits multiple runs of pandexo in parallel.</p>
 <p>Functionality: program contains functionality for running single or
 multiple runs of PandExo</p>
@@ -491,6 +493,40 @@ looped through.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">newwave</span><span class="p">))</span>
 <span class="go">11</span>
 </pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="engine.justplotit.hst_simulated_lightcurve">
+<code class="descclassname">engine.justplotit.</code><code class="descname">hst_simulated_lightcurve</code><span class="sig-paren">(</span><em>result_dict</em>, <em>plot=True</em>, <em>output_file='hsttime.html'</em>, <em>model=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/justplotit.html#hst_simulated_lightcurve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.justplotit.hst_simulated_lightcurve" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot simulated HST light curves (in fluece) for earliest and latest start times</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>result_dict</strong> (<em>dict</em>) &#8211; Dictionary from pandexo output.</li>
+<li><strong>plot</strong> (<em>bool</em>) &#8211; (Optional) True renders plot, False does not. Default=True</li>
+<li><strong>model</strong> (<em>bool</em>) &#8211; (Optional) Plot model under data. Default=True</li>
+<li><strong>output_file</strong> (<em>str</em>) &#8211; (Optional) Default = &#8216;hsttime.html&#8217;</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><strong>obsphase1</strong> (<em>numpy array</em>) &#8211; earliest start time</li>
+<li><strong>counts1</strong> (<em>numpy array</em>) &#8211; white light curve in fluence (e/pixel)</li>
+<li><strong>obsphase2</strong> (<em>numpy array</em>) &#8211; latest start time</li>
+<li><strong>counts2</strong> (<em>numpy array</em>) &#8211; white light curve in fluence (e/pixel)</li>
+<li><strong>rms</strong> (<em>numpy array</em>) &#8211; 1D rms noise</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#engine.justplotit.hst_spec" title="engine.justplotit.hst_spec"><code class="xref py py-func docutils literal"><span class="pre">hst_spec()</span></code></a></p>
 </div>
 </dd></dl>
 
@@ -1676,6 +1712,44 @@ compute simulated spectrum.</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="engine.hst.compute_sim_lightcurve">
+<code class="descclassname">engine.hst.</code><code class="descname">compute_sim_lightcurve</code><span class="sig-paren">(</span><em>exposureDict</em>, <em>lightCurveDict</em>, <em>calRamp=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/hst.html#compute_sim_lightcurve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.hst.compute_sim_lightcurve" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute simulated HST light curves</p>
+<p>Function to take the fluence and error estimates from wfc3_TExoNS
+and the model light curve from calc_start_window to simulate observed
+light curves. Ramp effect systemacts simulated by RECTE can be
+included by turning on the calRamp switch</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>exposureDict</strong> (<em>dict</em>) &#8211; </li>
+<li><strong>information for the observation. This dictionary is</strong> (<em>Includes</em>) &#8211; </li>
+<li><strong>by function wfc3_TExoNS. Relevant keys in the dictionary</strong> (<em>returned</em>) &#8211; </li>
+<li><strong>[</strong><strong>'info'</strong><strong>]</strong><strong>[</strong><strong>&quot;Maximum pixel fluence</strong><strong> (</strong><strong>electrons</strong><strong>)</strong><strong>&quot;</strong><strong>] </strong><strong>and</strong> (<em>are</em>) &#8211; </li>
+<li><strong>time'</strong><strong>]</strong> (<em>[</em><em>'info'</em><em>]</em><em>[</em><em>'exposure</em>) &#8211; </li>
+<li><strong>lightCurveDict</strong> (<em>dict</em>) &#8211; </li>
+<li><strong>the model light curve. The light curves are estimed by</strong> (<em>Includes</em>) &#8211; </li>
+<li><strong>calc_start_window</strong> &#8211; </li>
+<li><strong>calRamp</strong> (<em>bool</em><em> (</em><em>default: False</em><em>)</em>) &#8211; </li>
+<li><strong>to turn on/off RECTE ramp calculation. Calculate realistic</strong> (<em>Switch</em>) &#8211; </li>
+<li><strong>effect systematics when the switch is turned on.</strong> (<em>ramp</em>) &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><em>dict</em></li>
+<li><strong>Resulting light curve (unit</strong> (<em>e/pixel) for the earliest and latest time</em>)</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
 <dt id="engine.hst.create_out_div">
 <code class="descclassname">engine.hst.</code><code class="descname">create_out_div</code><span class="sig-paren">(</span><em>input_dict</em>, <em>minphase</em>, <em>maxphase</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/hst.html#create_out_div"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.hst.create_out_div" title="Permalink to this definition">¶</a></dt>
 <dd><p>Function to render input dicts in html format for web front end</p>
@@ -1749,20 +1823,22 @@ compute simulated spectrum.</p>
 
 <dl class="function">
 <dt id="engine.hst.wfc3_GuessParams">
-<code class="descclassname">engine.hst.</code><code class="descname">wfc3_GuessParams</code><span class="sig-paren">(</span><em>hmag</em>, <em>disperser</em>, <em>scanDirection</em>, <em>subarray</em>, <em>obsTime</em>, <em>maxScanHeight=180.0</em>, <em>maxExptime=150.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/hst.html#wfc3_GuessParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.hst.wfc3_GuessParams" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">engine.hst.</code><code class="descname">wfc3_GuessParams</code><span class="sig-paren">(</span><em>jmag</em>, <em>disperser</em>, <em>scanDirection</em>, <em>subarray</em>, <em>obsTime</em>, <em>maxScanHeight=180.0</em>, <em>maxExptime=150.0</em>, <em>targetFluence=30000.0</em>, <em>hmag=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/hst.html#wfc3_GuessParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.hst.wfc3_GuessParams" title="Permalink to this definition">¶</a></dt>
 <dd><p>Predict nsamp and samp_seq when values not provided by the user.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>hmag</strong> (<em>float</em>) &#8211; H-band magnitude</li>
+<li><strong>jmag</strong> (<em>float</em>) &#8211; J-band magnitude</li>
 <li><strong>disperser</strong> (<em>str</em>) &#8211; grism (&#8216;G141&#8217; or &#8216;G102&#8217;)</li>
 <li><strong>scanDirection</strong> (<em>str</em>) &#8211; spatial scan direction (&#8216;Forward&#8217; or &#8216;Round Trip&#8217;)</li>
 <li><strong>subarray</strong> (<em>str</em>) &#8211; Subarray aperture (&#8216;grism256&#8217; or &#8216;grism512&#8217;)</li>
 <li><strong>obsTime</strong> (<em>float</em>) &#8211; Available observing time per HST orbit in seconds</li>
 <li><strong>maxScanHeight</strong> (<em>float</em>) &#8211; (optional) maximum scan height in pixels</li>
 <li><strong>maxExptime</strong> (<em>float</em>) &#8211; (Optional) default=150.0, maximum exposure time in seconds</li>
+<li><strong>targetFluence</strong> (<em>float</em>) &#8211; (Optional) Desired fluence in electrons per pixel</li>
+<li><strong>hmag</strong> (<em>float</em>) &#8211; (Optional) H-band magnitude</li>
 </ul>
 </td>
 </tr>
@@ -1792,7 +1868,7 @@ Written by Kevin Stevenson      October 2016</p>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><ul class="simple">
 <li><em>float</em> &#8211; deptherr&#8211;transit depth uncertainty per spectrophotometric channel</li>
 <li><em>float</em> &#8211; chanrms&#8211;light curve root mean squarerms</li>
-<li><em>float</em> &#8211; ptsOrbit&#8211;number of HST orbits per visit</li>
+<li><em>float</em> &#8211; ptsOrbit&#8211;number of HST frames per orbit</li>
 </ul>
 </td>
 </tr>
@@ -1802,19 +1878,21 @@ Written by Kevin Stevenson      October 2016</p>
 
 <dl class="function">
 <dt id="engine.hst.wfc3_obs">
-<code class="descclassname">engine.hst.</code><code class="descname">wfc3_obs</code><span class="sig-paren">(</span><em>hmag</em>, <em>disperser</em>, <em>scanDirection</em>, <em>subarray</em>, <em>nsamp</em>, <em>samp_seq</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/hst.html#wfc3_obs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.hst.wfc3_obs" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">engine.hst.</code><code class="descname">wfc3_obs</code><span class="sig-paren">(</span><em>jmag</em>, <em>disperser</em>, <em>scanDirection</em>, <em>subarray</em>, <em>nsamp</em>, <em>samp_seq</em>, <em>targetFluence=30000.0</em>, <em>hmag=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/hst.html#wfc3_obs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.hst.wfc3_obs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determine the recommended exposure time, scan rate, scan height, and overheads.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>hmag</strong> (<em>float</em>) &#8211; H-band magnitude</li>
+<li><strong>jmag</strong> (<em>float</em>) &#8211; J-band magnitude</li>
 <li><strong>disperser</strong> (<em>str</em>) &#8211; Grism (&#8216;G141&#8217; or &#8216;G102&#8217;)</li>
 <li><strong>scanDirection</strong> (<em>str</em>) &#8211; spatial scan direction (&#8216;Forward&#8217; or &#8216;Round Trip&#8217;)</li>
 <li><strong>subarray</strong> (<em>str</em>) &#8211; Subarray aperture (&#8216;grism256&#8217; or &#8216;grism512&#8217;)</li>
 <li><strong>nsamp</strong> (<em>float</em>) &#8211; Number of up-the-ramp samples (1..15)</li>
 <li><strong>samp_seq</strong> (<em>str</em>) &#8211; Time between non-destructive reads (&#8216;SPARS5&#8217;, &#8216;SPARS10&#8217;, or &#8216;SPARS25&#8217;)</li>
+<li><strong>targetFluence</strong> (<em>float</em>) &#8211; (Optional) Desired fluence in electrons per pixel</li>
+<li><strong>hmag</strong> (<em>float</em>) &#8211; (Optional) H-band magnitude</li>
 </ul>
 </td>
 </tr>

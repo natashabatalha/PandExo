@@ -388,15 +388,17 @@
     <span class="c1">#bin the data according to user input </span>
     <span class="k">if</span> <span class="n">R</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span> 
         <span class="n">wbin</span> <span class="o">=</span> <span class="n">bin_wave_to_R</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">R</span><span class="p">)</span>
+
         <span class="n">photon_out_bin</span> <span class="o">=</span> <span class="n">uniform_tophat_sum</span><span class="p">(</span><span class="n">wbin</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span><span class="n">extracted_flux_out</span><span class="p">)</span>
-        <span class="n">wbin</span> <span class="o">=</span> <span class="n">wbin</span><span class="p">[</span><span class="n">photon_out_bin</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">]</span>
         <span class="n">photon_in_bin</span> <span class="o">=</span> <span class="n">uniform_tophat_sum</span><span class="p">(</span><span class="n">wbin</span><span class="p">,</span><span class="n">w</span><span class="p">,</span> <span class="n">extracted_flux_inn</span><span class="p">)</span>
-        <span class="n">photon_in_bin</span> <span class="o">=</span> <span class="n">photon_in_bin</span><span class="p">[</span><span class="n">photon_out_bin</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">]</span>
         <span class="n">var_in_bin</span> <span class="o">=</span> <span class="n">uniform_tophat_sum</span><span class="p">(</span><span class="n">wbin</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span><span class="n">varin</span><span class="p">)</span>
-        <span class="n">var_in_bin</span> <span class="o">=</span> <span class="n">var_in_bin</span><span class="p">[</span><span class="n">photon_out_bin</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">]</span>
         <span class="n">var_out_bin</span> <span class="o">=</span> <span class="n">uniform_tophat_sum</span><span class="p">(</span><span class="n">wbin</span><span class="p">,</span><span class="n">w</span><span class="p">,</span> <span class="n">varout</span><span class="p">)</span>
+
+        <span class="n">wbin</span> <span class="o">=</span> <span class="n">wbin</span><span class="p">[</span><span class="n">photon_out_bin</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">]</span>
+        <span class="n">photon_in_bin</span> <span class="o">=</span> <span class="n">photon_in_bin</span><span class="p">[</span><span class="n">photon_out_bin</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">]</span>
+        <span class="n">var_in_bin</span> <span class="o">=</span> <span class="n">var_in_bin</span><span class="p">[</span><span class="n">photon_out_bin</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">]</span>
         <span class="n">var_out_bin</span> <span class="o">=</span> <span class="n">var_out_bin</span><span class="p">[</span><span class="n">photon_out_bin</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">]</span>
-        <span class="n">photon_out_bin</span> <span class="o">=</span> <span class="n">photon_out_bin</span>
+        <span class="n">photon_out_bin</span> <span class="o">=</span> <span class="n">photon_out_bin</span><span class="p">[</span><span class="n">photon_out_bin</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span> 
         <span class="n">wbin</span> <span class="o">=</span> <span class="n">w</span>
         <span class="n">photon_out_bin</span> <span class="o">=</span> <span class="n">extracted_flux_out</span>

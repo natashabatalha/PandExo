@@ -89,10 +89,11 @@
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="includeme.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Pre-installation Data Download</a></li>
-<li class="toctree-l1"><a class="reference internal" href="installation.html#installation-for-users-with-conda">Installation for Users With Conda</a></li>
-<li class="toctree-l1"><a class="reference internal" href="installation.html#installation-for-users-with-pip">Installation for Users With PIP</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html#installation-with-pip-or-git">Installation with Pip or Git</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html#final-test-for-success">Final Test for Success</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html#troubleshooting-common-errors">Troubleshooting-Common Errors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html#the-importance-of-upgrading-pandexo">The Importance of Upgrading PandExo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation_windows.html">Windows Installing Guide for PandExo</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorialjwst.html">JWST Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="jwstinput.html">Possible Instrument Input Params</a></li>
 <li class="toctree-l1"><a class="reference internal" href="jwstdict.html">Py Dict Structure of JWST Output</a></li>
@@ -278,6 +279,7 @@ any system observed with WFC3/IR.</p>
 </div>
 <div class="section" id="compute-earliest-and-latest-start-times-for-given-start-window-size">
 <h3>Compute earliest and latest start times for given start window size<a class="headerlink" href="#compute-earliest-and-latest-start-times-for-given-start-window-size" title="Permalink to this headline">¶</a></h3>
+<p>The errors in the time series are the error per wavelength channel.</p>
 <div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="c1">#using foo from above</span>
 <span class="n">obsphase1</span><span class="p">,</span> <span class="n">obstr1</span><span class="p">,</span> <span class="n">obsphase2</span><span class="p">,</span> <span class="n">obstr2</span><span class="p">,</span><span class="n">rms</span> <span class="o">=</span> <span class="n">jpi</span><span class="o">.</span><span class="n">hst_time</span><span class="p">(</span><span class="n">foo</span><span class="p">)</span>
 </pre></div>
