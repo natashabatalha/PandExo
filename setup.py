@@ -48,11 +48,11 @@ else:
 setup(
 
     name='pandexo.engine',
-    version='1.4',
+    version='1.5.1',
     summary='pandexo transiting exoplanet simulator',
     description_file='README.rst',
-    author='Natasha Batalha at Space Telescope Science Institute',
-    author_email='natasha.e.batalha@gmail.com',
+    author='Natasha Batalha at NASA Ames',
+    author_email='natasha.e.batalha@nasa.gov',
     home_page='https://natashabatalha.github.io/PandExo',
     license='GPL',
     url='https://github.com/natashabatalha/PandExo',
@@ -97,7 +97,7 @@ setup(
           'tornado',
           'pandas=='+pandas_version,
           'joblib',
-          'pandeia.engine==1.4.0',
+          'pandeia.engine==1.5.1',
           'batman-package',
           'photutils',
           'astropy',
