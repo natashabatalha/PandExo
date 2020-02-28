@@ -107,6 +107,7 @@ Plot simulated spectrum using specified file
 
 Compute earliest and latest start times for given start window size
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The errors in the time series are the error per wavelength channel.
 
 .. code:: python
 

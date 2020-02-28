@@ -1,55 +1,16 @@
-import pysynphot as psyn
 import numpy as np 
 import pickle
-
-def binning(x, y, R=2000.0):
-    """Bins spectra at fixed dlambda 
+import pandas as pd
+from sqlalchemy import *   
+import astropy.units as u 
+import astropy.constants as c
+import os 
+from  astropy.modeling import blackbody as bb
+import warnings
+with warnings.catch_warnings():
+    warnings.filterwarnings("ignore")
+    import pysynphot as psyn
     
-    Takes 2 arrays x and y and bins them into groups of blength.
-    Uses uniform top hat to bin. This is necessary because really high resolution 
-    spectra cannot go through pandeia without crashing it. User is advised to bin spectra 
-    before running it through pandexo. 
-    
-    Parameters 
-    ----------
-	x : list or numpy array of float
-	    x (micron) 
-	y : list or numpy array of float
-	    (any unit)
-	R : int or float 
-	    (optional) Default is 2000.0 at micron which is approximately max resolution pandeia can handle.
-    
-    Returns
-    -------  
-    xout : numpy array of flaot
-        1D numpy arrays at new resolution 
-    yout : numpy array of flaot
-        1D numpy arrays at new resolution 
-    """
-    wlength = 1.0/R
-    ii = 0
-    start = 0
-    ind = []
-    for i in range(0, len(x)-1):
-        if x[i+1] - x[start] >= wlength:
-            ind.append(i+1)
-            start = i 
-    
-    if ind[len(ind)-1] != (len(x)):
-        ind.append(len(x))
-    
-    # convert to arrays if necessary
-    x = np.array(x)
-    y = np.array(y)
-
-    xout,yout= [],[]
-    first = 0
-    for i in ind:
-        xout.append(sum(x[first:i])/len(x[first:i]))
-        yout.append(sum(y[first:i])/len(y[first:i]))
-        first = i 
-    return np.array(xout),np.array(yout)
-       
 def outTrans(input) :
     """Compute out of transit spectra
     
@@ -67,7 +28,11 @@ def outTrans(input) :
     dict 
         contains wave and flux_out_trans
     """ 
-    
+
+    ref_wave = float(input['ref_wave'])
+    mag = float(input['mag'])
+
+    ################# USER ####################################
     if input['type'] == 'user':
         star = np.genfromtxt(input['starpath'], dtype=(float, float), names='w, f') #pyfits.getdata(input['starpath'],1)
         #get flux 
@@ -80,70 +45,90 @@ def outTrans(input) :
         sort= sort[sort[:,0].argsort()]
         wave = sort[:,0]
         flux = sort[:,1] 
-        
+        if input['w_unit'] == 'um':
+            PANDEIA_WAVEUNITS = 'um'
+            
+        elif input['w_unit'] == 'nm':
+            PANDEIA_WAVEUNITS = 'nm'
+      
+        elif input['w_unit'] == 'cm' :
+            PANDEIA_WAVEUNITS = 'cm'
+     
+        elif input['w_unit'] == 'Angs' :
+            PANDEIA_WAVEUNITS = 'angstrom'
+
+        elif input['w_unit'] == 'Hz' :
+            PANDEIA_WAVEUNITS = 'Hz'
+
+        else: 
+            raise Exception('Units are not correct. Pick um, nm, cm, hz, or Angs')        
+
+        #convert to photons/s/nm/m^2 for flux normalization based on 
+        #http://www.gemini.edu/sciops/instruments/integration-time-calculators/itc-help/source-definition
+        if input['f_unit'] == 'Jy':
+            PANDEIA_FLUXUNITS = 'jy' 
+        elif input['f_unit'] == 'FLAM' :
+            PANDEIA_FLUXUNITS = 'FLAM'
+        elif input['f_unit'] == 'erg/cm2/s/Hz':
+            flux = flux*1e23
+            PANDEIA_FLUXUNITS = 'jy' 
+        else: 
+            raise Exception('Units are not correct. Pick FLAM or Jy or erg/cm2/s/Hz')
+
+        sp = psyn.ArraySpectrum(wave, flux, waveunits=PANDEIA_WAVEUNITS, fluxunits=PANDEIA_FLUXUNITS)        #Convert evrything to nanometer for converstion based on gemini.edu  
+        sp.convert("nm")
+        sp.convert('jy')
+
+    ############ PHOENIX ################################################
     elif input['type'] =='phoenix':
         #make sure metal is not out of bounds
         if input['metal'] > 0.5: input['metal'] = 0.5
         sp = psyn.Icat("phoenix", input['temp'], input['metal'], input['logg'])
-        sp.convert("microns")
+        sp.convert("nm")
         sp.convert("jy")
         wave = sp.wave
         flux = sp.flux
-        input['w_unit'] ='um'
-        input['f_unit'] = 'Jy'
+        input['w_unit'] ='nm'
+        input['f_unit'] = 'jy'
         
     else: 
         raise Exception('Wrong input type for stellar spectra')
-        
-    ref_wave = float(input['ref_wave'])
-    ref_wave = ref_wave*1e3
     
-    
-        #Convert evrything to nanometer for converstion based on gemini.edu  
-    if input['w_unit'] == 'um':
-        wave = wave*1e3
-        
-    elif input['w_unit'] == 'nm':
-        wave = wave
-  
-    elif input['w_unit'] == 'cm' :
-        wave = wave*1e7
- 
-    elif input['w_unit'] == 'Angs' :
-        wave = wave*1e-1
 
-    elif input['w_unit'] == 'Hz' :
-        wave = 3e17/wave
+    ############ NORMALIZATION ################################################
+    refdata = os.environ.get("pandeia_refdata")
 
-    else: 
-        raise Exception('Units are not correct. Pick um, nm, cm or Angs')
+    all_bps = {"H": 'bessell_h_004_syn.fits',
+                 "J":'bessell_j_003_syn.fits' ,
+                 "K": 'bessell_k_003_syn.fits'}
 
-    #convert to photons/s/nm/m^2 for flux normalization based on gemini.edu
-    if input['f_unit'] == 'Jy':
-        flux = flux*1.509e7/wave #eq. C
-        
-    elif input['f_unit'] == 'W/m2/um':
-        flux = flux*wave/1.988e-13 #eq. D 
-    elif input['f_unit'] == 'FLAM' :
-        flux = flux*wave/1.988e-14 #eq. E
-    elif input['f_unit'] == 'erg/s/cm2/Hz':
-        flux = flux*1.509e30/wave #*4.0*np.pi
-    else: 
-        raise Exception('Units are not correct. Pick W/m2/um, FLAM, Jy, or erg/s/cm2/Hz')
-    
-    #normalize to specific mag 
-    mag = float(input['mag'])
-    norm_flux = np.interp(ref_wave, wave, flux)
-    flux = flux/norm_flux*1.97e7*10**(-mag/2.5)
-    
-    #return to Pandeia units... milliJy and micron 
-    flux_out_trans = flux*wave/1.509e7*1e3 #inverse of eq. C times 1e3 to get to milliJy instead of Jy 
-    wave = wave*1e-3  #nm to micron
+    if (ref_wave <= 1.3) & (ref_wave >= 1.2):
+        filt = 'J'
+    elif (ref_wave <= 1.7) & (ref_wave >= 1.6):
+        filt = 'H'
+    elif (ref_wave <= 2.3) & (ref_wave >= 2.1):
+        filt = 'K'
+    else:
+        raise Exception('Only J H and K zeropoints are included')
 
-    return {'flux_out_trans': flux_out_trans, 'wave': wave} 
+    bp_path = os.path.join(refdata, "normalization", "bandpass", all_bps[filt])
+    bp = psyn.FileBandpass(bp_path)
+
+    sp.convert('angstroms')
+    bp.convert('angstroms')
+
+    rn_sp = sp.renorm(mag, 'vegamag', bp)
 
 
-def bothTrans(out_trans, planet) :
+    rn_sp.convert("microns")
+    rn_sp.convert("mjy")
+
+    flux_out_trans = rn_sp.flux
+    wave = rn_sp.wave
+    return {'flux_out_trans': flux_out_trans, 'wave': wave,'phoenix':sp} 
+
+
+def bothTrans(out_trans, planet,star=None) :
     """Calculates in transit flux 
     
     Takes output from `outTrans`, which is the normalized stellar flux, and 
@@ -156,6 +141,9 @@ def bothTrans(out_trans, planet) :
         includes dictionary from `outTrans` output. 
     planet: dict
         dictionary with direction to planet spectra, wavelength and flux units
+    star: dict
+        (Optional) dictionary within exo_input with stellar information. Only 
+        used when scaling Fortney Grid spectra to get (rp/r*)^2
 
     Return
     ------
@@ -176,11 +164,110 @@ def bothTrans(out_trans, planet) :
         sort= sort[sort[:,0].argsort()]
         wave_planet = sort[:,0]
         flux_planet = sort[:,1]
+    
+    ############## IF USER SELECTS CONSTANT VALUE ##################   
+    elif planet['type'] == 'constant':
+        rplan = (planet['radius']*u.Unit(planet['r_unit'])).to(u.km)
+        rstar = (star['radius']*u.Unit(star['r_unit'])).to(u.km)
+
+        #constant transit depth
+        if planet['f_unit'] == 'rp^2/r*^2':
+            wave_planet = np.linspace(0.5,15,1000)
+            planet['depth'] = float(rplan**2 / rstar**2)
+            flux_planet = np.linspace(0.5,15,1000)*0 + planet['depth']
+            planet['w_unit'] = 'um'
+
+        #constant fp/f* (using out_trans from user)
+        elif planet['f_unit'] == 'fp/f*':
+            planet['w_unit'] = 'um'
+            wave_planet = out_trans['wave'][(out_trans['wave']>0.5) & (out_trans['wave']<15)]
+            flux_star = (out_trans['phoenix'].flux*(u.Jy)).to(u.mJy)[(out_trans['wave']>0.5) & (out_trans['wave']<15)]
+            #MAKING SURE TO ADD IN SUPID PI FOR PER STERADIAN!!!!
+            flux_planet = (bb.blackbody_nu(wave_planet*u.micron, planet['temp']*u.K)*np.pi*u.sr).to(u.mJy)
+            # ( bb planet / pheonix sed ) * (rp/r*)^2
+            flux_planet = np.array((flux_planet/flux_star) * (rplan/rstar)**2.0)
+
+    ############## IF USER SELECTS TO PULL FROM GRID ##################
+    elif planet['type'] =='grid':
+        try:
+            db = create_engine('sqlite:///'+os.environ.get('FORTGRID_DIR'))
+            header= pd.read_sql_table('header',db)
+        except:
+            raise Exception('Fortney Grid File Path is incorrect, or not initialized')
+
+        #radius of star
+        try:
+            rstar = (star['radius']*u.Unit(star['r_unit'])).to(u.km)
+        except:
+            raise Exception("Radius of Star not supplied for scaling. Check exo_input['star']['radius']")
+
+        #radius of planet
+        try:
+            rplan = (planet['radius']*u.Unit(planet['r_unit'])).to(u.km)
+        except: 
+            planet['radius'] = (1.25*c.R_jup).to(u.km)
+            rplan = planet['radius']
+            print('Default Planet Radius of 1.25 Rj given')
+
+        #clouds 
+        if planet['cloud'].find('flat') != -1: 
+            planet['flat'] = int(planet['cloud'][4:])
+            planet['ray'] = 0 
+        elif planet['cloud'].find('ray') != -1: 
+            planet['ray'] = int(planet['cloud'][3:])
+            planet['flat'] = 0 
+        elif int(planet['cloud']) == 0: 
+            planet['flat'] = 0 
+            planet['ray'] = 0     
+        else:
+            planet['flat'] = 0 
+            planet['ray'] = 0 
+            print('No cloud parameter not specified, default no clouds added')
         
-    elif planet['type'] == 'database':
-        raise Exception("Empty Database")
+        #chemistry 
+        if planet['chem'] == 'noTiO': 
+            planet['noTiO'] = True
+            planet['eqchem'] = True 
+        if planet['chem'] == 'eqchem': 
+            planet['noTiO'] = False
+            planet['eqchem'] = True 
+            #grid does not allow clouds for cases with TiO
+            planet['flat'] = 0 
+            planet['ray'] = 0 
+
+        #we are only using gravity of 25 and scaling by mass from there 
+        fort_grav = 25.0*u.m/u.s/u.s
+        df = header.loc[(header.gravity==fort_grav) & (header.temp==planet['temp'])
+                           & (header.noTiO==planet['noTiO']) & (header.ray==planet['ray']) &
+                           (header.flat==planet['flat'])]
+        wave_planet=np.array(pd.read_sql_table(df['name'].values[0],db)['wavelength'])[::-1]
+
+        r_lambda=np.array(pd.read_sql_table(df['name'].values[0],db)['radius'])*u.km
+        z_lambda = r_lambda- (1.25*u.R_jup).to(u.km) #all fortney models have fixed 1.25 radii
+
+        #scale with planetary mass 
+        try:
+            mass = (planet['mass']*u.Unit(planet['m_unit'])).to(u.kg)
+            gravity = c.G*(mass)/(rplan.to(u.m))**2.0 #convert radius to m for gravity units
+            #scale lambbda (this technically ignores the fact that scaleheight is altitude dependent)
+            #therefore, it will not be valide for very very low gravities
+            z_lambda = z_lambda*fort_grav/gravity
+        except: 
+            #keep original z lambda 
+            gravity=25.0
+            z_lambda = z_lambda*fort_grav/fort_grav
+            print('Default Planet Gravity of 25 m/s2 given')  
+        
+        #create new wavelength dependent R based on scaled ravity
+        r_lambda = z_lambda + rplan
+
+
+        #finally compute (rp/r*)^2
+        flux_planet = np.array(r_lambda**2/rstar**2)[::-1]
+        planet['w_unit'] = 'um'
+        planet['f_unit'] = 'rp^2/r*^2'
     else: 
-        raise Exception("Incorrect Planet File") 
+        raise Exception("Incorrect Planet Type. Options are 'user','constant','grid'") 
 
     #Convert wave to micron 
     if planet['w_unit'] == 'um':
@@ -206,7 +293,7 @@ def bothTrans(out_trans, planet) :
         if planet['f_unit'] == 'fp/f*' :
             flux_planet = flux_planet 
         else: 
-            print "Seconds with rp^2/r*^2 units not an option. Switch to Fp/F*"
+            print("Seconds with rp^2/r*^2 units not an option. Switch to Fp/F*")
             return 
         
         return {'time':time, 'wave':wave_star,'flux_out_trans':flux_star, 'planet_phase':flux_planet,
@@ -216,31 +303,184 @@ def bothTrans(out_trans, planet) :
         #star flux to calc transit depth
         flux_star = out_trans['flux_out_trans']
         wave_star = out_trans['wave']
-    
-        #bin planet to R=3000 at 0.7 microns  
-        wave_pR, flux_planet_R = binning(wave_planet, flux_planet)
+
     
         #give them same wave min and wave max 
-        wavemin = max([min(wave_pR), min(wave_star),0.5])
-        wavemax = min([max(wave_pR),max(wave_star),15])
+        wavemin = max([min(wave_planet), min(wave_star),0.5])
+        wavemax = min([max(wave_planet),max(wave_star),15])
     
-        flux_planet_R = flux_planet_R[(wave_pR>wavemin) & (wave_pR<wavemax)]
-        wave_pR = wave_pR[(wave_pR>wavemin) & (wave_pR<wavemax)]
+        flux_planet = flux_planet[(wave_planet>wavemin) & (wave_planet<wavemax)]
+        wave_planet = wave_planet[(wave_planet>wavemin) & (wave_planet<wavemax)]
     
-        flux_out_trans = np.interp(wave_pR, wave_star, flux_star)
+        flux_out_trans = np.interp(wave_planet, wave_star, flux_star)
 
         #convert to 1-depth 
         if planet['f_unit'] == 'rp^2/r*^2' :
-            depth_fraction = 1.-flux_planet_R 
+            depth_fraction = 1.-flux_planet 
             flux_in_trans = depth_fraction*flux_out_trans
         elif planet['f_unit'] == 'fp/f*':
-            depth_fraction = (1.0 + flux_planet_R)
-            flux_in_trans = flux_out_trans*(1.0 + flux_planet_R)        
+            depth_fraction = (1.0 + flux_planet)
+            flux_in_trans = flux_out_trans*(1.0 + flux_planet)        
         else: 
             raise Exception('Units are not correct. Pick rp^2/r*^2 or fp/f*')
     
-        results= {'wave':wave_pR, 'flux_in_trans': flux_in_trans, 'flux_out_trans':flux_out_trans,
-                    'model_wave':wave_pR, 'model_spec': flux_planet_R, 'frac':depth_fraction} 
+        results= {'wave':wave_planet, 'flux_in_trans': flux_in_trans, 'flux_out_trans':flux_out_trans,
+                    'model_wave':wave_planet, 'model_spec': flux_planet, 'frac':depth_fraction} 
     return results
 
+def hst_spec(planet,star) :
+    """Calculates in transit flux 
+    
+    Takes output from `outTrans`, which is the normalized stellar flux, and 
+    creates either a transit transmission spectrum, phase curve or emission spectrum. 
+    Magnitude 
+  
+    Parameters 
+    ----------
+    planet: dict
+        dictionary with direction to planet spectra, wavelength and flux units
+    star: dict
+        dictionary within exo_input with stellar information. Only 
+        used when scaling Fortney Grid spectra to get (rp/r*)^2
 
+    Return
+    ------
+    dict 
+        dictionary with out of transit flux, in transit flux, original model 
+        and corresponding wavelengths
+    """ 
+    
+    if planet['type'] =='user':
+        load_file = np.genfromtxt(planet['exopath'], dtype=(float, float), names='w, f')   
+        #get wavelength 
+        wave_planet = load_file['w']
+        #get planet flux 
+        flux_planet = load_file['f']
+        
+        #sort if not in ascending order 
+        sort = np.array([wave_planet,flux_planet]).T
+        sort= sort[sort[:,0].argsort()]
+        wave_planet = sort[:,0]
+        flux_planet = sort[:,1]
+    
+    ############## IF USER SELECTS CONSTANT VALUE ##################   
+    elif planet['type'] == 'constant':
+        rplan = (planet['radius']*u.Unit(planet['r_unit'])).to(u.km)
+        rstar = (star['radius']*u.Unit(star['r_unit'])).to(u.km)
+
+        #constant transit depth
+        if planet['f_unit'] == 'rp^2/r*^2':
+            wave_planet = np.linspace(0.1,3,500)
+            planet['depth'] = float(rplan**2 / rstar**2)
+            flux_planet = np.linspace(0.1,3,500)*0 + planet['depth']
+            planet['w_unit'] = 'um'
+
+        #constant fp/f* (using out_trans from user)
+        elif planet['f_unit'] == 'fp/f*':
+            planet['w_unit'] = 'um'
+            wave_planet = np.linspace(0.1,3,500)
+            flux_star = (bb.blackbody_nu(wave_planet*u.micron, star['temp']*u.K)*np.pi*u.sr).to(u.mJy)
+            #MAKING SURE TO ADD IN SUPID PI FOR PER STERADIAN!!!!
+            flux_planet = (bb.blackbody_nu(wave_planet*u.micron, planet['temp']*u.K)*np.pi*u.sr).to(u.mJy)
+            # ( bb planet / pheonix sed ) * (rp/r*)^2
+            flux_planet = np.array((flux_planet/flux_star) * (rplan/rstar)**2.0)
+
+
+    ############## IF USER SELECTS TO PULL FROM GRID ##################
+    elif planet['type'] =='grid':
+        try:
+            db = create_engine('sqlite:///'+os.environ.get('FORTGRID_DIR'))
+            header= pd.read_sql_table('header',db)
+        except:
+            raise Exception('Fortney Grid File Path is incorrect, or not initialized')
+
+        #radius of star
+        try:
+            rstar = (star['radius']*u.Unit(star['r_unit'])).to(u.km)
+        except:
+            raise Exception("Radius of Star not supplied for scaling. Check exo_input['star']['radius']")
+
+        #radius of planet
+        try:
+            rplan = (planet['radius']*u.Unit(planet['r_unit'])).to(u.km)
+        except: 
+            planet['radius'] = (1.25*c.R_jup).to(u.km)
+            rplan = planet['radius']
+            print('Default Planet Radius of 1.25 Rj given')
+
+        #clouds 
+        if planet['cloud'].find('flat') != -1: 
+            planet['flat'] = int(planet['cloud'][4:])
+            planet['ray'] = 0 
+        elif planet['cloud'].find('ray') != -1: 
+            planet['ray'] = int(planet['cloud'][3:])
+            planet['flat'] = 0 
+        elif int(planet['cloud']) == 0: 
+            planet['flat'] = 0 
+            planet['ray'] = 0     
+        else:
+            planet['flat'] = 0 
+            planet['ray'] = 0 
+            print('No cloud parameter not specified, default no clouds added')
+        
+        #chemistry 
+        if planet['chem'] == 'noTiO': 
+            planet['noTiO'] = True
+            planet['eqchem'] = True 
+        if planet['chem'] == 'eqchem': 
+            planet['noTiO'] = False
+            planet['eqchem'] = True 
+            #grid does not allow clouds for cases with TiO
+            planet['flat'] = 0 
+            planet['ray'] = 0 
+
+        #we are only using gravity of 25 and scaling by mass from there 
+        fort_grav = 25.0*u.m/u.s/u.s
+        df = header.loc[(header.gravity==fort_grav) & (header.temp==planet['temp'])
+                           & (header.noTiO==planet['noTiO']) & (header.ray==planet['ray']) &
+                           (header.flat==planet['flat'])]
+        wave_planet=np.array(pd.read_sql_table(df['name'].values[0],db)['wavelength'])[::-1]
+
+        r_lambda=np.array(pd.read_sql_table(df['name'].values[0],db)['radius'])*u.km
+        z_lambda = r_lambda- (1.25*u.R_jup).to(u.km) #all fortney models have fixed 1.25 radii
+
+        #scale with planetary mass 
+        try:
+            mass = (planet['mass']*u.Unit(planet['m_unit'])).to(u.kg)
+            gravity = c.G*(mass)/(rplan.to(u.m))**2.0 #convert radius to m for gravity units
+            #scale lambbda (this technically ignores the fact that scaleheight is altitude dependent)
+            #therefore, it will not be valide for very very low gravities
+            z_lambda = z_lambda*fort_grav/gravity
+        except: 
+            #keep original z lambda 
+            gravity=25.0
+            z_lambda = z_lambda*fort_grav/fort_grav
+            print('Default Planet Gravity of 25 m/s2 given')  
+        
+        #create new wavelength dependent R based on scaled ravity
+        r_lambda = z_lambda + rplan
+
+
+        #finally compute (rp/r*)^2
+        flux_planet = np.array(r_lambda**2/rstar**2)[::-1]
+        planet['w_unit'] = 'um'
+        planet['f_unit'] = 'rp^2/r*^2'
+    else: 
+        raise Exception("Incorrect Planet Type. Options are 'user','constant','grid'") 
+
+    #Convert wave to micron 
+    if planet['w_unit'] == 'um':
+        wave_planet = wave_planet
+    elif planet['w_unit'] == 'nm':
+        wave_planet = wave_planet*1e-3
+    elif planet['w_unit'] == 'cm':
+        wave_planet = wave_planet*1e4
+    elif planet['w_unit'] == 'Angs' :
+        wave_planet = wave_planet*1e-4
+    elif planet['w_unit'] == 'Hz' :
+        wave_planet = 3e17/wave_planet
+    else: 
+        raise Exception('Units are not correct. Pick um, nm, cm, Angs or sec.')
+
+    
+    return wave_planet, flux_planet

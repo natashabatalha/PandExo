@@ -20,7 +20,8 @@
                     }
                 }
             ],
-    "background": "medium",
+    "background_level": "medium",
+    "background":"ecliptic",
     "calculation":{
         "effects": {
                 "background": true,
@@ -54,8 +55,8 @@
     "strategy": {
             "method": "specapphot",
             "background_subtraction":true,
-            "aperture_size": 1.4,
-            "sky_annulus": [1.5,3.0],
+            "aperture_size": 0.6,
+            "sky_annulus": [2.3,3.0],
             "target_xy": [0.0, 0.0],
             "reference_wavelength": null,
             "units":"arcsec"

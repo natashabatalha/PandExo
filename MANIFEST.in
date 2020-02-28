@@ -1,0 +1,6 @@
+include pandexo/engine/templates/*.html
+include pandexo/engine/reference/*.json
+include pandexo/engine/static/css/*
+include pandexo/engine/static/fonts/*
+include pandexo/engine/static/img/*
+include pandexo/engine/static/js/*

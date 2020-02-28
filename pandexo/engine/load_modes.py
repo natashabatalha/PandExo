@@ -43,7 +43,7 @@ class SetDefaultModes():
         try: 
             return getattr(self, self.instrument)()
         except: 
-            print "INVALID INSTRUMENT NAME"
+            print("INVALID INSTRUMENT NAME")
             return 
                                    
     def wfc3(self):
@@ -65,11 +65,11 @@ class SetDefaultModes():
                                "niriss_input.json")) as data_file:
             pandeia_data = json.load(data_file)
         return pandeia_data
-        
+
     def nirspec(self):
         """Handles NIRSpec template
         """
-        filters = {'g140m':'f070lp','g140h':'f070lp',
+        filters = {'g140m':'f100lp','g140h':'f100lp',
                     'g235m':'f170lp','g235h':'f170lp',
                     'g395m':'f290lp','g395h':'f290lp',
                     'prism': 'clear'
@@ -78,9 +78,12 @@ class SetDefaultModes():
                                "nirspec_input.json")) as data_file:
             pandeia_data = json.load(data_file)
             pandeia_data["configuration"]["instrument"]["disperser"] = self.config
-            pandeia_data["configuration"]["instrument"]["filter"] = filters[self.config]                                  
+            pandeia_data["configuration"]["instrument"]["filter"] = filters[self.config]    
+            if self.config == 'prism':
+                pandeia_data["configuration"]["detector"]["subarray"] = 'sub512'
+
         return pandeia_data
-        
+
     def nircam(self):
         """Handles NIRCam template
         """

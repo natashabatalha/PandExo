@@ -17,7 +17,15 @@ engine.justplotit
     :members:
     :undoc-members:
     :show-inheritance:
-    
+
+engine.bintools
+-----------------
+
+.. automodule:: engine.bintools
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 engine.run_online
 -----------------
 
@@ -74,13 +82,6 @@ engine.pandexo
     :undoc-members:
     :show-inheritance:
     
-engine.ComputeZ
----------------
-
-.. automodule:: engine.ComputeZ
-    :members:
-    :undoc-members:
-    :show-inheritance:
 
 engine.elements
 ---------------
@@ -98,7 +99,13 @@ engine.hst_smooth
     :undoc-members:
     :show-inheritance:
 
+engine.logs
+-----------------
 
+.. automodule:: engine.logs
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
 Module contents
 ---------------

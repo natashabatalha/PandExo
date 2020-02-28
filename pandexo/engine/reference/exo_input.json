@@ -9,7 +9,9 @@
                 "ref_wave": "1.25 for J, 1.60 for H, 2.22 for K",
                 "temp": "Kelvin",
                 "metal": "log[M/H]",
-                "logg": "log gravity cgs"
+                "logg": "log gravity cgs",
+                "radius":null,
+                "r_unit":null
             },
 
     "planet" :{
@@ -18,19 +20,30 @@
             "w_unit": "Angs,um,nm,Hz,sec,cm",
             "f_unit": "rp^2/r*^2 or fp/r*",
             "transit_duration": "in seconds",
+            "td_unit":null,
             "depth":null, 
             "i":null, 
             "a":null, 
             "period":null,
             "ecc":null,
-            "w":null
+            "w":null,
+            "temp":null,
+            "chem":null,
+            "cloud":null,
+            "radius":null,
+            "r_unit":null,
+            "mass":null,
+            "m_unit":null
             },
 
     "observation": {
-        "sat_level": "% full well",
+        "sat_level": null,
+        "sat_unit":"% full well or e",
         "noccultations": 1,
         "R": null,
-        "fraction": 1, 
+        "baseline": 1,
+        "baseline_unit":"frac", 
+        "target_acq":false,
         "noise_floor":0.0
         }
 }

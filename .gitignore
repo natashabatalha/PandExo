@@ -2,3 +2,19 @@
 *.html~
 *.p
 *.json~
+
+# Jupyter Notebooks
+.ipynb_checkpoints
+notebooks/*.html
+
+# Installation
+build/
+dist/
+*.egg-info/
+
+# Mac files
+*.DS_Store
+
+
+# test files
+tests/

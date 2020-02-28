@@ -19,7 +19,8 @@
                     }
                 }],
 
-    "background": "medium",
+    "background_level": "medium",
+    "background":"ecliptic",
     "calculation":{
     "effects": {
                 "background": true,
@@ -43,7 +44,7 @@
             "disperser": "g140m"
         },
     "detector": {
-            "subarray": "s1600a1",
+            "subarray": "sub2048",
             "readmode": "nrsrapid",
             "ngroup": "optimize",
             "nint": 1,

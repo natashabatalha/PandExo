@@ -18,7 +18,8 @@ except ImportError:
     from ez_setup import use_setuptools
     use_setuptools()
     from setuptools import setup
-
+import sys 
+PY_V = sys.version_info
 # The standard setup() call.  Notice, however, that most of the arguments
 # normally passed to setup() are absent.  They will instead be read from the
 # setup.cfg file using d2to1.
@@ -39,18 +40,75 @@ except ImportError:
 # use_2to3 and zip_safe are common options support by setuptools; these can
 # also be placed in the setup.cfg, as will be demonstrated in a future update
 # to this sample package.
+
+if sys.version_info < (3,0): 
+    pandas_version = '0.24.0'
+else:
+    pandas_version = '0.25.0'
 setup(
-    setup_requires=['d2to1>=0.2.11', 'stsci.distutils>=0.3.7'],
-    namespace_packages=['pandexo'], packages=['pandexo'],
-    d2to1=True,
+
+    name='pandexo.engine',
+    version='1.4',
+    summary='pandexo transiting exoplanet simulator',
+    description_file='README.rst',
+    author='Natasha Batalha at Space Telescope Science Institute',
+    author_email='natasha.e.batalha@gmail.com',
+    home_page='https://natashabatalha.github.io/PandExo',
+    license='GPL',
+    url='https://github.com/natashabatalha/PandExo',
+    classifiers=[
+        'Intended Audience :: Science/Research',
+        'License :: OSI Approved :: BSD License',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 3',
+        'Topic :: Scientific/Engineering :: Astronomy',
+        'Topic :: Software Development :: Libraries :: Python Modules'
+    ],
+    packages=[
+        'pandexo',
+        'pandexo.engine',
+        'pandexo.engine.reference',
+        'pandexo.engine.static',
+        'pandexo.engine.static.css',
+        'pandexo.engine.static.fonts',
+        'pandexo.engine.static.img',
+        'pandexo.engine.static.js',
+        'pandexo.engine.temp',
+        'pandexo.engine.templates',
+        'pandexo.engine.utils'
+    ],
+    package_dir={
+        'engine': 'pandexo/engine'
+    },
+    include_package_data=True,
+    # package_data = {
+    #            'engine' : ['templates','*.html'],
+    #            'engine': ['reference','*.json'],
+    #            'engine': ['static','css','*'],
+    #            'engine': ['static','fonts','*'],
+    #            'engine': ['static','img','*'],
+    #            'engine': ['static','js','*']
+    # },
+
     install_requires=[
-          'numpy>=1.11.3',
-          'bokeh==0.12.4',
+          'numpy',
+          'bokeh==0.12.6',
           'tornado',
-          'pandas',
-          'multiprocessing',
+          'pandas=='+pandas_version,
           'joblib',
-          'pandeia.engine'
+          'pandeia.engine==1.4.0',
+          'batman-package',
+          'photutils',
+          'astropy',
+          'pysynphot',
+          'sqlalchemy',
+          'astroquery'
           ],
-    dependency_links=['https://github.com/spacetelescope/pysynphot.git@0.9.8.5']
+    entry_points = {
+        'console_scripts':
+            ['start_pandexo=pandexo.engine.run_online:main']
+    },
+    zip_safe=False,
+
 )

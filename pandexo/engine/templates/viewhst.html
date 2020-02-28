@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 
 {% block css %}
-<link rel="stylesheet" href="https://cdn.pydata.org/bokeh/release/bokeh-0.12.4.min.css" type="text/css" />
-<link rel="stylesheet" href="https://cdn.pydata.org/bokeh/release/bokeh-widgets-0.12.4.min.css" type="text/css" />
+<link rel="stylesheet" href="https://cdn.pydata.org/bokeh/release/bokeh-0.12.6.min.css" type="text/css" />
+<link rel="stylesheet" href="https://cdn.pydata.org/bokeh/release/bokeh-widgets-0.12.6.min.css" type="text/css" />
 {% end %}
 
 {% block body %}
@@ -16,7 +16,7 @@
     </div>
 </div>
 
-<h2 id="images">Timing</h2>
+<h2 id="images">Light Curve</h2>
 <div class="row">
     <div class="col-md-9">
         {% raw div['start_time'] %}
@@ -38,8 +38,8 @@
 
 {% block js %}
 
-<script type="text/javascript" src="https://cdn.pydata.org/bokeh/release/bokeh-0.12.4.min.js"></script>
-<script type="text/javascript" src="https://cdn.pydata.org/bokeh/release/bokeh-widgets-0.12.4.min.js"></script>
+<script type="text/javascript" src="https://cdn.pydata.org/bokeh/release/bokeh-0.12.6.min.js"></script>
+<script type="text/javascript" src="https://cdn.pydata.org/bokeh/release/bokeh-widgets-0.12.6.min.js"></script>
 {% raw script %}
 {% end %}
 

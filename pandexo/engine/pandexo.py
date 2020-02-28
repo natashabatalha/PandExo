@@ -29,12 +29,12 @@ def wrapper(dictinput):
     telescope = pandeia_input['telescope']
 
     if telescope=='jwst':
-        from jwst import compute_full_sim
+        from .jwst import compute_full_sim
         return compute_full_sim(dictinput)
     elif telescope=='hst':
-        from hst import compute_sim_hst 
+        from .hst import compute_sim_hst
         return compute_sim_hst(dictinput)
     elif telescope=='wfirst':
-        return     
+        return
     else:
-        print "INVALID TELESCOPE. PandExo only accepts: jwst, hst, wfirst"
+        print("INVALID TELESCOPE. PandExo only accepts: jwst, hst, wfirst")

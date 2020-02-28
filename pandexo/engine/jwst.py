@@ -1,19 +1,26 @@
+import os
 import sys
 import json
 import numpy as np
 import pandas as pd
 from copy import deepcopy 
-
+from astropy.io import fits
 from pandeia.engine.instrument_factory import InstrumentFactory
 from pandeia.engine.perform_calculation import perform_calculation
-import create_input as create
-from compute_noise import ExtractSpec
+from . import create_input as create
+from .compute_noise import ExtractSpec
+import astropy.units as u
+import pickle
+from pandeia.engine.calc_utils import build_default_calc, build_default_source
 
 #constant parameters.. consider putting these into json file 
 #max groups in integration
 max_ngroup = 65536.0 
 #minimum number of integrations
 min_nint_trans = 1
+
+#refdata directory
+default_refdata_directory = os.environ.get("pandeia_refdata")
 
 def compute_full_sim(dictinput): 
     """Top level function to set up exoplanet obs. for JW
@@ -36,8 +43,8 @@ def compute_full_sim(dictinput):
     Examples
     --------  
       
-    >>> from pandexo.engine.jwst import compute_full_sim 
-    >>> from pandexo.engine.justplotit import jwst_1d_spec
+    >>> from .pandexo.engine.jwst import compute_full_sim 
+    >>> from .pandexo.engine.justplotit import jwst_1d_spec
     >>> a = compute_full_sim({"pandeia_input": pandeiadict, "pandexo_input":exodict})
     >>> jwst_1d_spec(a)
     .. image:: 1d_spec.png
@@ -78,9 +85,17 @@ def compute_full_sim(dictinput):
         exp_pars = i.get_exposure_pars()
         
     #detector parameters
-    fullwell = det_pars['fullwell']
+    fullwell = det_pars['fullwell'] #from pandeia data
     rn = det_pars['rn']
-    sat_level = pandexo_input['observation']['sat_level']/100.0*fullwell
+    sat_unit = pandexo_input['observation']['sat_unit']
+
+    if sat_unit =='%':
+        sat_level = pandexo_input['observation']['sat_level']/100.0*fullwell
+    elif sat_unit =='e':
+        sat_level = pandexo_input['observation']['sat_level']
+    else: 
+        raise Exception("Saturation Level Needs Units: % fullwell or Electrons ")
+
     mingroups = det_pars['mingroups']
     
     #exposure parameters 
@@ -94,21 +109,38 @@ def compute_full_sim(dictinput):
     
     noccultations = pandexo_input['observation']['noccultations']
     R = pandexo_input['observation']['R']
-    #amount of exposure time out-of-occultation, as a fraction of in-occ time 
-    expfact_out = pandexo_input['observation']['fraction'] 
+
     noise_floor = pandexo_input['observation']['noise_floor']
 
-
+    
     #get stellar spectrum and in transit spec
     star_spec = create.outTrans(pandexo_input['star'])
-    both_spec = create.bothTrans(star_spec, pandexo_input['planet'])
+    #get rstar if user calling from grid 
+    both_spec = create.bothTrans(star_spec, pandexo_input['planet'], star=pandexo_input['star'])
     out_spectrum = np.array([both_spec['wave'], both_spec['flux_out_trans']])
-        
+    
     #get transit duration from phase curve or from input 
     if calculation == 'phase_spec': 
         transit_duration = max(both_spec['time']) - min(both_spec['time'])
     else: 
-        transit_duration = pandexo_input['planet']['transit_duration']
+        #convert to seconds, then remove quantity and convert back to float 
+        transit_duration = float((pandexo_input['planet']['transit_duration']*u.Unit(pandexo_input['planet']['td_unit'])).to(u.second)/u.second)
+
+    #amount of exposure time out-of-occultation, as a fraction of in-occ time 
+    try:
+        expfact_out = pandexo_input['observation']['fraction'] 
+        print("WARNING: key input fraction has been replaced with new 'baseline option'. See notebook example")
+        pandexo_input['observation']['baseline'] = pandexo_input['observation']['fraction'] 
+        pandexo_input['observation']['baseline_unit'] ='frac'
+    except:
+        if pandexo_input['observation']['baseline_unit'] =='frac':
+            expfact_out = pandexo_input['observation']['baseline'] 
+        elif pandexo_input['observation']['baseline_unit'] =='total':
+            expfact_out = transit_duration/( pandexo_input['observation']['baseline'] - transit_duration)
+        elif pandexo_input['observation']['baseline_unit'] =='total_hrs':
+            expfact_out = transit_duration/( pandexo_input['observation']['baseline']*3600.0 - transit_duration)
+        else: 
+            raise Exception("Wrong units for baseine: either 'frac' or 'total' or 'total_hrs' accepted")
 
     #add to pandeia input 
     pandeia_input['scene'][0]['spectrum']['sed']['spectrum'] = out_spectrum
@@ -118,32 +150,37 @@ def compute_full_sim(dictinput):
             "nframe":nframe,"mingroups":mingroups,"nskip":nskip}
     else:
         #run pandeia once to determine max exposure time per int and get exposure params
-        print "Optimization Reqested: Computing Duty Cycle"
+        print("Optimization Reqested: Computing Duty Cycle")
         m = {"maxexptime_per_int":compute_maxexptime_per_int(pandeia_input, sat_level) , 
             "tframe":tframe,"nframe":nframe,"mingroups":mingroups,"nskip":nskip}
-        print "Finished Duty Cycle Calc"
+        print("Finished Duty Cycle Calc")
 
     #calculate all timing info
     timing, flags = compute_timing(m,transit_duration,expfact_out,noccultations)
     
     #Simulate out trans and in transit
-    print "Starting Out of Transit Simulation"
+    print("Starting Out of Transit Simulation")
     out = perform_out(pandeia_input, pandexo_input,timing, both_spec)
     
     #extract extraction area before dict conversion
     extraction_area = out.extraction_area
     out = out.as_dict()
     out.pop('3d')
-    print "End out of Transit"
+    print("End out of Transit")
+
+    #Remove effects of Quantum Yield from shot noise 
+    out = remove_QY(out, instrument)
 
     #this kind of redundant going to compute inn from out instead 
     #keep perform_in but change inputs to (out, timing, both_spec)
-    print "Starting In Transit Simulation"
+    print("Starting In Transit Simulation")
     inn = perform_in(pandeia_input, pandexo_input,timing, both_spec, out, calculation)
-    print "End In Transit" 
+    print("End In Transit")
+    
+
 
     #compute warning flags for timing info 
-    warnings = add_warnings(out, timing, sat_level, flags, instrument) 
+    warnings = add_warnings(out, timing, sat_level/fullwell, flags, instrument) 
 
     compNoise = ExtractSpec(inn, out, rn, extraction_area, timing)
     
@@ -187,57 +224,82 @@ def compute_full_sim(dictinput):
     #bin the data according to user input 
     if R != None: 
         wbin = bin_wave_to_R(w, R)
+
         photon_out_bin = uniform_tophat_sum(wbin, w,extracted_flux_out)
         photon_in_bin = uniform_tophat_sum(wbin,w, extracted_flux_inn)
         var_in_bin = uniform_tophat_sum(wbin, w,varin)
         var_out_bin = uniform_tophat_sum(wbin,w, varout)
+
+        wbin = wbin[photon_out_bin > 0 ]
+        photon_in_bin = photon_in_bin[photon_out_bin > 0 ]
+        var_in_bin = var_in_bin[photon_out_bin > 0 ]
+        var_out_bin = var_out_bin[photon_out_bin > 0 ]
+        photon_out_bin = photon_out_bin[photon_out_bin>0]
     else: 
         wbin = w
         photon_out_bin = extracted_flux_out
+        wbin = wbin[photon_out_bin>0]
         photon_in_bin = extracted_flux_inn
+        photon_in_bin = photon_in_bin[photon_out_bin>0]
         var_in_bin = varin
+        var_in_bin = var_in_bin[photon_out_bin>0]
         var_out_bin = varout
+        var_out_bin = var_out_bin[photon_out_bin>0]
+        photon_out_bin = photon_out_bin[photon_out_bin>0]
+        
     
-    #calculate total variance
-    var_tot = var_in_bin + var_out_bin
-    error = np.sqrt(var_tot)
-    
-    #calculate error on spectrum
-    error_spec = error/photon_out_bin
-   
+    if calculation == 'phase_spec':
+        to = (timing["APT: Num Groups per Integration"]-1)*tframe
+        ti = (timing["APT: Num Groups per Integration"]-1)*tframe
+    else: 
+        #otherwise error propagation and account for different 
+        #times in transit and out 
+        to = result['on_source_out']
+        ti = result['on_source_in']
+        
+    var_tot = (to/ti/photon_out_bin)**2.0 * var_in_bin + (photon_in_bin*to/ti/photon_out_bin**2.0)**2.0 * var_out_bin
+    error_spec = np.sqrt(var_tot)
+        
+    #factor in occultations to noise 
+    nocc = timing['Number of Transits']
+    error_spec = error_spec / np.sqrt(nocc)
+        
     #Add in user specified noise floor 
     error_spec_nfloor = add_noise_floor(noise_floor, wbin, error_spec) 
 
-    
     #add in random noise for the simulated spectrum 
-    rand_noise= np.sqrt((var_in_bin+var_out_bin))*(np.random.randn(len(wbin)))
-    raw_spec = (photon_out_bin-photon_in_bin)/photon_out_bin
-    sim_spec = (photon_out_bin-photon_in_bin + rand_noise)/photon_out_bin 
+    np.random.seed()
+    rand_noise= error_spec_nfloor*(np.random.randn(len(wbin)))
+    raw_spec = (photon_out_bin/to-photon_in_bin/ti)/(photon_out_bin/to)
+    sim_spec = raw_spec + rand_noise 
     
     #if secondary tranist, multiply spectra by -1 
     if pandexo_input['planet']['f_unit'] == 'fp/f*':
         sim_spec = -1.0*sim_spec
-        raw_spec = -1.0*raw_spec
-    
+        raw_spec = -1.0*raw_spec    
    
     #package processed data
-    binned = {'wave':wbin,
+    finalspec = {'wave':wbin,
               'spectrum': raw_spec,
               'spectrum_w_rand':sim_spec,
               'error_w_floor':error_spec_nfloor}
     
-    unbinned = {
-                'flux_out':extracted_flux_out, 
-                'flux_in':extracted_flux_inn,
-                'var_in':varin, 
-                'var_out':varout, 
-                'wave':w,
-                'error_no_floor':np.sqrt(varin+varout)/extracted_flux_out
+    rawstuff = {
+                'electrons_out':photon_out_bin*nocc, 
+                'electrons_in':photon_in_bin*nocc,
+                'var_in':var_in_bin*nocc, 
+                'var_out':var_out_bin*nocc,
+                'e_rate_out':photon_out_bin/to,
+                'e_rate_in':photon_out_bin/ti,
+                'wave':wbin,
+                'error_no_floor':error_spec, 
+                'rn[out,in]':result['rn[out,in]'],
+                'bkg[out,in]':result['bkg[out,in]']
                 }
  
-    result_dict = as_dict(out,both_spec ,binned, 
+    result_dict = as_dict(out,both_spec ,finalspec, 
                 timing, mag, sat_level, warnings,
-                pandexo_input['planet']['f_unit'], unbinned,calculation)
+                pandexo_input['planet']['f_unit'], rawstuff,calculation)
 
     return result_dict 
     
@@ -267,7 +329,7 @@ def compute_maxexptime_per_int(pandeia_input, sat_level):
     --------
     
     >>> max_time = compute_maxexptime_per_int(pandeia_input, 50000.0)
-    >>> print max_time 
+    >>> print(max_time)
     12.0
     """
     
@@ -278,17 +340,20 @@ def compute_maxexptime_per_int(pandeia_input, sat_level):
     
     report = perform_calculation(pandeia_input, dict_report=False)
     report_dict = report.as_dict() 
+    
+    # count rate on the detector in e-/second/pixel
+    #det = report_dict['2d']['detector']
+    det = report.signal.rate_plus_bg_list[0]['fp_pix']
 
-    
-    # count rate on the detector in e-/second 
-    det = report_dict['2d']['detector']
-    
     timeinfo = report_dict['information']['exposure_specification']
     #totaltime = timeinfo['tgroup']*timeinfo['ngroup']*timeinfo['nint']
     
     maxdetvalue = np.max(det)
+
+
     #maximum time before saturation per integration 
     #based on user specified saturation level
+
     try:
         maxexptime_per_int = sat_level/maxdetvalue
     except: 
@@ -328,7 +393,7 @@ def compute_timing(m,transit_duration,expfact_out,noccultations):
     Examples
     --------
     >>> timing, flags = compute_timing(m, 2*60.0*60.0, 1.0, 1.0)
-    >>> print timing.keys()
+    >>> print((list(timing.keys())))
     ['Number of Transits', 'Num Integrations Out of Transit', 'Num Integrations In Transit', 
     'APT: Num Groups per Integration', 'Seconds per Frame', 'Observing Efficiency (%)', 'On Source Time(sec)', 
     'Exposure Time Per Integration (secs)', 'Reset time Plus 30 min TA time (hrs)',
@@ -355,25 +420,26 @@ def compute_timing(m,transit_duration,expfact_out,noccultations):
         #divided by the time it takes for one frame. Note this does not include 
         #reset frames 
 
-        nframes_per_int = long(maxexptime_per_int/tframe)
+        nframes_per_int = np.floor(maxexptime_per_int/tframe)
     
         #for exoplanets nframe =1 an nskip always = 0 so ngroups_per_int 
         #and nframes_per_int area always the same 
-        ngroups_per_int = long(nframes_per_int/(nframe + nskip)) 
+        ngroups_per_int = np.floor(nframes_per_int/(nframe + nskip)) 
     
         #put restriction on number of groups 
         #there is a hard limit to the maximum number groups. 
         #if you exceed that limit, set it to the maximum value instead.
         #also set another check for saturation
-    
+
         if ngroups_per_int > max_ngroup:
             ngroups_per_int = max_ngroup
             flag_high = "Groups/int > max num of allowed groups"
  
-        if (ngroups_per_int < mingroups) or (ngroups_per_int == np.nan):
+        if (ngroups_per_int < mingroups) | np.isnan(ngroups_per_int):
             ngroups_per_int = mingroups  
             nframes_per_int = mingroups
             flag_default = "NGROUPS<"+str(mingroups)+"SET TO NGROUPS="+str(mingroups)
+
     elif 'ngroups_per_int' in locals(): 
         #if it maxexptime_per_int been defined then set nframes per int 
         nframes_per_int = ngroups_per_int*(nframe+nskip)
@@ -385,21 +451,21 @@ def compute_timing(m,transit_duration,expfact_out,noccultations):
         ngroups_per_int = mingroups
         nframes_per_int = mingroups
         flag_default = "Something went wrong. SET TO NGROUPS="+str(mingroups)
-                
+
+          
     #the integration time is related to the number of groups and the time of each 
     #group 
     exptime_per_int = ngroups_per_int*tframe
     
     #clock time includes the reset frame 
-    clocktime_per_int = ngroups_per_int*tframe
+    clocktime_per_int = (ngroups_per_int+1.0)*tframe
     
     #observing efficiency (i.e. what percentage of total time is spent on soure)
     eff = (ngroups_per_int - 1.0)/(ngroups_per_int + 1.0)
     
     #this says "per occultation" but this is just the in transit frames.. See below
-    #nframes_per_occultation = long(transit_duration/tframe)
-    #ngroups_per_occultation = long(nframes_per_occultation/(nframe + nskip))
-    nint_per_occultation =  transit_duration*eff/exptime_per_int
+    # transit duration / ((ngroups + reset)*frame time)
+    nint_per_occultation =  transit_duration/((ngroups_per_int+1.0)*tframe)
     
     #figure out how many integrations are in transit and how many are out of transit 
     nint_in = np.ceil(nint_per_occultation)
@@ -409,11 +475,11 @@ def compute_timing(m,transit_duration,expfact_out,noccultations):
     #here we assume that for very dim things, you would want at least 
     #3 integrations in transit 
     if nint_in < min_nint_trans:
-        ngroups_per_int = np.floor(ngroups_per_int/3.0)
-        exptime_per_int = (ngroups_per_int-1.)*tframe
+        ngroups_per_int = np.floor(ngroups_per_int/min_nint_trans)
+        exptime_per_int = (ngroups_per_int)*tframe
         clocktime_per_int = ngroups_per_int*tframe
         eff = (ngroups_per_int - 1.0)/(ngroups_per_int + 1.0)
-        nint_per_occultation =  transit_duration*eff/exptime_per_int
+        nint_per_occultation =  transit_duration/((ngroups_per_int+1.0)*tframe)
         nint_in = np.ceil(nint_per_occultation)
         nint_out = np.ceil(nint_in/expfact_out)
         
@@ -421,20 +487,56 @@ def compute_timing(m,transit_duration,expfact_out,noccultations):
         nint_out = min_nint_trans
    
     timing = {
-        "Transit Duration" : transit_duration/60.0/60.0,
+        "Transit Duration" : (transit_duration)/60.0/60.0,
         "Seconds per Frame" : tframe,
-        "Exposure Time Per Integration (secs)":exptime_per_int,
+        "Time/Integration incl reset (sec)":clocktime_per_int,
         "APT: Num Groups per Integration" :ngroups_per_int, 
         "Num Integrations Out of Transit":nint_out,
         "Num Integrations In Transit":nint_in,
         "APT: Num Integrations per Occultation":nint_out+nint_in,
-        "On Source Time(sec)": noccultations*clocktime_per_int*(nint_out+nint_in),
-        "Reset time Plus 30 min TA time (hrs)": overhead_per_int*(nint_in + nint_out)/60.0/60.0 + 0.5,
         "Observing Efficiency (%)": eff*100.0,
+        "Transit+Baseline, no overhead (hrs)": (nint_out+nint_in)*clocktime_per_int/60.0/60.0, 
         "Number of Transits": noccultations
         }      
         
     return timing, {'flag_default':flag_default,'flag_high':flag_high}
+
+def remove_QY(pandeia_dict, instrument):
+    """Removes Quantum Yield from Pandeia Fluxes. Place Holder. 
+    
+    Parameters
+    ----------
+    pandeia_dict : dict 
+        pandeia output dictionary
+    instrument : str
+        instrument running
+    
+    Returns
+    -------
+    dict 
+        same exact dictionary with extracted_flux = extracted_flux/QY
+    """
+    if instrument == 'niriss':
+        try:
+            qy = fits.open(os.path.join(default_refdata_directory,'jwst', instrument,'qe' ,'jwst_niriss_h2rg_qe_20160902163017.fits'))
+        except: 
+            raise Exception('PANDEIA REFERENCE DATA NEEDS TO BE UPDATED')
+
+        x_grid = pandeia_dict['1d']['extracted_flux'][0]
+        qy_on_grid = np.interp(x_grid, qy[1].data['WAVELENGTH'], qy[1].data['CONVERSION'])
+    elif instrument == 'nirspec':
+        try:
+            qy = fits.open(os.path.join(default_refdata_directory,'jwst', instrument,'qe' ,'jwst_nirspec_qe_20160902193401.fits'))
+        except: 
+            raise Exception('PANDEIA REFERENCE DATA NEEDS TO BE UPDATED')        
+        x_grid = pandeia_dict['1d']['extracted_flux'][0]
+        qy_on_grid = np.interp(x_grid, qy[1].data['WAVELENGTH'], qy[1].data['CONVERSION'])
+    else:
+        #nircam and miri currently have no qy effects
+        qy_on_grid = 1.0
+
+    pandeia_dict['1d']['extracted_flux'][1] = pandeia_dict['1d']['extracted_flux'][1]/qy_on_grid
+    return pandeia_dict
 
 def perform_out(pandeia_input, pandexo_input,timing, both_spec):
     """Runs pandeia for the out of transit data
@@ -461,7 +563,7 @@ def perform_out(pandeia_input, pandexo_input,timing, both_spec):
     pandeia_input['configuration']['detector']['nexp'] = 1 
 
     report_out = perform_calculation(pandeia_input, dict_report=False)
-
+    
     return report_out
 
     
@@ -518,6 +620,9 @@ def perform_in(pandeia_input, pandexo_input,timing, both_spec, out, calculation)
         pandeia_input['scene'][0]['spectrum']['sed']['spectrum'] = in_transit_spec
 
         report_in = perform_calculation(pandeia_input, dict_report=True)
+        instrument = pandeia_input['configuration']['instrument']['instrument']
+        #remove QY effects 
+        report_in = remove_QY(report_in, instrument)
         report_in.pop('3d')
     
     return report_in
@@ -538,7 +643,7 @@ def add_warnings(pand_dict, timing, sat_level, flags,instrument):
     timing : dict 
         output from **compute_timing** 
     sat_level : int or float 
-        user specified saturation level in electrons 
+        user specified saturation level in fractional (00/100)
     flags : dict 
         warning flags taken from output of **compute_timing**
     instrument : str 
@@ -570,9 +675,9 @@ def add_warnings(pand_dict, timing, sat_level, flags,instrument):
     flag_low = "All good"
     flag_perc = "All good"
 
-    if (sat_level > 80) & (ngroups_per_int <5):
+    if (sat_level > .80) & (ngroups_per_int <3):
         flag_low = "% full well>80% & only " + str(ngroups_per_int) + " groups"
-    if (sat_level > 80): 
+    if (sat_level > .80): 
         flag_perc = "% full well>80%"
 
      
@@ -616,7 +721,7 @@ def add_noise_floor(noise_floor, wave_bin, error_spec):
     >>> wave = np.linspace(1,2.7,10)
     >>> error = np.zeros(10)+1e-6
     >>> newerror = add_noise_floor(20, wave, error)
-    >>> print newerror
+    >>> print(newerror)
     [  2.00000000e-05   2.00000000e-05   2.00000000e-05   2.00000000e-05
        2.00000000e-05   2.00000000e-05   2.00000000e-05   2.00000000e-05
        2.00000000e-05   2.00000000e-05]
@@ -640,8 +745,6 @@ def add_noise_floor(noise_floor, wave_bin, error_spec):
 def bin_wave_to_R(w, R):
     """Creates new wavelength axis at specified resolution
     
-    Rebins wavelength bin to a certain R 
-    
     Parameters
     ----------
     w : list of float or numpy array of float
@@ -658,37 +761,46 @@ def bin_wave_to_R(w, R):
     --------
     
     >>> newwave = bin_wave_to_R(np.linspace(1,2,1000), 10)
-    >>> print len(newwave)
+    >>> print((len(newwave)))
     11
     """
     wave = []
     tracker = min(w)
     i = 1 
     ind= 0
+    firsttime = True
     while(tracker<max(w)):
         if i <len(w)-1:
-        
             dlambda = w[i]-w[ind]
             newR = w[i]/dlambda
-            if newR < R:
+            if (newR < R) & (firsttime):
+                tracker = w[ind]
+                wave += [tracker]
+                ind += 1
+                i += 1 
+                firsttime = True
+            elif newR < R:
                 tracker = w[ind]+dlambda/2.0
                 wave +=[tracker]
                 ind = (np.abs(w-tracker)).argmin()
-                i = ind
-            else:            
+                i = ind+1
+                firsttime = True
+            else:
+                firsttime = False            
                 i+=1    
         else:
             tracker = max(w)
-    return wave
+            wave += [tracker]
+    return np.array(wave)
     
-def uniform_tophat_sum(xnew,x, y):
+def uniform_tophat_sum(newx,x, y):
     """Adapted from Mike R. Line to rebin spectra
     
     Sums groups of points in certain wave bin 
     
     Parameters
     ----------
-    xnew : list of float or numpy array of float
+    newx : list of float or numpy array of float
         New wavelength grid to rebin to 
     x : list of float or numpy array of float 
         Old wavelength grid to get rid of 
@@ -703,14 +815,14 @@ def uniform_tophat_sum(xnew,x, y):
     Examples 
     --------
         
-    >>> from pandexo.engine.jwst import uniform_tophat_sum
+    >>> from .pandexo.engine.jwst import uniform_tophat_sum
     >>> oldgrid = np.linspace(1,3,100)
     >>> y = np.zeros(100)+10.0
     >>> newy = uniform_tophat_sum(np.linspace(2,3,3), oldgrid, y)
     >>> newy
     array([ 240.,  250.,  130.])
     """
-    xnew = np.array(newx)
+    newx = np.array(newx)
     szmod=newx.shape[0]
     delta=np.zeros(szmod)
     ynew=np.zeros(szmod)
@@ -724,7 +836,52 @@ def uniform_tophat_sum(xnew,x, y):
     loc=np.where((x > newx[0]-0.5*delta[0]) & (x < newx[0]+0.5*delta[0]))
     ynew[0]=np.sum(y[loc])
     return ynew
-    
+
+def target_acq(instrument, both_spec, warning): 
+    """Contains functionality to compute optimal TA strategy 
+
+    Takes pandexo normalized flux from create_input and checks for saturation, or 
+    if SNR is below the minimum requirement for each. Then adds warnings and 2d displays 
+    and target acq info to final output dict 
+
+    Parameters
+    ----------
+    instrument : str 
+        possible options are niriss, nirspec, miri and nircam 
+    both_spec : dict
+        output dictionary from **create_input** 
+    warning : dict 
+        output dictionary from **add_warnings** 
+
+    Retruns
+    -------
+
+    """
+    out_spectrum = np.array([both_spec['wave'], both_spec['flux_out_trans']])
+
+    #this automatically builds a default calculation 
+    #I got reasonable answers for everything so all you should need to do here is swap out (instrument = 'niriss', 'nirspec','miri' or 'nircam')
+    c = build_default_calc(telescope='jwst', instrument=instrument, mode='target_acq', method='taphot')
+    c['scene'][0]['spectrum']['sed'] = {'sed_type':'input','spectrum':out_spectrum}
+    c['scene'][0]['spectrum']['normalization']['type'] = 'none'
+    rphot = perform_calculation(c, dict_report=True)
+
+    #check warnings (pandeia doesn't return values for these warnings, so try will fail if all good)
+    try: 
+        warnings['TA Satruated?'] = rphot['warnings']['saturated']
+    except:
+        warnings['TA Satruated?'] = 'All good'
+
+    try: 
+        warnings['TA SNR Threshold'] = rphot['warnings']['ta_snr_threshold']
+    except:
+        warnings['TA SNR Threshold'] = 'All good'
+
+    #build TA dict 
+    ta = {'sn':rphot['scalar']['sn'],
+            'ngroup': rphot['input']['configuration']['detector']['ngroup'], 
+            'saturation':rphot['2d']['saturation']}
+
 def as_dict(out, both_spec ,binned, timing, mag, sat_level, warnings, punit, unbinned,calculation): 
     """Format dictionary for output data 
     
@@ -762,12 +919,18 @@ def as_dict(out, both_spec ,binned, timing, mag, sat_level, warnings, punit, unb
 
     p=1.0
     if punit == 'fp/f*': p = -1.0
-    
-    timing_div = pd.DataFrame(timing.items(), columns=['Timing Info', 'Values']).to_html().encode()
-    timing_div = '<table class="table table-striped"> \n' + timing_div[36:len(timing_div)]
-    
-    warnings_div = pd.DataFrame(warnings.items(), columns=['Check', 'Status']).to_html().encode()
+
+    timing_div = pd.DataFrame.from_dict(timing, orient='index')
+    timing_div.columns = ['Value']
+    timing_div = timing_div.to_html()
+    timing_div = '<table class="table table-striped"> \n' + timing_div[36:len(timing_div)] 
+    timing_div = timing_div.encode()
+
+    warnings_div = pd.DataFrame.from_dict(warnings, orient='index')
+    warnings_div.columns = ['Value']
+    warnings_div = warnings_div.to_html()
     warnings_div = '<table class="table table-striped"> \n' + warnings_div[36:len(warnings_div)]
+    warnings_div = warnings_div.encode()
        
     input_dict = {
    	 "Target Mag": mag , 
@@ -782,15 +945,19 @@ def as_dict(out, both_spec ,binned, timing, mag, sat_level, warnings, punit, unb
  	 "Primary/Secondary": punit
     }
     
-    input_div = pd.DataFrame(input_dict.items(), columns=['Component', 'Values']).to_html().encode()
+    input_div = pd.DataFrame.from_dict(input_dict, orient='index')
+    input_div.columns = ['Value']
+    input_div = input_div.to_html()
     input_div = '<table class="table table-striped"> \n' + input_div[36:len(input_div)]
+    input_div = input_div.encode()
     
     #add calc type to input dict (doing it here so it doesn't output on webpage
     input_dict["Calculation Type"]= calculation
     
     final_dict = {
     'OriginalInput': {'model_spec':both_spec['model_spec'],
-                     'model_wave' : both_spec['model_wave']},
+                     'model_wave' : both_spec['model_wave'],
+                     'star_spec': both_spec['flux_out_trans']},
     'RawData': unbinned,
     'FinalSpectrum': binned,
         
@@ -810,3 +977,4 @@ def as_dict(out, both_spec ,binned, timing, mag, sat_level, warnings, punit, unb
     return final_dict
 
     
+

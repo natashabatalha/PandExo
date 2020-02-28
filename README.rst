@@ -1,3 +1,13 @@
+.. raw:: html
+
+   <div align="center">
+   <img src="docs/logo.png" width="450px">
+   </img>
+   <br/>
+   </div>
+   <br/><br/>
+
+
 Getting Started
 ---------------
 
@@ -28,3 +38,11 @@ Requires
 ~~~~~~~~
 
 - Python >2.7, that's it 
+
+
+.. image:: https://zenodo.org/badge/67237418.svg
+   :target: https://zenodo.org/badge/latestdoi/67237418
+
+
+.. image:: https://travis-ci.org/natashabatalha/PandExo.svg?branch=master
+    :target: https://travis-ci.org/natashabatalha/PandExo

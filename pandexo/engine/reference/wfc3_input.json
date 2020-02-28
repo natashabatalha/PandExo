@@ -16,7 +16,8 @@
         "nchan": "number of spec channels",
         "scanDirection": "Forward or Round Trip",
         "schedulability":"30 or 100",
-        "windowSize": 20
+        "windowSize": 20, 
+        "useFirstOrbit":false
 
     }
 }
