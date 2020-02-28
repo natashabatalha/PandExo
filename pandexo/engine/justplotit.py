@@ -1,11 +1,13 @@
 from bokeh.plotting import show, Figure
 from bokeh.io import output_file as outputfile
+from bokeh.io import output_notebook  as outnotebook
 import pickle as pk
 import numpy as np
 from bokeh.layouts import row
 import pandas as pd
 def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', output_file = 'data.html',legend = False,
-        R=False,  num_tran = False, plot_width=800, plot_height=400,x_range=[1,10],y_range=None, plot=True):
+        R=False,  num_tran = False, plot_width=800, plot_height=400,x_range=[1,10],y_range=None, plot=True,
+        output_notebook=False):
     """Plots 1d simulated spectrum and rebin or rescale for more transits
 
     Plots 1d data points with model in the background (if wanted). Designed to read in exact
@@ -41,6 +43,8 @@ def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', out
         (Optional) Sets x range of plot. Default = [1,10]
     plot : bool
         (Optional) Supresses the plot if not wanted (Default = True)
+    out_notebook : bool 
+        (Optional) Output notebook. Default is false, if true, outputs in the notebook
 
     Returns
     -------
@@ -66,7 +70,10 @@ def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', out
     outy=[]
     oute=[]
     TOOLS = "pan,wheel_zoom,box_zoom,reset,save"
-    outputfile(output_file)
+    if output_notebook:
+        outnotebook()
+    else:
+        outputfile(output_file)
     colors = ['black','blue','red','orange','yellow','purple','pink','cyan','grey','brown']
     #make sure its iterable
     if type(result_dict) != list:
@@ -79,14 +86,14 @@ def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', out
             legend_keys = [legend_keys]
 
     i = 0
-    for dict in result_dict:
-        ntran_old = dict['timing']['Number of Transits']
-        to = dict['timing']["Num Integrations Out of Transit"]
-        ti = dict['timing']["Num Integrations In Transit"]
+    for dictt in result_dict:
+        ntran_old = dictt['timing']['Number of Transits']
+        to = dictt['timing']["Num Integrations Out of Transit"]
+        ti = dictt['timing']["Num Integrations In Transit"]
         #remove any nans
-        y = dict['FinalSpectrum']['spectrum_w_rand']
-        x = dict['FinalSpectrum']['wave'][~np.isnan(y)]
-        err = dict['FinalSpectrum']['error_w_floor'][~np.isnan(y)]
+        y = dictt['FinalSpectrum']['spectrum_w_rand']
+        x = dictt['FinalSpectrum']['wave'][~np.isnan(y)]
+        err = dictt['FinalSpectrum']['error_w_floor'][~np.isnan(y)]
         y = y[~np.isnan(y)]
 
 
@@ -95,12 +102,12 @@ def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', out
             y=y
         elif (R != False) & (num_tran != False):
             new_wave = bin_wave_to_R(x, R)
-            out = uniform_tophat_sum(new_wave,x, dict['RawData']['electrons_out']*num_tran/ntran_old)
-            inn = uniform_tophat_sum(new_wave,x, dict['RawData']['electrons_in']*num_tran/ntran_old)
-            vout = uniform_tophat_sum(new_wave,x, dict['RawData']['var_out']*num_tran/ntran_old)
-            vin = uniform_tophat_sum(new_wave,x, dict['RawData']['var_in']*num_tran/ntran_old)
+            out = uniform_tophat_sum(new_wave,x, dictt['RawData']['electrons_out']*num_tran/ntran_old)
+            inn = uniform_tophat_sum(new_wave,x, dictt['RawData']['electrons_in']*num_tran/ntran_old)
+            vout = uniform_tophat_sum(new_wave,x, dictt['RawData']['var_out']*num_tran/ntran_old)
+            vin = uniform_tophat_sum(new_wave,x, dictt['RawData']['var_in']*num_tran/ntran_old)
             var_tot = (to/ti/out)**2.0 * vin + (inn*to/ti/out**2.0)**2.0 * vout
-            if dict['input']['Primary/Secondary']=='fp/f*':
+            if dictt['input']['Primary/Secondary']=='fp/f*':
                 fac = -1.0
             else:
                 fac = 1.0
@@ -111,12 +118,12 @@ def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', out
             y = sim_spec
             err = np.sqrt(var_tot)
         elif (R == False) & (num_tran != False):
-            out = dict['RawData']['electrons_out']*num_tran/ntran_old
-            inn = dict['RawData']['electrons_in']*num_tran/ntran_old
-            vout = dict['RawData']['var_out']*num_tran/ntran_old
-            vin = dict['RawData']['var_in']*num_tran/ntran_old
+            out = dictt['RawData']['electrons_out']*num_tran/ntran_old
+            inn = dictt['RawData']['electrons_in']*num_tran/ntran_old
+            vout = dictt['RawData']['var_out']*num_tran/ntran_old
+            vin = dictt['RawData']['var_in']*num_tran/ntran_old
             var_tot = (to/ti/out)**2.0 * vin + (inn*to/ti/out**2.0)**2.0 * vout
-            if dict['input']['Primary/Secondary']=='fp/f*':
+            if dictt['input']['Primary/Secondary']=='fp/f*':
                 fac = -1.0
             else:
                 fac = 1.0
@@ -128,12 +135,12 @@ def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', out
             err = np.sqrt(var_tot)
         elif (R != False) & (num_tran == False):
             new_wave = bin_wave_to_R(x, R)
-            out = uniform_tophat_sum(new_wave,x, dict['RawData']['electrons_out'])
-            inn = uniform_tophat_sum(new_wave,x, dict['RawData']['electrons_in'])
-            vout = uniform_tophat_sum(new_wave,x, dict['RawData']['var_out'])
-            vin = uniform_tophat_sum(new_wave,x, dict['RawData']['var_in'])
+            out = uniform_tophat_sum(new_wave,x, dictt['RawData']['electrons_out'])
+            inn = uniform_tophat_sum(new_wave,x, dictt['RawData']['electrons_in'])
+            vout = uniform_tophat_sum(new_wave,x, dictt['RawData']['var_out'])
+            vin = uniform_tophat_sum(new_wave,x, dictt['RawData']['var_in'])
             var_tot = (to/ti/out)**2.0 * vin + (inn*to/ti/out**2.0)**2.0 * vout
-            if dict['input']['Primary/Secondary']=='fp/f*':
+            if dictt['input']['Primary/Secondary']=='fp/f*':
                 fac = -1.0
             else:
                 fac = 1.0
@@ -158,12 +165,12 @@ def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', out
         #initialize Figure
         if i == 0:
             #Define units for x and y axis
-            y_axis_label = dict['input']['Primary/Secondary']
+            y_axis_label = dictt['input']['Primary/Secondary']
 
             if y_axis_label == 'fp/f*': p = -1.0
             else: y_axis_label = y_axis_label
 
-            if dict['input']['Calculation Type'] =='phase_spec':
+            if dictt['input']['Calculation Type'] =='phase_spec':
                 x_axis_label='Time (secs)'
                 x_range = [min(x), max(x)]
             else:
@@ -172,8 +179,8 @@ def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', out
             if y_range!=None:
                 ylims = y_range
             else:
-                ylims = [min(dict['OriginalInput']['model_spec'])- 0.1*min(dict['OriginalInput']['model_spec']),
-                 0.1*max(dict['OriginalInput']['model_spec'])+max(dict['OriginalInput']['model_spec'])]
+                ylims = [min(dictt['OriginalInput']['model_spec'])- 0.1*min(dictt['OriginalInput']['model_spec']),
+                 0.1*max(dictt['OriginalInput']['model_spec'])+max(dictt['OriginalInput']['model_spec'])]
 
             fig1d = Figure(x_range=x_range, y_range = ylims,
                plot_width = plot_width, plot_height =plot_height,title=title,x_axis_label=x_axis_label,
@@ -182,11 +189,11 @@ def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', out
 
         #plot model, data, and errors
         if model:
-            mxx = dict['OriginalInput']['model_wave']
-            myy = dict['OriginalInput']['model_spec']
+            mxx = dictt['OriginalInput']['model_wave']
+            myy = dictt['OriginalInput']['model_spec']
             my = uniform_tophat_mean(x, mxx,myy)
             model_line = pd.DataFrame({'x':x, 'my':my}).dropna()
-            fig1d.line(model_line['x'],model_line['my'], color='black',alpha=0.2, line_width = 4)
+            fig1d.line(model_line['x'],model_line['my'], color=colors[i],alpha=0.2, line_width = 4)
 
 
         if legend:
