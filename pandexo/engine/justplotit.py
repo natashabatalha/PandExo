@@ -185,8 +185,8 @@ def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', out
             mxx = dict['OriginalInput']['model_wave']
             myy = dict['OriginalInput']['model_spec']
             my = uniform_tophat_mean(x, mxx,myy)
-            model = pd.DataFrame({'x':x, 'my':my}).dropna()
-            fig1d.line(model['x'],model['my'], color='black',alpha=0.2, line_width = 4)
+            model_line = pd.DataFrame({'x':x, 'my':my}).dropna()
+            fig1d.line(model_line['x'],model_line['my'], color='black',alpha=0.2, line_width = 4)
 
 
         if legend:
