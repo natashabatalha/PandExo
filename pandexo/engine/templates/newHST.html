@@ -140,14 +140,12 @@
 
     <div class="form-group hidden resolve-target">
         <div class="col-md-3 col-md-offset-3">
-            <select id="planetname" name="planetname" class="form-control" data-placeholder="Select Planet">
-                <option value=""></option> 
-                {% for i in planets %}
-                    <option {{ escape(i) }} value={{ escape(i) }}>{{ escape(i) }}</option>
-                {% end %}               
-            </select>
-            <p class="help-block">Search Planet Name</p>
-    </div>
+            <div class="input-group">
+                <input id="planetname" name="planetname" type="text" class="form-control" placeholder="Wasp-18 b"><br>
+            </div>
+            <span id="helpBlock" class="help-block">The name of a target to resolve in ExoMAST</span>
+            <button type="submit" class="btn btn-success" name="resolve_target">Resolve Target</button>
+        </div>
     </div>
 
 

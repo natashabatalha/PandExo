@@ -77,7 +77,7 @@ class Application(tornado.web.Application):
             static_path=os.path.join(os.path.dirname(__file__), "static"),
             xsrf_cookies=True,
             cookie_secret="__TODO:_GENERATE_YOUR_OWN_RANDOM_VALUE_HERE__",
-            debug=options.debug,
+            debug=True,
         )
         super(Application, self).__init__(handlers, **settings)
 
@@ -482,18 +482,15 @@ class CalculationNewHSTHandler(BaseHandler):
     """
     def get(self):
         try: 
-            header= pd.read_sql_table('header',db_fort)
+            self.header= pd.read_sql_table('header',db_fort)
         except:
-            header = pd.DataFrame({
+            self.header = pd.DataFrame({
             'temp': ['NO GRID DB FOUND'],
             'ray' : ['NO GRID DB FOUND'],
             'flat':['NO GRID DB FOUND']})
-        all_planets =  requests.get("https://exoplanetarchive.ipac.caltech.edu/cgi-bin/nstedAPI/nph-nstedAPI?table=exoplanets&select=pl_name&format=csv")  
-        all_planets = all_planets.text.replace(' ','').split('\n')[1:]
         self.render("newHST.html", id=id,
-                                 temp=list(map(str, header.temp.unique())),
-                                 planets=all_planets
-                                 )
+                    temp=list(map(str, self.header.temp.unique()))
+                   )
 
     def post(self):
         """
@@ -502,21 +499,19 @@ class CalculationNewHSTHandler(BaseHandler):
         or `self.request.body` to grab the entire returned object.
         """
         
-        #print(self.request.body)
-        
-        id = str(uuid.uuid4())+'h'
+        # print(self.request.body)
 
+        id = str(uuid.uuid4())+'h'
         with open(os.path.join(os.path.dirname(__file__), "reference",
                                "exo_input.json")) as data_file:
             exodata = json.load(data_file)
             exodata["telescope"] = 'hst'
 
-
             #planet properties 
             properties = self.get_argument("properties")
-            
-            if properties=="user":
 
+            if properties=="user":
+                print('bad')
                 #star
                 exodata["star"]["jmag"]         = float(self.get_argument("Jmag"))
                 try:
@@ -551,9 +546,7 @@ class CalculationNewHSTHandler(BaseHandler):
                     exodata["planet"]["w"]      = 90.
                 exodata["planet"]["transit_duration"]   = float(self.get_argument("transit_duration"))
 
-            
             if properties=="exomast":
-
                 planet_name = self.get_argument("planetname")
                 planet_data = get_target_data(planet_name)[0]
 
@@ -599,8 +592,17 @@ class CalculationNewHSTHandler(BaseHandler):
                     exodata["planet"]["w"]      = float(planet_data['omega'] )
                 except: 
                     exodata["planet"]["w"]      = 90.
+
+                self.header = pd.DataFrame({'temp': ['NO GRID DB FOUND'],
+                                       'ray' : ['NO GRID DB FOUND'],
+                                       'flat':['NO GRID DB FOUND']})
+
+                self.render("newHST.html", id=id,
+                            temp=list(map(str, self.header.temp.unique()))
+                           )
+
             # planet model
-            exodata["planet"]["type"] = self.get_argument("planetModel")
+            # exodata["planet"]["type"] = self.get_argument("planetModel")
 
             if exodata["planet"]["type"] == "user":
                 # process planet file
