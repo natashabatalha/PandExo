@@ -488,9 +488,13 @@ class CalculationNewHSTHandler(BaseHandler):
             'temp': ['NO GRID DB FOUND'],
             'ray' : ['NO GRID DB FOUND'],
             'flat':['NO GRID DB FOUND']})
+        with open(os.path.join(os.path.dirname(__file__), "reference",
+                               "exo_input.json")) as data_file:
+            exodata = json.load(data_file)
+        
         self.render("newHST.html", id=id,
-                    temp=list(map(str, self.header.temp.unique()))
-                   )
+                    temp=list(map(str, self.header.temp.unique())),
+                    data=exodata)
 
     def post(self):
         """
@@ -511,7 +515,6 @@ class CalculationNewHSTHandler(BaseHandler):
             properties = self.get_argument("properties")
 
             if properties=="user":
-                print('bad')
                 #star
                 exodata["star"]["jmag"]         = float(self.get_argument("Jmag"))
                 try:
@@ -559,6 +562,9 @@ class CalculationNewHSTHandler(BaseHandler):
                 exodata["star"]["jmag"] = jmag
                 exodata["star"]["hmag"] = hmag
 
+                if exodata["telescope"] == 'hst':
+                    exodata["star"]["mag"] = hmag
+
                 #optinoal star radius
                 exodata["star"]["radius"] = planet_data['Rs']  
                 exodata["star"]["r_unit"] = planet_data['Rs_unit'][0]+ planet_data['Rs_unit'][1:].lower()    
@@ -597,9 +603,12 @@ class CalculationNewHSTHandler(BaseHandler):
                                        'ray' : ['NO GRID DB FOUND'],
                                        'flat':['NO GRID DB FOUND']})
 
+                for i in planet_data.keys():
+                    print(i)
+
                 self.render("newHST.html", id=id,
-                            temp=list(map(str, self.header.temp.unique()))
-                           )
+                            temp=list(map(str, self.header.temp.unique())),
+                            data=exodata)
 
             # planet model
             # exodata["planet"]["type"] = self.get_argument("planetModel")
