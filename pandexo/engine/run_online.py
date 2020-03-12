@@ -589,7 +589,7 @@ class CalculationNewHSTHandler(BaseHandler):
                     inc = planet_data['inclination']
 
                 exodata["planet"]["i"]          = inc
-                exodata["planet"]["ars"]        = planet_data['a/Rs'] 
+                exodata["planet"]["a"]        = planet_data['a/Rs'] 
                 period = planet_data['orbital_period'] 
                 period_unit = planet_data['orbital_period_unit'] 
                 exodata["planet"]["period"]     = (period*u.Unit(period_unit)).to(u.Unit('day')).value
@@ -606,9 +606,9 @@ class CalculationNewHSTHandler(BaseHandler):
                 for i in planet_data.keys():
                     print(i)
 
-                self.render("newHST.html", id=id,
-                            temp=list(map(str, self.header.temp.unique())),
-                            data=exodata)
+                return self.render("newHST.html", id=id,
+                                    temp=list(map(str, self.header.temp.unique())),
+                                    data=exodata)
 
             # planet model
             # exodata["planet"]["type"] = self.get_argument("planetModel")
