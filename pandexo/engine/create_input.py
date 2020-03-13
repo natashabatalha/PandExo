@@ -34,7 +34,11 @@ def outTrans(input) :
 
     ################# USER ####################################
     if input['type'] == 'user':
-        star = np.genfromtxt(input['starpath'], dtype=(float, float), names='w, f') #pyfits.getdata(input['starpath'],1)
+        if isinstance(input['starpath'], dict):
+            star = input['starpath']
+        else: #if isinstance(input['starpath'], str):
+            star = np.genfromtxt(input['starpath'], dtype=(float, float),
+                                 names='w, f')
         #get flux 
         flux = star['f'] #star.field(input['logg'])
         #get wavelength and reference wavelength for mag normalization
@@ -153,7 +157,11 @@ def bothTrans(out_trans, planet,star=None) :
     """ 
     
     if planet['type'] =='user':
-        load_file = np.genfromtxt(planet['exopath'], dtype=(float, float), names='w, f')   
+        if isinstance(planet['exopath'], dict):
+            load_file = planet['exopath']
+        else: #if isinstance(planet['exopath'], str):
+            load_file = np.genfromtxt(planet['exopath'], dtype=(float, float),
+                names='w, f')
         #get wavelength 
         wave_planet = load_file['w']
         #get planet flux 
