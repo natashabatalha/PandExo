@@ -26,7 +26,8 @@ def binning(x, y,  dy=None, binwidth=None, r=None,newx= None, log = False, nan=F
 	binwidth : float 
 		(Optional) constant bin width in same units as x 
 	r : float 
-		(Optional) constant resolution to bin to 
+		(Optional) constant resolution to bin to. R is defined as w[1]/(w[2] - w[0]) 
+		to maintain consistency with `pandeia.engine`
 	newx : array, float 
 		(Optional) new x axis to bin to 
 	log : bool
