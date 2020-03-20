@@ -1,7 +1,9 @@
 {
     "calculation":"fml",
+    "url": null,
+    "url_err": null,
     "star":{
-                "type" : "user,phoenix", 
+                "type" : "user, phoenix", 
                 "starpath" : "filename_star",
                 "w_unit": "Angs,um,nm,Hz,sec,cm",
                 "f_unit": "FLAM or W/m2/um or erg/s/cm2/Hz or Jy",
@@ -22,10 +24,11 @@
             "w_unit": "Angs,um,nm,Hz,sec,cm",
             "f_unit": "rp^2/r*^2 or fp/r*",
             "transit_duration": "in seconds",
+            "planetname":null,
             "td_unit":null,
             "depth":null, 
             "i":null, 
-            "a":null, 
+            "ars":null, 
             "period":null,
             "ecc":null,
             "w":null,

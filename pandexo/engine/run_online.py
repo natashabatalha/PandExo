@@ -506,53 +506,24 @@ class CalculationNewHSTHandler(BaseHandler):
         # print(self.request.body)
 
         id = str(uuid.uuid4())+'h'
-        with open(os.path.join(os.path.dirname(__file__), "reference",
-                               "exo_input.json")) as data_file:
-            exodata = json.load(data_file)
-            exodata["telescope"] = 'hst'
 
-            #planet properties 
-            properties = self.get_argument("properties")
+        exomast_response = self.get_argument("resolve_target", None)
+        
+        submit_form = self.get_argument("submit_form", None)
 
-            if properties=="user":
-                #star
-                exodata["star"]["jmag"]         = float(self.get_argument("Jmag"))
-                try:
-                    #only needed for higher accuracy
-                    exodata["star"]["hmag"]     = float(self.get_argument("Hmag"))
-                except: 
-                    exodata["star"]["hmag"]     = None
+        if exomast_response=="exomast":
+            with open(os.path.join(os.path.dirname(__file__), "reference",
+                            "exo_input.json")) as data_file:
+                exodata = json.load(data_file)
+                exodata["telescope"] = 'hst'
 
-                exodata["star"]["radius"] = float(self.get_argument("rstarc"))
-                exodata["star"]["r_unit"] = str(self.get_argument("rstar_unitc"))
-                try:
-                    #only needed for secondary eclipse
-                    exodata["star"]["temp"] = float(self.get_argument("stempc"))
-                except:
-                    exodata["star"]["temp"] = None
-
-                #planet
-                exodata["planet"]["radius"] = float(self.get_argument("refradc"))
-                exodata["planet"]["r_unit"] = str(self.get_argument("r_unitc")) 
-                depth = exodata["planet"]["radius"]**2 / ((exodata["star"]["radius"]
-                                                            *u.Unit(exodata["star"]["r_unit"]) )
-                                                                .to(u.Unit(exodata["planet"]["r_unit"]))).value**2
-
-                exodata["planet"]["depth"]      = depth
-                exodata["planet"]["i"]          = float(self.get_argument("i"))
-                exodata["planet"]["ars"]        = float(self.get_argument("ars"))
-                exodata["planet"]["period"]     = float(self.get_argument("period"))
-                exodata["planet"]["ecc"]        = float(self.get_argument("ecc"))
-                try:
-                    exodata["planet"]["w"]      = float(self.get_argument("w"))
-                except:
-                    exodata["planet"]["w"]      = 90.
-                exodata["planet"]["transit_duration"]   = float(self.get_argument("transit_duration"))
-
-            if properties=="exomast":
+            try:
                 planet_name = self.get_argument("planetname")
-                planet_data = get_target_data(planet_name)[0]
+                planet_data, url = get_target_data(planet_name)
 
+                exodata['planet']['planetname'] = planet_data['canonical_name']
+                exodata['url'] = url
+                
                 #star
                 exodata["star"]["temp"] = planet_data['Teff']
 
@@ -568,9 +539,9 @@ class CalculationNewHSTHandler(BaseHandler):
                 #optinoal star radius
                 exodata["star"]["radius"] = planet_data['Rs']  
                 exodata["star"]["r_unit"] = planet_data['Rs_unit'][0]+ planet_data['Rs_unit'][1:].lower()    
- 
+
                 #optional planet radius/mass
-                exodata["planet"]["radius"] = planet_data['Rp']  
+                exodata["planet"]["radius"] = planet_data['Rp']
                 exodata["planet"]["r_unit"] = planet_data['Rp_unit'][0]+ planet_data['Rp_unit'][1:].lower()  
                 exodata["planet"]["mass"] = planet_data['Mp'] 
                 exodata["planet"]["m_unit"] = planet_data['Mp_unit'][0]+ planet_data['Mp_unit'][1:].lower()  
@@ -579,17 +550,14 @@ class CalculationNewHSTHandler(BaseHandler):
                 td_unit = planet_data['transit_duration_unit'] 
                 transit_duration  = (transit_duration*u.Unit(td_unit)).to(u.Unit('day')).value
                 exodata["planet"]["transit_duration"] = transit_duration
-                depth = exodata["planet"]["radius"]**2 / ((exodata["star"]["radius"]
-                                                            *u.Unit(exodata["star"]["r_unit"]) )
-                                                                .to(u.Unit(exodata["planet"]["r_unit"]))).value**2
-                exodata["planet"]["depth"]      = depth
+                
                 if planet_data['inclination'] == None:   
                     inc = 90
                 else: 
                     inc = planet_data['inclination']
 
                 exodata["planet"]["i"]          = inc
-                exodata["planet"]["a"]        = planet_data['a/Rs'] 
+                exodata["planet"]["ars"]        = planet_data['a/Rs'] 
                 period = planet_data['orbital_period'] 
                 period_unit = planet_data['orbital_period_unit'] 
                 exodata["planet"]["period"]     = (period*u.Unit(period_unit)).to(u.Unit('day')).value
@@ -600,15 +568,41 @@ class CalculationNewHSTHandler(BaseHandler):
                     exodata["planet"]["w"]      = 90.
 
                 self.header = pd.DataFrame({'temp': ['NO GRID DB FOUND'],
-                                       'ray' : ['NO GRID DB FOUND'],
-                                       'flat':['NO GRID DB FOUND']})
+                                    'ray' : ['NO GRID DB FOUND'],
+                                    'flat':['NO GRID DB FOUND']})
+            except:
+                exodata['url_err'] = 'Sorry, cant resolve target {}'.format(planet_name)
 
-                for i in planet_data.keys():
-                    print(i)
+            return self.render("newHST.html", id=id,
+                                temp=list(map(str, self.header.temp.unique())),
+                                data=exodata)
 
-                return self.render("newHST.html", id=id,
-                                    temp=list(map(str, self.header.temp.unique())),
-                                    data=exodata)
+        if submit_form == 'submit':
+            with open(os.path.join(os.path.dirname(__file__), "reference",
+                            "exo_input.json")) as data_file:
+                exodata = json.load(data_file)
+                exodata["telescope"] = 'hst'
+
+                exodata['planet']['planetname'] = str(self.get_argument("planetname", None))
+                exodata['planet']['transit_duration'] = float(self.get_argument("transit_duration", None))
+                exodata['planet']['i'] = float(self.get_argument("i", None))
+                exodata['planet']['ars'] = float(self.get_argument("ars", None))
+                exodata['planet']['period'] = float(self.get_argument("period", None))
+                exodata['planet']['ecc'] = float(self.get_argument("ecc", None))
+                exodata['planet']['w'] = float(self.get_argument("w", None))
+                exodata['planet']['radius'] = float(self.get_argument("refradc", None))
+                exodata['planet']['r_unit'] = str(self.get_argument("r_unitc")) + 'iter'
+
+                exodata['star']['jmag'] = float(self.get_argument("Jmag", None))
+                exodata['star']['hmag'] = float(self.get_argument("Hmag", None))
+                exodata['star']['temp'] = float(self.get_argument("stempc", None))
+                exodata['star']['radius'] = float(self.get_argument("rstarc", None))
+                exodata['star']['r_unit'] = str(self.get_argument("rstar_unitc"))
+
+                depth = exodata["planet"]["radius"]**2 / ((exodata["star"]["radius"]
+                                                            *u.Unit(exodata["star"]["r_unit"]) )
+                                                                .to(u.Unit(exodata["planet"]["r_unit"]))).value**2
+                exodata["planet"]["depth"] = depth
 
             # planet model
             # exodata["planet"]["type"] = self.get_argument("planetModel")
@@ -700,7 +694,8 @@ class CalculationNewHSTHandler(BaseHandler):
         response['info'] = {}
         response['location'] = '/calculation/statushst/{}'.format(id)
         
-        
+        print('Dashboard')
+        print(exodata["planet"])
         self.write(dict(response))
         self.redirect("../dashboardhst")
         
