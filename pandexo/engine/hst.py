@@ -3,7 +3,7 @@ import pandas as pd
 from .create_input import hst_spec
 import batman
 from .RECTE import RECTE
-
+from scipy import optimize
 
 def wfc3_GuessNOrbits(trdur):
     '''Predict number of HST orbits
@@ -214,7 +214,7 @@ def wfc3_TExoNS(dictinput):
     '''
     pandeia_input = dictinput['pandeia_input']
     pandexo_input = dictinput['pandexo_input']
-    
+
     jmag = pandexo_input['star']['jmag']
     try:
         hmag = pandexo_input['star']['hmag']
@@ -386,9 +386,9 @@ def calc_start_window(eventType, rms, ptsOrbit, numOrbits, depth, inc, aRs, peri
         'transit' or 'eclipse'
     rms : float
         light curve root-mean-square
-    ptsOrbit : float
+    ptsOrbit : int
         number of frames per HST orbit
-    numOrbits :  float
+    numOrbits :  int
         number of HST orbits per visit
     depth : float
         transit/eclipse depth
@@ -403,7 +403,7 @@ def calc_start_window(eventType, rms, ptsOrbit, numOrbits, depth, inc, aRs, peri
     ecc : float
         (Optional) eccentricity
     w : float
-        (Optional) longitude of periastron
+        (Optional) longitude of periastron in degrees
     duration : float
         (Optional) full transit/eclipse duration in days
     offset : float
@@ -418,6 +418,9 @@ def calc_start_window(eventType, rms, ptsOrbit, numOrbits, depth, inc, aRs, peri
     float
         maxphase--latest observation start phase
     '''
+    ptsOrbit  = int(ptsOrbit)
+    numOrbits = int(numOrbits)
+
     hstperiod = 96./60/24                 # HST orbital period, days
     punc = windowSize/120./24/period  # Half start window size, in phase
     cosi = np.cos(inc*np.pi/180)     # Cosine of the inclination
@@ -432,7 +435,8 @@ def calc_start_window(eventType, rms, ptsOrbit, numOrbits, depth, inc, aRs, peri
         # limb darkening coefficients
         params.u = [0.1, 0.1]
     elif eventType == 'eclipse':
-        midpt = period/2*(1+4*ecc*np.cos(w*np.pi/180)/np.pi)
+        #midpt = period/2*(1+4*ecc*np.cos(w*np.pi/180)/np.pi)
+        midpt = calculate_tsec(period, ecc, w*np.pi/180, inc*np.pi/180, t0=0, tperi=None, winn_approximation=False)
         b = aRs*cosi*(1-ecc**2)/(1-ecc*np.sin(w*np.pi/180))  # Impact parameter
         # Account for planet speed on eccentric orbits
         sfactor = np.sqrt(1-ecc**2)/(1-ecc*np.sin(w*np.pi/180))
@@ -464,7 +468,7 @@ def calc_start_window(eventType, rms, ptsOrbit, numOrbits, depth, inc, aRs, peri
     maxphase = (phase1+phase2)/2+punc
 
     # Compute light curves at extremes of HST start window
-    npts = 4 * ptsOrbit * numOrbits
+    npts = int(4 * ptsOrbit * numOrbits)
     phdur = duration/period
     phase1 = np.linspace(minphase+(1-useFirstOrbit)*hstperiod/period,
                          minphase+hstperiod/period*(numOrbits-1)+hstperiod/period/2, npts)
@@ -476,7 +480,7 @@ def calc_start_window(eventType, rms, ptsOrbit, numOrbits, depth, inc, aRs, peri
     trmodel2 = m.light_curve(params)
     obsphase1 = []
     obsphase2 = []
-    for i in range(int(numOrbits)):
+    for i in range(numOrbits):
         obsphase1 = np.r_[obsphase1, np.linspace(
             minphase+hstperiod/period*i, minphase+hstperiod/period*i+hstperiod/period/2, ptsOrbit)]
         obsphase2 = np.r_[obsphase2, np.linspace(
@@ -683,7 +687,7 @@ def compute_sim_hst(dictinput):
 
     a = wfc3_TExoNS(dictinput)
 
-    b = calc_start_window(eventType, a['light_curve_rms'], a['nframes_per_orb'], a['info']['Number of HST orbits'], 
+    b = calc_start_window(eventType, a['light_curve_rms'], a['nframes_per_orb'], a['info']['Number of HST orbits'],
         depth, inc, aRs, period, windowSize, ecc, w, useFirstOrbit=useFirstOrbit)
     c = planet_spec(pandexo_input['planet'], pandexo_input['star'],
                     w_unit, disperser, a['spec_error'], nchan, smooth=20)
@@ -718,3 +722,213 @@ def create_out_div(input_dict, minphase, maxphase):
         input_div[36:len(input_div)]
     input_div = input_div.encode()
     return input_div
+
+def calculate_tsec(period, ecc, omega, inc, t0 = None, tperi = None, winn_approximation = False):
+    ''' Function to calculate the time of secondary eclipse.
+
+        This uses Halley's method (Newton-Raphson, but using second derivatives) to first find the true anomaly (f) at which secondary eclipse occurs,
+        then uses this to get the eccentric anomaly (E) at secondary eclipse, which gives the mean anomaly (M) at secondary
+        eclipse using Kepler's equation. This finally leads to the time of secondary eclipse using the definition of the mean
+        anomaly (M = n*(t - tau) --- here tau is the time of pericenter passage, n = 2*pi/period the mean motion).
+        Time inputs can be either the time of periastron passage directly or the time of transit center. If the latter, the
+        true anomaly for primary transit will be calculated using Halley's method as well, and this will be used to get the
+        time of periastron passage.
+
+        Parameters
+        ----------
+        period : float
+            The period of the transit in days.
+        ecc : float
+            Eccentricity of the orbit
+        omega : float
+            Argument of periastron passage (in radians)
+        inc : string
+            Inclination of the orbit (in radians)
+        t0 : float
+            The transit time in BJD or HJD (will be used to get time of periastron passage).
+        tperi : float
+            The time of periastron passage in BJD or HJD (needed if t0 is not supplied).
+        winn_approximation : boolean
+            If True, the approximation in Winn (2010) is used --- (only valid for not very eccentric and inclined orbits).
+        Returns
+        -------
+        tsec : float
+            The time of secondary eclipse '''
+    # Check user is not playing trick on us:
+    if period<0:
+        raise Exception('Period cannot be a negative number.')
+    if ecc<0 or ecc>1:
+        raise Exception('Eccentricity (e) is out of bounds (0 < e < 1).')
+
+    # Use true anomaly approximation given in Winn (2010) as starting point:
+    f_occ_0 = (-0.5*np.pi) - omega
+    if not winn_approximation:
+        f_occ = optimize.newton(drsky, f_occ_0, fprime = drsky_prime, fprime2 = drsky_2prime, args = (ecc, omega, inc,))
+    else:
+        f_occ = f_occ_0
+    # Define the mean motion, n:
+    n = 2.*np.pi/period
+
+    # If time of transit center is given, use it to calculate the time of periastron passage. If no time of periastron
+    # or time-of-transit center given, raise error:
+    if tperi is None:
+        # For this, find true anomaly during transit. Use Winn (2010) as starting point:
+        f_tra_0 = (np.pi/2.) - omega
+        if not winn_approximation:
+            f_tra = optimize.newton(drsky, f_tra_0, fprime = drsky_prime, fprime2 = drsky_2prime, args = (ecc, omega, inc,))
+        else:
+            f_tra = f_tra_0
+        # Get eccentric anomaly during transit:
+        E = getE(f_tra, ecc)
+
+        # Get mean anomaly during transit:
+        M = getM(E, ecc)
+
+        # Get time of periastron passage from mean anomaly definition:
+        tperi = t0 - (M/n)
+
+    elif (tperi is None) and (t0 is None):
+        raise ValueError('The time of periastron passage or time-of-transit center has to be supplied for the calculation to work.')
+
+    # Get eccentric anomaly:
+    E = getE(f_occ, ecc)
+
+    # Get mean anomaly during secondary eclipse:
+    M = getM(E, ecc)
+
+    # Get the time of secondary eclipse using the definition of the mean anomaly:
+    tsec = (M/n) + tperi
+
+    # Note returned time-of-secondary eclipse is the closest to the time of periastron passage and/or time-of-transit center. Check that
+    # the returned tsec is the *next* tsec to the time of periastron or t0 (i.e., the closest *future* tsec):
+    if t0 is not None:
+        tref = t0
+    else:
+        tref = tperi
+    if tref > tsec:
+        while True:
+            tsec += period
+            if tsec > tref:
+                break
+    return tsec
+
+def drsky_2prime(x, ecc, omega, inc):
+    ''' Second derivative of function drsky. This is the second derivative with respect to f of the drsky function.
+    Parameters
+    ----------
+    x : float
+      True anomaly
+    ecc : float
+      Eccentricity of the orbit
+    omega : float
+      Argument of periastron passage (in radians)
+    inc : float
+      Inclination of the orbit (in radians)
+
+    Returns
+    -------
+    drsky_2prime : float
+      Function evaluated at x, ecc, omega, inc'''
+
+    sq_sini = np.sin(inc)**2
+    sin_o_p_f = np.sin(x+omega)
+    cos_o_p_f = np.cos(x+omega)
+    ecosf = ecc*np.cos(x)
+    esinf = ecc*np.sin(x)
+
+    f1 = esinf - esinf*sq_sini*(sin_o_p_f**2)
+    f2 = -sq_sini*(ecosf + 4.)*(sin_o_p_f*cos_o_p_f)
+
+    return f1+f2
+
+def drsky_prime(x, ecc, omega, inc):
+    ''' Derivative of function drsky. This is the first derivative with respect to f of the drsky function.
+    Parameters
+    ----------
+    x : float
+      True anomaly
+    ecc : float
+      Eccentricity of the orbit
+    omega : float
+      Argument of periastron passage (in radians)
+    inc : float
+      Inclination of the orbit (in radians)
+
+    Returns
+    -------
+    drsky_prime : float
+      Function evaluated at x, ecc, omega, inc'''
+
+    sq_sini = np.sin(inc)**2
+    sin_o_p_f = np.sin(x+omega)
+    cos_o_p_f = np.cos(x+omega)
+    ecosf = ecc*np.cos(x)
+    esinf = ecc*np.sin(x)
+
+    f1 = (cos_o_p_f**2 - sin_o_p_f**2)*(sq_sini)*(1. + ecosf)
+    f2 = -ecosf*(1 - (sin_o_p_f**2)*(sq_sini))
+    f3 = esinf*sin_o_p_f*cos_o_p_f*sq_sini
+
+    return f1+f2+f3
+
+def drsky(x, ecc, omega, inc):
+    ''' Function whose roots we wish to find to obtain time of secondary (and primary) eclipse(s)
+    When one takes the derivative of equation (5) in Winn (2010; https://arxiv.org/abs/1001.2010v5), and equates that to zero (to find the
+    minimum/maximum of said function), one gets to an equation of the form g(x) = 0. This function (drsky) is g(x), where x is the true
+    anomaly.
+    Parameters
+    ----------
+    x : float
+      True anomaly
+    ecc : float
+      Eccentricity of the orbit
+    omega : float
+      Argument of periastron passage (in radians)
+    inc : float
+      Inclination of the orbit (in radians)
+
+    Returns
+    -------
+    drsky : float
+      Function evaluated at x, ecc, omega, inc '''
+
+    sq_sini = np.sin(inc)**2
+    sin_o_p_f = np.sin(x+omega)
+    cos_o_p_f = np.cos(x+omega)
+
+    f1 = sin_o_p_f*cos_o_p_f*sq_sini*(1. + ecc*np.cos(x))
+    f2 = ecc*np.sin(x)*(1. - sin_o_p_f**2 * sq_sini)
+    return f1 - f2
+
+def getE(f,ecc):
+    """ Function that returns the eccentric anomaly
+    Note normally this is defined in terms of cosines (see, e.g., Section 2.4 in Murray and Dermott), but numerically
+    this is troublesome because the arccosine doesn't handle negative numbers by definition (equation 2.43). That's why
+    the arctan version is better as signs are preserved (derivation is also in the same section, equation 2.46).
+    Parameters
+    ----------
+    f : float
+      True anomaly
+    ecc : float
+      Eccentricity
+    Returns
+    -------
+    E : float
+      Eccentric anomaly """
+
+    return 2. * np.arctan(np.sqrt((1.-ecc)/(1.+ecc))*np.tan(f/2.))
+
+def getM(E, ecc):
+    """ Function that returns the mean anomaly using Kepler's equation
+    Parameters
+    ----------
+    E : float
+      Eccentric anomaly
+    ecc: float
+      Eccentricity
+    Returns
+    -------
+    M : float
+      Mean anomaly """
+
+    return E - ecc*np.sin(E)
