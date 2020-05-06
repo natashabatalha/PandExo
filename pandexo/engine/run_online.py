@@ -491,7 +491,7 @@ class CalculationNewHSTHandler(BaseHandler):
         with open(os.path.join(os.path.dirname(__file__), "reference",
                                "exo_input.json")) as data_file:
             exodata = json.load(data_file)
-        
+
         self.render("newHST.html", id=id,
                     temp=list(map(str, self.header.temp.unique())),
                     data=exodata)
