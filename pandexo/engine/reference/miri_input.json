@@ -45,6 +45,7 @@
            "disperser": "p750l"
            },
     "detector": {
+              "readout_pattern":"fast",
               "subarray": "slitlessprism",
               "readmode": "fast",
               "ngroup": "optimize",

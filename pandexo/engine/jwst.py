@@ -290,7 +290,7 @@ def compute_full_sim(dictinput):
                 'var_in':var_in_bin*nocc, 
                 'var_out':var_out_bin*nocc,
                 'e_rate_out':photon_out_bin/to,
-                'e_rate_in':photon_out_bin/ti,
+                'e_rate_in':photon_in_bin/ti,
                 'wave':wbin,
                 'error_no_floor':error_spec, 
                 'rn[out,in]':result['rn[out,in]'],
@@ -663,11 +663,11 @@ def add_warnings(pand_dict, timing, sat_level, flags,instrument):
   
     #check for saturation 
     try:  
-        flag_nonl = pand_dict['warnings']['nonlinear']
+        flag_nonl = pand_dict['warnings']['partial_saturated']
     except: 
         flag_nonl = "All good"    
     try: 
-        flag_sat = pand_dict['warnings']['saturated']
+        flag_sat = pand_dict['warnings']['full_saturated']
     except: 
         flag_sat = "All good"
         

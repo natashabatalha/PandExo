@@ -44,6 +44,7 @@
             "disperser": "gr700xd"
         },
     "detector": {
+            "readout_pattern":"nisrapid",
             "subarray": "substrip96",
             "readmode": "nisrapid",
             "ngroup": "optimize",
@@ -52,6 +53,7 @@
         }
     },
     "strategy": {
-            "method": "soss"
+            "method": "soss",
+            "order":1
             }
 }
