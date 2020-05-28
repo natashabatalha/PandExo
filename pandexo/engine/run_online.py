@@ -181,7 +181,6 @@ class BaseHandler(tornado.web.RequestHandler):
         # Only allow 100 tasks **globally**. This will delete old tasks first.
         if len(self.buffer) > 100:
             self.buffer.popitem(last=False)
-            
 
 
 class HomeHandler(BaseHandler):
@@ -260,12 +259,10 @@ class CalculationNewHandler(BaseHandler):
             'temp': ['NO GRID DB FOUND'],
             'ray' : ['NO GRID DB FOUND'],
             'flat':['NO GRID DB FOUND']})
-        all_planets =  requests.get("https://exoplanetarchive.ipac.caltech.edu/cgi-bin/nstedAPI/nph-nstedAPI?table=exoplanets&select=pl_name&format=csv")  
-        all_planets = all_planets.text.replace(' ','').split('\n')[1:]
 
         self.render("new.html", id=id,
                                  temp=list(map(str, header.temp.unique())), 
-                                 planets=all_planets
+                                 planets=self.get_all_planets()
                                  )
 
     def post(self):
@@ -480,6 +477,8 @@ class CalculationNewHSTHandler(BaseHandler):
     This request handler deals with processing the form data and submitting
     a new HST calculation task to the parallelized workers.
     """
+
+
     def get(self):
         try: 
             self.header= pd.read_sql_table('header',db_fort)
@@ -491,10 +490,12 @@ class CalculationNewHSTHandler(BaseHandler):
         with open(os.path.join(os.path.dirname(__file__), "reference",
                                "exo_input.json")) as data_file:
             exodata = json.load(data_file)
-
+        all_planets =  requests.get("https://exoplanetarchive.ipac.caltech.edu/cgi-bin/nstedAPI/nph-nstedAPI?table=exoplanets&select=pl_name&format=csv")  
+        all_planets = all_planets.text.replace(' ','').split('\n')[1:]
         self.render("newHST.html", id=id,
                     temp=list(map(str, self.header.temp.unique())),
-                    data=exodata)
+                    data=exodata,
+                    planets=all_planets)
 
     def post(self):
         """
@@ -573,9 +574,13 @@ class CalculationNewHSTHandler(BaseHandler):
             except:
                 exodata['url_err'] = 'Sorry, cant resolve target {}'.format(planet_name)
 
+            all_planets =  requests.get("https://exoplanetarchive.ipac.caltech.edu/cgi-bin/nstedAPI/nph-nstedAPI?table=exoplanets&select=pl_name&format=csv")  
+            all_planets = all_planets.text.replace(' ','').split('\n')[1:]
+
             return self.render("newHST.html", id=id,
                                 temp=list(map(str, self.header.temp.unique())),
-                                data=exodata)
+                                data=exodata,
+                                planets=all_planets)
 
         if submit_form == 'submit':
             with open(os.path.join(os.path.dirname(__file__), "reference",
@@ -698,8 +703,6 @@ class CalculationNewHSTHandler(BaseHandler):
         print(exodata["planet"])
         self.write(dict(response))
         self.redirect("../dashboardhst")
-        
-            
 
 
 class CalculationStatusHandler(BaseHandler):
