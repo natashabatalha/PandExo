@@ -244,8 +244,6 @@ class DashboardHSTHandler(BaseHandler):
         self.render("dashboardhst.html", calculations=task_responses[::-1])
 
 
-
-
 class CalculationNewHandler(BaseHandler):
     """
     This request handler deals with processing the form data and submitting
@@ -260,10 +258,17 @@ class CalculationNewHandler(BaseHandler):
             'ray' : ['NO GRID DB FOUND'],
             'flat':['NO GRID DB FOUND']})
 
+        with open(os.path.join(os.path.dirname(__file__), "reference",
+                               "exo_input.json")) as data_file:
+            exodata = json.load(data_file)
+
+        all_planets =  requests.get("https://exoplanetarchive.ipac.caltech.edu/cgi-bin/nstedAPI/nph-nstedAPI?table=exoplanets&select=pl_name&format=csv")  
+        all_planets = all_planets.text.replace(' ','').split('\n')[1:]
+
         self.render("new.html", id=id,
                                  temp=list(map(str, header.temp.unique())), 
-                                 planets=self.get_all_planets()
-                                 )
+                                 planets=all_planets,
+                                 data=exodata)
 
     def post(self):
         """
@@ -275,47 +280,18 @@ class CalculationNewHandler(BaseHandler):
         #print(self.request.body)
         
         id = str(uuid.uuid4())+'e'
+        
+        exomast_response = self.get_argument("resolve_target", None)
+        submit_form = self.get_argument("submit_form", None)
 
-        with open(os.path.join(os.path.dirname(__file__), "reference",
-                               "exo_input.json")) as data_file:
+        if exomast_response=="exomast":
+            with open(os.path.join(os.path.dirname(__file__), "reference",
+                            "exo_input.json")) as data_file:
+                exodata = json.load(data_file)
+                exodata["telescope"] = 'jwst'
+                exodata["calculation"] = 'fml'  # always for online form
 
-            exodata = json.load(data_file)
-            exodata["telescope"] = 'jwst'
-            exodata["calculation"] = 'fml'  # always for online form
-
-
-            #planet properties 
-            properties = self.get_argument("properties")
-            if properties=="user":
-                #star
-
-                exodata["star"]["temp"] = float(self.get_argument("temp"))
-                exodata["star"]["logg"] = float(self.get_argument("logg"))
-                exodata["star"]["metal"] = float(self.get_argument("metal"))  
-                exodata["star"]["mag"] = float(self.get_argument("mag"))
-                exodata["star"]["ref_wave"] = float(self.get_argument("ref_wave"))
-
-                #optinoal star radius
-                exodata["star"]["radius"] = float(self.get_argument("rstarc"))
-                exodata["star"]["r_unit"] = str(self.get_argument("rstar_unitc"))
- 
-                #optional planet radius
-                exodata["planet"]["radius"] = float(self.get_argument("refradc"))
-                exodata["planet"]["r_unit"] = str(self.get_argument("r_unitc")) 
-
-                #transit duration
-                # for phase curves user doesn't necessarily have to input a transit duration
-                try:
-                    exodata["planet"]["transit_duration"] = float(self.get_argument("transit_duration"))
-                    exodata["planet"]["td_unit"] = str(self.get_argument("td_unit"))
-                except:
-                    # but if they don't.. make sure that the planet units are in seconds...
-                    if self.get_argument("planwunits") == 'sec':
-                        exodata["planet"]["transit_duration"] = 0.0
-                    else: 
-                        raise Exception("Need transit duraiton or input phase curve file")
-
-            elif properties=="exomast":
+            try:
                 planet_name = self.get_argument("planetname")
                 planet_data = get_target_data(planet_name)[0]
 
@@ -323,7 +299,7 @@ class CalculationNewHandler(BaseHandler):
                 exodata["star"]["temp"] = planet_data['Teff']
                 exodata["star"]["logg"] = planet_data['stellar_gravity']
                 exodata["star"]["metal"] = planet_data['Fe/H'] 
-                exodata["star"]["mag"] = Simbad.query_object(planet_name[:-1])['FLUX_J'][0]
+                exodata["star"]["jmag"] = jmag
                 exodata["star"]["ref_wave"] = 1.25
 
                 #optinoal star radius
@@ -339,137 +315,239 @@ class CalculationNewHandler(BaseHandler):
                 exodata["planet"]["transit_duration"] = planet_data['transit_duration'] 
                 exodata["planet"]["td_unit"] = planet_data['transit_duration_unit'] 
 
-            # stellar model
-            exodata["star"]["type"] = self.get_argument("stellarModel")
+                if planet_data['inclination'] == None:   
+                    inc = 90
+                else: 
+                    inc = planet_data['inclination']
 
-            if exodata["star"]["type"] == "user":
-                # process star file
-                fileinfo_star = self.request.files['starFile'][0]
-                fname_star = fileinfo_star['filename']
-                extn_star = os.path.splitext(fname_star)[1]
-                cname_star = id+'star' + extn_star
-                fh_star = open(os.path.join(__TEMP__, cname_star), 'wb')
-                fh_star.write(fileinfo_star['body'])
+                exodata["planet"]["i"]          = inc
+                exodata["planet"]["ars"]        = planet_data['a/Rs'] 
+                period = planet_data['orbital_period'] 
+                period_unit = planet_data['orbital_period_unit'] 
+                exodata["planet"]["period"]     = (period*u.Unit(period_unit)).to(u.Unit('day')).value
+                exodata["planet"]["ecc"]        = planet_data['eccentricity'] 
+                try:
+                    exodata["planet"]["w"]      = float(planet_data['omega'] )
+                except: 
+                    exodata["planet"]["w"]      = 90.
 
-                exodata["star"]["starpath"] = os.path.join(__TEMP__, cname_star)
-                exodata["star"]["f_unit"] = self.get_argument("starfunits")
-                exodata["star"]["w_unit"] = self.get_argument("starwunits")
+                self.header = pd.DataFrame({'temp': ['NO GRID DB FOUND'],
+                                    'ray' : ['NO GRID DB FOUND'],
+                                    'flat':['NO GRID DB FOUND']})
+            except:
+                exodata['url_err'] = 'Sorry, cant resolve target {}'.format(planet_name)
+
+            all_planets =  requests.get("https://exoplanetarchive.ipac.caltech.edu/cgi-bin/nstedAPI/nph-nstedAPI?table=exoplanets&select=pl_name&format=csv")  
+            all_planets = all_planets.text.replace(' ','').split('\n')[1:]
+
+            self.header = pd.DataFrame({'temp': ['NO GRID DB FOUND'],
+                                    'ray' : ['NO GRID DB FOUND'],
+                                    'flat':['NO GRID DB FOUND']})
+
+            print(exodata['planet']['radius'],
+                  exodata['star']['metal'],
+                  exodata['star']['jmag'],
+                  exodata['planet']['transit_duration'])
+
+            return self.render("new.html", id=id,
+                                temp=list(map(str, self.header.temp.unique())),
+                                data=exodata,
+                                planets=all_planets)
+        
+        # with open(os.path.join(os.path.dirname(__file__), "reference",
+        #                        "exo_input.json")) as data_file:
+
+        #     exodata = json.load(data_file)
+        #     exodata["telescope"] = 'jwst'
+        #     exodata["calculation"] = 'fml'  # always for online form
+
+
+        #     #planet properties 
+        #     properties = self.get_argument("resolve_target")
+        #     if properties=="user":
+        #         #star
+
+        #         exodata["star"]["temp"] = float(self.get_argument("temp"))
+        #         exodata["star"]["logg"] = float(self.get_argument("logg"))
+        #         exodata["star"]["metal"] = float(self.get_argument("metal"))  
+        #         exodata["star"]["mag"] = float(self.get_argument("mag"))
+        #         exodata["star"]["ref_wave"] = float(self.get_argument("ref_wave"))
+
+        #         #optinoal star radius
+        #         exodata["star"]["radius"] = float(self.get_argument("rstarc"))
+        #         exodata["star"]["r_unit"] = str(self.get_argument("rstar_unitc"))
+ 
+        #         #optional planet radius
+        #         exodata["planet"]["radius"] = float(self.get_argument("refradc"))
+        #         exodata["planet"]["r_unit"] = str(self.get_argument("r_unitc")) 
+
+        #         #transit duration
+        #         # for phase curves user doesn't necessarily have to input a transit duration
+        #         try:
+        #             exodata["planet"]["transit_duration"] = float(self.get_argument("transit_duration"))
+        #             exodata["planet"]["td_unit"] = str(self.get_argument("td_unit"))
+        #         except:
+        #             # but if they don't.. make sure that the planet units are in seconds...
+        #             if self.get_argument("planwunits") == 'sec':
+        #                 exodata["planet"]["transit_duration"] = 0.0
+        #             else: 
+        #                 raise Exception("Need transit duraiton or input phase curve file")
+
+        #     elif properties=="exomast":
+        #         planet_name = self.get_argument("planetname")
+        #         planet_data = get_target_data(planet_name)[0]
+
+        #         #star
+        #         exodata["star"]["temp"] = planet_data['Teff']
+        #         exodata["star"]["logg"] = planet_data['stellar_gravity']
+        #         exodata["star"]["metal"] = planet_data['Fe/H'] 
+        #         exodata["star"]["mag"] = Simbad.query_object(planet_name[:-1])['FLUX_J'][0]
+        #         exodata["star"]["ref_wave"] = 1.25
+
+        #         #optinoal star radius
+        #         exodata["star"]["radius"] = planet_data['Rs']  
+        #         exodata["star"]["r_unit"] = planet_data['Rs_unit'][0]+ planet_data['Rs_unit'][1:].lower()    
+ 
+        #         #optional planet radius/mass
+        #         exodata["planet"]["radius"] = planet_data['Rp']  
+        #         exodata["planet"]["r_unit"] = planet_data['Rp_unit'][0]+ planet_data['Rp_unit'][1:].lower()  
+        #         exodata["planet"]["mass"] = planet_data['Mp'] 
+        #         exodata["planet"]["m_unit"] = planet_data['Mp_unit'][0]+ planet_data['Mp_unit'][1:].lower() 
+
+        #         exodata["planet"]["transit_duration"] = planet_data['transit_duration'] 
+        #         exodata["planet"]["td_unit"] = planet_data['transit_duration_unit'] 
+
+        #     # stellar model
+        #     exodata["star"]["type"] = self.get_argument("stellarModel")
+
+        #     if exodata["star"]["type"] == "user":
+        #         # process star file
+        #         fileinfo_star = self.request.files['starFile'][0]
+        #         fname_star = fileinfo_star['filename']
+        #         extn_star = os.path.splitext(fname_star)[1]
+        #         cname_star = id+'star' + extn_star
+        #         fh_star = open(os.path.join(__TEMP__, cname_star), 'wb')
+        #         fh_star.write(fileinfo_star['body'])
+
+        #         exodata["star"]["starpath"] = os.path.join(__TEMP__, cname_star)
+        #         exodata["star"]["f_unit"] = self.get_argument("starfunits")
+        #         exodata["star"]["w_unit"] = self.get_argument("starwunits")
  
 
-            # planet model
-            exodata["planet"]["type"] = self.get_argument("planetModel")
-            if exodata["planet"]["type"] == "user":
-                # process planet file
-                fileinfo_plan = self.request.files['planFile'][0]
-                fname_plan = fileinfo_plan['filename']
-                extn_plan = os.path.splitext(fname_plan)[1]
-                cname_plan = id+'planet' + extn_plan
-                fh_plan = open(os.path.join(__TEMP__, cname_plan), 'wb')
-                fh_plan.write(fileinfo_plan['body'])
+        #     # planet model
+        #     exodata["planet"]["type"] = self.get_argument("planetModel")
+        #     if exodata["planet"]["type"] == "user":
+        #         # process planet file
+        #         fileinfo_plan = self.request.files['planFile'][0]
+        #         fname_plan = fileinfo_plan['filename']
+        #         extn_plan = os.path.splitext(fname_plan)[1]
+        #         cname_plan = id+'planet' + extn_plan
+        #         fh_plan = open(os.path.join(__TEMP__, cname_plan), 'wb')
+        #         fh_plan.write(fileinfo_plan['body'])
 
-                exodata["planet"]["exopath"] = os.path.join(__TEMP__, cname_plan)
-                exodata["planet"]["w_unit"] = self.get_argument("planwunits")
-                exodata["planet"]["f_unit"] = self.get_argument("planfunits")
-            elif exodata["planet"]["type"] == "constant":                               
-                if self.get_argument("constant_unit") == 'fp/f*':
-                    exodata["planet"]["temp"] = float(self.get_argument("ptempc"))
-                    exodata["planet"]["f_unit"] = 'fp/f*'
-                elif self.get_argument("constant_unit") == 'rp^2/r*^2':
-                    exodata["planet"]["f_unit"] = 'rp^2/r*^2'
-            elif exodata["planet"]["type"] == "grid":
-                exodata["planet"]["temp"] = float(self.get_argument("ptempg"))
-                exodata["planet"]["chem"] = str(self.get_argument("pchem"))
-                exodata["planet"]["cloud"] = self.get_argument("cloud") 
-                exodata["planet"]["mass"] = float(self.get_argument("pmass"))
-                exodata["planet"]["m_unit"] = str(self.get_argument("m_unit"))
-            #baseline 
-            exodata["observation"]["baseline"] = float(self.get_argument("baseline"))
-            exodata["observation"]["baseline_unit"] = self.get_argument("baseline_unit")
-            try:
-                exodata["observation"]["target_acq"] = self.get_argument("TA") == 'on'
-            except:
-                exodata["observation"]["target_acq"] = False
+        #         exodata["planet"]["exopath"] = os.path.join(__TEMP__, cname_plan)
+        #         exodata["planet"]["w_unit"] = self.get_argument("planwunits")
+        #         exodata["planet"]["f_unit"] = self.get_argument("planfunits")
+        #     elif exodata["planet"]["type"] == "constant":                               
+        #         if self.get_argument("constant_unit") == 'fp/f*':
+        #             exodata["planet"]["temp"] = float(self.get_argument("ptempc"))
+        #             exodata["planet"]["f_unit"] = 'fp/f*'
+        #         elif self.get_argument("constant_unit") == 'rp^2/r*^2':
+        #             exodata["planet"]["f_unit"] = 'rp^2/r*^2'
+        #     elif exodata["planet"]["type"] == "grid":
+        #         exodata["planet"]["temp"] = float(self.get_argument("ptempg"))
+        #         exodata["planet"]["chem"] = str(self.get_argument("pchem"))
+        #         exodata["planet"]["cloud"] = self.get_argument("cloud") 
+        #         exodata["planet"]["mass"] = float(self.get_argument("pmass"))
+        #         exodata["planet"]["m_unit"] = str(self.get_argument("m_unit"))
+        #     #baseline 
+        #     exodata["observation"]["baseline"] = float(self.get_argument("baseline"))
+        #     exodata["observation"]["baseline_unit"] = self.get_argument("baseline_unit")
+        #     try:
+        #         exodata["observation"]["target_acq"] = self.get_argument("TA") == 'on'
+        #     except:
+        #         exodata["observation"]["target_acq"] = False
                 
-            exodata["observation"]["noccultations"] = float(self.get_argument("numtrans"))
-            exodata["observation"]["sat_level"] = float(self.get_argument("satlevel"))
-            exodata["observation"]["sat_unit"] = self.get_argument("sat_unit")
+        #     exodata["observation"]["noccultations"] = float(self.get_argument("numtrans"))
+        #     exodata["observation"]["sat_level"] = float(self.get_argument("satlevel"))
+        #     exodata["observation"]["sat_unit"] = self.get_argument("sat_unit")
 
                 
-            # noise floor, set to 0.0 of no values are input
-            try:
-                observation_type = self.get_argument("noiseModel")
-                if observation_type == "user":
-                    # process noise file
-                    fileinfo_noise = self.request.files['noiseFile'][0]
-                    fname_noise = fileinfo_noise['filename']
-                    extn_noise = os.path.splitext(fname_noise)[1]
-                    cname_noise = id + 'noise' + extn_noise
-                    fh_noise = open(os.path.join(__TEMP__, cname_noise), 'wb')
-                    fh_noise.write(fileinfo_star['body'])
-                    exodata["observation"]["noise_floor"] = os.path.join(__TEMP__, cname_noise)
-                else:
-                    exodata["observation"]["noise_floor"] = float(self.get_argument("noisefloor"))
-            except:
-                exodata["observation"]["noise_floor"] = 0.0
+        #     # noise floor, set to 0.0 of no values are input
+        #     try:
+        #         observation_type = self.get_argument("noiseModel")
+        #         if observation_type == "user":
+        #             # process noise file
+        #             fileinfo_noise = self.request.files['noiseFile'][0]
+        #             fname_noise = fileinfo_noise['filename']
+        #             extn_noise = os.path.splitext(fname_noise)[1]
+        #             cname_noise = id + 'noise' + extn_noise
+        #             fh_noise = open(os.path.join(__TEMP__, cname_noise), 'wb')
+        #             fh_noise.write(fileinfo_star['body'])
+        #             exodata["observation"]["noise_floor"] = os.path.join(__TEMP__, cname_noise)
+        #         else:
+        #             exodata["observation"]["noise_floor"] = float(self.get_argument("noisefloor"))
+        #     except:
+        #         exodata["observation"]["noise_floor"] = 0.0
 
-        instrument = self.get_argument("instrument").lower()
-        if instrument == "miri":
-            with open(os.path.join(os.path.dirname(__file__), "reference", "miri_input.json")) as data_file:
-                pandata = json.load(data_file)       
-                mirimode = self.get_argument("mirimode")
-                if (mirimode == "lrsslit"):
-                    pandata["configuration"]["instrument"]["mode"] = mirimode
-                    pandata["configuration"]["instrument"]["aperture"] = "lrsslit"
-                    pandata["configuration"]["detector"]["subarray"] = "full"
+        # instrument = self.get_argument("instrument").lower()
+        # if instrument == "miri":
+        #     with open(os.path.join(os.path.dirname(__file__), "reference", "miri_input.json")) as data_file:
+        #         pandata = json.load(data_file)       
+        #         mirimode = self.get_argument("mirimode")
+        #         if (mirimode == "lrsslit"):
+        #             pandata["configuration"]["instrument"]["mode"] = mirimode
+        #             pandata["configuration"]["instrument"]["aperture"] = "lrsslit"
+        #             pandata["configuration"]["detector"]["subarray"] = "full"
 
-        if instrument == "nirspec":
-            with open(os.path.join(os.path.dirname(__file__), "reference", "nirspec_input.json")) as data_file:
-                pandata = json.load(data_file)  
-                nirspecmode = self.get_argument("nirspecmode")
-                pandata["configuration"]["instrument"]["disperser"] = nirspecmode[0:5]
-                pandata["configuration"]["instrument"]["filter"] = nirspecmode[5:11]
-                pandata["configuration"]["detector"]["subarray"] = self.get_argument("nirspecsubarray")
+        # if instrument == "nirspec":
+        #     with open(os.path.join(os.path.dirname(__file__), "reference", "nirspec_input.json")) as data_file:
+        #         pandata = json.load(data_file)  
+        #         nirspecmode = self.get_argument("nirspecmode")
+        #         pandata["configuration"]["instrument"]["disperser"] = nirspecmode[0:5]
+        #         pandata["configuration"]["instrument"]["filter"] = nirspecmode[5:11]
+        #         pandata["configuration"]["detector"]["subarray"] = self.get_argument("nirspecsubarray")
 
-        if instrument == "nircam":
-            with open(os.path.join(os.path.dirname(__file__), "reference", "nircam_input.json")) as data_file:
-                pandata = json.load(data_file) 
-                pandata["configuration"]["instrument"]["filter"] = self.get_argument("nircammode")
-                pandata["configuration"]["detector"]["subarray"] = self.get_argument("nircamsubarray")
+        # if instrument == "nircam":
+        #     with open(os.path.join(os.path.dirname(__file__), "reference", "nircam_input.json")) as data_file:
+        #         pandata = json.load(data_file) 
+        #         pandata["configuration"]["instrument"]["filter"] = self.get_argument("nircammode")
+        #         pandata["configuration"]["detector"]["subarray"] = self.get_argument("nircamsubarray")
 
-        if instrument == "niriss":
-            with open(os.path.join(os.path.dirname(__file__), "reference", "niriss_input.json")) as data_file:
-                pandata = json.load(data_file)
-                nirissmode = self.get_argument("nirissmode")
-                pandata["configuration"]["detector"]["subarray"] = nirissmode
+        # if instrument == "niriss":
+        #     with open(os.path.join(os.path.dirname(__file__), "reference", "niriss_input.json")) as data_file:
+        #         pandata = json.load(data_file)
+        #         nirissmode = self.get_argument("nirissmode")
+        #         pandata["configuration"]["detector"]["subarray"] = nirissmode
 
-        pandata['configuration']['instrument']['instrument'] = instrument
+        # pandata['configuration']['instrument']['instrument'] = instrument
         
-        # write in optimal groups or set a number
-        try:
-            pandata["configuration"]["detector"]["ngroup"] = int(self.get_argument("optimize"))
-        except: 
-            pandata["configuration"]["detector"]["ngroup"] = self.get_argument("optimize")
+        # # write in optimal groups or set a number
+        # try:
+        #     pandata["configuration"]["detector"]["ngroup"] = int(self.get_argument("optimize"))
+        # except: 
+        #     pandata["configuration"]["detector"]["ngroup"] = self.get_argument("optimize")
         
-        finaldata = {"pandeia_input": pandata, "pandexo_input": exodata}
+        # finaldata = {"pandeia_input": pandata, "pandexo_input": exodata}
 
-        #PandExo stats
-        try: 
-            jwst_log(finaldata)
-        except: 
-            pass
+        # #PandExo stats
+        # try: 
+        #     jwst_log(finaldata)
+        # except: 
+        #     pass
 
-        task = self.executor.submit(wrapper, finaldata)
+        # task = self.executor.submit(wrapper, finaldata)
 
 
-        self._add_task(id, self.get_argument("calcName"), task)
+        # self._add_task(id, self.get_argument("calcName"), task)
 
-        response = self._get_task_response(id)
-        response['info'] = {}
-        response['location'] = '/calculation/status/{}'.format(id)
+        # response = self._get_task_response(id)
+        # response['info'] = {}
+        # response['location'] = '/calculation/status/{}'.format(id)
         
         
-        self.write(dict(response))
-        self.redirect("../dashboard")
+        # self.write(dict(response))
+        # self.redirect("../dashboard")
         
     
 class CalculationNewHSTHandler(BaseHandler):
