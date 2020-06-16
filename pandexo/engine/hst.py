@@ -216,6 +216,8 @@ def wfc3_TExoNS(dictinput):
     pandexo_input = dictinput['pandexo_input']
 
     jmag = pandexo_input['star']['jmag']
+    if np.ma.is_masked(jmag):
+        print("Jmag not found.")
     try:
         hmag = pandexo_input['star']['hmag']
     except:
@@ -668,7 +670,11 @@ def compute_sim_hst(dictinput):
     period = pandexo_input['planet']['period']
     ecc = pandexo_input['planet']['ecc']
     w = pandexo_input['planet']['w']
-
+    try:
+        offset = pandeia_input['strategy']['offset']
+    except:
+        offset = 0.
+    
     # check to see if ecc or w was provided
     if (type(ecc) != float) and (type(ecc) != int):
         ecc = 0.0
@@ -688,7 +694,7 @@ def compute_sim_hst(dictinput):
     a = wfc3_TExoNS(dictinput)
 
     b = calc_start_window(eventType, a['light_curve_rms'], a['nframes_per_orb'], a['info']['Number of HST orbits'],
-        depth, inc, aRs, period, windowSize, ecc, w, useFirstOrbit=useFirstOrbit)
+        depth, inc, aRs, period, windowSize, ecc, w, useFirstOrbit=useFirstOrbit, offset=offset)
     c = planet_spec(pandexo_input['planet'], pandexo_input['star'],
                     w_unit, disperser, a['spec_error'], nchan, smooth=20)
     info_div = create_out_div(a['info'], b['minphase'], b['maxphase'])
