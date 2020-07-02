@@ -88,10 +88,10 @@
             <input type="text" class="form-control" id="transit_duration" name="transit_duration" style="width: 70%;" value= "{{ data['planet']['transit_duration'] }}">
         <div class="input-group-btn" style="width: 20%;left: -4px;display: inline-block;">
             <select id="td_unit" name="td_unit" class="form-control">
-            <option value='s'>sec</option>  
-            <option value='min'>min</option>  
-            <option value='h'>hr</option>  
-            <option value='d'>day</option>   
+            <option value='s'>sec</option>
+            <option value='min'>min</option>
+            <option value='h'>hr</option>
+            <option value='d' selected>day</option>
             </select>
         </div>
         <p class="help-block">For phase curves, will derive duration of phase from input file.</p>
@@ -175,7 +175,7 @@
     </div>
 
     <div class="form-group hidden select-from-grid">
-        <div class="col-md-3 col-md-offset-3"">
+        <div class="col-md-3 col-md-offset-3">
             <select id="ptempg" name="ptempg" class="form-control" data-placeholder="Select Temp (K)">
                 <option value=""></option> 
                 {% for i in temp %}
@@ -458,7 +458,7 @@
 
     <div class="form-group">
         <div class="col-sm-offset-3 col-sm-9">
-            <button type="submit" class="btn btn-success">Submit</button>
+            <button type="submit" class="btn btn-success" name="submit_form" value='submit'>Submit</button>
             {% module xsrf_form_html() %}
         </div>
     </div>
