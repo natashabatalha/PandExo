@@ -696,7 +696,7 @@ that run_pandexo assigns.</li>
 
 <dl class="function">
 <dt id="engine.justplotit.jwst_1d_spec">
-<code class="descclassname">engine.justplotit.</code><code class="descname">jwst_1d_spec</code><span class="sig-paren">(</span><em>result_dict, model=True, title='Model + Data + Error Bars', output_file='data.html', legend=False, R=False, num_tran=False, plot_width=800, plot_height=400, x_range=[1, 10], y_range=None, plot=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/justplotit.html#jwst_1d_spec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.justplotit.jwst_1d_spec" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">engine.justplotit.</code><code class="descname">jwst_1d_spec</code><span class="sig-paren">(</span><em>result_dict, model=True, title='Model + Data + Error Bars', output_file='data.html', legend=False, R=False, num_tran=False, plot_width=800, plot_height=400, x_range=[1, 10], y_range=None, plot=True, output_notebook=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/justplotit.html#jwst_1d_spec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.justplotit.jwst_1d_spec" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plots 1d simulated spectrum and rebin or rescale for more transits</p>
 <p>Plots 1d data points with model in the background (if wanted). Designed to read in exact
 output of run_pandexo.</p>
@@ -714,13 +714,14 @@ that run_pandexo assigns.</li>
 have the option to save as png.</li>
 <li><strong>legend</strong> (<em>bool</em>) &#8211; (Optional) Default is False. True, plots legend.</li>
 <li><strong>R</strong> (<em>float</em>) &#8211; (Optional) Rebin data from native instrument resolution to specified resolution. Dafult is False,
-no binning.</li>
+no binning. Here I adopt R as w[1]/(w[2] - w[0]) to maintain consistency with <cite>pandeia.engine</cite></li>
 <li><strong>num_tran</strong> (<em>float</em>) &#8211; (Optional) Scales data by number of transits to improve error by sqrt(<cite>num_trans</cite>)</li>
 <li><strong>plot_width</strong> (<em>int</em>) &#8211; (Optional) Sets the width of the plot. Default = 800</li>
 <li><strong>plot_height</strong> (<em>int</em>) &#8211; (Optional) Sets the height of the plot. Default = 400</li>
 <li><strong>y_range</strong> (<em>list of int</em>) &#8211; (Optional) sets y range of plot. Defaut is +- 10% of max and min</li>
 <li><strong>x_range</strong> (<em>list of int</em>) &#8211; (Optional) Sets x range of plot. Default = [1,10]</li>
 <li><strong>plot</strong> (<em>bool</em>) &#8211; (Optional) Supresses the plot if not wanted (Default = True)</li>
+<li><strong>out_notebook</strong> (<em>bool</em>) &#8211; (Optional) Output notebook. Default is false, if true, outputs in the notebook</li>
 </ul>
 </td>
 </tr>
@@ -957,7 +958,8 @@ if there were 3 points to bin.</p>
 <li><strong>y</strong> (<em>array</em><em>,</em><em>float</em>) &#8211; vector containing ordinates.</li>
 <li><strong>dy</strong> (<em>array</em><em>,</em><em>float</em>) &#8211; (Optional) errors on ordinates, can be float or array</li>
 <li><strong>binwidth</strong> (<em>float</em>) &#8211; (Optional) constant bin width in same units as x</li>
-<li><strong>r</strong> (<em>float</em>) &#8211; (Optional) constant resolution to bin to</li>
+<li><strong>r</strong> (<em>float</em>) &#8211; (Optional) constant resolution to bin to. R is defined as w[1]/(w[2] - w[0])
+to maintain consistency with <cite>pandeia.engine</cite></li>
 <li><strong>newx</strong> (<em>array</em><em>, </em><em>float</em>) &#8211; (Optional) new x axis to bin to</li>
 <li><strong>log</strong> (<em>bool</em>) &#8211; (Optional) computes equal bin spacing logarithmically, Default = False</li>
 <li><strong>sort</strong> (<em>bool</em>) &#8211; (Optional) sort into ascending order of x, default = True</li>
@@ -1665,15 +1667,15 @@ filename which points to a stellar spectrum</td>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>eventType</strong> (<em>str</em>) &#8211; &#8216;transit&#8217; or &#8216;eclipse&#8217;</li>
 <li><strong>rms</strong> (<em>float</em>) &#8211; light curve root-mean-square</li>
-<li><strong>ptsOrbit</strong> (<em>float</em>) &#8211; number of frames per HST orbit</li>
-<li><strong>numOrbits</strong> (<em>float</em>) &#8211; number of HST orbits per visit</li>
+<li><strong>ptsOrbit</strong> (<em>int</em>) &#8211; number of frames per HST orbit</li>
+<li><strong>numOrbits</strong> (<em>int</em>) &#8211; number of HST orbits per visit</li>
 <li><strong>depth</strong> (<em>float</em>) &#8211; transit/eclipse depth</li>
 <li><strong>inc</strong> (<em>float</em>) &#8211; orbital inclination in degrees</li>
 <li><strong>aRs</strong> (<em>float</em>) &#8211; Semi-major axis in units of stellar radii (a/R*)</li>
 <li><strong>period</strong> (<em>float</em>) &#8211; orbital period in days</li>
 <li><strong>windowSize</strong> (<em>float</em>) &#8211; observation start window size in minutes</li>
 <li><strong>ecc</strong> (<em>float</em>) &#8211; (Optional) eccentricity</li>
-<li><strong>w</strong> (<em>float</em>) &#8211; (Optional) longitude of periastron</li>
+<li><strong>w</strong> (<em>float</em>) &#8211; (Optional) longitude of periastron in degrees</li>
 <li><strong>duration</strong> (<em>float</em>) &#8211; (Optional) full transit/eclipse duration in days</li>
 <li><strong>offset</strong> (<em>float</em>) &#8211; (Optional) manual offset in observation start time, in minutes</li>
 <li><strong>useFirstOrbit</strong> (<em>bool</em>) &#8211; (Optional) whether to use first orbit</li>
@@ -1685,6 +1687,42 @@ filename which points to a stellar spectrum</td>
 <li><em>float</em> &#8211; maxphase&#8211;latest observation start phase</li>
 </ul>
 </p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="engine.hst.calculate_tsec">
+<code class="descclassname">engine.hst.</code><code class="descname">calculate_tsec</code><span class="sig-paren">(</span><em>period</em>, <em>ecc</em>, <em>omega</em>, <em>inc</em>, <em>t0=None</em>, <em>tperi=None</em>, <em>winn_approximation=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/hst.html#calculate_tsec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.hst.calculate_tsec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to calculate the time of secondary eclipse.</p>
+<p>This uses Halley&#8217;s method (Newton-Raphson, but using second derivatives) to first find the true anomaly (f) at which secondary eclipse occurs,
+then uses this to get the eccentric anomaly (E) at secondary eclipse, which gives the mean anomaly (M) at secondary
+eclipse using Kepler&#8217;s equation. This finally leads to the time of secondary eclipse using the definition of the mean
+anomaly (M = n*(t - tau) &#8212; here tau is the time of pericenter passage, n = 2*pi/period the mean motion).
+Time inputs can be either the time of periastron passage directly or the time of transit center. If the latter, the
+true anomaly for primary transit will be calculated using Halley&#8217;s method as well, and this will be used to get the
+time of periastron passage.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>period</strong> (<em>float</em>) &#8211; The period of the transit in days.</li>
+<li><strong>ecc</strong> (<em>float</em>) &#8211; Eccentricity of the orbit</li>
+<li><strong>omega</strong> (<em>float</em>) &#8211; Argument of periastron passage (in radians)</li>
+<li><strong>inc</strong> (<em>string</em>) &#8211; Inclination of the orbit (in radians)</li>
+<li><strong>t0</strong> (<em>float</em>) &#8211; The transit time in BJD or HJD (will be used to get time of periastron passage).</li>
+<li><strong>tperi</strong> (<em>float</em>) &#8211; The time of periastron passage in BJD or HJD (needed if t0 is not supplied).</li>
+<li><strong>winn_approximation</strong> (<em>boolean</em>) &#8211; If True, the approximation in Winn (2010) is used &#8212; (only valid for not very eccentric and inclined orbits).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>tsec</strong> &#8211; The time of secondary eclipse</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">float</p>
 </td>
 </tr>
 </tbody>
@@ -1762,6 +1800,124 @@ included by turning on the calRamp switch</p>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">html rendered table</td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">div</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="engine.hst.drsky">
+<code class="descclassname">engine.hst.</code><code class="descname">drsky</code><span class="sig-paren">(</span><em>x</em>, <em>ecc</em>, <em>omega</em>, <em>inc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/hst.html#drsky"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.hst.drsky" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function whose roots we wish to find to obtain time of secondary (and primary) eclipse(s)
+When one takes the derivative of equation (5) in Winn (2010; <a class="reference external" href="https://arxiv.org/abs/1001.2010v5">https://arxiv.org/abs/1001.2010v5</a>), and equates that to zero (to find the
+minimum/maximum of said function), one gets to an equation of the form g(x) = 0. This function (drsky) is g(x), where x is the true
+anomaly.
+:param x: True anomaly
+:type x: float
+:param ecc: Eccentricity of the orbit
+:type ecc: float
+:param omega: Argument of periastron passage (in radians)
+:type omega: float
+:param inc: Inclination of the orbit (in radians)
+:type inc: float</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>drsky</strong> &#8211; Function evaluated at x, ecc, omega, inc</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">float</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="engine.hst.drsky_2prime">
+<code class="descclassname">engine.hst.</code><code class="descname">drsky_2prime</code><span class="sig-paren">(</span><em>x</em>, <em>ecc</em>, <em>omega</em>, <em>inc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/hst.html#drsky_2prime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.hst.drsky_2prime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Second derivative of function drsky. This is the second derivative with respect to f of the drsky function.
+:param x: True anomaly
+:type x: float
+:param ecc: Eccentricity of the orbit
+:type ecc: float
+:param omega: Argument of periastron passage (in radians)
+:type omega: float
+:param inc: Inclination of the orbit (in radians)
+:type inc: float</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>drsky_2prime</strong> &#8211; Function evaluated at x, ecc, omega, inc</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">float</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="engine.hst.drsky_prime">
+<code class="descclassname">engine.hst.</code><code class="descname">drsky_prime</code><span class="sig-paren">(</span><em>x</em>, <em>ecc</em>, <em>omega</em>, <em>inc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/hst.html#drsky_prime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.hst.drsky_prime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Derivative of function drsky. This is the first derivative with respect to f of the drsky function.
+:param x: True anomaly
+:type x: float
+:param ecc: Eccentricity of the orbit
+:type ecc: float
+:param omega: Argument of periastron passage (in radians)
+:type omega: float
+:param inc: Inclination of the orbit (in radians)
+:type inc: float</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>drsky_prime</strong> &#8211; Function evaluated at x, ecc, omega, inc</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">float</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="engine.hst.getE">
+<code class="descclassname">engine.hst.</code><code class="descname">getE</code><span class="sig-paren">(</span><em>f</em>, <em>ecc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/hst.html#getE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.hst.getE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function that returns the eccentric anomaly
+Note normally this is defined in terms of cosines (see, e.g., Section 2.4 in Murray and Dermott), but numerically
+this is troublesome because the arccosine doesn&#8217;t handle negative numbers by definition (equation 2.43). That&#8217;s why
+the arctan version is better as signs are preserved (derivation is also in the same section, equation 2.46).
+:param f: True anomaly
+:type f: float
+:param ecc: Eccentricity
+:type ecc: float</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>E</strong> &#8211; Eccentric anomaly</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">float</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="engine.hst.getM">
+<code class="descclassname">engine.hst.</code><code class="descname">getM</code><span class="sig-paren">(</span><em>E</em>, <em>ecc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/engine/hst.html#getM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#engine.hst.getM" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function that returns the mean anomaly using Kepler&#8217;s equation
+:param E: Eccentric anomaly
+:type E: float
+:param ecc: Eccentricity
+:type ecc: float</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>M</strong> &#8211; Mean anomaly</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">float</td>
 </tr>
 </tbody>
 </table>

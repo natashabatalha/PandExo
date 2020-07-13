@@ -454,7 +454,7 @@
                 <span class="s1">&#39;var_in&#39;</span><span class="p">:</span><span class="n">var_in_bin</span><span class="o">*</span><span class="n">nocc</span><span class="p">,</span> 
                 <span class="s1">&#39;var_out&#39;</span><span class="p">:</span><span class="n">var_out_bin</span><span class="o">*</span><span class="n">nocc</span><span class="p">,</span>
                 <span class="s1">&#39;e_rate_out&#39;</span><span class="p">:</span><span class="n">photon_out_bin</span><span class="o">/</span><span class="n">to</span><span class="p">,</span>
-                <span class="s1">&#39;e_rate_in&#39;</span><span class="p">:</span><span class="n">photon_out_bin</span><span class="o">/</span><span class="n">ti</span><span class="p">,</span>
+                <span class="s1">&#39;e_rate_in&#39;</span><span class="p">:</span><span class="n">photon_in_bin</span><span class="o">/</span><span class="n">ti</span><span class="p">,</span>
                 <span class="s1">&#39;wave&#39;</span><span class="p">:</span><span class="n">wbin</span><span class="p">,</span>
                 <span class="s1">&#39;error_no_floor&#39;</span><span class="p">:</span><span class="n">error_spec</span><span class="p">,</span> 
                 <span class="s1">&#39;rn[out,in]&#39;</span><span class="p">:</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;rn[out,in]&#39;</span><span class="p">],</span>
@@ -827,11 +827,11 @@
   
     <span class="c1">#check for saturation </span>
     <span class="k">try</span><span class="p">:</span>  
-        <span class="n">flag_nonl</span> <span class="o">=</span> <span class="n">pand_dict</span><span class="p">[</span><span class="s1">&#39;warnings&#39;</span><span class="p">][</span><span class="s1">&#39;nonlinear&#39;</span><span class="p">]</span>
+        <span class="n">flag_nonl</span> <span class="o">=</span> <span class="n">pand_dict</span><span class="p">[</span><span class="s1">&#39;warnings&#39;</span><span class="p">][</span><span class="s1">&#39;partial_saturated&#39;</span><span class="p">]</span>
     <span class="k">except</span><span class="p">:</span> 
         <span class="n">flag_nonl</span> <span class="o">=</span> <span class="s2">&quot;All good&quot;</span>    
     <span class="k">try</span><span class="p">:</span> 
-        <span class="n">flag_sat</span> <span class="o">=</span> <span class="n">pand_dict</span><span class="p">[</span><span class="s1">&#39;warnings&#39;</span><span class="p">][</span><span class="s1">&#39;saturated&#39;</span><span class="p">]</span>
+        <span class="n">flag_sat</span> <span class="o">=</span> <span class="n">pand_dict</span><span class="p">[</span><span class="s1">&#39;warnings&#39;</span><span class="p">][</span><span class="s1">&#39;full_saturated&#39;</span><span class="p">]</span>
     <span class="k">except</span><span class="p">:</span> 
         <span class="n">flag_sat</span> <span class="o">=</span> <span class="s2">&quot;All good&quot;</span>
         

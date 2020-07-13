@@ -190,7 +190,8 @@
 <span class="sd">	binwidth : float </span>
 <span class="sd">		(Optional) constant bin width in same units as x </span>
 <span class="sd">	r : float </span>
-<span class="sd">		(Optional) constant resolution to bin to </span>
+<span class="sd">		(Optional) constant resolution to bin to. R is defined as w[1]/(w[2] - w[0]) </span>
+<span class="sd">		to maintain consistency with `pandeia.engine`</span>
 <span class="sd">	newx : array, float </span>
 <span class="sd">		(Optional) new x axis to bin to </span>
 <span class="sd">	log : bool</span>
@@ -349,7 +350,7 @@
 	
 	<span class="c1">#remove nans if requested</span>
 	<span class="n">out</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;bin_y&#39;</span><span class="p">:</span><span class="n">ynew</span><span class="p">,</span> <span class="s1">&#39;bin_x&#39;</span><span class="p">:</span><span class="n">newx</span><span class="p">,</span> <span class="s1">&#39;bin_dy&#39;</span><span class="p">:</span><span class="n">bin_dy</span><span class="p">,</span> <span class="s1">&#39;bin_n&#39;</span><span class="p">:</span><span class="n">bin_n</span><span class="p">})</span>
-	<span class="k">if</span> <span class="o">~</span><span class="n">nan</span><span class="p">:</span>
+	<span class="k">if</span> <span class="ow">not</span> <span class="n">nan</span><span class="p">:</span>
 		<span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
 
 	<span class="k">return</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;bin_x&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;bin_y&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;bin_dy&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;bin_n&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span></div>

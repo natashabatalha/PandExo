@@ -167,7 +167,7 @@
 <span class="kn">from</span> <span class="nn">.create_input</span> <span class="k">import</span> <span class="n">hst_spec</span>
 <span class="kn">import</span> <span class="nn">batman</span>
 <span class="kn">from</span> <span class="nn">.RECTE</span> <span class="k">import</span> <span class="n">RECTE</span>
-
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="k">import</span> <span class="n">optimize</span>
 
 <div class="viewcode-block" id="wfc3_GuessNOrbits"><a class="viewcode-back" href="../../engine.html#engine.hst.wfc3_GuessNOrbits">[docs]</a><span class="k">def</span> <span class="nf">wfc3_GuessNOrbits</span><span class="p">(</span><span class="n">trdur</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;Predict number of HST orbits</span>
@@ -378,8 +378,10 @@
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="n">pandeia_input</span> <span class="o">=</span> <span class="n">dictinput</span><span class="p">[</span><span class="s1">&#39;pandeia_input&#39;</span><span class="p">]</span>
     <span class="n">pandexo_input</span> <span class="o">=</span> <span class="n">dictinput</span><span class="p">[</span><span class="s1">&#39;pandexo_input&#39;</span><span class="p">]</span>
-    
+
     <span class="n">jmag</span> <span class="o">=</span> <span class="n">pandexo_input</span><span class="p">[</span><span class="s1">&#39;star&#39;</span><span class="p">][</span><span class="s1">&#39;jmag&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">is_masked</span><span class="p">(</span><span class="n">jmag</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Jmag not found.&quot;</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">hmag</span> <span class="o">=</span> <span class="n">pandexo_input</span><span class="p">[</span><span class="s1">&#39;star&#39;</span><span class="p">][</span><span class="s1">&#39;hmag&#39;</span><span class="p">]</span>
     <span class="k">except</span><span class="p">:</span>
@@ -550,9 +552,9 @@
 <span class="sd">        &#39;transit&#39; or &#39;eclipse&#39;</span>
 <span class="sd">    rms : float</span>
 <span class="sd">        light curve root-mean-square</span>
-<span class="sd">    ptsOrbit : float</span>
+<span class="sd">    ptsOrbit : int</span>
 <span class="sd">        number of frames per HST orbit</span>
-<span class="sd">    numOrbits :  float</span>
+<span class="sd">    numOrbits :  int</span>
 <span class="sd">        number of HST orbits per visit</span>
 <span class="sd">    depth : float</span>
 <span class="sd">        transit/eclipse depth</span>
@@ -567,7 +569,7 @@
 <span class="sd">    ecc : float</span>
 <span class="sd">        (Optional) eccentricity</span>
 <span class="sd">    w : float</span>
-<span class="sd">        (Optional) longitude of periastron</span>
+<span class="sd">        (Optional) longitude of periastron in degrees</span>
 <span class="sd">    duration : float</span>
 <span class="sd">        (Optional) full transit/eclipse duration in days</span>
 <span class="sd">    offset : float</span>
@@ -582,6 +584,9 @@
 <span class="sd">    float</span>
 <span class="sd">        maxphase--latest observation start phase</span>
 <span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">ptsOrbit</span>  <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ptsOrbit</span><span class="p">)</span>
+    <span class="n">numOrbits</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">numOrbits</span><span class="p">)</span>
+
     <span class="n">hstperiod</span> <span class="o">=</span> <span class="mf">96.</span><span class="o">/</span><span class="mi">60</span><span class="o">/</span><span class="mi">24</span>                 <span class="c1"># HST orbital period, days</span>
     <span class="n">punc</span> <span class="o">=</span> <span class="n">windowSize</span><span class="o">/</span><span class="mf">120.</span><span class="o">/</span><span class="mi">24</span><span class="o">/</span><span class="n">period</span>  <span class="c1"># Half start window size, in phase</span>
     <span class="n">cosi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">inc</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">180</span><span class="p">)</span>     <span class="c1"># Cosine of the inclination</span>
@@ -596,7 +601,8 @@
         <span class="c1"># limb darkening coefficients</span>
         <span class="n">params</span><span class="o">.</span><span class="n">u</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">]</span>
     <span class="k">elif</span> <span class="n">eventType</span> <span class="o">==</span> <span class="s1">&#39;eclipse&#39;</span><span class="p">:</span>
-        <span class="n">midpt</span> <span class="o">=</span> <span class="n">period</span><span class="o">/</span><span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="mi">4</span><span class="o">*</span><span class="n">ecc</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">w</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">180</span><span class="p">)</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+        <span class="c1">#midpt = period/2*(1+4*ecc*np.cos(w*np.pi/180)/np.pi)</span>
+        <span class="n">midpt</span> <span class="o">=</span> <span class="n">calculate_tsec</span><span class="p">(</span><span class="n">period</span><span class="p">,</span> <span class="n">ecc</span><span class="p">,</span> <span class="n">w</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">180</span><span class="p">,</span> <span class="n">inc</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">180</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">tperi</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">winn_approximation</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="n">b</span> <span class="o">=</span> <span class="n">aRs</span><span class="o">*</span><span class="n">cosi</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">ecc</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">ecc</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">w</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">180</span><span class="p">))</span>  <span class="c1"># Impact parameter</span>
         <span class="c1"># Account for planet speed on eccentric orbits</span>
         <span class="n">sfactor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">ecc</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">ecc</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">w</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">180</span><span class="p">))</span>
@@ -628,7 +634,7 @@
     <span class="n">maxphase</span> <span class="o">=</span> <span class="p">(</span><span class="n">phase1</span><span class="o">+</span><span class="n">phase2</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="o">+</span><span class="n">punc</span>
 
     <span class="c1"># Compute light curves at extremes of HST start window</span>
-    <span class="n">npts</span> <span class="o">=</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">ptsOrbit</span> <span class="o">*</span> <span class="n">numOrbits</span>
+    <span class="n">npts</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="n">ptsOrbit</span> <span class="o">*</span> <span class="n">numOrbits</span><span class="p">)</span>
     <span class="n">phdur</span> <span class="o">=</span> <span class="n">duration</span><span class="o">/</span><span class="n">period</span>
     <span class="n">phase1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">minphase</span><span class="o">+</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">useFirstOrbit</span><span class="p">)</span><span class="o">*</span><span class="n">hstperiod</span><span class="o">/</span><span class="n">period</span><span class="p">,</span>
                          <span class="n">minphase</span><span class="o">+</span><span class="n">hstperiod</span><span class="o">/</span><span class="n">period</span><span class="o">*</span><span class="p">(</span><span class="n">numOrbits</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="n">hstperiod</span><span class="o">/</span><span class="n">period</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">npts</span><span class="p">)</span>
@@ -640,7 +646,7 @@
     <span class="n">trmodel2</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">light_curve</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
     <span class="n">obsphase1</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">obsphase2</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">numOrbits</span><span class="p">)):</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numOrbits</span><span class="p">):</span>
         <span class="n">obsphase1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">r_</span><span class="p">[</span><span class="n">obsphase1</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span>
             <span class="n">minphase</span><span class="o">+</span><span class="n">hstperiod</span><span class="o">/</span><span class="n">period</span><span class="o">*</span><span class="n">i</span><span class="p">,</span> <span class="n">minphase</span><span class="o">+</span><span class="n">hstperiod</span><span class="o">/</span><span class="n">period</span><span class="o">*</span><span class="n">i</span><span class="o">+</span><span class="n">hstperiod</span><span class="o">/</span><span class="n">period</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">ptsOrbit</span><span class="p">)]</span>
         <span class="n">obsphase2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">r_</span><span class="p">[</span><span class="n">obsphase2</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span>
@@ -828,7 +834,11 @@
     <span class="n">period</span> <span class="o">=</span> <span class="n">pandexo_input</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;period&#39;</span><span class="p">]</span>
     <span class="n">ecc</span> <span class="o">=</span> <span class="n">pandexo_input</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;ecc&#39;</span><span class="p">]</span>
     <span class="n">w</span> <span class="o">=</span> <span class="n">pandexo_input</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;w&#39;</span><span class="p">]</span>
-
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">offset</span> <span class="o">=</span> <span class="n">pandeia_input</span><span class="p">[</span><span class="s1">&#39;strategy&#39;</span><span class="p">][</span><span class="s1">&#39;offset&#39;</span><span class="p">]</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="n">offset</span> <span class="o">=</span> <span class="mf">0.</span>
+    
     <span class="c1"># check to see if ecc or w was provided</span>
     <span class="k">if</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">ecc</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">float</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">ecc</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">int</span><span class="p">):</span>
         <span class="n">ecc</span> <span class="o">=</span> <span class="mf">0.0</span>
@@ -847,8 +857,8 @@
 
     <span class="n">a</span> <span class="o">=</span> <span class="n">wfc3_TExoNS</span><span class="p">(</span><span class="n">dictinput</span><span class="p">)</span>
 
-    <span class="n">b</span> <span class="o">=</span> <span class="n">calc_start_window</span><span class="p">(</span><span class="n">eventType</span><span class="p">,</span> <span class="n">a</span><span class="p">[</span><span class="s1">&#39;light_curve_rms&#39;</span><span class="p">],</span> <span class="n">a</span><span class="p">[</span><span class="s1">&#39;nframes_per_orb&#39;</span><span class="p">],</span> <span class="n">a</span><span class="p">[</span><span class="s1">&#39;info&#39;</span><span class="p">][</span><span class="s1">&#39;Number of HST orbits&#39;</span><span class="p">],</span> 
-        <span class="n">depth</span><span class="p">,</span> <span class="n">inc</span><span class="p">,</span> <span class="n">aRs</span><span class="p">,</span> <span class="n">period</span><span class="p">,</span> <span class="n">windowSize</span><span class="p">,</span> <span class="n">ecc</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">useFirstOrbit</span><span class="o">=</span><span class="n">useFirstOrbit</span><span class="p">)</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">calc_start_window</span><span class="p">(</span><span class="n">eventType</span><span class="p">,</span> <span class="n">a</span><span class="p">[</span><span class="s1">&#39;light_curve_rms&#39;</span><span class="p">],</span> <span class="n">a</span><span class="p">[</span><span class="s1">&#39;nframes_per_orb&#39;</span><span class="p">],</span> <span class="n">a</span><span class="p">[</span><span class="s1">&#39;info&#39;</span><span class="p">][</span><span class="s1">&#39;Number of HST orbits&#39;</span><span class="p">],</span>
+        <span class="n">depth</span><span class="p">,</span> <span class="n">inc</span><span class="p">,</span> <span class="n">aRs</span><span class="p">,</span> <span class="n">period</span><span class="p">,</span> <span class="n">windowSize</span><span class="p">,</span> <span class="n">ecc</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">useFirstOrbit</span><span class="o">=</span><span class="n">useFirstOrbit</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="n">offset</span><span class="p">)</span>
     <span class="n">c</span> <span class="o">=</span> <span class="n">planet_spec</span><span class="p">(</span><span class="n">pandexo_input</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">],</span> <span class="n">pandexo_input</span><span class="p">[</span><span class="s1">&#39;star&#39;</span><span class="p">],</span>
                     <span class="n">w_unit</span><span class="p">,</span> <span class="n">disperser</span><span class="p">,</span> <span class="n">a</span><span class="p">[</span><span class="s1">&#39;spec_error&#39;</span><span class="p">],</span> <span class="n">nchan</span><span class="p">,</span> <span class="n">smooth</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
     <span class="n">info_div</span> <span class="o">=</span> <span class="n">create_out_div</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="s1">&#39;info&#39;</span><span class="p">],</span> <span class="n">b</span><span class="p">[</span><span class="s1">&#39;minphase&#39;</span><span class="p">],</span> <span class="n">b</span><span class="p">[</span><span class="s1">&#39;maxphase&#39;</span><span class="p">])</span>
@@ -882,6 +892,216 @@
         <span class="n">input_div</span><span class="p">[</span><span class="mi">36</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="n">input_div</span><span class="p">)]</span>
     <span class="n">input_div</span> <span class="o">=</span> <span class="n">input_div</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">input_div</span></div>
+
+<div class="viewcode-block" id="calculate_tsec"><a class="viewcode-back" href="../../engine.html#engine.hst.calculate_tsec">[docs]</a><span class="k">def</span> <span class="nf">calculate_tsec</span><span class="p">(</span><span class="n">period</span><span class="p">,</span> <span class="n">ecc</span><span class="p">,</span> <span class="n">omega</span><span class="p">,</span> <span class="n">inc</span><span class="p">,</span> <span class="n">t0</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">tperi</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">winn_approximation</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Function to calculate the time of secondary eclipse.</span>
+
+<span class="sd">        This uses Halley&#39;s method (Newton-Raphson, but using second derivatives) to first find the true anomaly (f) at which secondary eclipse occurs,</span>
+<span class="sd">        then uses this to get the eccentric anomaly (E) at secondary eclipse, which gives the mean anomaly (M) at secondary</span>
+<span class="sd">        eclipse using Kepler&#39;s equation. This finally leads to the time of secondary eclipse using the definition of the mean</span>
+<span class="sd">        anomaly (M = n*(t - tau) --- here tau is the time of pericenter passage, n = 2*pi/period the mean motion).</span>
+<span class="sd">        Time inputs can be either the time of periastron passage directly or the time of transit center. If the latter, the</span>
+<span class="sd">        true anomaly for primary transit will be calculated using Halley&#39;s method as well, and this will be used to get the</span>
+<span class="sd">        time of periastron passage.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        period : float</span>
+<span class="sd">            The period of the transit in days.</span>
+<span class="sd">        ecc : float</span>
+<span class="sd">            Eccentricity of the orbit</span>
+<span class="sd">        omega : float</span>
+<span class="sd">            Argument of periastron passage (in radians)</span>
+<span class="sd">        inc : string</span>
+<span class="sd">            Inclination of the orbit (in radians)</span>
+<span class="sd">        t0 : float</span>
+<span class="sd">            The transit time in BJD or HJD (will be used to get time of periastron passage).</span>
+<span class="sd">        tperi : float</span>
+<span class="sd">            The time of periastron passage in BJD or HJD (needed if t0 is not supplied).</span>
+<span class="sd">        winn_approximation : boolean</span>
+<span class="sd">            If True, the approximation in Winn (2010) is used --- (only valid for not very eccentric and inclined orbits).</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        tsec : float</span>
+<span class="sd">            The time of secondary eclipse &#39;&#39;&#39;</span>
+    <span class="c1"># Check user is not playing trick on us:</span>
+    <span class="k">if</span> <span class="n">period</span><span class="o">&lt;</span><span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Period cannot be a negative number.&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">ecc</span><span class="o">&lt;</span><span class="mi">0</span> <span class="ow">or</span> <span class="n">ecc</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Eccentricity (e) is out of bounds (0 &lt; e &lt; 1).&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Use true anomaly approximation given in Winn (2010) as starting point:</span>
+    <span class="n">f_occ_0</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span> <span class="o">-</span> <span class="n">omega</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">winn_approximation</span><span class="p">:</span>
+        <span class="n">f_occ</span> <span class="o">=</span> <span class="n">optimize</span><span class="o">.</span><span class="n">newton</span><span class="p">(</span><span class="n">drsky</span><span class="p">,</span> <span class="n">f_occ_0</span><span class="p">,</span> <span class="n">fprime</span> <span class="o">=</span> <span class="n">drsky_prime</span><span class="p">,</span> <span class="n">fprime2</span> <span class="o">=</span> <span class="n">drsky_2prime</span><span class="p">,</span> <span class="n">args</span> <span class="o">=</span> <span class="p">(</span><span class="n">ecc</span><span class="p">,</span> <span class="n">omega</span><span class="p">,</span> <span class="n">inc</span><span class="p">,))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">f_occ</span> <span class="o">=</span> <span class="n">f_occ_0</span>
+    <span class="c1"># Define the mean motion, n:</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="mf">2.</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="n">period</span>
+
+    <span class="c1"># If time of transit center is given, use it to calculate the time of periastron passage. If no time of periastron</span>
+    <span class="c1"># or time-of-transit center given, raise error:</span>
+    <span class="k">if</span> <span class="n">tperi</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># For this, find true anomaly during transit. Use Winn (2010) as starting point:</span>
+        <span class="n">f_tra_0</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mf">2.</span><span class="p">)</span> <span class="o">-</span> <span class="n">omega</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">winn_approximation</span><span class="p">:</span>
+            <span class="n">f_tra</span> <span class="o">=</span> <span class="n">optimize</span><span class="o">.</span><span class="n">newton</span><span class="p">(</span><span class="n">drsky</span><span class="p">,</span> <span class="n">f_tra_0</span><span class="p">,</span> <span class="n">fprime</span> <span class="o">=</span> <span class="n">drsky_prime</span><span class="p">,</span> <span class="n">fprime2</span> <span class="o">=</span> <span class="n">drsky_2prime</span><span class="p">,</span> <span class="n">args</span> <span class="o">=</span> <span class="p">(</span><span class="n">ecc</span><span class="p">,</span> <span class="n">omega</span><span class="p">,</span> <span class="n">inc</span><span class="p">,))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">f_tra</span> <span class="o">=</span> <span class="n">f_tra_0</span>
+        <span class="c1"># Get eccentric anomaly during transit:</span>
+        <span class="n">E</span> <span class="o">=</span> <span class="n">getE</span><span class="p">(</span><span class="n">f_tra</span><span class="p">,</span> <span class="n">ecc</span><span class="p">)</span>
+
+        <span class="c1"># Get mean anomaly during transit:</span>
+        <span class="n">M</span> <span class="o">=</span> <span class="n">getM</span><span class="p">(</span><span class="n">E</span><span class="p">,</span> <span class="n">ecc</span><span class="p">)</span>
+
+        <span class="c1"># Get time of periastron passage from mean anomaly definition:</span>
+        <span class="n">tperi</span> <span class="o">=</span> <span class="n">t0</span> <span class="o">-</span> <span class="p">(</span><span class="n">M</span><span class="o">/</span><span class="n">n</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="p">(</span><span class="n">tperi</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">t0</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;The time of periastron passage or time-of-transit center has to be supplied for the calculation to work.&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Get eccentric anomaly:</span>
+    <span class="n">E</span> <span class="o">=</span> <span class="n">getE</span><span class="p">(</span><span class="n">f_occ</span><span class="p">,</span> <span class="n">ecc</span><span class="p">)</span>
+
+    <span class="c1"># Get mean anomaly during secondary eclipse:</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="n">getM</span><span class="p">(</span><span class="n">E</span><span class="p">,</span> <span class="n">ecc</span><span class="p">)</span>
+
+    <span class="c1"># Get the time of secondary eclipse using the definition of the mean anomaly:</span>
+    <span class="n">tsec</span> <span class="o">=</span> <span class="p">(</span><span class="n">M</span><span class="o">/</span><span class="n">n</span><span class="p">)</span> <span class="o">+</span> <span class="n">tperi</span>
+
+    <span class="c1"># Note returned time-of-secondary eclipse is the closest to the time of periastron passage and/or time-of-transit center. Check that</span>
+    <span class="c1"># the returned tsec is the *next* tsec to the time of periastron or t0 (i.e., the closest *future* tsec):</span>
+    <span class="k">if</span> <span class="n">t0</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">tref</span> <span class="o">=</span> <span class="n">t0</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">tref</span> <span class="o">=</span> <span class="n">tperi</span>
+    <span class="k">if</span> <span class="n">tref</span> <span class="o">&gt;</span> <span class="n">tsec</span><span class="p">:</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">tsec</span> <span class="o">+=</span> <span class="n">period</span>
+            <span class="k">if</span> <span class="n">tsec</span> <span class="o">&gt;</span> <span class="n">tref</span><span class="p">:</span>
+                <span class="k">break</span>
+    <span class="k">return</span> <span class="n">tsec</span></div>
+
+<div class="viewcode-block" id="drsky_2prime"><a class="viewcode-back" href="../../engine.html#engine.hst.drsky_2prime">[docs]</a><span class="k">def</span> <span class="nf">drsky_2prime</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">ecc</span><span class="p">,</span> <span class="n">omega</span><span class="p">,</span> <span class="n">inc</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Second derivative of function drsky. This is the second derivative with respect to f of the drsky function.</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x : float</span>
+<span class="sd">      True anomaly</span>
+<span class="sd">    ecc : float</span>
+<span class="sd">      Eccentricity of the orbit</span>
+<span class="sd">    omega : float</span>
+<span class="sd">      Argument of periastron passage (in radians)</span>
+<span class="sd">    inc : float</span>
+<span class="sd">      Inclination of the orbit (in radians)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    drsky_2prime : float</span>
+<span class="sd">      Function evaluated at x, ecc, omega, inc&#39;&#39;&#39;</span>
+
+    <span class="n">sq_sini</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">inc</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+    <span class="n">sin_o_p_f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="o">+</span><span class="n">omega</span><span class="p">)</span>
+    <span class="n">cos_o_p_f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">x</span><span class="o">+</span><span class="n">omega</span><span class="p">)</span>
+    <span class="n">ecosf</span> <span class="o">=</span> <span class="n">ecc</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">esinf</span> <span class="o">=</span> <span class="n">ecc</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+    <span class="n">f1</span> <span class="o">=</span> <span class="n">esinf</span> <span class="o">-</span> <span class="n">esinf</span><span class="o">*</span><span class="n">sq_sini</span><span class="o">*</span><span class="p">(</span><span class="n">sin_o_p_f</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">f2</span> <span class="o">=</span> <span class="o">-</span><span class="n">sq_sini</span><span class="o">*</span><span class="p">(</span><span class="n">ecosf</span> <span class="o">+</span> <span class="mf">4.</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">sin_o_p_f</span><span class="o">*</span><span class="n">cos_o_p_f</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">f1</span><span class="o">+</span><span class="n">f2</span></div>
+
+<div class="viewcode-block" id="drsky_prime"><a class="viewcode-back" href="../../engine.html#engine.hst.drsky_prime">[docs]</a><span class="k">def</span> <span class="nf">drsky_prime</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">ecc</span><span class="p">,</span> <span class="n">omega</span><span class="p">,</span> <span class="n">inc</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Derivative of function drsky. This is the first derivative with respect to f of the drsky function.</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x : float</span>
+<span class="sd">      True anomaly</span>
+<span class="sd">    ecc : float</span>
+<span class="sd">      Eccentricity of the orbit</span>
+<span class="sd">    omega : float</span>
+<span class="sd">      Argument of periastron passage (in radians)</span>
+<span class="sd">    inc : float</span>
+<span class="sd">      Inclination of the orbit (in radians)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    drsky_prime : float</span>
+<span class="sd">      Function evaluated at x, ecc, omega, inc&#39;&#39;&#39;</span>
+
+    <span class="n">sq_sini</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">inc</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+    <span class="n">sin_o_p_f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="o">+</span><span class="n">omega</span><span class="p">)</span>
+    <span class="n">cos_o_p_f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">x</span><span class="o">+</span><span class="n">omega</span><span class="p">)</span>
+    <span class="n">ecosf</span> <span class="o">=</span> <span class="n">ecc</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">esinf</span> <span class="o">=</span> <span class="n">ecc</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+    <span class="n">f1</span> <span class="o">=</span> <span class="p">(</span><span class="n">cos_o_p_f</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">sin_o_p_f</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">sq_sini</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mf">1.</span> <span class="o">+</span> <span class="n">ecosf</span><span class="p">)</span>
+    <span class="n">f2</span> <span class="o">=</span> <span class="o">-</span><span class="n">ecosf</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">sin_o_p_f</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">sq_sini</span><span class="p">))</span>
+    <span class="n">f3</span> <span class="o">=</span> <span class="n">esinf</span><span class="o">*</span><span class="n">sin_o_p_f</span><span class="o">*</span><span class="n">cos_o_p_f</span><span class="o">*</span><span class="n">sq_sini</span>
+
+    <span class="k">return</span> <span class="n">f1</span><span class="o">+</span><span class="n">f2</span><span class="o">+</span><span class="n">f3</span></div>
+
+<div class="viewcode-block" id="drsky"><a class="viewcode-back" href="../../engine.html#engine.hst.drsky">[docs]</a><span class="k">def</span> <span class="nf">drsky</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">ecc</span><span class="p">,</span> <span class="n">omega</span><span class="p">,</span> <span class="n">inc</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Function whose roots we wish to find to obtain time of secondary (and primary) eclipse(s)</span>
+<span class="sd">    When one takes the derivative of equation (5) in Winn (2010; https://arxiv.org/abs/1001.2010v5), and equates that to zero (to find the</span>
+<span class="sd">    minimum/maximum of said function), one gets to an equation of the form g(x) = 0. This function (drsky) is g(x), where x is the true</span>
+<span class="sd">    anomaly.</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x : float</span>
+<span class="sd">      True anomaly</span>
+<span class="sd">    ecc : float</span>
+<span class="sd">      Eccentricity of the orbit</span>
+<span class="sd">    omega : float</span>
+<span class="sd">      Argument of periastron passage (in radians)</span>
+<span class="sd">    inc : float</span>
+<span class="sd">      Inclination of the orbit (in radians)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    drsky : float</span>
+<span class="sd">      Function evaluated at x, ecc, omega, inc &#39;&#39;&#39;</span>
+
+    <span class="n">sq_sini</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">inc</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+    <span class="n">sin_o_p_f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="o">+</span><span class="n">omega</span><span class="p">)</span>
+    <span class="n">cos_o_p_f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">x</span><span class="o">+</span><span class="n">omega</span><span class="p">)</span>
+
+    <span class="n">f1</span> <span class="o">=</span> <span class="n">sin_o_p_f</span><span class="o">*</span><span class="n">cos_o_p_f</span><span class="o">*</span><span class="n">sq_sini</span><span class="o">*</span><span class="p">(</span><span class="mf">1.</span> <span class="o">+</span> <span class="n">ecc</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+    <span class="n">f2</span> <span class="o">=</span> <span class="n">ecc</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mf">1.</span> <span class="o">-</span> <span class="n">sin_o_p_f</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">sq_sini</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">f1</span> <span class="o">-</span> <span class="n">f2</span></div>
+
+<div class="viewcode-block" id="getE"><a class="viewcode-back" href="../../engine.html#engine.hst.getE">[docs]</a><span class="k">def</span> <span class="nf">getE</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="n">ecc</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Function that returns the eccentric anomaly</span>
+<span class="sd">    Note normally this is defined in terms of cosines (see, e.g., Section 2.4 in Murray and Dermott), but numerically</span>
+<span class="sd">    this is troublesome because the arccosine doesn&#39;t handle negative numbers by definition (equation 2.43). That&#39;s why</span>
+<span class="sd">    the arctan version is better as signs are preserved (derivation is also in the same section, equation 2.46).</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    f : float</span>
+<span class="sd">      True anomaly</span>
+<span class="sd">    ecc : float</span>
+<span class="sd">      Eccentricity</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    E : float</span>
+<span class="sd">      Eccentric anomaly &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="mf">2.</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="mf">1.</span><span class="o">-</span><span class="n">ecc</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mf">1.</span><span class="o">+</span><span class="n">ecc</span><span class="p">))</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">tan</span><span class="p">(</span><span class="n">f</span><span class="o">/</span><span class="mf">2.</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="getM"><a class="viewcode-back" href="../../engine.html#engine.hst.getM">[docs]</a><span class="k">def</span> <span class="nf">getM</span><span class="p">(</span><span class="n">E</span><span class="p">,</span> <span class="n">ecc</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Function that returns the mean anomaly using Kepler&#39;s equation</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    E : float</span>
+<span class="sd">      Eccentric anomaly</span>
+<span class="sd">    ecc: float</span>
+<span class="sd">      Eccentricity</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    M : float</span>
+<span class="sd">      Mean anomaly &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="n">E</span> <span class="o">-</span> <span class="n">ecc</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">E</span><span class="p">)</span></div>
 </pre></div>
 
            </div>

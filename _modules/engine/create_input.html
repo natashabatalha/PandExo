@@ -198,7 +198,11 @@
 
     <span class="c1">################# USER ####################################</span>
     <span class="k">if</span> <span class="nb">input</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;user&#39;</span><span class="p">:</span>
-        <span class="n">star</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span><span class="nb">input</span><span class="p">[</span><span class="s1">&#39;starpath&#39;</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span> <span class="n">names</span><span class="o">=</span><span class="s1">&#39;w, f&#39;</span><span class="p">)</span> <span class="c1">#pyfits.getdata(input[&#39;starpath&#39;],1)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">input</span><span class="p">[</span><span class="s1">&#39;starpath&#39;</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">star</span> <span class="o">=</span> <span class="nb">input</span><span class="p">[</span><span class="s1">&#39;starpath&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span> <span class="c1">#if isinstance(input[&#39;starpath&#39;], str):</span>
+            <span class="n">star</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span><span class="nb">input</span><span class="p">[</span><span class="s1">&#39;starpath&#39;</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span>
+                                 <span class="n">names</span><span class="o">=</span><span class="s1">&#39;w, f&#39;</span><span class="p">)</span>
         <span class="c1">#get flux </span>
         <span class="n">flux</span> <span class="o">=</span> <span class="n">star</span><span class="p">[</span><span class="s1">&#39;f&#39;</span><span class="p">]</span> <span class="c1">#star.field(input[&#39;logg&#39;])</span>
         <span class="c1">#get wavelength and reference wavelength for mag normalization</span>
@@ -317,7 +321,11 @@
 <span class="sd">    &quot;&quot;&quot;</span> 
     
     <span class="k">if</span> <span class="n">planet</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span><span class="s1">&#39;user&#39;</span><span class="p">:</span>
-        <span class="n">load_file</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span><span class="n">planet</span><span class="p">[</span><span class="s1">&#39;exopath&#39;</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span> <span class="n">names</span><span class="o">=</span><span class="s1">&#39;w, f&#39;</span><span class="p">)</span>   
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">planet</span><span class="p">[</span><span class="s1">&#39;exopath&#39;</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">load_file</span> <span class="o">=</span> <span class="n">planet</span><span class="p">[</span><span class="s1">&#39;exopath&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span> <span class="c1">#if isinstance(planet[&#39;exopath&#39;], str):</span>
+            <span class="n">load_file</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span><span class="n">planet</span><span class="p">[</span><span class="s1">&#39;exopath&#39;</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span>
+                <span class="n">names</span><span class="o">=</span><span class="s1">&#39;w, f&#39;</span><span class="p">)</span>
         <span class="c1">#get wavelength </span>
         <span class="n">wave_planet</span> <span class="o">=</span> <span class="n">load_file</span><span class="p">[</span><span class="s1">&#39;w&#39;</span><span class="p">]</span>
         <span class="c1">#get planet flux </span>
