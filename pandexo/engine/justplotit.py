@@ -70,9 +70,9 @@ def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', out
     outy=[]
     oute=[]
     TOOLS = "pan,wheel_zoom,box_zoom,reset,save"
-    if output_notebook:
+    if output_notebook & plot:
         outnotebook()
-    else:
+    elif plot:
         outputfile(output_file)
     colors = ['black','blue','red','orange','yellow','purple','pink','cyan','grey','brown']
     #make sure its iterable

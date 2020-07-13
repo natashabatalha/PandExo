@@ -186,7 +186,7 @@ def uniform_tophat_mean(newx,x, y, dy=None,nan=False):
 	
 	#remove nans if requested
 	out = pd.DataFrame({'bin_y':ynew, 'bin_x':newx, 'bin_dy':bin_dy, 'bin_n':bin_n})
-	if ~nan:
+	if not nan:
 		out = out.dropna()
 
 	return out['bin_x'].values,out['bin_y'].values, out['bin_dy'].values, out['bin_n'].values
