@@ -300,7 +300,8 @@ class CalculationNewHandler(BaseHandler):
                 exodata["star"]["temp"] = planet_data['Teff']
                 exodata["star"]["logg"] = planet_data['stellar_gravity']
                 exodata["star"]["metal"] = planet_data['Fe/H'] 
-                exodata["star"]["jmag"] = planet_data['Jmag']
+                # Keep Simbad query, as exoMAST typically does not have Jmag:
+                exodata["star"]["jmag"] = Simbad.query_object(planet_name[:-1])['FLUX_J'][0] #planet_data['Jmag']
                 exodata["star"]["ref_wave"] = 1.25
 
                 # optional star radius
