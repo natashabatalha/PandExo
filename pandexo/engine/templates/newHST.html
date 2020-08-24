@@ -21,9 +21,9 @@
         </div>
     </div>
 
-    <hr class="col-md-11 col-md-offset-1">
+    <!-- <hr class="col-md-11 col-md-offset-1"> -->
 
-    <div class="form-group">
+    <!-- <div class="form-group">
         <label class="col-md-3 control-label" for="" style="top: 35px;">Star/Planet Properties</label>
         <div class="col-md-9">
             <div class="radio-chooser">
@@ -41,12 +41,18 @@
                 </div>
             </div>
         </div>
-    </div> 
+    </div>  -->
 
-    <div class="form-group hidden define-properties">
+    <hr class="col-md-11">
+
+    {% include 'target_resolve.html' %}
+
+    <hr class="col-md-11">
+
+    <div class="form-group define-properties">
         <div class="col-md-offset-3 col-md-3">
             <div class="input-group">
-                <input type="text" class="form-control" id="Jmag" name="Jmag">
+                <input type="text" class="form-control" id="Jmag" name="Jmag" value="{{ data['star']['jmag'] }}">
                 <span class="input-group-addon">J</span>
             </div>
             <p class="help-block">Magnitude for the Host Star</p>
@@ -54,7 +60,7 @@
 
         <div class="col-md-3">
             <div class="input-group">
-                <input type="text" class="form-control" id="Hmag" name="Hmag" value="Optional">
+                <input type="text" class="form-control" id="Hmag" name="Hmag" value="{{ data['star']['hmag'] }}">
                 <span class="input-group-addon">H</span>
             </div>
             <p class="help-block">Color correction for higher accuracy</p>
@@ -62,7 +68,7 @@
 
         <div class="col-md-3">
             <div class="input-group">
-                <input type="text" class="form-control" id="stempc" name="stempc" value="Only for Secondary Eclipse">
+                <input type="text" class="form-control" id="stempc" name="stempc" value="{{ data['star']['temp'] }}">
             </div>
             <p class="help-block">Stellar Teff(K)</p>
         </div>
@@ -70,9 +76,9 @@
     </div>
 
 
-    <div class="form-group hidden define-properties">
+    <div class="form-group define-properties">
         <div class="col-md-offset-3 col-md-3 form-inline">
-            <input type="text" class="form-control" id="refradc" name="refradc" style="width: 60%;" value="1.25">
+            <input type="text" class="form-control" id="refradc" name="refradc" style="width: 60%;" value="{{ data['planet']['radius'] }}">
             <div class="input-group-btn" style="width: 30%;left: -4px;display: inline-block;">
                 <select id="r_unitc" name="r_unitc" class="form-control">
                 <option value='R_jup'>R<sub>J</sub></option>
@@ -86,7 +92,7 @@
         </div>
 
         <div class="col-md-3 form-inline">
-            <input type="text" class="form-control" id="rstarc" name="rstarc" style="width: 60%;" value="1">
+            <input type="text" class="form-control" id="rstarc" name="rstarc" style="width: 60%;" value="{{ data['star']['radius'] }}">
             <div class="input-group-btn" style="width: 30%;left: -4px;display: inline-block;">
                 <select id="rstar_unitc" name="rstar_unitc" class="form-control">
                 <option value='R_sun'>R<sub>S</sub></option>
@@ -100,14 +106,14 @@
         </div>
     </div>
 
-    <div class="form-group hidden define-properties">
+    <div class="form-group define-properties">
         <div class="col-md-offset-3 col-md-3">
-            <input type="text" class="form-control" id="period" name="period">
+            <input type="text" class="form-control" id="period" name="period" value="{{ data['planet']['period'] }}">
             <p class="help-block">Orbital period in days.</p>
         </div>
 
         <div class="col-md-3">
-            <input type="text" class="form-control" id="transit_duration" name="transit_duration">
+            <input type="text" class="form-control" id="transit_duration" name="transit_duration" value= "{{ data['planet']['transit_duration'] }}">
             <p class="help-block">Full transit/eclipse duration in days.</p>
         </div>
 
@@ -117,39 +123,25 @@
         </div-->
 
         <div class="col-md-3">
-            <input type="text" class="form-control" id="i" name="i">
+            <input type="text" class="form-control" id="i" name="i" value="{{ data['planet']['i'] }}">
             <p class="help-block">Orbital inclination in degrees.</p>
         </div>
 
         <div class="col-md-3 col-md-offset-3">
-            <input type="text" class="form-control" id="ars" name="ars">
+            <input type="text" class="form-control" id="ars" name="ars" value="{{ data['planet']['ars'] }}">
             <p class="help-block">Semi-major axis in units of stellar radii (a/R<sub>*</sub>).</p>
         </div>
 
         <div class="col-md-3">
-            <input type="text" class="form-control" id="ecc" name="ecc">
+            <input type="text" class="form-control" id="ecc" name="ecc" value="{{ data['planet']['ecc'] }}">
             <p class="help-block">Orbital eccentricity.</p>
         </div>
 
         <div class="col-md-3">
-            <input type="text" class="form-control" id="w" name="w">
+            <input type="text" class="form-control" id="w" name="w" value="{{ data['planet']['w'] }}">
             <p class="help-block">Longitude of periastron in degrees.<br>Leave blank if eccentricity is zero.</p>
         </div>
     </div>
-
-
-    <div class="form-group hidden resolve-target">
-        <div class="col-md-3 col-md-offset-3">
-            <select id="planetname" name="planetname" class="form-control" data-placeholder="Select Planet">
-                <option value=""></option> 
-                {% for i in planets %}
-                    <option {{ escape(i) }} value={{ escape(i) }}>{{ escape(i) }}</option>
-                {% end %}               
-            </select>
-            <p class="help-block">Search Planet Name</p>
-    </div>
-    </div>
-
 
     <hr class="col-md-11 col-md-offset-1">
 
@@ -400,7 +392,7 @@
 
     <div class="form-group">
         <div class="col-sm-offset-3 col-sm-9">
-            <button type="submit" class="btn btn-success">Submit</button>
+            <button type="submit" name="submit_form" class="btn btn-success" value="submit">Submit</button>
             {% module xsrf_form_html() %}
         </div>
     </div>
