@@ -1,4 +1,4 @@
-def wrapper(dictinput):
+def wrapper(dictinput, verbose=False):
     """Tpo level function to call either jwst, hst, wfirst
     
     Top level function which calls either jwst, hst or wfirst noise simulation. 
@@ -8,11 +8,14 @@ def wrapper(dictinput):
     dictinput : 
         dictionary containing instrument parameters and exoplanet 
         specific parameters. {"pandeia_input":dict1, "pandexo_input":dict1}
+    verbose : bool 
+        (Optional) prints out checkpoints throughout code
 
     Returns
     -------
     dict 
         output specific to observatory requested
+
     
     Notes
     -----
@@ -30,10 +33,10 @@ def wrapper(dictinput):
 
     if telescope=='jwst':
         from .jwst import compute_full_sim
-        return compute_full_sim(dictinput)
+        return compute_full_sim(dictinput, verbose=verbose)
     elif telescope=='hst':
         from .hst import compute_sim_hst
-        return compute_sim_hst(dictinput)
+        return compute_sim_hst(dictinput, verbose=verbose)
     elif telescope=='wfirst':
         return
     else:

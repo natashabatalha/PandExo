@@ -22,7 +22,7 @@ min_nint_trans = 1
 #refdata directory
 default_refdata_directory = os.environ.get("pandeia_refdata")
 
-def compute_full_sim(dictinput): 
+def compute_full_sim(dictinput,verbose=False): 
     """Top level function to set up exoplanet obs. for JW
     
     Function to set up explanet observations for JWST only and 
@@ -34,6 +34,8 @@ def compute_full_sim(dictinput):
     dictinput : dict
         dictionary containing instrument parameters and exoplanet specific 
         parameters. {"pandeia_input":dict1, "pandexo_input":dict1}
+    verbose : bool 
+        (Optional) prints out check points throughout code 
     
     Returns
     -------
@@ -150,32 +152,32 @@ def compute_full_sim(dictinput):
             "nframe":nframe,"mingroups":mingroups,"nskip":nskip}
     else:
         #run pandeia once to determine max exposure time per int and get exposure params
-        print("Optimization Reqested: Computing Duty Cycle")
+        if verbose: print("Optimization Reqested: Computing Duty Cycle")
         m = {"maxexptime_per_int":compute_maxexptime_per_int(pandeia_input, sat_level) , 
             "tframe":tframe,"nframe":nframe,"mingroups":mingroups,"nskip":nskip}
-        print("Finished Duty Cycle Calc")
+        if verbose: print("Finished Duty Cycle Calc")
 
     #calculate all timing info
     timing, flags = compute_timing(m,transit_duration,expfact_out,noccultations)
     
     #Simulate out trans and in transit
-    print("Starting Out of Transit Simulation")
+    if verbose: print("Starting Out of Transit Simulation")
     out = perform_out(pandeia_input, pandexo_input,timing, both_spec)
     
     #extract extraction area before dict conversion
     extraction_area = out.extraction_area
     out = out.as_dict()
     out.pop('3d')
-    print("End out of Transit")
+    if verbose: print("End out of Transit")
 
     #Remove effects of Quantum Yield from shot noise 
     out = remove_QY(out, instrument)
 
     #this kind of redundant going to compute inn from out instead 
     #keep perform_in but change inputs to (out, timing, both_spec)
-    print("Starting In Transit Simulation")
+    if verbose: print("Starting In Transit Simulation")
     inn = perform_in(pandeia_input, pandexo_input,timing, both_spec, out, calculation)
-    print("End In Transit")
+    if verbose: print("End In Transit")
     
 
 

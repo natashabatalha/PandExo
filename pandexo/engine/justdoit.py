@@ -27,12 +27,11 @@ ALL = {"WFC3 G141":False,
        "NIRCam F444W":False}
 
 
-def print_instruments():
+def print_instruments(verbose=True):
     """Prints a list of the possible instrument templates to load
     """
-    print("Choose from the following:")
-    print(ALL.keys())
-    return
+    if verbose: print("Choose from the following:")
+    return ALL.keys()
 
 def load_exo_dict(planet_name=None):
     """Loads in empty exoplanet dictionary for pandexo input
@@ -186,7 +185,7 @@ def get_thruput(inst, niriss=1, nirspec='f100lp'):
     pce = i.get_total_eff(wave)
     return {'wave':wave,'pce':pce}
 
-def run_param_space(i,exo,inst,param_space):
+def run_param_space(i,exo,inst,param_space, verbose=False):
     """Changes exo dictionary and submits run
 
     This function is used to reset the exo dictionary based on what parameter
@@ -206,6 +205,9 @@ def run_param_space(i,exo,inst,param_space):
         Set of keys within exo_dict to indicate which parameter to loop through.
         Should be in the format of "first level of dict"+"second level of dict".
         For example, for stellar temp `param_space` would be "star+temp"
+    verbose : bool 
+        (Optional) prints out checkpoints. Assuming the user does not want a load of 
+        print statements for parallel runs
 
     Returns
     -------
@@ -220,9 +222,9 @@ def run_param_space(i,exo,inst,param_space):
     #load in correct dict format
     inst_dict = load_mode_dict(inst)
     name = os.path.split(str(i))[1]
-    return {name: wrapper({"pandeia_input": inst_dict , "pandexo_input":exo})}
+    return {name: wrapper({"pandeia_input": inst_dict , "pandexo_input":exo}, verbose=verbose)}
 
-def run_inst_space(inst,exo):
+def run_inst_space(inst,exo, verbose=False):
     """Changes inst dictionary and submits run
 
     This function is used to reset the instrument dictionary.
@@ -233,6 +235,9 @@ def run_inst_space(inst,exo):
         Exoplanet dictionary which can be loaded in and editted through `load_exo_dict`
     inst : str
         Key which indicates with instrument
+    verbose : bool 
+        (Optional) prints out checkpoints. Assuming the user does not want a load of 
+        print statements for parallel runs
 
     Returns
     -------
@@ -242,11 +247,11 @@ def run_inst_space(inst,exo):
     """
     #load in correct dict format
     inst_dict = load_mode_dict(inst)
-    return {inst: wrapper({"pandeia_input": inst_dict , "pandexo_input":exo})}
+    return {inst: wrapper({"pandeia_input": inst_dict , "pandexo_input":exo}, verbose=verbose)}
 
 
 def run_pandexo(exo, inst, param_space = 0, param_range = 0,save_file = True,
-                            output_path=os.getcwd(), output_file = '',num_cores=user_cores):
+                            output_path=os.getcwd(), output_file = '',num_cores=user_cores, verbose=True):
     """Submits multiple runs of pandexo in parallel.
 
     Functionality: program contains functionality for running single or
@@ -276,6 +281,9 @@ def run_pandexo(exo, inst, param_space = 0, param_range = 0,save_file = True,
     output_file : str
         (Optional) Default is "singlerun.p" for single runs, "param_space.p" for exo parameter runs
         or "instrument_run.p" for instrument parameter space runs.
+    verbose : bool 
+        (Optional) For single runs, if false, it turns off all print statements. For parameter space 
+        runs it is defaulted to never print statements out.
 
     Returns
     -------
@@ -304,8 +312,8 @@ def run_pandexo(exo, inst, param_space = 0, param_range = 0,save_file = True,
 
     #single instrument mode with dictionary input OR single planet
     if type(inst) == dict:
-        print("Running Single Case w/ User Instrument Dict")
-        results =wrapper({"pandeia_input": inst , "pandexo_input":exo})
+        if verbose: print("Running Single Case w/ User Instrument Dict")
+        results =wrapper({"pandeia_input": inst , "pandexo_input":exo}, verbose=verbose)
         if output_file == '':
             output_file = 'singlerun.p'
         if save_file: pkl.dump(results, open(os.path.join(output_path,output_file),'wb'))
@@ -326,16 +334,16 @@ def run_pandexo(exo, inst, param_space = 0, param_range = 0,save_file = True,
 
         #start case of no parameter space run
         if isinstance(param_space, (float, int)) or isinstance(param_range, (float, int)):
-            print("Running Single Case for: " + inst[0])
+            if verbose: print("Running Single Case for: " + inst[0])
             inst_dict = load_mode_dict(inst[0])
-            results =wrapper({"pandeia_input": inst_dict , "pandexo_input":exo})
+            results =wrapper({"pandeia_input": inst_dict , "pandexo_input":exo}, verbose=verbose)
             if output_file == '':
                 output_file = 'singlerun.p'
             if save_file: pkl.dump(results, open(os.path.join(output_path,output_file),'wb'))
             return results
 
         #if there are parameters to cycle through this will run
-        print("Running through exo parameters in parallel: " + param_space)
+        if verbose: print("Running through exo parameters in parallel: " + param_space)
         #run the above function in parallel
         results = Parallel(n_jobs=num_cores)(delayed(run_param_space)(i,exo,inst[0],param_space) for i in param_range)
 
@@ -348,7 +356,7 @@ def run_pandexo(exo, inst, param_space = 0, param_range = 0,save_file = True,
         return results
 
     #run several different instrument modes and single planet
-    print("Running select instruments")
+    if verbose: print("Running select instruments")
     if len(inst)>1:
 
         results = Parallel(n_jobs=num_cores)(delayed(run_inst_space)(i, exo) for i in inst)
@@ -362,7 +370,7 @@ def run_pandexo(exo, inst, param_space = 0, param_range = 0,save_file = True,
 
     #cycle through all options
     elif inst[0].lower() == 'run all':
-        print("Running through all instruments")
+        if verbose: print("Running through all instruments")
         results = Parallel(n_jobs=num_cores)(delayed(run_inst_space)(i, exo) for i in ALL.keys())
 
         #Default dump all results [an array of dictionaries] into single file

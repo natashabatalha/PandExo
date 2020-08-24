@@ -472,10 +472,11 @@ def calc_start_window(eventType, rms, ptsOrbit, numOrbits, depth, inc, aRs, peri
     # Compute light curves at extremes of HST start window
     npts = int(4 * ptsOrbit * numOrbits)
     phdur = duration/period
+    
     phase1 = np.linspace(minphase+(1-useFirstOrbit)*hstperiod/period,
-                         minphase+hstperiod/period*(numOrbits-1)+hstperiod/period/2, npts)
+                         minphase+hstperiod/period*(numOrbits-1)+hstperiod/period/2, int(npts))
     phase2 = np.linspace(maxphase+(1-useFirstOrbit)*hstperiod/period,
-                         maxphase+hstperiod/period*(numOrbits-1)+hstperiod/period/2, npts)
+                         maxphase+hstperiod/period*(numOrbits-1)+hstperiod/period/2, int(npts))
     m = batman.TransitModel(params, phase1)
     trmodel1 = m.light_curve(params)
     m = batman.TransitModel(params, phase2)
@@ -484,9 +485,9 @@ def calc_start_window(eventType, rms, ptsOrbit, numOrbits, depth, inc, aRs, peri
     obsphase2 = []
     for i in range(numOrbits):
         obsphase1 = np.r_[obsphase1, np.linspace(
-            minphase+hstperiod/period*i, minphase+hstperiod/period*i+hstperiod/period/2, ptsOrbit)]
+            minphase+hstperiod/period*i, minphase+hstperiod/period*i+hstperiod/period/2, int(ptsOrbit))]
         obsphase2 = np.r_[obsphase2, np.linspace(
-            maxphase+hstperiod/period*i, maxphase+hstperiod/period*i+hstperiod/period/2, ptsOrbit)]
+            maxphase+hstperiod/period*i, maxphase+hstperiod/period*i+hstperiod/period/2, int(ptsOrbit))]
     m = batman.TransitModel(params, obsphase1)
     obstr1 = m.light_curve(params) + np.random.normal(0, rms, obsphase1.shape)
     m = batman.TransitModel(params, obsphase2)
