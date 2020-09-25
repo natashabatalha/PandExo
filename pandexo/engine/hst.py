@@ -627,7 +627,7 @@ def compute_sim_lightcurve(exposureDict, lightCurveDict, calRamp=False):
     return resultDict
 
 
-def compute_sim_hst(dictinput):
+def compute_sim_hst(dictinput,verbose=False):
     """Sets up HST simulations
 
     Function to set up explanet observations for HST only and
@@ -652,8 +652,8 @@ def compute_sim_hst(dictinput):
     calRamp = pandeia_input['strategy']['calculateRamp']
 
     if not pandeia_input['strategy']['useFirstOrbit']:
-        print("Dropping first orbit designed by observation strategy")
-        print("Do not calculate ramp profile")
+        if verbose:print("Dropping first orbit designed by observation strategy")
+        if verbose:print("Do not calculate ramp profile")
         calRamp = False
     numorbits = pandeia_input['strategy']['norbits']
     nchan = pandeia_input['strategy']['nchan']
