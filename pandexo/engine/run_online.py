@@ -337,6 +337,15 @@ class CalculationNewHandler(BaseHandler):
             except:
                 exodata['url_err'] = 'Sorry, cant resolve target {}'.format(planet_name)
 
+            # Need to re-define header before rendering:
+            try:
+                header= pd.read_sql_table('header',db_fort)
+            except:
+                header = pd.DataFrame({
+                'temp': ['NO GRID DB FOUND'],
+                'ray' : ['NO GRID DB FOUND'],
+                'flat':['NO GRID DB FOUND']})
+
             all_planets =  requests.get("https://exoplanetarchive.ipac.caltech.edu/cgi-bin/nstedAPI/nph-nstedAPI?table=exoplanets&select=pl_name&format=csv")  
             all_planets = all_planets.text.replace(' ','').split('\n')[1:]
 
@@ -616,6 +625,16 @@ class CalculationNewHSTHandler(BaseHandler):
 
             except:
                 exodata['url_err'] = 'Sorry, cant resolve target {}'.format(planet_name)
+
+            # Need to re-define header before rendering:
+            try:
+                self.header= pd.read_sql_table('header',db_fort)
+            except:
+                self.header = pd.DataFrame({
+                'temp': ['NO GRID DB FOUND'],
+                'ray' : ['NO GRID DB FOUND'],
+                'flat':['NO GRID DB FOUND']})
+
 
             all_planets =  requests.get("https://exoplanetarchive.ipac.caltech.edu/cgi-bin/nstedAPI/nph-nstedAPI?table=exoplanets&select=pl_name&format=csv")  
             all_planets = all_planets.text.replace(' ','').split('\n')[1:]
