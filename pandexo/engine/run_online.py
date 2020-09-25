@@ -621,9 +621,6 @@ class CalculationNewHSTHandler(BaseHandler):
                 except: 
                     exodata["planet"]["w"]      = 90.
 
-                self.header = pd.DataFrame({'temp': ['NO GRID DB FOUND'],
-                                    'ray' : ['NO GRID DB FOUND'],
-                                    'flat':['NO GRID DB FOUND']})
             except:
                 exodata['url_err'] = 'Sorry, cant resolve target {}'.format(planet_name)
 
