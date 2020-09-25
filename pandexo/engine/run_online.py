@@ -339,9 +339,9 @@ class CalculationNewHandler(BaseHandler):
 
             # Need to re-define header before rendering:
             try:
-                header= pd.read_sql_table('header',db_fort)
+                self.header = pd.read_sql_table('header',db_fort)
             except:
-                header = pd.DataFrame({
+                self.header = pd.DataFrame({
                 'temp': ['NO GRID DB FOUND'],
                 'ray' : ['NO GRID DB FOUND'],
                 'flat':['NO GRID DB FOUND']})
