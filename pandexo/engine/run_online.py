@@ -334,18 +334,11 @@ class CalculationNewHandler(BaseHandler):
                 except: 
                     exodata["planet"]["w"]      = 90.
 
-                self.header = pd.DataFrame({'temp': ['NO GRID DB FOUND'],
-                                    'ray' : ['NO GRID DB FOUND'],
-                                    'flat':['NO GRID DB FOUND']})
             except:
                 exodata['url_err'] = 'Sorry, cant resolve target {}'.format(planet_name)
 
             all_planets =  requests.get("https://exoplanetarchive.ipac.caltech.edu/cgi-bin/nstedAPI/nph-nstedAPI?table=exoplanets&select=pl_name&format=csv")  
             all_planets = all_planets.text.replace(' ','').split('\n')[1:]
-
-            self.header = pd.DataFrame({'temp': ['NO GRID DB FOUND'],
-                                    'ray' : ['NO GRID DB FOUND'],
-                                    'flat':['NO GRID DB FOUND']})
 
             return self.render("new.html", id=id,
                                 temp=list(map(str, self.header.temp.unique())),
