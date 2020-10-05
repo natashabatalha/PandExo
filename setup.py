@@ -48,7 +48,7 @@ else:
 setup(
 
     name='pandexo.engine',
-    version='1.5.1',
+    version='1.5.2',
     summary='pandexo transiting exoplanet simulator',
     description_file='README.rst',
     author='Natasha Batalha at NASA Ames',

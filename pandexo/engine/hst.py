@@ -472,10 +472,11 @@ def calc_start_window(eventType, rms, ptsOrbit, numOrbits, depth, inc, aRs, peri
     # Compute light curves at extremes of HST start window
     npts = int(4 * ptsOrbit * numOrbits)
     phdur = duration/period
+    
     phase1 = np.linspace(minphase+(1-useFirstOrbit)*hstperiod/period,
-                         minphase+hstperiod/period*(numOrbits-1)+hstperiod/period/2, npts)
+                         minphase+hstperiod/period*(numOrbits-1)+hstperiod/period/2, int(npts))
     phase2 = np.linspace(maxphase+(1-useFirstOrbit)*hstperiod/period,
-                         maxphase+hstperiod/period*(numOrbits-1)+hstperiod/period/2, npts)
+                         maxphase+hstperiod/period*(numOrbits-1)+hstperiod/period/2, int(npts))
     m = batman.TransitModel(params, phase1)
     trmodel1 = m.light_curve(params)
     m = batman.TransitModel(params, phase2)
@@ -484,9 +485,9 @@ def calc_start_window(eventType, rms, ptsOrbit, numOrbits, depth, inc, aRs, peri
     obsphase2 = []
     for i in range(numOrbits):
         obsphase1 = np.r_[obsphase1, np.linspace(
-            minphase+hstperiod/period*i, minphase+hstperiod/period*i+hstperiod/period/2, ptsOrbit)]
+            minphase+hstperiod/period*i, minphase+hstperiod/period*i+hstperiod/period/2, int(ptsOrbit))]
         obsphase2 = np.r_[obsphase2, np.linspace(
-            maxphase+hstperiod/period*i, maxphase+hstperiod/period*i+hstperiod/period/2, ptsOrbit)]
+            maxphase+hstperiod/period*i, maxphase+hstperiod/period*i+hstperiod/period/2, int(ptsOrbit))]
     m = batman.TransitModel(params, obsphase1)
     obstr1 = m.light_curve(params) + np.random.normal(0, rms, obsphase1.shape)
     m = batman.TransitModel(params, obsphase2)
@@ -626,7 +627,7 @@ def compute_sim_lightcurve(exposureDict, lightCurveDict, calRamp=False):
     return resultDict
 
 
-def compute_sim_hst(dictinput):
+def compute_sim_hst(dictinput,verbose=False):
     """Sets up HST simulations
 
     Function to set up explanet observations for HST only and
@@ -651,8 +652,8 @@ def compute_sim_hst(dictinput):
     calRamp = pandeia_input['strategy']['calculateRamp']
 
     if not pandeia_input['strategy']['useFirstOrbit']:
-        print("Dropping first orbit designed by observation strategy")
-        print("Do not calculate ramp profile")
+        if verbose:print("Dropping first orbit designed by observation strategy")
+        if verbose:print("Do not calculate ramp profile")
         calRamp = False
     numorbits = pandeia_input['strategy']['norbits']
     nchan = pandeia_input['strategy']['nchan']
