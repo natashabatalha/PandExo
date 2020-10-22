@@ -46,6 +46,17 @@ Finally, create your environment variable:
 
     echo 'export PYSYN_CDBS="$USRDIR/path/to/data/files/grp/hst/cdbs"' >>~/.bash_profile
 
+Fortney+ 20210  Planet Grid 
+````````````````````````````
+A user may want to install a grid of atmospheric models to simulate planet atmospheres. Some of the example notebooks use an atmospheric model grid. This grid can be obtained from:
+"https://github.com/ExoCTK/exoctk#obtain-the-exoctk-data"
+
+After downloading the Fortney files, create an environmental variable to point to them.
+
+.. code-block:: bash 
+
+    echo 'export FORTGRID_DIR="$USRDIR/path/to/data/files/fortney_models.db"' >>~/.bash_profile
+
 
 Installation with Pip or Git
 ============================
