@@ -153,7 +153,11 @@ def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', out
         else:
             print("Something went wrong. Cannot enter both resolution and ask to bin to new wave")
             return
-
+        
+        x = np.array(x,dtype=float)
+        y = np.array(y,dtype=float)
+        err= np.array(err,dtype=float)
+        
         #create error bars for Bokeh's multi_line and drop nans
         data = pd.DataFrame({'x':x, 'y':y,'err':err}).dropna()
 
