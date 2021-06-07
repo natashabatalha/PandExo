@@ -398,7 +398,7 @@ def subarrays(inst):
   if inst.lower() == 'niriss':
     return {'substrip96':2.2129,'substrip256':5.4913}
   elif inst.lower() == 'nirspec':
-    return {'sub1024a':0.451,'sub1024b':0.451,'sub2048':0.90156,'sub512':0.22572}
+    return {'sub1024a':0.451,'sub1024b':0.451,'sub2048':0.90156,'sub512':0.22572,'sub512s':0.14392}
   elif inst.lower() == 'miri':
     return {'slitlessprism':0.159}
   elif inst.lower()  == 'nircam':
@@ -448,8 +448,7 @@ def filters(inst):
     print("Filters field stored in inst_dict['configuration']['instrument']['filter']")
 
     if inst.lower() == 'niriss':
-        print("No filters for niriss soss, type None, or null in filter field")
-        return [None]
+        return ["clear","f277w"]
     elif inst.lower() == 'nirspec':
         return ['f070lp','f100lp','f170lp','f290lp','clear']
     elif inst.lower() == 'miri':
