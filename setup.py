@@ -42,9 +42,9 @@ PY_V = sys.version_info
 # to this sample package.
 
 if sys.version_info < (3,0): 
-    pandas_version = '0.24.0'
+    pandas_version = '==0.24.0'
 else:
-    pandas_version = '0.25.0'
+    pandas_version = '>=0.25.0'
 setup(
 
     name='pandexo.engine',
@@ -95,9 +95,9 @@ setup(
           'numpy',
           'bokeh==0.12.6',
           'tornado',
-          'pandas=='+pandas_version,
+          'pandas'+pandas_version,
           'joblib',
-          'pandeia.engine==1.5.1',
+          'pandeia.engine==1.6',
           'batman-package',
           'photutils',
           'astropy',
