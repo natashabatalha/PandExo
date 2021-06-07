@@ -38,7 +38,7 @@
     "configuration":{
     "instrument": {
             "instrument": "nirspec",
-            "mode": "fixed_slit",
+            "mode": "bots",
             "filter": "f100lp",
             "aperture": "s1600a1",
             "disperser": "g140m"
