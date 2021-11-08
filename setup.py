@@ -100,7 +100,7 @@ setup(
           'pandeia.engine==1.5.1',
           'batman-package',
           'photutils',
-          'astropy',
+          'astropy==4.2',
           'pysynphot',
           'sqlalchemy',
           'astroquery',
