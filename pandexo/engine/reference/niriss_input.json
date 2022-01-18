@@ -39,7 +39,7 @@
     "instrument": {
             "instrument": "niriss",
             "mode": "soss",
-            "filter": null,
+            "filter": "clear",
             "aperture": "soss",
             "disperser": "gr700xd"
         },
