@@ -24,6 +24,9 @@ from .utils.plotters import create_component_jwst, create_component_hst
 from .logs import jwst_log, hst_log
 from .exomast import get_target_data
 
+#grab all planets for folks 
+#all_planets =  pd.read_csv('https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=select+pl_name+from+PSCompPars&format=csv')
+#all_planets = sorted(all_planets['pl_name'].values)
 
 # define location of temp files
 __TEMP__ = os.environ.get("PANDEXO_TEMP", os.path.join(os.path.dirname(__file__), "temp"))
@@ -261,10 +264,8 @@ class CalculationNewHandler(BaseHandler):
         with open(os.path.join(os.path.dirname(__file__), "reference",
                                "exo_input.json")) as data_file:
             exodata = json.load(data_file)
-
-        all_planets =  requests.get("https://exoplanetarchive.ipac.caltech.edu/cgi-bin/nstedAPI/nph-nstedAPI?table=exoplanets&select=pl_name&format=csv")  
-        all_planets = all_planets.text.replace(' ','').split('\n')[1:]
-
+        all_planets =  pd.read_csv('https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=select+pl_name+from+PSCompPars&format=csv')
+        all_planets = sorted(all_planets['pl_name'].values)
         self.render("new.html", id=id,
                                  temp=list(map(str, header.temp.unique())), 
                                  planets=all_planets,
@@ -345,10 +346,8 @@ class CalculationNewHandler(BaseHandler):
                 'temp': ['NO GRID DB FOUND'],
                 'ray' : ['NO GRID DB FOUND'],
                 'flat':['NO GRID DB FOUND']})
-
-            all_planets =  requests.get("https://exoplanetarchive.ipac.caltech.edu/cgi-bin/nstedAPI/nph-nstedAPI?table=exoplanets&select=pl_name&format=csv")  
-            all_planets = all_planets.text.replace(' ','').split('\n')[1:]
-
+            all_planets =  pd.read_csv('https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=select+pl_name+from+PSCompPars&format=csv')
+            all_planets = sorted(all_planets['pl_name'].values)
             return self.render("new.html", id=id,
                                 temp=list(map(str, self.header.temp.unique())),
                                 data=exodata,
@@ -545,8 +544,9 @@ class CalculationNewHSTHandler(BaseHandler):
         with open(os.path.join(os.path.dirname(__file__), "reference",
                                "exo_input.json")) as data_file:
             exodata = json.load(data_file)
-        all_planets =  requests.get("https://exoplanetarchive.ipac.caltech.edu/cgi-bin/nstedAPI/nph-nstedAPI?table=exoplanets&select=pl_name&format=csv")  
-        all_planets = all_planets.text.replace(' ','').split('\n')[1:]
+
+        all_planets =  pd.read_csv('https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=select+pl_name+from+PSCompPars&format=csv')
+        all_planets = sorted(all_planets['pl_name'].values)
         self.render("newHST.html", id=id,
                     temp=list(map(str, self.header.temp.unique())),
                     data=exodata,
@@ -635,10 +635,8 @@ class CalculationNewHSTHandler(BaseHandler):
                 'ray' : ['NO GRID DB FOUND'],
                 'flat':['NO GRID DB FOUND']})
 
-
-            all_planets =  requests.get("https://exoplanetarchive.ipac.caltech.edu/cgi-bin/nstedAPI/nph-nstedAPI?table=exoplanets&select=pl_name&format=csv")  
-            all_planets = all_planets.text.replace(' ','').split('\n')[1:]
-
+            all_planets =  pd.read_csv('https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=select+pl_name+from+PSCompPars&format=csv')
+            all_planets = sorted(all_planets['pl_name'].values)
             return self.render("newHST.html", id=id,
                                 temp=list(map(str, self.header.temp.unique())),
                                 data=exodata,

@@ -33,7 +33,7 @@ def print_instruments(verbose=True):
     if verbose: print("Choose from the following:")
     return ALL.keys()
 
-def load_exo_dict(planet_name=None):
+def load_exo_dict(planet_name=None,pl_kwargs={}):
     """Loads in empty exoplanet dictionary for pandexo input
 
     Loads in empty exoplanet dictionary so that the user can manually edit different planet
@@ -43,6 +43,10 @@ def load_exo_dict(planet_name=None):
     ----------
     planet_name : str
         (Optional) Planet name e.g. 'HD 189733 b' or 'HD189733b'
+    pl_kwargs : dict 
+        (Optional) : dict
+        if you get an error that there is a missing field you can enter it in dictionary form using this
+        e.g. pl_kwargs = {"Jmag":7}
 
     Returns
     -------
@@ -68,12 +72,35 @@ def load_exo_dict(planet_name=None):
         Simbad.add_votable_fields('flux(H)')
         Simbad.add_votable_fields('flux(J)')
         star_name = planet_name[:-1]
-        jmag = Simbad.query_object(star_name)['FLUX_J'][0]
-        if np.ma.is_masked(jmag):
-            # Remove 'A' from star_name for systems with binary stars (e.g., WASP-77A)
-            star_name = star_name[:-1]
-            jmag = Simbad.query_object(star_name)['FLUX_J'][0]
-        hmag = Simbad.query_object(star_name)['FLUX_H'][0]
+
+        if 'Jmag' in planet_data.keys():
+            jmag = planet_data['Jmag']
+        else: 
+            try:
+                jmag = Simbad.query_object(star_name)['FLUX_J'][0]
+                if np.ma.is_masked(jmag):
+                    # Remove 'A' from star_name for systems with binary stars (e.g., WASP-77A)
+                    star_name = star_name[:-1]
+                    jmag = Simbad.query_object(star_name)['FLUX_J'][0]
+            except: 
+                jmag = pl_kwargs.get('Jmag',0)
+                if jmag==0: 
+                    raise Exception("Uh oh. Exo.MAST/simbad do not have a Jmag. Please enter it with pl_kwargs. E.g. pl_wargs={'Jmag':8} ")
+
+        if 'Hmag' in planet_data.keys():
+            hmag = planet_data['Hmag']
+        else: 
+            try:
+                hmag = Simbad.query_object(star_name)['FLUX_H'][0]
+                if np.ma.is_masked(hmag):
+                    # Remove 'A' from star_name for systems with binary stars (e.g., WASP-77A)
+                    star_name = star_name[:-1]
+                    hmag = Simbad.query_object(star_name)['FLUX_H'][0]
+            except: 
+                hmag = pl_kwargs.get('Hmag',0)
+                if hmag==0: 
+                    raise Exception("Uh oh. Exo.MAST/simbad do not have a Hmag. Please enter it with pl_kwargs. E.g. pl_wargs={'Hmag':8} ")
+
 
         pandexo_input["star"]["mag"] = jmag
         pandexo_input["star"]["ref_wave"] = 1.25
@@ -86,8 +113,14 @@ def load_exo_dict(planet_name=None):
        #optional planet radius/mass
         pandexo_input["planet"]["radius"] = planet_data['Rp']
         pandexo_input["planet"]["r_unit"] = planet_data['Rp_unit'][0]+ planet_data['Rp_unit'][1:].lower()
-        pandexo_input["planet"]["mass"] = planet_data['Mp']
-        pandexo_input["planet"]["m_unit"] = planet_data['Mp_unit'][0]+ planet_data['Mp_unit'][1:].lower()
+        try: 
+            pandexo_input["planet"]["mass"] = planet_data['Mp']
+            pandexo_input["planet"]["m_unit"] = planet_data['Mp_unit'][0]+ planet_data['Mp_unit'][1:].lower()
+
+        except: 
+            print("No mass found. Setting mass to np.nan. Mass is only required for model grids. If you want to enter one please enter it with pl_kwargs. E.g. pl_wargs={'Mp':1,'Mp_unit':'M_jupiter'}")
+            pandexo_input["planet"]["mass"] = pl_kwargs.get('mass',np.nan)
+            pandexo_input["planet"]["m_unit"] = pl_kwargs.get('m_unit',np.nan)
 
         pandexo_input["planet"]["transit_duration"] = planet_data['transit_duration']
         pandexo_input["planet"]["td_unit"] = planet_data['transit_duration_unit']
