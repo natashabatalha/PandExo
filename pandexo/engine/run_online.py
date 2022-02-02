@@ -616,8 +616,9 @@ class CalculationNewHSTHandler(BaseHandler):
                 #star
                 exodata["star"]["temp"] = planet_data['Teff']
 
-                jmag = Simbad.query_object(planet_name[:-1])['FLUX_J'][0]
-                hmag = Simbad.query_object(planet_name[:-1])['FLUX_H'][0]
+                star_name = getStarName(planet_name)
+                jmag = Simbad.query_object(star_name)['FLUX_J'][0]
+                hmag = Simbad.query_object(star_name)['FLUX_H'][0]
 
                 exodata["star"]["jmag"] = jmag
                 exodata["star"]["hmag"] = hmag
