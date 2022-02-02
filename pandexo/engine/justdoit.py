@@ -47,24 +47,15 @@ def getStarName(planet_name):
     - If `planet_name` is 'HAT-P-1  ' it returns 'HAT-P-1'.
     """
 
-    star_name = copy.copy(planet_name) 
-
-    # Check if last character is space:
-    if star_name[-1] == ' ':
-        
-        star_name = star_name[:-1]
-        star_name = getStarName(star_name)
+    star_name = planet_name.strip()
 
     # Check if last character is a letter:
     if str.isalpha(star_name[-1]):
-
         if star_name[-1] == star_name[-1].lower():
-
             star_name = star_name[:-1]
-            star_name = getStarName(star_name)
-
+            
     # Return trimmed string:
-    return star_name
+    return star_name.strip()
 
 def load_exo_dict(planet_name=None,pl_kwargs={}):
     """Loads in empty exoplanet dictionary for pandexo input
@@ -104,7 +95,9 @@ def load_exo_dict(planet_name=None,pl_kwargs={}):
         pandexo_input['star']['logg'] = planet_data['stellar_gravity']
         Simbad.add_votable_fields('flux(H)')
         Simbad.add_votable_fields('flux(J)')
+        print(planet_name)
         star_name = getStarName(planet_name)
+        print(star_name)
 
         if 'Jmag' in planet_data.keys():
             jmag = planet_data['Jmag']
