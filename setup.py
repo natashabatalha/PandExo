@@ -48,7 +48,7 @@ else:
 setup(
 
     name='pandexo.engine',
-    version='1.5.3.1',
+    version='1.7',
     summary='pandexo transiting exoplanet simulator',
     description_file='README.rst',
     author='Natasha Batalha at NASA Ames',
@@ -92,19 +92,19 @@ setup(
     # },
 
     install_requires=[
-          'numpy',
+          'numpy==1.21',
           'bokeh==0.12.6',
           'tornado',
           'pandas'+pandas_version,
           'joblib',
-          'pandeia.engine==1.6',
+          'pandeia.engine==1.7a1',
           'batman-package',
-          'photutils',
-          'astropy',
+          'photutils==1.1.0',
+          'astropy==4.2',
           'pysynphot',
           'sqlalchemy',
           'astroquery',
-          'scipy==1.3.1'
+          'scipy==1.7.0'
           ],
     entry_points = {
         'console_scripts':
