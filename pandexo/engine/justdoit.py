@@ -95,9 +95,9 @@ def load_exo_dict(planet_name=None,pl_kwargs={}):
         pandexo_input['star']['logg'] = planet_data['stellar_gravity']
         Simbad.add_votable_fields('flux(H)')
         Simbad.add_votable_fields('flux(J)')
-        print(planet_name)
+
         star_name = getStarName(planet_name)
-        print(star_name)
+
 
         if 'Jmag' in planet_data.keys():
             jmag = planet_data['Jmag']
