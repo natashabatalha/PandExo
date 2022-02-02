@@ -10,6 +10,7 @@ import json
 from .exomast import get_target_data
 from astroquery.simbad import Simbad
 import astropy.units as u
+import copy
 
 user_cores = multiprocessing.cpu_count()
 
@@ -32,6 +33,38 @@ def print_instruments(verbose=True):
     """
     if verbose: print("Choose from the following:")
     return ALL.keys()
+
+def getStarName(planet_name):
+    """
+    Given a string with a (supposed) planet name, this function returns the star name. For example:
+
+    - If `planet_name` is 'HATS-5b' this returns 'HATS-5'.
+    - If `planet_name` is 'Kepler-12Ab' this returns 'Kepler-12A'.
+    
+    It also handles the corner case in which `planet_name` is *not* a planet name, but a star name itself, e.g.:
+
+    - If `planet_name` is 'HAT-P-1' it returns 'HAT-P-1'.
+    - If `planet_name` is 'HAT-P-1  ' it returns 'HAT-P-1'.
+    """
+
+    star_name = copy.copy(planet_name) 
+
+    # Check if last character is space:
+    if star_name[-1] == ' ':
+        
+        star_name = star_name[:-1]
+        star_name = getStarName(star_name)
+
+    # Check if last character is a letter:
+    if str.isalpha(star_name[-1]):
+
+        if star_name[-1] == star_name[-1].lower():
+
+            star_name = star_name[:-1]
+            star_name = getStarName(star_name)
+
+    # Return trimmed string:
+    return star_name
 
 def load_exo_dict(planet_name=None,pl_kwargs={}):
     """Loads in empty exoplanet dictionary for pandexo input
@@ -71,17 +104,19 @@ def load_exo_dict(planet_name=None,pl_kwargs={}):
         pandexo_input['star']['logg'] = planet_data['stellar_gravity']
         Simbad.add_votable_fields('flux(H)')
         Simbad.add_votable_fields('flux(J)')
-        star_name = planet_name[:-1]
+        star_name = getStarName(planet_name)
 
         if 'Jmag' in planet_data.keys():
             jmag = planet_data['Jmag']
         else: 
             try:
                 jmag = Simbad.query_object(star_name)['FLUX_J'][0]
-                if np.ma.is_masked(jmag):
-                    # Remove 'A' from star_name for systems with binary stars (e.g., WASP-77A)
-                    star_name = star_name[:-1]
-                    jmag = Simbad.query_object(star_name)['FLUX_J'][0]
+
+                #removing for how as blind str cutoffs are bug prone
+                #if np.ma.is_masked(jmag):
+                #    # Remove 'A' from star_name for systems with binary stars (e.g., WASP-77A)
+                #    star_name = star_name[:-1]
+                #    jmag = Simbad.query_object(star_name)['FLUX_J'][0]
             except: 
                 jmag = pl_kwargs.get('Jmag',0)
                 if jmag==0: 
@@ -92,10 +127,12 @@ def load_exo_dict(planet_name=None,pl_kwargs={}):
         else: 
             try:
                 hmag = Simbad.query_object(star_name)['FLUX_H'][0]
-                if np.ma.is_masked(hmag):
-                    # Remove 'A' from star_name for systems with binary stars (e.g., WASP-77A)
-                    star_name = star_name[:-1]
-                    hmag = Simbad.query_object(star_name)['FLUX_H'][0]
+                
+                #removing for how as blind str cutoffs are bug prone
+                #if np.ma.is_masked(hmag):
+                #    # Remove 'A' from star_name for systems with binary stars (e.g., WASP-77A)
+                #    star_name = star_name[:-1]
+                #    hmag = Simbad.query_object(star_name)['FLUX_H'][0]
             except: 
                 hmag = pl_kwargs.get('Hmag',0)
                 if hmag==0: 
