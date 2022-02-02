@@ -1,5 +1,6 @@
 import json
 import os
+import copy
 import uuid
 from collections import namedtuple, OrderedDict
 import tornado.escape
@@ -50,6 +51,37 @@ define("workers", default=4, help="maximum number of simultaneous async tasks")
 CalculationTask = namedtuple('CalculationTask', ['id', 'name', 'task',
                                                  'cookie', 'count'])
 
+def getStarName(planet_name):
+    """
+    Given a string with a (supposed) planet name, this function returns the star name. For example:
+
+    - If `planet_name` is 'HATS-5b' this returns 'HATS-5'.
+    - If `planet_name` is 'Kepler-12Ab' this returns 'Kepler-12A'.
+    
+    It also handles the corner case in which `planet_name` is *not* a planet name, but a star name itself, e.g.:
+
+    - If `planet_name` is 'HAT-P-1' it returns 'HAT-P-1'.
+    - If `planet_name` is 'HAT-P-1  ' it returns 'HAT-P-1'.
+    """
+
+    star_name = copy.copy(planet_name) 
+
+    # Check if last character is space:
+    if star_name[-1] == ' ':
+        
+        star_name = star_name[:-1]
+        star_name = getStarName(star_name)
+
+    # Check if last character is a letter:
+    if str.isalpha(star_name[-1]):
+
+        if star_name[-1] == star_name[-1].lower():
+
+            star_name = star_name[:-1]
+            star_name = getStarName(star_name)
+
+    # Return trimmed string:
+    return star_name
 
 class Application(tornado.web.Application):
     """Gobal settings of the server
@@ -304,7 +336,8 @@ class CalculationNewHandler(BaseHandler):
                 exodata["star"]["logg"] = planet_data['stellar_gravity']
                 exodata["star"]["metal"] = planet_data['Fe/H'] 
                 # Keep Simbad query, as exoMAST typically does not have Jmag:
-                exodata["star"]["jmag"] = Simbad.query_object(planet_name[:-1])['FLUX_J'][0] #planet_data['Jmag']
+                star_name = getStarName(planet_name)
+                exodata["star"]["jmag"] = Simbad.query_object(star_name)['FLUX_J'][0] #planet_data['Jmag']
                 exodata["star"]["ref_wave"] = 1.25
 
                 # optional star radius
@@ -583,8 +616,9 @@ class CalculationNewHSTHandler(BaseHandler):
                 #star
                 exodata["star"]["temp"] = planet_data['Teff']
 
-                jmag = Simbad.query_object(planet_name[:-1])['FLUX_J'][0]
-                hmag = Simbad.query_object(planet_name[:-1])['FLUX_H'][0]
+                star_name = getStarName(planet_name)
+                jmag = Simbad.query_object(star_name)['FLUX_J'][0]
+                hmag = Simbad.query_object(star_name)['FLUX_H'][0]
 
                 exodata["star"]["jmag"] = jmag
                 exodata["star"]["hmag"] = hmag
