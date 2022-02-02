@@ -4,7 +4,7 @@
         <select id="planetname" name="planetname" class="form-control" data-placeholder="{{data['planet']['planetname']}}">
             <option value=""></option> 
             {% for i in planets %}
-                <option {{ escape(i) }} value={{ escape(i) }}>{{ escape(i) }}</option>
+                <option {{ escape(i) }} value="{{ escape(i) }}">{{ escape(i) }}</option>
             {% end %}               
         </select>
             <span id="helpBlock" class="help-block">The name of a target to resolve in ExoMAST</span>

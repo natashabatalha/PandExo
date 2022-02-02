@@ -64,24 +64,15 @@ def getStarName(planet_name):
     - If `planet_name` is 'HAT-P-1  ' it returns 'HAT-P-1'.
     """
 
-    star_name = copy.copy(planet_name) 
-
-    # Check if last character is space:
-    if star_name[-1] == ' ':
-        
-        star_name = star_name[:-1]
-        star_name = getStarName(star_name)
+    star_name = planet_name.strip()
 
     # Check if last character is a letter:
     if str.isalpha(star_name[-1]):
-
         if star_name[-1] == star_name[-1].lower():
-
             star_name = star_name[:-1]
-            star_name = getStarName(star_name)
-
+            
     # Return trimmed string:
-    return star_name
+    return star_name.strip()
 
 class Application(tornado.web.Application):
     """Gobal settings of the server
@@ -336,7 +327,9 @@ class CalculationNewHandler(BaseHandler):
                 exodata["star"]["logg"] = planet_data['stellar_gravity']
                 exodata["star"]["metal"] = planet_data['Fe/H'] 
                 # Keep Simbad query, as exoMAST typically does not have Jmag:
+
                 star_name = getStarName(planet_name)
+
                 exodata["star"]["jmag"] = Simbad.query_object(star_name)['FLUX_J'][0] #planet_data['Jmag']
                 exodata["star"]["ref_wave"] = 1.25
 
