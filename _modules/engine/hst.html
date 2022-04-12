@@ -17,41 +17,34 @@
   
 
   
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
-  
-  
-    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  
-
-  
-
-  
-        <link rel="index" title="Index"
-              href="../../genindex.html"/>
-        <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="PandExo  documentation" href="../../index.html"/>
-        <link rel="up" title="Module code" href="../index.html"/> 
-
-  
-  <script src="../../_static/js/modernizr.min.js"></script>
-
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -109,7 +102,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../index.html">PandExo</a>
@@ -117,9 +110,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -149,8 +143,6 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
-        
       </li>
     
   </ul>
@@ -164,10 +156,10 @@
   <h1>Source code for engine.hst</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">from</span> <span class="nn">.create_input</span> <span class="k">import</span> <span class="n">hst_spec</span>
+<span class="kn">from</span> <span class="nn">.create_input</span> <span class="kn">import</span> <span class="n">hst_spec</span>
 <span class="kn">import</span> <span class="nn">batman</span>
-<span class="kn">from</span> <span class="nn">.RECTE</span> <span class="k">import</span> <span class="n">RECTE</span>
-<span class="kn">from</span> <span class="nn">scipy</span> <span class="k">import</span> <span class="n">optimize</span>
+<span class="kn">from</span> <span class="nn">.RECTE</span> <span class="kn">import</span> <span class="n">RECTE</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">optimize</span>
 
 <div class="viewcode-block" id="wfc3_GuessNOrbits"><a class="viewcode-back" href="../../engine.html#engine.hst.wfc3_GuessNOrbits">[docs]</a><span class="k">def</span> <span class="nf">wfc3_GuessNOrbits</span><span class="p">(</span><span class="n">trdur</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;Predict number of HST orbits</span>
@@ -636,10 +628,11 @@
     <span class="c1"># Compute light curves at extremes of HST start window</span>
     <span class="n">npts</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="n">ptsOrbit</span> <span class="o">*</span> <span class="n">numOrbits</span><span class="p">)</span>
     <span class="n">phdur</span> <span class="o">=</span> <span class="n">duration</span><span class="o">/</span><span class="n">period</span>
+    
     <span class="n">phase1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">minphase</span><span class="o">+</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">useFirstOrbit</span><span class="p">)</span><span class="o">*</span><span class="n">hstperiod</span><span class="o">/</span><span class="n">period</span><span class="p">,</span>
-                         <span class="n">minphase</span><span class="o">+</span><span class="n">hstperiod</span><span class="o">/</span><span class="n">period</span><span class="o">*</span><span class="p">(</span><span class="n">numOrbits</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="n">hstperiod</span><span class="o">/</span><span class="n">period</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">npts</span><span class="p">)</span>
+                         <span class="n">minphase</span><span class="o">+</span><span class="n">hstperiod</span><span class="o">/</span><span class="n">period</span><span class="o">*</span><span class="p">(</span><span class="n">numOrbits</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="n">hstperiod</span><span class="o">/</span><span class="n">period</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">npts</span><span class="p">))</span>
     <span class="n">phase2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">maxphase</span><span class="o">+</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">useFirstOrbit</span><span class="p">)</span><span class="o">*</span><span class="n">hstperiod</span><span class="o">/</span><span class="n">period</span><span class="p">,</span>
-                         <span class="n">maxphase</span><span class="o">+</span><span class="n">hstperiod</span><span class="o">/</span><span class="n">period</span><span class="o">*</span><span class="p">(</span><span class="n">numOrbits</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="n">hstperiod</span><span class="o">/</span><span class="n">period</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">npts</span><span class="p">)</span>
+                         <span class="n">maxphase</span><span class="o">+</span><span class="n">hstperiod</span><span class="o">/</span><span class="n">period</span><span class="o">*</span><span class="p">(</span><span class="n">numOrbits</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="n">hstperiod</span><span class="o">/</span><span class="n">period</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">npts</span><span class="p">))</span>
     <span class="n">m</span> <span class="o">=</span> <span class="n">batman</span><span class="o">.</span><span class="n">TransitModel</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">phase1</span><span class="p">)</span>
     <span class="n">trmodel1</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">light_curve</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
     <span class="n">m</span> <span class="o">=</span> <span class="n">batman</span><span class="o">.</span><span class="n">TransitModel</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">phase2</span><span class="p">)</span>
@@ -648,9 +641,9 @@
     <span class="n">obsphase2</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numOrbits</span><span class="p">):</span>
         <span class="n">obsphase1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">r_</span><span class="p">[</span><span class="n">obsphase1</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span>
-            <span class="n">minphase</span><span class="o">+</span><span class="n">hstperiod</span><span class="o">/</span><span class="n">period</span><span class="o">*</span><span class="n">i</span><span class="p">,</span> <span class="n">minphase</span><span class="o">+</span><span class="n">hstperiod</span><span class="o">/</span><span class="n">period</span><span class="o">*</span><span class="n">i</span><span class="o">+</span><span class="n">hstperiod</span><span class="o">/</span><span class="n">period</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">ptsOrbit</span><span class="p">)]</span>
+            <span class="n">minphase</span><span class="o">+</span><span class="n">hstperiod</span><span class="o">/</span><span class="n">period</span><span class="o">*</span><span class="n">i</span><span class="p">,</span> <span class="n">minphase</span><span class="o">+</span><span class="n">hstperiod</span><span class="o">/</span><span class="n">period</span><span class="o">*</span><span class="n">i</span><span class="o">+</span><span class="n">hstperiod</span><span class="o">/</span><span class="n">period</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">ptsOrbit</span><span class="p">))]</span>
         <span class="n">obsphase2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">r_</span><span class="p">[</span><span class="n">obsphase2</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span>
-            <span class="n">maxphase</span><span class="o">+</span><span class="n">hstperiod</span><span class="o">/</span><span class="n">period</span><span class="o">*</span><span class="n">i</span><span class="p">,</span> <span class="n">maxphase</span><span class="o">+</span><span class="n">hstperiod</span><span class="o">/</span><span class="n">period</span><span class="o">*</span><span class="n">i</span><span class="o">+</span><span class="n">hstperiod</span><span class="o">/</span><span class="n">period</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">ptsOrbit</span><span class="p">)]</span>
+            <span class="n">maxphase</span><span class="o">+</span><span class="n">hstperiod</span><span class="o">/</span><span class="n">period</span><span class="o">*</span><span class="n">i</span><span class="p">,</span> <span class="n">maxphase</span><span class="o">+</span><span class="n">hstperiod</span><span class="o">/</span><span class="n">period</span><span class="o">*</span><span class="n">i</span><span class="o">+</span><span class="n">hstperiod</span><span class="o">/</span><span class="n">period</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">ptsOrbit</span><span class="p">))]</span>
     <span class="n">m</span> <span class="o">=</span> <span class="n">batman</span><span class="o">.</span><span class="n">TransitModel</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">obsphase1</span><span class="p">)</span>
     <span class="n">obstr1</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">light_curve</span><span class="p">(</span><span class="n">params</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">rms</span><span class="p">,</span> <span class="n">obsphase1</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
     <span class="n">m</span> <span class="o">=</span> <span class="n">batman</span><span class="o">.</span><span class="n">TransitModel</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">obsphase2</span><span class="p">)</span>
@@ -700,7 +693,7 @@
 
     <span class="c1"># Smooth model spectrum (optional)</span>
     <span class="k">if</span> <span class="n">smooth</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="kn">from</span> <span class="nn">.hst_smooth</span> <span class="k">import</span> <span class="n">smooth</span> <span class="k">as</span> <span class="n">sm</span>
+        <span class="kn">from</span> <span class="nn">.hst_smooth</span> <span class="kn">import</span> <span class="n">smooth</span> <span class="k">as</span> <span class="n">sm</span>
         <span class="n">mspec</span> <span class="o">=</span> <span class="n">sm</span><span class="p">(</span><span class="n">mspec</span><span class="p">,</span> <span class="n">smooth</span><span class="p">)</span>
 
     <span class="c1"># Determine disperser wavelength boundaries</span>
@@ -790,7 +783,7 @@
     <span class="k">return</span> <span class="n">resultDict</span></div>
 
 
-<div class="viewcode-block" id="compute_sim_hst"><a class="viewcode-back" href="../../engine.html#engine.hst.compute_sim_hst">[docs]</a><span class="k">def</span> <span class="nf">compute_sim_hst</span><span class="p">(</span><span class="n">dictinput</span><span class="p">):</span>
+<div class="viewcode-block" id="compute_sim_hst"><a class="viewcode-back" href="../../engine.html#engine.hst.compute_sim_hst">[docs]</a><span class="k">def</span> <span class="nf">compute_sim_hst</span><span class="p">(</span><span class="n">dictinput</span><span class="p">,</span><span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Sets up HST simulations</span>
 
 <span class="sd">    Function to set up explanet observations for HST only and</span>
@@ -815,8 +808,8 @@
     <span class="n">calRamp</span> <span class="o">=</span> <span class="n">pandeia_input</span><span class="p">[</span><span class="s1">&#39;strategy&#39;</span><span class="p">][</span><span class="s1">&#39;calculateRamp&#39;</span><span class="p">]</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">pandeia_input</span><span class="p">[</span><span class="s1">&#39;strategy&#39;</span><span class="p">][</span><span class="s1">&#39;useFirstOrbit&#39;</span><span class="p">]:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Dropping first orbit designed by observation strategy&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Do not calculate ramp profile&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Dropping first orbit designed by observation strategy&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Do not calculate ramp profile&quot;</span><span class="p">)</span>
         <span class="n">calRamp</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">numorbits</span> <span class="o">=</span> <span class="n">pandeia_input</span><span class="p">[</span><span class="s1">&#39;strategy&#39;</span><span class="p">][</span><span class="s1">&#39;norbits&#39;</span><span class="p">]</span>
     <span class="n">nchan</span> <span class="o">=</span> <span class="n">pandeia_input</span><span class="p">[</span><span class="s1">&#39;strategy&#39;</span><span class="p">][</span><span class="s1">&#39;nchan&#39;</span><span class="p">]</span>
@@ -1105,9 +1098,7 @@
 </pre></div>
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -1116,11 +1107,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2016, Natasha Batalha;Kevin Stevenson.
+        &copy; Copyright 2016, Natasha Batalha;Kevin Stevenson
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -1133,36 +1124,15 @@
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../',
-            VERSION:'',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../_static/doctools.js"></script>
-
-  
-
-  
-  
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
-  
-
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
+
+  
+  
+    
    
 
 </body>

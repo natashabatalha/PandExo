@@ -17,42 +17,36 @@
   
 
   
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
-  
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-
-  
-
-  
-        <link rel="index" title="Index"
-              href="genindex.html"/>
-        <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="PandExo  documentation" href="index.html"/>
-        <link rel="next" title="JWST Tutorial" href="tutorialjwst.html"/>
-        <link rel="prev" title="Pre-installation Data Download" href="installation.html"/> 
-
-  
-  <script src="_static/js/modernizr.min.js"></script>
-
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="JWST Tutorial" href="tutorialjwst.html" />
+    <link rel="prev" title="Pre-installation Data Download" href="installation.html" /> 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -121,7 +115,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">PandExo</a>
@@ -129,9 +123,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -189,8 +184,8 @@ Univesity of Amsterdam and VU University Amsterdam</p>
 <h2>Step 3<a class="headerlink" href="#step-3" title="Permalink to this headline">¶</a></h2>
 <p>Install Anaconda as main python and add to path environment</p>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">If succesfully installed you can open CMD and type <cite>&gt;&gt;python</cite> and <cite>&gt;&gt;quit()</cite> to check version</p>
+<p class="admonition-title">Note</p>
+<p>If succesfully installed you can open CMD and type <cite>&gt;&gt;python</cite> and <cite>&gt;&gt;quit()</cite> to check version</p>
 </div>
 </div>
 <div class="section" id="step-4">
@@ -201,9 +196,9 @@ Univesity of Amsterdam and VU University Amsterdam</p>
 <h2>Step 5<a class="headerlink" href="#step-5" title="Permalink to this headline">¶</a></h2>
 <p><a class="reference external" href="https://natashabatalha.github.io/PandExo/installation.html">Follow PandExo Installation guide in getting files</a></p>
 <ul class="simple">
-<li>get pandeia_data      (pandeia_data-1.2.tar.gz)</li>
-<li>get pysynphot_data        (synphot5.tar.gz)</li>
-<li>get PandExo github folder (pandexo-master.zip)</li>
+<li><p>get pandeia_data      (pandeia_data-1.2.tar.gz)</p></li>
+<li><p>get pysynphot_data        (synphot5.tar.gz)</p></li>
+<li><p>get PandExo github folder (pandexo-master.zip)</p></li>
 </ul>
 </div>
 <div class="section" id="step-6">
@@ -213,17 +208,17 @@ Univesity of Amsterdam and VU University Amsterdam</p>
 <div class="section" id="step-7-setting-reference-data">
 <h2>Step 7: Setting Reference Data<a class="headerlink" href="#step-7-setting-reference-data" title="Permalink to this headline">¶</a></h2>
 <p>Using an achiver (eg. Winrar, 7Zip) extract Pandeia and Pysynphot data in two seperate folders.</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>C:/Users/USERNAME/pandeia_data
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>C:/Users/USERNAME/pandeia_data
 C:/Users/USERNAME/pysynphot_data
 </pre></div>
 </div>
 <p>Check the variable names</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="nb">echo</span> <span class="s1">&#39;export VARIABLE_NAME = &quot;..&quot;&#39;</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">echo</span> <span class="s1">&#39;export VARIABLE_NAME = &quot;..&quot;&#39;</span>
 </pre></div>
 </div>
 <p>In case nothing changes these should be <cite>PYSYN_CDBS</cite> &amp; <cite>pandeia_refdata</cite></p>
 <p>Set these in Windows environment variables / registry using SETX. Open CMD or Anaconda Prompt and run:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>SETX PYSYN_CDBS <span class="s1">&#39;C:/Users/USERNAME/pysynphot_data&#39;</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>SETX PYSYN_CDBS <span class="s1">&#39;C:/Users/USERNAME/pysynphot_data&#39;</span>
 SETX pandeia_refdata <span class="s1">&#39;C:/Users/USERNAME/pysynphot_data&#39;</span>
 </pre></div>
 </div>
@@ -232,19 +227,19 @@ SETX pandeia_refdata <span class="s1">&#39;C:/Users/USERNAME/pysynphot_data&#39;
 <div class="section" id="step-7-installing-needed-packages">
 <h2>Step 7: Installing needed Packages<a class="headerlink" href="#step-7-installing-needed-packages" title="Permalink to this headline">¶</a></h2>
 <p>Add conda channel, in CMD:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>conda config --add channels http://ssb.stsci.edu/astroconda
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda config --add channels http://ssb.stsci.edu/astroconda
 </pre></div>
 </div>
 <p>Check needed packages, at the moment:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>numpy synphot joblib scipy <span class="nv">astropy</span><span class="o">==</span><span class="m">2</span>.0.2 pyfftw pysynphot photutils <span class="nv">sphinx</span><span class="o">=</span><span class="m">1</span>.5.6 <span class="nv">bokeh</span><span class="o">=</span><span class="m">0</span>.12.6
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>numpy synphot joblib scipy <span class="nv">astropy</span><span class="o">==</span><span class="m">2</span>.0.2 pyfftw pysynphot photutils <span class="nv">sphinx</span><span class="o">=</span><span class="m">1</span>.5.6 <span class="nv">bokeh</span><span class="o">=</span><span class="m">0</span>.12.6
 </pre></div>
 </div>
 <p>All but <cite>Pyfftw</cite> can be installed using:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>conda install PACKAGE
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda install PACKAGE
 </pre></div>
 </div>
 <p>or</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>pip install PACKAGE
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install PACKAGE
 </pre></div>
 </div>
 <p>If they fail check in the error if you are missing a certain .dll or look online.</p>
@@ -252,15 +247,15 @@ SETX pandeia_refdata <span class="s1">&#39;C:/Users/USERNAME/pysynphot_data&#39;
 <p>Get a matching cp36-cp36 for your python version.
 For Python 3.6.4 64-bit I used:</p>
 <ul class="simple">
-<li><cite>pyFFTW-0.10.5.dev0+d45d7fe-cp36-cp36m-win_amd64.whl</cite></li>
+<li><p><cite>pyFFTW-0.10.5.dev0+d45d7fe-cp36-cp36m-win_amd64.whl</cite></p></li>
 </ul>
 <p>Navigate to download folder and install</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="nb">cd</span> <span class="s1">&#39;C:\Users\USERNAME\Downloads&#39;</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> <span class="s1">&#39;C:\Users\USERNAME\Downloads&#39;</span>
 pip install pyFFTW-0.10.5.dev0+d45d7fe-cp36-cp36m-win_amd64.whl
 </pre></div>
 </div>
 <p>With your fingers crossed, install PandExo Engine</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>pip install pandexo.engine
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install pandexo.engine
 </pre></div>
 </div>
 <p>Probabily fail, look what I/you missed and try again. <a class="reference external" href="https://natashabatalha.github.io/PandExo/installation.html#troubleshooting-common-errors">Troubleshooting here</a>.</p>
@@ -268,7 +263,7 @@ pip install pyFFTW-0.10.5.dev0+d45d7fe-cp36-cp36m-win_amd64.whl
 <div class="section" id="step-8-run-test">
 <h2>Step 8: Run Test<a class="headerlink" href="#step-8-run-test" title="Permalink to this headline">¶</a></h2>
 <p>Navigate to your pandexo-master and run the run_test. Check in the <a class="reference external" href="https://natashabatalha.github.io/PandExo/installation.html#pandexo-startup-bash-script">installation</a> guide on the exact expected output.</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="nb">cd</span> <span class="s1">&#39;...&#39;</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> <span class="s1">&#39;...&#39;</span>
 python run_test.py
 </pre></div>
 </div>
@@ -279,9 +274,7 @@ There are some test Jupyter files to try out in <cite>pandexo-master/notebooks</
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -290,7 +283,7 @@ There are some test Jupyter files to try out in <cite>pandexo-master/notebooks</
         <a href="tutorialjwst.html" class="btn btn-neutral float-right" title="JWST Tutorial" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="installation.html" class="btn btn-neutral" title="Pre-installation Data Download" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="installation.html" class="btn btn-neutral float-left" title="Pre-installation Data Download" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -299,11 +292,11 @@ There are some test Jupyter files to try out in <cite>pandexo-master/notebooks</
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2016, Natasha Batalha;Kevin Stevenson.
+        &copy; Copyright 2016, Natasha Batalha;Kevin Stevenson
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -316,36 +309,15 @@ There are some test Jupyter files to try out in <cite>pandexo-master/notebooks</
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-
-  
-
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
-
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
+
+  
+  
+    
    
 
 </body>

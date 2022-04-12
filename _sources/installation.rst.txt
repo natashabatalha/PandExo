@@ -17,7 +17,7 @@ JWST Reference data has been updated to 1.5!
     Reference data for OLD 1.3 is NOT backwards compatible with PandExo/Pandeia 1.4/1.5. The old reference data 
     can be found `here <http://ssb.stsci.edu/pandeia/engine/1.3/pandeia_data-1.3.tar.gz>`_ if you still wish to use PandExo v1.3. It is important to make sure that the version number of `PandExo` matches the version number of your reference data.
 
-The new reference data is located `here for V1p5 <https://stsci.app.box.com/v/pandeia-refdata-v1p5>`_. Hopefully backwards compatibility issues will subside as Pandeia becomes more mature.
+The new reference data is located `here for V1p6 <https://stsci.app.box.com/v/pandeia-refdata-v1p6>`_. Hopefully backwards compatibility issues will subside as Pandeia becomes more mature.
 
 
 After you have downloaded the reference data, create environment variable: 
@@ -45,6 +45,18 @@ Finally, create your environment variable:
 .. code-block:: bash 
 
     echo 'export PYSYN_CDBS="$USRDIR/path/to/data/files/grp/hst/cdbs"' >>~/.bash_profile
+
+Fortney+ 20210  Planet Grid (Optional)
+````````````````````````````````````````
+A user may want to install a grid of atmospheric models to simulate planet atmospheres. Some of the example notebooks use an atmospheric model grid. This grid can be obtained from:
+
+- `The ExoCTK Website <https://github.com/ExoCTK/exoctk#obtain-the-exoctk-data>`_.
+
+After downloading the Fortney files, create an environmental variable to point to them.
+
+.. code-block:: bash 
+
+    echo 'export FORTGRID_DIR="$USRDIR/path/to/data/files/fortney_models.db"' >>~/.bash_profile
 
 
 Installation with Pip or Git

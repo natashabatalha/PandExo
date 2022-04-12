@@ -17,42 +17,36 @@
   
 
   
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
-  
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-
-  
-
-  
-        <link rel="index" title="Index"
-              href="genindex.html"/>
-        <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="PandExo  documentation" href="index.html"/>
-        <link rel="next" title="Windows Installing Guide for PandExo" href="installation_windows.html"/>
-        <link rel="prev" title="Getting Started" href="includeme.html"/> 
-
-  
-  <script src="_static/js/modernizr.min.js"></script>
-
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Windows Installing Guide for PandExo" href="installation_windows.html" />
+    <link rel="prev" title="Getting Started" href="includeme.html" /> 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -91,6 +85,7 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Pre-installation Data Download</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#jwst-reference-data">JWST Reference Data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#stellar-seds">Stellar SEDs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#fortney-20210-planet-grid-optional">Fortney+ 20210  Planet Grid (Optional)</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="#installation-with-pip-or-git">Installation with Pip or Git</a></li>
@@ -125,7 +120,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">PandExo</a>
@@ -133,9 +128,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -178,8 +174,8 @@
            <div itemprop="articleBody">
             
   <div class="admonition warning">
-<p class="first admonition-title">Warning</p>
-<p class="last">Before reading further, if you do not wish to install PandExo,there is an online version of the code here at <a class="reference external" href="https://exoctk.stsci.edu/pandexo/">STScI&#8217;s ExoCTK</a>.</p>
+<p class="admonition-title">Warning</p>
+<p>Before reading further, if you do not wish to install PandExo,there is an online version of the code here at <a class="reference external" href="https://exoctk.stsci.edu/pandexo/">STScI’s ExoCTK</a>.</p>
 </div>
 <div class="section" id="pre-installation-data-download">
 <h1>Pre-installation Data Download<a class="headerlink" href="#pre-installation-data-download" title="Permalink to this headline">¶</a></h1>
@@ -188,13 +184,13 @@
 <h2>JWST Reference Data<a class="headerlink" href="#jwst-reference-data" title="Permalink to this headline">¶</a></h2>
 <p>JWST Reference data has been updated to 1.5!</p>
 <div class="admonition warning">
-<p class="first admonition-title">Warning</p>
-<p class="last">Reference data for OLD 1.3 is NOT backwards compatible with PandExo/Pandeia 1.4/1.5. The old reference data
+<p class="admonition-title">Warning</p>
+<p>Reference data for OLD 1.3 is NOT backwards compatible with PandExo/Pandeia 1.4/1.5. The old reference data
 can be found <a class="reference external" href="http://ssb.stsci.edu/pandeia/engine/1.3/pandeia_data-1.3.tar.gz">here</a> if you still wish to use PandExo v1.3. It is important to make sure that the version number of <cite>PandExo</cite> matches the version number of your reference data.</p>
 </div>
-<p>The new reference data is located <a class="reference external" href="https://stsci.app.box.com/v/pandeia-refdata-v1p5">here for V1p5</a>. Hopefully backwards compatibility issues will subside as Pandeia becomes more mature.</p>
+<p>The new reference data is located <a class="reference external" href="https://stsci.app.box.com/v/pandeia-refdata-v1p6">here for V1p6</a>. Hopefully backwards compatibility issues will subside as Pandeia becomes more mature.</p>
 <p>After you have downloaded the reference data, create environment variable:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="nb">echo</span> <span class="s1">&#39;export pandeia_refdata=&quot;$USRDIR/pandeia_data&quot;&#39;</span> &gt;&gt;~/.bash_profile
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">echo</span> <span class="s1">&#39;export pandeia_refdata=&quot;$USRDIR/pandeia_data&quot;&#39;</span> &gt;&gt;~/.bash_profile
 </pre></div>
 </div>
 </div>
@@ -203,15 +199,26 @@ can be found <a class="reference external" href="http://ssb.stsci.edu/pandeia/en
 <p>Likewise, the user may wish to install specific data for use with the PySynPhot package Pandeia uses. We will only be using the Phoenix stellar atlas, which can be downloaded <a class="reference external" href="ftp://ftp.stsci.edu/cdbs/tarfiles/synphot5.tar.gz">here</a>.</p>
 <p>More reference files can be downloaded via ftp:</p>
 <ul class="simple">
-<li>ftp archive.stsci.edu</li>
-<li>username &#8220;anonymous&#8221;</li>
-<li>password is your e-mail address</li>
-<li>cd pub/hst/pysynphot</li>
-<li>download desired files.</li>
+<li><p>ftp archive.stsci.edu</p></li>
+<li><p>username “anonymous”</p></li>
+<li><p>password is your e-mail address</p></li>
+<li><p>cd pub/hst/pysynphot</p></li>
+<li><p>download desired files.</p></li>
 </ul>
-<p><em>Note</em> that the tar.gz files downloaded from the STScI anonymous FTP site will untar into the directory structure &#8220;grp/hst/cdbs&#8221;, with the actual data files in an assortment of directories under &#8220;cdbs&#8221;. pysynphot (and pandeia) expect that the &#8220;PYSYN_CDBS&#8221; environment variable will point to the &#8220;cdbs&#8221; directory. As such, you can either move the files out of &#8220;grp/hst/&#8221; to wherever you would like to store them, or point &#8220;PYSYN_CDBS&#8221; to &#8220;/path/to/data/files/grp/hst/cdbs&#8221; in order to allow pysynphot and pandeia to properly detect the reference files.</p>
+<p><em>Note</em> that the tar.gz files downloaded from the STScI anonymous FTP site will untar into the directory structure “grp/hst/cdbs”, with the actual data files in an assortment of directories under “cdbs”. pysynphot (and pandeia) expect that the “PYSYN_CDBS” environment variable will point to the “cdbs” directory. As such, you can either move the files out of “grp/hst/” to wherever you would like to store them, or point “PYSYN_CDBS” to “/path/to/data/files/grp/hst/cdbs” in order to allow pysynphot and pandeia to properly detect the reference files.</p>
 <p>Finally, create your environment variable:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="nb">echo</span> <span class="s1">&#39;export PYSYN_CDBS=&quot;$USRDIR/path/to/data/files/grp/hst/cdbs&quot;&#39;</span> &gt;&gt;~/.bash_profile
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">echo</span> <span class="s1">&#39;export PYSYN_CDBS=&quot;$USRDIR/path/to/data/files/grp/hst/cdbs&quot;&#39;</span> &gt;&gt;~/.bash_profile
+</pre></div>
+</div>
+</div>
+<div class="section" id="fortney-20210-planet-grid-optional">
+<h2>Fortney+ 20210  Planet Grid (Optional)<a class="headerlink" href="#fortney-20210-planet-grid-optional" title="Permalink to this headline">¶</a></h2>
+<p>A user may want to install a grid of atmospheric models to simulate planet atmospheres. Some of the example notebooks use an atmospheric model grid. This grid can be obtained from:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/ExoCTK/exoctk#obtain-the-exoctk-data">The ExoCTK Website</a>.</p></li>
+</ul>
+<p>After downloading the Fortney files, create an environmental variable to point to them.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">echo</span> <span class="s1">&#39;export FORTGRID_DIR=&quot;$USRDIR/path/to/data/files/fortney_models.db&quot;&#39;</span> &gt;&gt;~/.bash_profile
 </pre></div>
 </div>
 </div>
@@ -219,16 +226,16 @@ can be found <a class="reference external" href="http://ssb.stsci.edu/pandeia/en
 <div class="section" id="installation-with-pip-or-git">
 <h1>Installation with Pip or Git<a class="headerlink" href="#installation-with-pip-or-git" title="Permalink to this headline">¶</a></h1>
 <p>Install STScI specific packages</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>conda config --add channels http://ssb.stsci.edu/astroconda
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda config --add channels http://ssb.stsci.edu/astroconda
 conda install pyfftw
 </pre></div>
 </div>
 <p>Now, install <cite>pandexo</cite>.</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>pip install pandexo.engine
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install pandexo.engine
 </pre></div>
 </div>
-<p>OR Download PandExo&#8217;s repository via Github. The Github also has helpful notebooks for getting started!</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>git clone --recursive https://github.com/natashabatalha/pandexo
+<p>OR Download PandExo’s repository via Github. The Github also has helpful notebooks for getting started!</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git clone --recursive https://github.com/natashabatalha/pandexo
 <span class="nb">cd</span> pandexo
 python setup.py install
 </pre></div>
@@ -236,8 +243,8 @@ python setup.py install
 </div>
 <div class="section" id="final-test-for-success">
 <h1>Final Test for Success<a class="headerlink" href="#final-test-for-success" title="Permalink to this headline">¶</a></h1>
-<p>There is a <cite>run_test.py</cite> in the <cite>github</cite>. Test that you&#8217;re code is working:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>python run_test.py
+<p>There is a <cite>run_test.py</cite> in the <cite>github</cite>. Test that you’re code is working:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python run_test.py
 Starting TEST run
 Running Single Case <span class="k">for</span>: NIRSpec G140H
 Optimization Reqested: Computing Duty Cycle
@@ -255,7 +262,7 @@ SUCCESS
 <div class="section" id="pyfftw">
 <h2>PyFFTW<a class="headerlink" href="#pyfftw" title="Permalink to this headline">¶</a></h2>
 <p>PyFFTW is needed to run PandExo. In order to run PyFFTW you need to also isntall fftw. To do so, it is necessary to do so through Homebrew, if you do not have conda.</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>brew install fftw
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>brew install fftw
 pip install pyfftw
 </pre></div>
 </div>
@@ -263,7 +270,7 @@ pip install pyfftw
 <div class="section" id="multiprocessing">
 <h2>Multiprocessing<a class="headerlink" href="#multiprocessing" title="Permalink to this headline">¶</a></h2>
 <p>Python 2.7 users might need to install multiprocessing</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>pip install multiprocessing
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install multiprocessing
 </pre></div>
 </div>
 </div>
@@ -271,11 +278,11 @@ pip install pyfftw
 <h2>RecursionError: maximum recursion depth exceeded while calling a Python object<a class="headerlink" href="#recursionerror-maximum-recursion-depth-exceeded-while-calling-a-python-object" title="Permalink to this headline">¶</a></h2>
 <p>There is a known bug with Python 3.6 and Sphinx &lt;1.6. Before updating or installing pandexo do the following:</p>
 <p>PIP USERS:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>pip install <span class="nv">sphinx</span><span class="o">==</span><span class="m">1</span>.5.6
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install <span class="nv">sphinx</span><span class="o">==</span><span class="m">1</span>.5.6
 </pre></div>
 </div>
 <p>CONDA USERS:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>conda install <span class="nv">sphinx</span><span class="o">=</span><span class="m">1</span>.5.6
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda install <span class="nv">sphinx</span><span class="o">=</span><span class="m">1</span>.5.6
 </pre></div>
 </div>
 </div>
@@ -283,11 +290,11 @@ pip install pyfftw
 <h2>TypeError: super() argument 1 must be type<a class="headerlink" href="#typeerror-super-argument-1-must-be-type" title="Permalink to this headline">¶</a></h2>
 <p>This is the same error above with Sphinx, but for Python 2.7 users. The fix is the same:</p>
 <p>PIP USERS:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>pip install <span class="nv">sphinx</span><span class="o">==</span><span class="m">1</span>.5.6
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install <span class="nv">sphinx</span><span class="o">==</span><span class="m">1</span>.5.6
 </pre></div>
 </div>
 <p>CONDA USERS:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>conda install <span class="nv">sphinx</span><span class="o">=</span><span class="m">1</span>.5.6
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda install <span class="nv">sphinx</span><span class="o">=</span><span class="m">1</span>.5.6
 </pre></div>
 </div>
 </div>
@@ -297,17 +304,17 @@ pip install pyfftw
 <p>It is crucial that your verison of PandExo remain up to date. Especially through commissioning and leading up to launch, there may be crucial changes to the code or the reference data. Updating PandExo requires three crucial steps.</p>
 <div class="section" id="verify-reference-data-is-current">
 <h2>Verify Reference Data is Current<a class="headerlink" href="#verify-reference-data-is-current" title="Permalink to this headline">¶</a></h2>
-<p>The link to the reference data is located on <a class="reference external" href="https://pypi.python.org/pypi/pandeia.engine/">Pandeia&#8217;s PyPI page</a>. Before doing a large batch of calculations, make sure that you have this version.</p>
+<p>The link to the reference data is located on <a class="reference external" href="https://pypi.python.org/pypi/pandeia.engine/">Pandeia’s PyPI page</a>. Before doing a large batch of calculations, make sure that you have this version.</p>
 </div>
 <div class="section" id="verify-pandeia-engine-is-current">
 <h2>Verify pandeia.engine is Current<a class="headerlink" href="#verify-pandeia-engine-is-current" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>pip install pandeia.engine --upgrade
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install pandeia.engine --upgrade
 </pre></div>
 </div>
 </div>
 <div class="section" id="verify-pandexo-engine-is-current">
 <h2>Verify pandexo.engine is Current<a class="headerlink" href="#verify-pandexo-engine-is-current" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>pip install pandexo.engine --upgrade
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install pandexo.engine --upgrade
 </pre></div>
 </div>
 </div>
@@ -315,9 +322,7 @@ pip install pyfftw
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -326,7 +331,7 @@ pip install pyfftw
         <a href="installation_windows.html" class="btn btn-neutral float-right" title="Windows Installing Guide for PandExo" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="includeme.html" class="btn btn-neutral" title="Getting Started" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="includeme.html" class="btn btn-neutral float-left" title="Getting Started" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -335,11 +340,11 @@ pip install pyfftw
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2016, Natasha Batalha;Kevin Stevenson.
+        &copy; Copyright 2016, Natasha Batalha;Kevin Stevenson
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -352,36 +357,15 @@ pip install pyfftw
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-
-  
-
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
-
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
+
+  
+  
+    
    
 
 </body>

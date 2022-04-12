@@ -17,42 +17,36 @@
   
 
   
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
-  
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-
-  
-
-  
-        <link rel="index" title="Index"
-              href="genindex.html"/>
-        <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="PandExo  documentation" href="index.html"/>
-        <link rel="next" title="Possible Instrument Input Params" href="jwstinput.html"/>
-        <link rel="prev" title="Windows Installing Guide for PandExo" href="installation_windows.html"/> 
-
-  
-  <script src="_static/js/modernizr.min.js"></script>
-
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Possible Instrument Input Params" href="jwstinput.html" />
+    <link rel="prev" title="Windows Installing Guide for PandExo" href="installation_windows.html" /> 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -143,7 +137,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">PandExo</a>
@@ -151,9 +145,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -199,13 +194,13 @@
 <h1>JWST Tutorial<a class="headerlink" href="#jwst-tutorial" title="Permalink to this headline">¶</a></h1>
 <p>Here you will learn how to:</p>
 <ul class="simple">
-<li>set planet properties</li>
-<li>set stellar properties</li>
-<li>run default instrument modes</li>
-<li>adjust instrument modes</li>
-<li>run pandexo</li>
+<li><p>set planet properties</p></li>
+<li><p>set stellar properties</p></li>
+<li><p>run default instrument modes</p></li>
+<li><p>adjust instrument modes</p></li>
+<li><p>run pandexo</p></li>
 </ul>
-<div class="code ipython3 highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">warnings</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">warnings</span>
 <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
 <span class="kn">import</span> <span class="nn">pandexo.engine.justdoit</span> <span class="k">as</span> <span class="nn">jdi</span> <span class="c1"># THIS IS THE HOLY GRAIL OF PANDEXO</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -217,7 +212,7 @@
 <h2>Setting up a run<a class="headerlink" href="#setting-up-a-run" title="Permalink to this headline">¶</a></h2>
 <p>To start, load in a blank exoplanet dictionary with empty keys. You will
 fill these out for yourself in the next step.</p>
-<div class="code ipython3 highlight-default"><div class="highlight"><pre><span></span><span class="n">exo_dict</span> <span class="o">=</span> <span class="n">jdi</span><span class="o">.</span><span class="n">load_exo_dict</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">exo_dict</span> <span class="o">=</span> <span class="n">jdi</span><span class="o">.</span><span class="n">load_exo_dict</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">exo_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
 <span class="c1">#print(exo_dict[&#39;star&#39;][&#39;w_unit&#39;])</span>
 </pre></div>
@@ -226,7 +221,7 @@ fill these out for yourself in the next step.</p>
 <h3>Edit exoplanet observation inputs<a class="headerlink" href="#edit-exoplanet-observation-inputs" title="Permalink to this headline">¶</a></h3>
 <p>Editting each keys are annoying. But, do this carefully or it could
 result in nonsense runs</p>
-<div class="code ipython3 highlight-default"><div class="highlight"><pre><span></span><span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;observation&#39;</span><span class="p">][</span><span class="s1">&#39;sat_level&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">80</span>    <span class="c1">#saturation level in percent of full well</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;observation&#39;</span><span class="p">][</span><span class="s1">&#39;sat_level&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">80</span>    <span class="c1">#saturation level in percent of full well</span>
 <span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;observation&#39;</span><span class="p">][</span><span class="s1">&#39;sat_unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;%&#39;</span>
 <span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;observation&#39;</span><span class="p">][</span><span class="s1">&#39;noccultations&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span> <span class="c1">#number of transits</span>
 <span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;observation&#39;</span><span class="p">][</span><span class="s1">&#39;R&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>          <span class="c1">#fixed binning. I usually suggest ZERO binning.. you can always bin later</span>
@@ -247,7 +242,7 @@ result in nonsense runs</p>
 w_unit or f_unit, but you <strong>do</strong> have to provide a temp, metal and logg.
 If you select ‘user’ you <strong>do not</strong> need to provide a temp, metal and
 logg, but you <strong>do</strong> need to provide units and starpath.</p>
-<div class="code ipython3 highlight-default"><div class="highlight"><pre><span></span><span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;star&#39;</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;phoenix&#39;</span>        <span class="c1">#phoenix or user (if you have your own)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;star&#39;</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;phoenix&#39;</span>        <span class="c1">#phoenix or user (if you have your own)</span>
 <span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;star&#39;</span><span class="p">][</span><span class="s1">&#39;mag&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">8.0</span>               <span class="c1">#magnitude of the system</span>
 <span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;star&#39;</span><span class="p">][</span><span class="s1">&#39;ref_wave&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.25</span>         <span class="c1">#For J mag = 1.25, H = 1.6, K =2.22.. etc (all in micron)</span>
 <span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;star&#39;</span><span class="p">][</span><span class="s1">&#39;temp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">5500</span>             <span class="c1">#in K</span>
@@ -259,13 +254,13 @@ logg, but you <strong>do</strong> need to provide units and starpath.</p>
 <div class="section" id="edit-exoplanet-inputs-using-one-of-three-options">
 <h3>Edit exoplanet inputs using one of three options<a class="headerlink" href="#edit-exoplanet-inputs-using-one-of-three-options" title="Permalink to this headline">¶</a></h3>
 <ol class="arabic simple">
-<li>user specified</li>
-<li>constant value</li>
-<li>select from grid</li>
+<li><p>user specified</p></li>
+<li><p>constant value</p></li>
+<li><p>select from grid</p></li>
 </ol>
 <div class="section" id="edit-exoplanet-planet-inputs-if-using-your-own-model">
 <h4>1) Edit exoplanet planet inputs if using your own model<a class="headerlink" href="#edit-exoplanet-planet-inputs-if-using-your-own-model" title="Permalink to this headline">¶</a></h4>
-<div class="code ipython3 highlight-default"><div class="highlight"><pre><span></span><span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span><span class="s1">&#39;user&#39;</span>                       <span class="c1">#tells pandexo you are uploading your own spectrum</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span><span class="s1">&#39;user&#39;</span>                       <span class="c1">#tells pandexo you are uploading your own spectrum</span>
 <span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;exopath&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;wasp12b.txt&#39;</span>
 <span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;w_unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;cm&#39;</span>                      <span class="c1">#other options include &quot;um&quot;,&quot;nm&quot; ,&quot;Angs&quot;, &quot;sec&quot; (for phase curves)</span>
 <span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;f_unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;rp^2/r*^2&#39;</span>               <span class="c1">#other options are &#39;fp/f*&#39;</span>
@@ -276,7 +271,7 @@ logg, but you <strong>do</strong> need to provide units and starpath.</p>
 </div>
 <div class="section" id="users-can-also-add-in-a-constant-temperature-or-a-constant-transit-depth">
 <h4>2) Users can also add in a constant temperature or a constant transit depth<a class="headerlink" href="#users-can-also-add-in-a-constant-temperature-or-a-constant-transit-depth" title="Permalink to this headline">¶</a></h4>
-<div class="code ipython3 highlight-default"><div class="highlight"><pre><span></span><span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;constant&#39;</span>                  <span class="c1">#tells pandexo you want a fixed transit depth</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;constant&#39;</span>                  <span class="c1">#tells pandexo you want a fixed transit depth</span>
 <span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;transit_duration&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.0</span><span class="o">*</span><span class="mf">60.0</span><span class="o">*</span><span class="mf">60.0</span>   <span class="c1">#transit duration</span>
 <span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;td_unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;s&#39;</span>
 <span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;radius&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
@@ -296,7 +291,7 @@ logg, but you <strong>do</strong> need to provide units and starpath.</p>
 <h4>3) Select from grid<a class="headerlink" href="#select-from-grid" title="Permalink to this headline">¶</a></h4>
 <p>NOTE: Currently only the fortney grid for hot Jupiters from Fortney+2010
 is supported. Holler though, if you want another grid supported</p>
-<div class="code ipython3 highlight-default"><div class="highlight"><pre><span></span><span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;grid&#39;</span>                <span class="c1">#tells pandexo you want to pull from the grid</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;grid&#39;</span>                <span class="c1">#tells pandexo you want to pull from the grid</span>
 <span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;temp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1000</span>                 <span class="c1">#grid: 500, 750, 1000, 1250, 1500, 1750, 2000, 2250, 2500</span>
 <span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;chem&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;noTiO&#39;</span>              <span class="c1">#options: &#39;noTiO&#39; and &#39;eqchem&#39;, noTiO is chemical eq. without TiO</span>
 <span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;cloud&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;ray10&#39;</span>               <span class="c1">#options: nothing: &#39;0&#39;,</span>
@@ -324,11 +319,11 @@ the smallest frame time and the readout mode with 1 frame/1 group
 (standard): - NIRCam F444W - NIRSpec Prism - NIRSpec G395M - NIRSpec
 G395H - NIRSpec G235H - NIRSpec G235M - NIRCam F322W - NIRSpec G140M -
 NIRSpec G140H - MIRI LRS - NIRISS SOSS</p>
-<div class="code ipython3 highlight-default"><div class="highlight"><pre><span></span><span class="c1">#jdi.print_instruments()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#jdi.print_instruments()</span>
 <span class="n">result</span> <span class="o">=</span> <span class="n">jdi</span><span class="o">.</span><span class="n">run_pandexo</span><span class="p">(</span><span class="n">exo_dict</span><span class="p">,[</span><span class="s1">&#39;NIRCam F322W2&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
-<div class="code ipython3 highlight-default"><div class="highlight"><pre><span></span><span class="n">inst_dict</span> <span class="o">=</span> <span class="n">jdi</span><span class="o">.</span><span class="n">load_mode_dict</span><span class="p">(</span><span class="s1">&#39;NIRSpec G140H&#39;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">inst_dict</span> <span class="o">=</span> <span class="n">jdi</span><span class="o">.</span><span class="n">load_mode_dict</span><span class="p">(</span><span class="s1">&#39;NIRSpec G140H&#39;</span><span class="p">)</span>
 
 <span class="c1">#loading in instrument dictionaries allow you to personalize some of</span>
 <span class="c1">#the fields that are predefined in the templates. The templates have</span>
@@ -340,13 +335,13 @@ NIRSpec G140H - MIRI LRS - NIRISS SOSS</p>
 <span class="nb">print</span><span class="p">(</span><span class="n">inst_dict</span><span class="p">[</span><span class="s1">&#39;configuration&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
-<div class="code ipython3 highlight-default"><div class="highlight"><pre><span></span><span class="c1">#Another way to display this is to print out the keys</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#Another way to display this is to print out the keys</span>
 <span class="n">inst_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
 </pre></div>
 </div>
 <div class="section" id="dont-know-what-instrument-options-there-are">
 <h3>Don’t know what instrument options there are?<a class="headerlink" href="#dont-know-what-instrument-options-there-are" title="Permalink to this headline">¶</a></h3>
-<div class="code ipython3 highlight-default"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;SUBARRAYS&quot;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;SUBARRAYS&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">jdi</span><span class="o">.</span><span class="n">subarrays</span><span class="p">(</span><span class="s1">&#39;nirspec&#39;</span><span class="p">))</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;FILTERS&quot;</span><span class="p">)</span>
@@ -356,7 +351,7 @@ NIRSpec G140H - MIRI LRS - NIRISS SOSS</p>
 <span class="nb">print</span><span class="p">(</span><span class="n">jdi</span><span class="o">.</span><span class="n">dispersers</span><span class="p">(</span><span class="s1">&#39;nirspec&#39;</span><span class="p">))</span>
 </pre></div>
 </div>
-<div class="code ipython3 highlight-default"><div class="highlight"><pre><span></span><span class="c1">#you can try personalizing some of these fields</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#you can try personalizing some of these fields</span>
 
 <span class="n">inst_dict</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">][</span><span class="s2">&quot;detector&quot;</span><span class="p">][</span><span class="s2">&quot;ngroup&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;optimize&#39;</span>   <span class="c1">#running &quot;optimize&quot; will select the maximum</span>
                                                                 <span class="c1">#possible groups before saturation.</span>
@@ -372,10 +367,10 @@ NIRSpec G140H - MIRI LRS - NIRISS SOSS</p>
 observation, based on the position of your target. PandExo two options
 and three levels for the position:</p>
 <ul class="simple">
-<li><code class="docutils literal"><span class="pre">ecliptic</span></code> or <code class="docutils literal"><span class="pre">minzodi</span></code></li>
-<li><code class="docutils literal"><span class="pre">low</span></code>, <code class="docutils literal"><span class="pre">medium</span></code>, <code class="docutils literal"><span class="pre">high</span></code></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ecliptic</span></code> or <code class="docutils literal notranslate"><span class="pre">minzodi</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">low</span></code>, <code class="docutils literal notranslate"><span class="pre">medium</span></code>, <code class="docutils literal notranslate"><span class="pre">high</span></code></p></li>
 </ul>
-<div class="code ipython3 highlight-default"><div class="highlight"><pre><span></span><span class="n">inst_dict</span><span class="p">[</span><span class="s1">&#39;background&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;ecliptic&#39;</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">inst_dict</span><span class="p">[</span><span class="s1">&#39;background&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;ecliptic&#39;</span>
 <span class="n">inst_dict</span><span class="p">[</span><span class="s1">&#39;background_level&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;high&#39;</span>
 </pre></div>
 </div>
@@ -387,10 +382,10 @@ set to extract Order 1. Below you can see how to extract the second
 order.</p>
 <p><strong>NOTE!</strong> Users should be careful with this calculation. Saturation will
 be limited by the <strong>first</strong> order. Therefore, I suggest running one
-calculation with <code class="docutils literal"><span class="pre">ngroup='optmize'</span></code> for Order 1. This will give you an
+calculation with <code class="docutils literal notranslate"><span class="pre">ngroup='optmize'</span></code> for Order 1. This will give you an
 idea of a good number of groups to use. Then, you can use that in this
 order 2 calculation.</p>
-<div class="code ipython3 highlight-default"><div class="highlight"><pre><span></span><span class="n">inst_dict</span> <span class="o">=</span> <span class="n">jdi</span><span class="o">.</span><span class="n">load_mode_dict</span><span class="p">(</span><span class="s1">&#39;NIRISS SOSS&#39;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">inst_dict</span> <span class="o">=</span> <span class="n">jdi</span><span class="o">.</span><span class="n">load_mode_dict</span><span class="p">(</span><span class="s1">&#39;NIRISS SOSS&#39;</span><span class="p">)</span>
 <span class="n">inst_dict</span><span class="p">[</span><span class="s1">&#39;strategy&#39;</span><span class="p">][</span><span class="s1">&#39;order&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
 <span class="n">inst_dict</span><span class="p">[</span><span class="s1">&#39;configuration&#39;</span><span class="p">][</span><span class="s1">&#39;detector&#39;</span><span class="p">][</span><span class="s1">&#39;subarray&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;substrip256&#39;</span>
 <span class="n">ngroup_from_order1_run</span> <span class="o">=</span> <span class="mi">2</span>
@@ -403,15 +398,15 @@ order 2 calculation.</p>
 <h2>Running PandExo<a class="headerlink" href="#running-pandexo" title="Permalink to this headline">¶</a></h2>
 <p>You have <strong>four options</strong> for running PandExo. All of them are accessed
 through attribute <strong>jdi.run_pandexo</strong>. See examples below.</p>
-<p><code class="docutils literal"><span class="pre">jdi.run_pandexo(exo,</span> <span class="pre">inst,</span> <span class="pre">param_space</span> <span class="pre">=</span> <span class="pre">0,</span> <span class="pre">param_range</span> <span class="pre">=</span> <span class="pre">0,save_file</span> <span class="pre">=</span> <span class="pre">True,</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">output_path=os.getcwd(),</span> <span class="pre">output_file</span> <span class="pre">=</span> <span class="pre">'')</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">jdi.run_pandexo(exo,</span> <span class="pre">inst,</span> <span class="pre">param_space</span> <span class="pre">=</span> <span class="pre">0,</span> <span class="pre">param_range</span> <span class="pre">=</span> <span class="pre">0,save_file</span> <span class="pre">=</span> <span class="pre">True,</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">output_path=os.getcwd(),</span> <span class="pre">output_file</span> <span class="pre">=</span> <span class="pre">'')</span></code></p>
 <div class="section" id="option-1-run-single-instrument-mode-single-planet">
 <h3>Option 1- Run single instrument mode, single planet<a class="headerlink" href="#option-1-run-single-instrument-mode-single-planet" title="Permalink to this headline">¶</a></h3>
 <p>If you forget which instruments are available run
 <strong>jdi.print_isntruments()</strong> and pick one</p>
-<div class="code ipython3 highlight-default"><div class="highlight"><pre><span></span><span class="n">jdi</span><span class="o">.</span><span class="n">print_instruments</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">jdi</span><span class="o">.</span><span class="n">print_instruments</span><span class="p">()</span>
 </pre></div>
 </div>
-<div class="code ipython3 highlight-default"><div class="highlight"><pre><span></span><span class="n">result</span> <span class="o">=</span> <span class="n">jdi</span><span class="o">.</span><span class="n">run_pandexo</span><span class="p">(</span><span class="n">exo_dict</span><span class="p">,[</span><span class="s1">&#39;NIRCam F322W2&#39;</span><span class="p">])</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">result</span> <span class="o">=</span> <span class="n">jdi</span><span class="o">.</span><span class="n">run_pandexo</span><span class="p">(</span><span class="n">exo_dict</span><span class="p">,[</span><span class="s1">&#39;NIRCam F322W2&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
@@ -420,7 +415,7 @@ through attribute <strong>jdi.run_pandexo</strong>. See examples below.</p>
 <p>This is the same thing as option 1 but instead of feeding it a list of
 keys, you can feed it a instrument dictionary (this is for users who
 wanted to simulate something NOT pre defined within pandexo)</p>
-<div class="code ipython3 highlight-default"><div class="highlight"><pre><span></span><span class="n">inst_dict</span> <span class="o">=</span> <span class="n">jdi</span><span class="o">.</span><span class="n">load_mode_dict</span><span class="p">(</span><span class="s1">&#39;NIRSpec G140H&#39;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">inst_dict</span> <span class="o">=</span> <span class="n">jdi</span><span class="o">.</span><span class="n">load_mode_dict</span><span class="p">(</span><span class="s1">&#39;NIRSpec G140H&#39;</span><span class="p">)</span>
 <span class="c1">#personalize subarray</span>
 <span class="n">inst_dict</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">][</span><span class="s2">&quot;detector&quot;</span><span class="p">][</span><span class="s2">&quot;subarray&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;sub2048&#39;</span>
 <span class="n">result</span> <span class="o">=</span> <span class="n">jdi</span><span class="o">.</span><span class="n">run_pandexo</span><span class="p">(</span><span class="n">exo_dict</span><span class="p">,</span> <span class="n">inst_dict</span><span class="p">)</span>
@@ -430,7 +425,7 @@ wanted to simulate something NOT pre defined within pandexo)</p>
 <div class="section" id="option-3-run-several-modes-single-planet">
 <h3>Option 3- Run several modes, single planet<a class="headerlink" href="#option-3-run-several-modes-single-planet" title="Permalink to this headline">¶</a></h3>
 <p>Use several modes from <strong>print_isntruments()</strong> options.</p>
-<div class="code ipython3 highlight-default"><div class="highlight"><pre><span></span><span class="c1">#choose select</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#choose select</span>
 <span class="n">result</span> <span class="o">=</span> <span class="n">jdi</span><span class="o">.</span><span class="n">run_pandexo</span><span class="p">(</span><span class="n">exo_dict</span><span class="p">,[</span><span class="s1">&#39;NIRSpec G140M&#39;</span><span class="p">,</span><span class="s1">&#39;NIRSpec G235M&#39;</span><span class="p">,</span><span class="s1">&#39;NIRSpec G395M&#39;</span><span class="p">],</span>
                <span class="n">output_file</span><span class="o">=</span><span class="s1">&#39;three_nirspec_modes.p&#39;</span><span class="p">)</span>
 <span class="c1">#run all</span>
@@ -446,9 +441,9 @@ example below shows how to loop over several planet models</p>
 <p>You can loop through anything in the exoplanet dictionary. It will be
 planet, star or observation followed by whatever you want to loop
 through in that set.</p>
-<p>i.e.&nbsp;planet+exopath, star+temp, star+metal, star+logg,
+<p>i.e. planet+exopath, star+temp, star+metal, star+logg,
 observation+sat_level.. etc</p>
-<div class="code ipython3 highlight-default"><div class="highlight"><pre><span></span><span class="c1">#looping over different exoplanet models</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#looping over different exoplanet models</span>
 <span class="n">jdi</span><span class="o">.</span><span class="n">run_pandexo</span><span class="p">(</span><span class="n">exo_dict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;NIRCam F444W&#39;</span><span class="p">],</span> <span class="n">param_space</span> <span class="o">=</span> <span class="s1">&#39;planet+exopath&#39;</span><span class="p">,</span>
                 <span class="n">param_range</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="s1">&#39;/path/to/location/of/models&#39;</span><span class="p">),</span>
                <span class="n">output_path</span> <span class="o">=</span> <span class="s1">&#39;/path/to/output/simulations&#39;</span><span class="p">)</span>
@@ -471,7 +466,7 @@ observation+sat_level.. etc</p>
 <p>The same interface that is available online is also available for use on your machine.
 Using the GUI is very simple and good alternative if editing the input dictionaries is
 confusing.</p>
-<div class="code bash highlight-default"><div class="highlight"><pre><span></span><span class="n">start_pandexo</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>start_pandexo
 </pre></div>
 </div>
 <p>Then open up your favorite internet browser and go to: <a class="reference external" href="http://localhost:1111">http://localhost:1111</a></p>
@@ -480,7 +475,7 @@ confusing.</p>
 <h2>Analyzing Output<a class="headerlink" href="#analyzing-output" title="Permalink to this headline">¶</a></h2>
 <p>There are pre computed functions for analyzing most common outputs. You can also explore
 the dictionary structure yourself.</p>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandexo.engine.justplotit</span> <span class="k">as</span> <span class="nn">jpi</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandexo.engine.justplotit</span> <span class="k">as</span> <span class="nn">jpi</span>
 <span class="kn">import</span> <span class="nn">pickle</span> <span class="k">as</span> <span class="nn">pk</span>
 </pre></div>
 </div>
@@ -488,9 +483,9 @@ the dictionary structure yourself.</p>
 <h3>Plot 1D Data with Errorbars<a class="headerlink" href="#plot-1d-data-with-errorbars" title="Permalink to this headline">¶</a></h3>
 <p>Multiple plotting options exist within <cite>jwst_1d_spec</cite></p>
 <ol class="arabic simple">
-<li>Plot a single run</li>
+<li><p>Plot a single run</p></li>
 </ol>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="c1">#load in output from run</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">#load in output from run</span>
 <span class="n">out</span> <span class="o">=</span> <span class="n">pk</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="s1">&#39;singlerun.p&#39;</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">))</span>
 <span class="c1">#for a single run</span>
 <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span> <span class="n">e</span> <span class="o">=</span> <span class="n">jpi</span><span class="o">.</span><span class="n">jwst_1d_spec</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">R</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">num_tran</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">x_range</span><span class="o">=</span><span class="p">[</span><span class="o">.</span><span class="mi">8</span><span class="p">,</span><span class="mf">1.28</span><span class="p">])</span>
@@ -498,9 +493,9 @@ the dictionary structure yourself.</p>
 </div>
 <img alt="_images/jwst_1d_spec.png" src="_images/jwst_1d_spec.png" />
 <ol class="arabic simple" start="2">
-<li>Plot several runs from parameters space run</li>
+<li><p>Plot several runs from parameters space run</p></li>
 </ol>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="c1">#load in output from multiple runs</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">#load in output from multiple runs</span>
 <span class="n">multi</span> <span class="o">=</span> <span class="n">pk</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="s1">&#39;three_nirspec_modes.p&#39;</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">))</span>
 
 <span class="c1">#get into list format</span>
@@ -515,7 +510,7 @@ the dictionary structure yourself.</p>
 <h3>Plot Noise &amp; More<a class="headerlink" href="#plot-noise-more" title="Permalink to this headline">¶</a></h3>
 <p>Several functions exist to plot various outputs.</p>
 <p>See also <strong>jwst_1d_bkg</strong>, <strong>jwst_1d_snr</strong>, <strong>jwst_1d_flux</strong>,</p>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span><span class="p">,</span><span class="n">y</span> <span class="o">=</span> <span class="n">jpi</span><span class="o">.</span><span class="n">jwst_noise</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">x</span><span class="p">,</span><span class="n">y</span> <span class="o">=</span> <span class="n">jpi</span><span class="o">.</span><span class="n">jwst_noise</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
 </pre></div>
 </div>
 <img alt="_images/jwst_noise.png" src="_images/jwst_noise.png" />
@@ -523,7 +518,7 @@ the dictionary structure yourself.</p>
 <div class="section" id="plot-2d-detector-profile">
 <h3>Plot 2D Detector Profile<a class="headerlink" href="#plot-2d-detector-profile" title="Permalink to this headline">¶</a></h3>
 <p>See also <strong>jwst_2d_sat</strong> to plot saturation profile</p>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">jpi</span><span class="o">.</span><span class="n">jwst_2d_det</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">jpi</span><span class="o">.</span><span class="n">jwst_2d_det</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
 </pre></div>
 </div>
 <img alt="_images/jwst_1d_det.png" src="_images/jwst_1d_det.png" />
@@ -533,9 +528,7 @@ the dictionary structure yourself.</p>
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -544,7 +537,7 @@ the dictionary structure yourself.</p>
         <a href="jwstinput.html" class="btn btn-neutral float-right" title="Possible Instrument Input Params" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="installation_windows.html" class="btn btn-neutral" title="Windows Installing Guide for PandExo" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="installation_windows.html" class="btn btn-neutral float-left" title="Windows Installing Guide for PandExo" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -553,11 +546,11 @@ the dictionary structure yourself.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2016, Natasha Batalha;Kevin Stevenson.
+        &copy; Copyright 2016, Natasha Batalha;Kevin Stevenson
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -570,36 +563,15 @@ the dictionary structure yourself.</p>
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-
-  
-
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
-
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
+
+  
+  
+    
    
 
 </body>

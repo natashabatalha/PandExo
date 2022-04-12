@@ -17,42 +17,36 @@
   
 
   
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
-  
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-
-  
-
-  
-        <link rel="index" title="Index"
-              href="genindex.html"/>
-        <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="PandExo  documentation" href="index.html"/>
-        <link rel="next" title="HST Tutorial" href="tutorialhst.html"/>
-        <link rel="prev" title="Possible Instrument Input Params" href="jwstinput.html"/> 
-
-  
-  <script src="_static/js/modernizr.min.js"></script>
-
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="HST Tutorial" href="tutorialhst.html" />
+    <link rel="prev" title="Possible Instrument Input Params" href="jwstinput.html" /> 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -89,10 +83,11 @@
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="includeme.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Pre-installation Data Download</a></li>
-<li class="toctree-l1"><a class="reference internal" href="installation.html#installation-for-users-with-conda">Installation for Users With Conda</a></li>
-<li class="toctree-l1"><a class="reference internal" href="installation.html#installation-for-users-with-pip">Installation for Users With PIP</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html#installation-with-pip-or-git">Installation with Pip or Git</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html#final-test-for-success">Final Test for Success</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html#troubleshooting-common-errors">Troubleshooting-Common Errors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html#the-importance-of-upgrading-pandexo">The Importance of Upgrading PandExo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation_windows.html">Windows Installing Guide for PandExo</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorialjwst.html">JWST Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="jwstinput.html">Possible Instrument Input Params</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Py Dict Structure of JWST Output</a><ul>
@@ -119,7 +114,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">PandExo</a>
@@ -127,9 +122,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -180,48 +176,48 @@ contained in the PandExo output dictionary.</p>
 <div class="section" id="finalspectrum-contains-4-keys">
 <h2>FinalSpectrum (contains 4 keys)<a class="headerlink" href="#finalspectrum-contains-4-keys" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><strong>spectrum_w_rand</strong>: Planet spectrum with random noise added in
-units of <em>(Rp/Rs)2</em> or <em>(Fp/Fs)</em></li>
-<li><strong>spectrum</strong>: Planet spectrum with no random noise</li>
-<li><strong>error_w_floor</strong>: Error with user defined noise floor. If no floor
-was specified, there is no floor.</li>
-<li><strong>wave</strong>: wavelength (microns)</li>
+<li><p><strong>spectrum_w_rand</strong>: Planet spectrum with random noise added in
+units of <em>(Rp/Rs)2</em> or <em>(Fp/Fs)</em></p></li>
+<li><p><strong>spectrum</strong>: Planet spectrum with no random noise</p></li>
+<li><p><strong>error_w_floor</strong>: Error with user defined noise floor. If no floor
+was specified, there is no floor.</p></li>
+<li><p><strong>wave</strong>: wavelength (microns)</p></li>
 </ul>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="nb">print</span> <span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;FinalSpectrum&#39;</span><span class="p">][</span><span class="s1">&#39;spectrum_w_rand&#39;</span><span class="p">]</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span> <span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;FinalSpectrum&#39;</span><span class="p">][</span><span class="s1">&#39;spectrum_w_rand&#39;</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="originalinput-contains-2-keys">
 <h2>OriginalInput (contains 2 keys)<a class="headerlink" href="#originalinput-contains-2-keys" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><strong>model_wave</strong>: original wavelength input by user</li>
-<li><strong>model_spec</strong>: original spectrum input by user</li>
+<li><p><strong>model_wave</strong>: original wavelength input by user</p></li>
+<li><p><strong>model_spec</strong>: original spectrum input by user</p></li>
 </ul>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="nb">print</span> <span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;OriginalInput&#39;</span><span class="p">][</span><span class="s1">&#39;model_wave&#39;</span><span class="p">]</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span> <span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;OriginalInput&#39;</span><span class="p">][</span><span class="s1">&#39;model_wave&#39;</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="warning-contains-6-keys">
 <h2>Warning (contains 6 keys)<a class="headerlink" href="#warning-contains-6-keys" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><strong>Num Groups Reset?</strong>: Before PandExo simulates in and out of transit
+<li><p><strong>Num Groups Reset?</strong>: Before PandExo simulates in and out of transit
 observations, it computes a single integration with 2 groups in order
 to figure out how many additional groups it can add before hitting
 saturation. If it computes a number less than 2, it resets the number
-of groups to 2.</li>
-<li><strong>Group Number Too Low?</strong>: Prints out warning if number of groups is
-less than 5 and the saturation level less than 60%.</li>
-<li><strong>Group Number Too High?</strong>: Prints out warning if number of groups
-per integration exceeds 65536</li>
-<li><strong>Saturated?</strong>: This is an output directly taken from Pandeia’s “hard
+of groups to 2.</p></li>
+<li><p><strong>Group Number Too Low?</strong>: Prints out warning if number of groups is
+less than 5 and the saturation level less than 60%.</p></li>
+<li><p><strong>Group Number Too High?</strong>: Prints out warning if number of groups
+per integration exceeds 65536</p></li>
+<li><p><strong>Saturated?</strong>: This is an output directly taken from Pandeia’s “hard
 saturation” flag. If there are any saturated pixels, it will alert
-you here. You can also see the saturation profile.</li>
-<li><strong>Non linear?</strong>: This is an output directly taken from Pandeia’s
-“soft saturation” flag.</li>
-<li><strong>% full well high?</strong>: If you’ve set the saturation level over 80%,
-it will warn you.</li>
+you here. You can also see the saturation profile.</p></li>
+<li><p><strong>Non linear?</strong>: This is an output directly taken from Pandeia’s
+“soft saturation” flag.</p></li>
+<li><p><strong>% full well high?</strong>: If you’ve set the saturation level over 80%,
+it will warn you.</p></li>
 </ul>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="nb">print</span> <span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;Warning&#39;</span><span class="p">][</span><span class="s1">&#39;Num Groups Reset?&#39;</span><span class="p">]</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span> <span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;Warning&#39;</span><span class="p">][</span><span class="s1">&#39;Num Groups Reset?&#39;</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
@@ -231,68 +227,68 @@ it will warn you.</li>
 observation. For a complete breakdown of these outputs go to <a class="reference external" href="https://jwst.etc.stsci.edu">STScI’s
 Pandeia Documentation</a>.</p>
 <ul class="simple">
-<li><strong>sub_reports</strong></li>
-<li><strong>information</strong></li>
-<li><strong>warnings</strong></li>
-<li><strong>transform</strong></li>
-<li><strong>2d</strong></li>
-<li><strong>scalar</strong></li>
-<li><strong>1d</strong></li>
-<li><strong>input</strong></li>
-<li><strong>3d</strong></li>
+<li><p><strong>sub_reports</strong></p></li>
+<li><p><strong>information</strong></p></li>
+<li><p><strong>warnings</strong></p></li>
+<li><p><strong>transform</strong></p></li>
+<li><p><strong>2d</strong></p></li>
+<li><p><strong>scalar</strong></p></li>
+<li><p><strong>1d</strong></p></li>
+<li><p><strong>input</strong></p></li>
+<li><p><strong>3d</strong></p></li>
 </ul>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="nb">print</span> <span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;PandeiaOutTrans&#39;</span><span class="p">][</span><span class="s1">&#39;information&#39;</span><span class="p">]</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span> <span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;PandeiaOutTrans&#39;</span><span class="p">][</span><span class="s1">&#39;information&#39;</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="rawdata-contains-6-keys">
 <h2>RawData (contains 6 keys)<a class="headerlink" href="#rawdata-contains-6-keys" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><strong>var_in</strong>: The variance of only the in transit data</li>
-<li><strong>wave</strong>: wavelength vector</li>
-<li><strong>flux_in</strong>: Flux of the in transit data in units of e-/s</li>
-<li><strong>flux_out</strong>: Flux of the out of transit data in units of e-/s</li>
-<li><strong>error_no_floor</strong>: Error without any noise floor</li>
-<li><strong>var_out</strong>: The variance of only the out of transit data</li>
+<li><p><strong>var_in</strong>: The variance of only the in transit data</p></li>
+<li><p><strong>wave</strong>: wavelength vector</p></li>
+<li><p><strong>flux_in</strong>: Flux of the in transit data in units of e-/s</p></li>
+<li><p><strong>flux_out</strong>: Flux of the out of transit data in units of e-/s</p></li>
+<li><p><strong>error_no_floor</strong>: Error without any noise floor</p></li>
+<li><p><strong>var_out</strong>: The variance of only the out of transit data</p></li>
 </ul>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="nb">print</span> <span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;RawData&#39;</span><span class="p">][</span><span class="s1">&#39;var_in&#39;</span><span class="p">]</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span> <span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;RawData&#39;</span><span class="p">][</span><span class="s1">&#39;var_in&#39;</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="timing-contains-10-keys">
 <h2>Timing (contains 10 keys)<a class="headerlink" href="#timing-contains-10-keys" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><strong>Seconds per Frame</strong></li>
-<li><strong>Number of Transits</strong></li>
-<li><strong>Observing Efficiency (%)</strong> = (num groups - 1)/(num groups + 1)</li>
-<li><strong>Num Integrations Out of Transit</strong></li>
-<li><strong>On Source Time</strong></li>
-<li><strong>Exposure Time Per Integration (secs)</strong></li>
-<li><strong>Reset time Plus TA time (hrs)</strong>: Target acquisition time is assumed
-to be 30 minutes</li>
-<li><strong>Num Integrations In Transit</strong></li>
-<li><strong>Num Groups per Integration</strong></li>
-<li><strong>Num Integrations per Occultation</strong></li>
+<li><p><strong>Seconds per Frame</strong></p></li>
+<li><p><strong>Number of Transits</strong></p></li>
+<li><p><strong>Observing Efficiency (%)</strong> = (num groups - 1)/(num groups + 1)</p></li>
+<li><p><strong>Num Integrations Out of Transit</strong></p></li>
+<li><p><strong>On Source Time</strong></p></li>
+<li><p><strong>Exposure Time Per Integration (secs)</strong></p></li>
+<li><p><strong>Reset time Plus TA time (hrs)</strong>: Target acquisition time is assumed
+to be 30 minutes</p></li>
+<li><p><strong>Num Integrations In Transit</strong></p></li>
+<li><p><strong>Num Groups per Integration</strong></p></li>
+<li><p><strong>Num Integrations per Occultation</strong></p></li>
 </ul>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="nb">print</span> <span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;Timing&#39;</span><span class="p">][</span><span class="s1">&#39;Seconds per Frame&#39;</span><span class="p">]</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span> <span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;Timing&#39;</span><span class="p">][</span><span class="s1">&#39;Seconds per Frame&#39;</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="input-contains-10-keys">
 <h2>Input (contains 10 keys)<a class="headerlink" href="#input-contains-10-keys" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><strong>Target Mag</strong></li>
-<li><strong>Readmode</strong></li>
-<li><strong>Disperser</strong></li>
-<li><strong>Filter</strong></li>
-<li><strong>Instrument</strong></li>
-<li><strong>Mode</strong></li>
-<li><strong>Saturation Level (electons)</strong></li>
-<li><strong>Aperture</strong></li>
-<li><strong>Subarray</strong></li>
-<li><strong>Primary/Secondary</strong></li>
+<li><p><strong>Target Mag</strong></p></li>
+<li><p><strong>Readmode</strong></p></li>
+<li><p><strong>Disperser</strong></p></li>
+<li><p><strong>Filter</strong></p></li>
+<li><p><strong>Instrument</strong></p></li>
+<li><p><strong>Mode</strong></p></li>
+<li><p><strong>Saturation Level (electons)</strong></p></li>
+<li><p><strong>Aperture</strong></p></li>
+<li><p><strong>Subarray</strong></p></li>
+<li><p><strong>Primary/Secondary</strong></p></li>
 </ul>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="nb">print</span> <span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;Input&#39;</span><span class="p">][</span><span class="s1">&#39;Target Mag&#39;</span><span class="p">]</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span> <span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;Input&#39;</span><span class="p">][</span><span class="s1">&#39;Target Mag&#39;</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
@@ -305,9 +301,7 @@ website output page.</p>
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -316,7 +310,7 @@ website output page.</p>
         <a href="tutorialhst.html" class="btn btn-neutral float-right" title="HST Tutorial" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="jwstinput.html" class="btn btn-neutral" title="Possible Instrument Input Params" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="jwstinput.html" class="btn btn-neutral float-left" title="Possible Instrument Input Params" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -325,11 +319,11 @@ website output page.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2016, Natasha Batalha;Kevin Stevenson.
+        &copy; Copyright 2016, Natasha Batalha;Kevin Stevenson
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -342,36 +336,15 @@ website output page.</p>
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-
-  
-
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
-
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
+
+  
+  
+    
    
 
 </body>
