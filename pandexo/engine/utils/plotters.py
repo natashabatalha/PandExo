@@ -3,7 +3,7 @@ import numpy as np
 from bokeh.plotting import Figure, output_file, show
 from bokeh.embed import components
 from bokeh.models.widgets import Panel, Tabs
-from bokeh.models import CustomJS, ColumnDataSource, Slider, Select, Range1d
+from bokeh.models import CustomJS, ColumnDataSource, Slider, Select
 from bokeh.io import curdoc
 from bokeh.layouts import row
 
@@ -68,7 +68,6 @@ def create_component_jwst(result_dict):
     ylims = [np.nanmin(0.9 * result_dict['OriginalInput']['model_spec']), 1.1 * np.nanmax(result_dict['OriginalInput']['model_spec'])]
     xlims = [np.nanmin(result_dict['FinalSpectrum']['wave'].astype(float)), np.nanmax(result_dict['FinalSpectrum']['wave'].astype(float))]
 
-    # TODO: FOR SOME REASON BOKEH DOESN'T LIKE THIS FIGURE BUT THE SIMPLE ONE WORKS?!
     plot_spectrum = Figure(plot_width=800, plot_height=300, x_range=xlims,
                                y_range=ylims, tools=TOOLS,#responsive=True,
                                  x_axis_label=x_axis_label,
