@@ -3,7 +3,7 @@ import numpy as np
 from bokeh.plotting import Figure, output_file, show
 from bokeh.embed import components
 from bokeh.models.widgets import Panel, Tabs
-from bokeh.models import CustomJS, ColumnDataSource, Slider,Select
+from bokeh.models import CustomJS, ColumnDataSource, Slider, Select, Range1d
 from bokeh.io import curdoc
 from bokeh.layouts import row
 
@@ -50,10 +50,9 @@ def create_component_jwst(result_dict):
     var_in = result_dict['RawData']['var_in']
     var_out = result_dict['RawData']['var_out']
     
-    
-    x = result_dict['FinalSpectrum']['wave']
-    y = result_dict['FinalSpectrum']['spectrum_w_rand']
-    err = result_dict['FinalSpectrum']['error_w_floor']
+    x = result_dict['FinalSpectrum']['wave'].astype(float)
+    y = result_dict['FinalSpectrum']['spectrum_w_rand'].astype(float)
+    err = result_dict['FinalSpectrum']['error_w_floor'].astype(float)
 
     y_err = []
     x_err = []
@@ -61,23 +60,22 @@ def create_component_jwst(result_dict):
         np.array(x_err.append((px, px)))
         np.array(y_err.append((py - yerr, py + yerr)))
 
-    source = ColumnDataSource(data=dict(x=x, y=y, y_err=y_err, x_err=x_err, err=err, 
-                                electrons_out=electrons_out, electrons_in=electrons_in, var_in=var_in, var_out=var_out, 
+    source = ColumnDataSource(data=dict(x=x, y=y, y_err=y_err, x_err=x_err, err=err,
+                                electrons_out=electrons_out, electrons_in=electrons_in, var_in=var_in, var_out=var_out,
                                 p=var_in*0+p,nocc=var_in*0+noccultations, frac = var_in*0+frac))
     original = ColumnDataSource(data=dict(x=x, y=y, y_err=y_err, x_err=x_err, err=err, electrons_out=electrons_out, electrons_in=electrons_in, var_in=var_in, var_out=var_out))
 
-    ylims = [min(result_dict['OriginalInput']['model_spec'])- 0.1*min(result_dict['OriginalInput']['model_spec']),
-                 0.1*max(result_dict['OriginalInput']['model_spec'])+max(result_dict['OriginalInput']['model_spec'])]
-    xlims = [min(result_dict['FinalSpectrum']['wave']), max(result_dict['FinalSpectrum']['wave'])]
+    ylims = [np.nanmin(0.9 * result_dict['OriginalInput']['model_spec']), 1.1 * np.nanmax(result_dict['OriginalInput']['model_spec'])]
+    xlims = [np.nanmin(result_dict['FinalSpectrum']['wave'].astype(float)), np.nanmax(result_dict['FinalSpectrum']['wave'].astype(float))]
 
+    # TODO: FOR SOME REASON BOKEH DOESN'T LIKE THIS FIGURE BUT THE SIMPLE ONE WORKS?!
     plot_spectrum = Figure(plot_width=800, plot_height=300, x_range=xlims,
                                y_range=ylims, tools=TOOLS,#responsive=True,
                                  x_axis_label=x_axis_label,
-                                 y_axis_label=punit, 
+                                 y_axis_label=punit,
                                title="Original Model with Observation")
-    
+
     plot_spectrum.line(result_dict['OriginalInput']['model_wave'],result_dict['OriginalInput']['model_spec'], color= "black", alpha = 0.5, line_width = 4)
-        
     plot_spectrum.circle('x', 'y', source=source, line_width=3, line_alpha=0.6)
     plot_spectrum.multi_line('x_err', 'y_err', source=source)
 
@@ -201,7 +199,6 @@ def create_component_jwst(result_dict):
     sliderTrans =  Slider(title="Num Trans", value=noccultations, start=1, end=50, step= 1, callback=callback)
     callback.args["ntran"] = sliderTrans
     layout = column(row(sliderWbin,sliderTrans), plot_spectrum)
-
 
     #out of transit 2d output 
     raw = result_dict['RawData']
@@ -347,8 +344,6 @@ def create_component_jwst(result_dict):
     #create set of five tabs 
     tabs1d = Tabs(tabs=[ tab1,tab3, tab4, tab5])
 
-
-
     # Detector 2d
     data = out['2d']['detector']
 
@@ -398,9 +393,8 @@ def create_component_jwst(result_dict):
     tab2b = Panel(child=plot_sat_2d, title="Saturation")
 
     tabs2d = Tabs(tabs=[ tab1b, tab2b])
-    
- 
-    result_comp = components({'plot_spectrum':layout, 
+
+    result_comp = components({'plot_spectrum':layout,
                               'tabs1d': tabs1d, 'det_2d': plot_detector_2d,
                               'tabs2d': tabs2d})
 
