@@ -192,7 +192,7 @@ def bothTrans(out_trans, planet,star=None) :
             wave_planet = out_trans['wave'][(out_trans['wave']>0.5) & (out_trans['wave']<15)]
             flux_star = (out_trans['phoenix'].flux*(u.Jy)).to(u.mJy)[(out_trans['wave']>0.5) & (out_trans['wave']<15)]
             #MAKING SURE TO ADD IN SUPID PI FOR PER STERADIAN!!!!
-            flux_planet = (bb(temperature=planet['temp'])(wave_planet*u.micron)*np.pi*u.sr).to(u.mJy)
+            flux_planet = (bb(temperature=planet['temp']*u.K)(wave_planet*u.micron)*np.pi*u.sr).to(u.mJy)
             # ( bb planet / pheonix sed ) * (rp/r*)^2
             flux_planet = np.array((flux_planet/flux_star) * (rplan/rstar)**2.0)
 
@@ -388,9 +388,9 @@ def hst_spec(planet,star) :
         elif planet['f_unit'] == 'fp/f*':
             planet['w_unit'] = 'um'
             wave_planet = np.linspace(0.1,3,500)
-            flux_star = (bb(temperature=star['temp'])(wave_planet*u.micron)*np.pi*u.sr).to(u.mJy)
+            flux_star = (bb(temperature=star['temp']*u.K)(wave_planet*u.micron)*np.pi*u.sr).to(u.mJy)
             #MAKING SURE TO ADD IN SUPID PI FOR PER STERADIAN!!!!
-            flux_planet = (bb(temperature=planet['temp'])(wave_planet*u.micron)*np.pi*u.sr).to(u.mJy)
+            flux_planet = (bb(temperature=planet['temp']*u.K)(wave_planet*u.micron)*np.pi*u.sr).to(u.mJy)
             # ( bb planet / pheonix sed ) * (rp/r*)^2
             flux_planet = np.array((flux_planet/flux_star) * (rplan/rstar)**2.0)
 
