@@ -75,20 +75,27 @@ def compute_full_sim(dictinput,verbose=False):
     
     #if optimize is in the ngroups section, this will throw an error 
     #so create temp conf with 2 groups 
-    try:
-        i = InstrumentFactory(config=conf)
-        det_pars = i.get_detector_pars()
-        exp_pars = i.get_exposure_pars()
-    except: 
+    if 'optimize' in conf['detector']['ngroup']: 
         conf_temp = deepcopy(conf) 
-        conf_temp['detector']['ngroup'] = 2 
-        i = InstrumentFactory(config=conf_temp)
-        det_pars = i.get_detector_pars()
-        exp_pars = i.get_exposure_pars()
-        
+        conf_temp['detector']['ngroup'] = 2
+    else: 
+        conf_temp = conf
+
+
+    i = InstrumentFactory(config=conf_temp)
+    
     #detector parameters
-    fullwell = det_pars['fullwell'] #from pandeia data
+    det_pars = i.read_detector_pars()
+    fullwell = det_pars['fullwell']
     rn = det_pars['rn']
+    mingroups = det_pars['mingroups']
+        
+    #exposure parameters 
+    exp_pars = i.the_detector.exposure_spec
+    tframe =exp_pars.tframe
+    nframe = exp_pars.nframe
+    nskip = exp_pars.nsample_skip
+
     sat_unit = pandexo_input['observation']['sat_unit']
 
     if sat_unit =='%':
@@ -97,13 +104,8 @@ def compute_full_sim(dictinput,verbose=False):
         sat_level = pandexo_input['observation']['sat_level']
     else: 
         raise Exception("Saturation Level Needs Units: % fullwell or Electrons ")
-
-    mingroups = det_pars['mingroups']
     
-    #exposure parameters 
-    tframe = exp_pars.tframe
-    nframe = exp_pars.nframe
-    nskip = exp_pars.nskip
+
     
     #parameteres needed from exo_input
     mag = pandexo_input['star']['mag']
@@ -148,7 +150,7 @@ def compute_full_sim(dictinput,verbose=False):
     pandeia_input['scene'][0]['spectrum']['sed']['spectrum'] = out_spectrum
     
     if isinstance(pandeia_input["configuration"]["detector"]["ngroup"], (float,int)):
-        m = {"ngroup":pandeia_input["configuration"]["detector"]["ngroup"], "tframe":tframe,
+        m = {"ngroup":int(pandeia_input["configuration"]["detector"]["ngroup"]), "tframe":tframe,
             "nframe":nframe,"mingroups":mingroups,"nskip":nskip}
     else:
         #run pandeia once to determine max exposure time per int and get exposure params
@@ -336,7 +338,7 @@ def compute_maxexptime_per_int(pandeia_input, sat_level):
     """
     
     #run once to get 2d rate image 
-    pandeia_input['configuration']['detector']['ngroup'] = 2 
+    pandeia_input['configuration']['detector']['ngroup'] = int(2 )
     pandeia_input['configuration']['detector']['nint'] = 1 
     pandeia_input['configuration']['detector']['nexp'] = 1
     
@@ -492,10 +494,10 @@ def compute_timing(m,transit_duration,expfact_out,noccultations):
         "Transit Duration" : (transit_duration)/60.0/60.0,
         "Seconds per Frame" : tframe,
         "Time/Integration incl reset (sec)":clocktime_per_int,
-        "APT: Num Groups per Integration" :ngroups_per_int, 
-        "Num Integrations Out of Transit":nint_out,
-        "Num Integrations In Transit":nint_in,
-        "APT: Num Integrations per Occultation":nint_out+nint_in,
+        "APT: Num Groups per Integration" :int(ngroups_per_int), 
+        "Num Integrations Out of Transit":int(nint_out),
+        "Num Integrations In Transit":int(nint_in),
+        "APT: Num Integrations per Occultation":int(nint_out+nint_in),
         "Observing Efficiency (%)": eff*100.0,
         "Transit+Baseline, no overhead (hrs)": (nint_out+nint_in)*clocktime_per_int/60.0/60.0, 
         "Number of Transits": noccultations
@@ -520,7 +522,7 @@ def remove_QY(pandeia_dict, instrument):
     """
     if instrument == 'niriss':
         try:
-            qy = fits.open(os.path.join(default_refdata_directory,'jwst', instrument,'qe' ,'jwst_niriss_h2rg_qe_20160902163017.fits'))
+            qy = fits.open(os.path.join(default_refdata_directory,'jwst', instrument,'qe' ,'jwst_niriss_h2rg_qe_20221003172003.fits'))
         except: 
             raise Exception('PANDEIA REFERENCE DATA NEEDS TO BE UPDATED')
 
@@ -560,8 +562,8 @@ def perform_out(pandeia_input, pandexo_input,timing, both_spec):
         pandeia output dictionary for out of transit data 
     """
     #pandeia inputs, simulate one integration at a time 
-    pandeia_input['configuration']['detector']['ngroup'] = timing['APT: Num Groups per Integration']
-    pandeia_input['configuration']['detector']['nint'] = timing['Num Integrations Out of Transit']
+    pandeia_input['configuration']['detector']['ngroup'] = int(timing['APT: Num Groups per Integration'])
+    pandeia_input['configuration']['detector']['nint'] = int(timing['Num Integrations Out of Transit'])
     pandeia_input['configuration']['detector']['nexp'] = 1 
 
     report_out = perform_calculation(pandeia_input, dict_report=False)
@@ -613,8 +615,8 @@ def perform_in(pandeia_input, pandexo_input,timing, both_spec, out, calculation)
     else: 
         #only run pandeia a third time if doing slope method and need accurate run for the 
         #nint and timing
-        pandeia_input['configuration']['detector']['ngroup'] = timing['APT: Num Groups per Integration']
-        pandeia_input['configuration']['detector']['nint'] = timing['Num Integrations In Transit']
+        pandeia_input['configuration']['detector']['ngroup'] = int(timing['APT: Num Groups per Integration'])
+        pandeia_input['configuration']['detector']['nint'] = int(timing['Num Integrations In Transit'])
         pandeia_input['configuration']['detector']['nexp'] = 1
   
         in_transit_spec = np.array([both_spec['wave'], both_spec['flux_in_trans']])
