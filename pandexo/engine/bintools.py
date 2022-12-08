@@ -149,12 +149,14 @@ def uniform_tophat_mean(newx,x, y, dy=None,nan=False):
 	newx = np.array(newx)
 	szmod=newx.shape[0]
 	delta=np.zeros(szmod)
-	ynew=np.zeros(szmod)
-	bin_dy =np.zeros(szmod)
+	ynew=np.full(szmod, np.nan)
+	bin_dy =np.full(szmod, np.nan)
 	bin_n =np.zeros(szmod)
 
 	delta[0:-1]=newx[1:]-newx[:-1]  
-	delta[szmod-1]=delta[szmod-2] 
+	delta[szmod-1]=delta[szmod-2]
+	
+	missing_bool = False
     
 	for i in range(szmod-1):
 		i=i+1
@@ -165,12 +167,10 @@ def uniform_tophat_mean(newx,x, y, dy=None,nan=False):
 			if dy is not None: 
 				bin_dy[i] = np.sqrt(np.sum(dy[loc]**2.0))/len(y[loc])
 			bin_n[i] = len(y[loc])
-		#if not give empty slice a nan
-		elif len(loc[0]) is 0 : 
-			warn.warn(UserWarning("Empty slice exists within specified new x, replacing value with nan"))
-			ynew[i]=np.nan
-			bin_n[i] = np.nan 
-
+		#if not remember and give warning later
+		else:
+			missing_bool = True
+			
 	#fill in zeroth entry
 	loc=np.where((x > newx[0]-0.5*delta[0]) & (x < newx[0]+0.5*delta[0]))
 	if len(loc[0]) > 0: 
@@ -178,11 +178,12 @@ def uniform_tophat_mean(newx,x, y, dy=None,nan=False):
 		bin_n[0] = len(y[loc])
 		if dy is not None: 
 			bin_dy[0] = np.sqrt(np.sum(dy[loc]**2.0))/len(y[loc])
-	elif len(loc[0]) is 0 : 
-		ynew[0]=np.nan
-		bin_n[0] = np.nan
-		if dy is not None:
-			bin_dy[0] = np.nan 
+	else:
+		missing_bool = True
+	
+	#warn user if there was an empty slice
+	if missing_bool:
+		warn.warn(UserWarning("Empty slice exists within specified new x, replacing value with nan"))
 	
 	#remove nans if requested
 	out = pd.DataFrame({'bin_y':ynew, 'bin_x':newx, 'bin_dy':bin_dy, 'bin_n':bin_n})
