@@ -11,13 +11,13 @@ PandExo requires: JWST instrument info and stellar SEDs. Users must set up these
 
 JWST Reference Data
 ````````````````````
-JWST Reference data has been updated to 1.5!
+JWST Reference data has been updated to 2.0!
 
 .. warning::
     Reference data for OLD 1.3 is NOT backwards compatible with PandExo/Pandeia 1.4/1.5. The old reference data 
     can be found `here <http://ssb.stsci.edu/pandeia/engine/1.3/pandeia_data-1.3.tar.gz>`_ if you still wish to use PandExo v1.3. It is important to make sure that the version number of `PandExo` matches the version number of your reference data.
 
-The new reference data is located `here for V1p6 <https://stsci.app.box.com/v/pandeia-refdata-v1p6>`_. Hopefully backwards compatibility issues will subside as Pandeia becomes more mature.
+The new reference data is located `here for v2p0 <https://stsci.app.box.com/v/pandeia-refdata-v2p0-jwst>`_. Hopefully backwards compatibility issues will subside as Pandeia becomes more mature. More information on `pandeia installation can be found here <https://outerspace.stsci.edu/display/PEN/Pandeia+Engine+Installation>`_
 
 
 After you have downloaded the reference data, create environment variable: 
@@ -28,23 +28,17 @@ After you have downloaded the reference data, create environment variable:
 
 Stellar SEDs 
 ````````````
-Likewise, the user may wish to install specific data for use with the PySynPhot package Pandeia uses. We will only be using the Phoenix stellar atlas, which can be downloaded `here <ftp://ftp.stsci.edu/cdbs/tarfiles/synphot5.tar.gz>`_.
+Likewise, the user may wish to install specific data for use with the PySynPhot package Pandeia uses. We will only be using the Phoenix stellar atlas, which can be `downloaded here <https://archive.stsci.edu/hlsps/reference-atlases/hlsp_reference-atlases_hst_multi_pheonix-models_multi_v3_synphot5.tar>`_.
 
-More reference files can be downloaded via ftp: 
+Once untarred, the files will produce a directory tree of `grp/redcat/trds`. The pandeia.engine uses the contents of the `trds` directory.
 
-- ftp archive.stsci.edu
-- username "anonymous"
-- password is your e-mail address
-- cd pub/hst/pysynphot
-- download desired files. 
+**Environment variable: $PYSYN_CDBS must point to the trds directory (NOT grp)**
 
-*Note* that the tar.gz files downloaded from the STScI anonymous FTP site will untar into the directory structure "grp/hst/cdbs", with the actual data files in an assortment of directories under "cdbs". pysynphot (and pandeia) expect that the "PYSYN_CDBS" environment variable will point to the "cdbs" directory. As such, you can either move the files out of "grp/hst/" to wherever you would like to store them, or point "PYSYN_CDBS" to "/path/to/data/files/grp/hst/cdbs" in order to allow pysynphot and pandeia to properly detect the reference files.
-
-Finally, create your environment variable:
+Create your environment variable:
 
 .. code-block:: bash 
 
-    echo 'export PYSYN_CDBS="$USRDIR/path/to/data/files/grp/hst/cdbs"' >>~/.bash_profile
+    echo 'export PYSYN_CDBS="$USRDIR/grp/redcat/trds"' >>~/.bash_profile
 
 Fortney+ 20210  Planet Grid (Optional)
 ````````````````````````````````````````
@@ -56,7 +50,7 @@ After downloading the Fortney files, create an environmental variable to point t
 
 .. code-block:: bash 
 
-    echo 'export FORTGRID_DIR="$USRDIR/path/to/data/files/fortney_models.db"' >>~/.bash_profile
+    echo 'export FORTGRID_DIR="$USRDIR/fortney_models.db"' >>~/.bash_profile
 
 
 Installation with Pip or Git
