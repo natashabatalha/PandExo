@@ -100,7 +100,7 @@ def outTrans(input) :
     
 
     ############ NORMALIZATION ################################################
-    refdata = os.environ.get("pandeia_refdata")
+    refdata = os.environ.get("PYSYN_CDBS")
 
     all_bps = {"H": 'bessell_h_004_syn.fits',
                  "J":'bessell_j_003_syn.fits' ,
@@ -115,7 +115,10 @@ def outTrans(input) :
     else:
         raise Exception('Only J H and K zeropoints are included')
 
-    bp_path = os.path.join(refdata, "normalization", "bandpass", all_bps[filt])
+    bp_path = os.path.join(refdata, "comp", "nonhst", all_bps[filt])
+    if not os.path.exists(bp_path): 
+        raise Exception("Oops! PandExo 2.0 now requires users to download this file https://archive.stsci.edu/hlsps/reference-atlases/hlsp_reference-atlases_hst_multi_everything_multi_v11_sed.tar it will untar with the structure grp/redcat/trds. Please place the directories nonhst and comp into this folder: "+refdata)
+
     bp = psyn.FileBandpass(bp_path)
 
     sp.convert('angstroms')
