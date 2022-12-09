@@ -83,7 +83,7 @@ OR Download PandExo's repository via Github. The Github also has helpful noteboo
 
     git clone --recursive https://github.com/natashabatalha/pandexo
     cd pandexo
-    python setup.py install
+    pip install .
 
 
 
