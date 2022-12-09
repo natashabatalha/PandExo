@@ -70,14 +70,7 @@ After downloading the Fortney files, create an environmental variable to point t
 Installation with Pip or Git
 ============================
 
-Install STScI specific packages
-
-.. code-block:: bash
-
-    conda config --add channels http://ssb.stsci.edu/astroconda
-    conda install pyfftw
-
-Now, install `pandexo`. 
+Install with pip: 
 
 .. code-block:: bash
 
@@ -116,14 +109,6 @@ There is a `run_test.py` in the `github`. Test that you're code is working:
 Troubleshooting-Common Errors
 =============================
 
-PyFFTW
-````````
-PyFFTW is needed to run PandExo. In order to run PyFFTW you need to also isntall fftw. To do so, it is necessary to do so through Homebrew, if you do not have conda. 
-
-.. code-block:: bash 
-
-    brew install fftw
-    pip install pyfftw 
 
 Multiprocessing
 ````````````````
