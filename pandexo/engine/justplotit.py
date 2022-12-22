@@ -1,4 +1,5 @@
-from bokeh.plotting import show, Figure
+from bokeh.plotting import show
+from bokeh.plotting import figure as Figure
 from bokeh.io import output_file as outputfile
 from bokeh.io import output_notebook  as outnotebook
 import pickle as pk
@@ -7,7 +8,7 @@ from bokeh.layouts import row
 import pandas as pd
 def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', output_file = 'data.html',legend = False,
         R=False,  num_tran = False, plot_width=800, plot_height=400,x_range=[1,10],y_range=None, plot=True,
-        output_notebook=False):
+        output_notebook=True):
     """Plots 1d simulated spectrum and rebin or rescale for more transits
 
     Plots 1d data points with model in the background (if wanted). Designed to read in exact
@@ -187,7 +188,7 @@ def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', out
                  0.1*max(dictt['OriginalInput']['model_spec'])+max(dictt['OriginalInput']['model_spec'])]
 
             fig1d = Figure(x_range=x_range, y_range = ylims,
-               plot_width = plot_width, plot_height =plot_height,title=title,x_axis_label=x_axis_label,
+               width = plot_width, height =plot_height,title=title,x_axis_label=x_axis_label,
               y_axis_label = y_axis_label, tools=TOOLS, background_fill_color = 'white')
 
 
@@ -384,7 +385,7 @@ def jwst_1d_flux(result_dict, plot=True, output_file= 'flux.html'):
     plot_flux_1d1 = Figure(tools=TOOLS,
                          x_axis_label='Wavelength [microns]',
                          y_axis_label='Flux (e/s)', title="Out of Transit Flux Rate",
-                         plot_width=800, plot_height=300)
+                         width=800, height=300)
     plot_flux_1d1.line(x, y, line_width = 4, alpha = .7)
 
     if plot:
@@ -427,7 +428,7 @@ def jwst_1d_snr(result_dict, plot=True, output_file='snr.html'):
     plot_snr_1d1 = Figure(tools=TOOLS,
                          x_axis_label='Wavelength (micron)',
                          y_axis_label='SNR', title="SNR Out of Trans",
-                         plot_width=800, plot_height=300)
+                         width=800, height=300)
     plot_snr_1d1.line(x, y, line_width = 4, alpha = .7)
     if plot:
         outputfile(output_file)
@@ -468,7 +469,7 @@ def jwst_1d_bkg(result_dict, plot=True, output_file='bkg.html'):
     plot_bg_1d1 = Figure(tools=TOOLS,
                          x_axis_label='Wavelength [microns]',
                          y_axis_label='Flux (e/s)', title="Background",
-                         plot_width=800, plot_height=300)
+                         width=800, height=300)
     plot_bg_1d1.line(x, y, line_width = 4, alpha = .7)
     if plot:
         outputfile(output_file)
@@ -511,7 +512,7 @@ def jwst_noise(result_dict, plot=True, output_file= 'noise.html'):
     plot_noise_1d1 = Figure(tools=TOOLS,#responsive=True,
                          x_axis_label='Wavelength (micron)',
                          y_axis_label='Error on Spectrum (PPM)', title="Error Curve",
-                         plot_width=800, plot_height=300, y_range = [0,2.0*ymed])
+                         width=800, height=300, y_range = [0,2.0*ymed])
     ymed = np.median(y)
     plot_noise_1d1.circle(x, y, line_width = 4, alpha = .7)
     if plot:
@@ -554,7 +555,7 @@ def jwst_2d_det(result_dict, plot=True, output_file='det2d.html'):
                          x_range=[0, yr], y_range=[0, xr],
                          x_axis_label='Pixel', y_axis_label='Spatial',
                          title="2D Detector Image",
-                        plot_width=800, plot_height=300)
+                        width=800, height=300)
 
     plot_detector_2d.image(image=[data], x=[0], y=[0], dh=[xr], dw=[yr],
                       palette="Spectral11")
@@ -596,7 +597,7 @@ def jwst_2d_sat(result_dict, plot=True, output_file='sat2d.html'):
                          x_range=[0, yr], y_range=[0, xr],
                          x_axis_label='Pixel', y_axis_label='Spatial',
                          title="Saturation",
-                        plot_width=800, plot_height=300)
+                        width=800, height=300)
 
     plot_sat_2d.image(image=[data], x=[0], y=[0], dh=[xr], dw=[yr],
                       palette="Spectral11")
@@ -605,7 +606,7 @@ def jwst_2d_sat(result_dict, plot=True, output_file='sat2d.html'):
         show(plot_sat_2d)
     return data
 
-def hst_spec(result_dict, plot=True, output_file ='hstspec.html', model = True):
+def hst_spec(result_dict, plot=True, output_file ='hstspec.html', model = True, output_notebook=True):
     """Plot 1d spec with error bars for hst
 
     Parameters
@@ -619,6 +620,8 @@ def hst_spec(result_dict, plot=True, output_file ='hstspec.html', model = True):
         (Optional) Plot model under data. Default=True
     output_file : str
         (Optional) Default = 'hstspec.html'
+    output_notebook : bool 
+        (Optional) Default true, plots in notebook
 
     Return
     ------
@@ -649,7 +652,7 @@ def hst_spec(result_dict, plot=True, output_file ='hstspec.html', model = True):
     xlims = [result_dict['planet_spec']['wmin'], result_dict['planet_spec']['wmax']]
     ylims = [np.min(binspec)-2.0*error[0], np.max(binspec)+2.0*error[0]]
 
-    plot_spectrum = Figure(plot_width=800, plot_height=300, x_range=xlims,
+    plot_spectrum = Figure(width=800, height=300, x_range=xlims,
                                y_range=ylims, tools=TOOLS,#responsive=True,
                                  x_axis_label='Wavelength [microns]',
                                  y_axis_label='Ratio',
@@ -665,13 +668,17 @@ def hst_spec(result_dict, plot=True, output_file ='hstspec.html', model = True):
     plot_spectrum.circle(binwave,binspec, line_width=3, line_alpha=0.6)
     plot_spectrum.multi_line(x_err, y_err)
 
-    if plot:
+    if output_notebook & plot:
+        outnotebook()
+        show(plot_spectrum)
+    elif plot:
         outputfile(output_file)
+        
         show(plot_spectrum)
 
     return binwave, binspec, error, mwave, mspec
 
-def hst_time(result_dict, plot=True, output_file ='hsttime.html', model = True):
+def hst_time(result_dict, plot=True, output_file ='hsttime.html', model = True, output_notebook=True):
     """Plot earliest and latest start times for hst observation
 
     Parameters
@@ -729,7 +736,7 @@ def hst_time(result_dict, plot=True, output_file ='hsttime.html', model = True):
         np.array(x_err2.append((px, px)))
         np.array(y_err2.append((py - yerr, py + yerr)))
 
-    early = Figure(plot_width=400, plot_height=300,
+    early = Figure(width=400, height=300,
                                tools=TOOLS,#responsive=True,
                                  x_axis_label='Orbital Phase',
                                  y_axis_label='Flux',
@@ -739,7 +746,7 @@ def hst_time(result_dict, plot=True, output_file ='hsttime.html', model = True):
     early.circle(obsphase1, obstr1, line_width=3, line_alpha=0.6)
     early.multi_line(x_err1, y_err1)
 
-    late = Figure(plot_width=400, plot_height=300,
+    late = Figure(width=400, height=300,
                                 tools=TOOLS,#responsive=True,
                                  x_axis_label='Orbital Phase',
                                  y_axis_label='Flux',
@@ -750,16 +757,19 @@ def hst_time(result_dict, plot=True, output_file ='hsttime.html', model = True):
 
     start_time = row(early, late)
 
-    if plot:
+
+    if output_notebook & plot:
+        outnotebook()
+        show(start_time)
+    elif plot:
         outputfile(output_file)
         show(start_time)
-
 
 
     return obsphase1, obstr1, obsphase2, obstr2,rms
 
 
-def hst_simulated_lightcurve(result_dict, plot=True, output_file ='hsttime.html', model = True):
+def hst_simulated_lightcurve(result_dict, plot=True, output_file ='hsttime.html', model = True, output_notebook=True):
     """Plot simulated HST light curves (in fluece) for earliest and latest start times
 
     Parameters
@@ -824,7 +834,7 @@ def hst_simulated_lightcurve(result_dict, plot=True, output_file ='hsttime.html'
     else:
         title_description =" (Ramp Removed)"
 
-    early = Figure(plot_width=400, plot_height=300,
+    early = Figure(width=400, height=300,
                                tools=TOOLS,#responsive=True,
                                  x_axis_label='Orbital Phase',
                                  y_axis_label='Flux [electrons/pixel]',
@@ -835,7 +845,7 @@ def hst_simulated_lightcurve(result_dict, plot=True, output_file ='hsttime.html'
     early.circle(obsphase1, counts1, line_width=3, line_alpha=0.6)
     early.multi_line(x_err1, y_err1)
 
-    late = Figure(plot_width=400, plot_height=300,
+    late = Figure(width=400, height=300,
                   tools=TOOLS,  # responsive=True,
                   x_axis_label='Orbital Phase',
                   y_axis_label='Flux [electrons/pixel]',
@@ -848,7 +858,10 @@ def hst_simulated_lightcurve(result_dict, plot=True, output_file ='hsttime.html'
     start_time = row(early, late)
 
     if plot:
-        outputfile(output_file)
+        if output_notebook: 
+            outnotebook()
+        else:
+            outputfile(output_file)
         show(start_time)
 
     return obsphase1, counts1, obsphase2, counts2, rms

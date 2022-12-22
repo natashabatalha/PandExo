@@ -32,12 +32,13 @@ Install EVEN if...
 Do not install if...
 
 - I will only be using PandExo fewer than 10 times
-- I have a student who can install it for me
 
 Requires
 ~~~~~~~~
 
-- Python >2.7, that's it 
+- Python >=3.8
+- Installation: https://natashabatalha.github.io/PandExo/installation.html 
+- PandExo now requires downloading **three folders**: 1) JWST instrument info (from pandeia), 2) stellar SEDs (pysynphot), and 3) normalization bandasses (pysynphot). See installation for furthur instructions: https://natashabatalha.github.io/PandExo/installation.html 
 
 
 .. image:: https://zenodo.org/badge/67237418.svg

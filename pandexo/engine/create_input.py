@@ -5,7 +5,7 @@ from sqlalchemy import *
 import astropy.units as u 
 import astropy.constants as c
 import os 
-from  astropy.modeling import blackbody as bb
+from astropy.modeling.models import BlackBody
 import warnings
 with warnings.catch_warnings():
     warnings.filterwarnings("ignore")
@@ -100,7 +100,7 @@ def outTrans(input) :
     
 
     ############ NORMALIZATION ################################################
-    refdata = os.environ.get("pandeia_refdata")
+    refdata = os.environ.get("PYSYN_CDBS")
 
     all_bps = {"H": 'bessell_h_004_syn.fits',
                  "J":'bessell_j_003_syn.fits' ,
@@ -115,7 +115,10 @@ def outTrans(input) :
     else:
         raise Exception('Only J H and K zeropoints are included')
 
-    bp_path = os.path.join(refdata, "normalization", "bandpass", all_bps[filt])
+    bp_path = os.path.join(refdata, "comp", "nonhst", all_bps[filt])
+    if not os.path.exists(bp_path): 
+        raise Exception("Oops! PandExo 2.0 now requires users to download this file https://archive.stsci.edu/hlsps/reference-atlases/hlsp_reference-atlases_hst_multi_everything_multi_v11_sed.tar it will untar with the structure grp/redcat/trds. Please place the directories nonhst and comp into this folder: "+refdata)
+
     bp = psyn.FileBandpass(bp_path)
 
     sp.convert('angstroms')
@@ -191,7 +194,8 @@ def bothTrans(out_trans, planet,star=None) :
             wave_planet = out_trans['wave'][(out_trans['wave']>0.5) & (out_trans['wave']<15)]
             flux_star = (out_trans['phoenix'].flux*(u.Jy)).to(u.mJy)[(out_trans['wave']>0.5) & (out_trans['wave']<15)]
             #MAKING SURE TO ADD IN SUPID PI FOR PER STERADIAN!!!!
-            flux_planet = (bb.blackbody_nu(wave_planet*u.micron, planet['temp']*u.K)*np.pi*u.sr).to(u.mJy)
+            bb = BlackBody(temperature=planet['temp']*u.K) 
+            flux_planet = (bb(wave_planet*u.micron)*np.pi*u.sr).to(u.mJy)
             # ( bb planet / pheonix sed ) * (rp/r*)^2
             flux_planet = np.array((flux_planet/flux_star) * (rplan/rstar)**2.0)
 
@@ -387,9 +391,12 @@ def hst_spec(planet,star) :
         elif planet['f_unit'] == 'fp/f*':
             planet['w_unit'] = 'um'
             wave_planet = np.linspace(0.1,3,500)
-            flux_star = (bb.blackbody_nu(wave_planet*u.micron, star['temp']*u.K)*np.pi*u.sr).to(u.mJy)
+
+            bb = BlackBody(temperature=star['temp']*u.K) 
+            flux_star = (bb(wave_planet*u.micron)*np.pi*u.sr).to(u.mJy)
             #MAKING SURE TO ADD IN SUPID PI FOR PER STERADIAN!!!!
-            flux_planet = (bb.blackbody_nu(wave_planet*u.micron, planet['temp']*u.K)*np.pi*u.sr).to(u.mJy)
+            bb = BlackBody(temperature=planet['temp']*u.K) 
+            flux_planet = (bb(wave_planet*u.micron)*np.pi*u.sr).to(u.mJy)
             # ( bb planet / pheonix sed ) * (rp/r*)^2
             flux_planet = np.array((flux_planet/flux_star) * (rplan/rstar)**2.0)
 

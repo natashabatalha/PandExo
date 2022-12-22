@@ -1,4 +1,4 @@
-.. warning::
+.. note::
     Before reading further, if you do not wish to install PandExo,\
     there is an online version of the code here at \
     `STScI's ExoCTK <https://exoctk.stsci.edu/pandexo/>`_. 
@@ -7,44 +7,52 @@
 Pre-installation Data Download
 ==============================
 
-PandExo requires: JWST instrument info and stellar SEDs. Users must set up these two environment variables before proceeding.
+PandExo requires downloading **three folders**: 1) JWST instrument info, 2) stellar SEDs, and 3) normalization bandasses. It also requires setting up **two environment variables**. 
 
 JWST Reference Data
 ````````````````````
-JWST Reference data has been updated to 1.5!
+JWST Reference data has been updated to 2.0!
 
 .. warning::
-    Reference data for OLD 1.3 is NOT backwards compatible with PandExo/Pandeia 1.4/1.5. The old reference data 
-    can be found `here <http://ssb.stsci.edu/pandeia/engine/1.3/pandeia_data-1.3.tar.gz>`_ if you still wish to use PandExo v1.3. It is important to make sure that the version number of `PandExo` matches the version number of your reference data.
+    Reference data for PandExo/Pandeia 1.X is not compatible with PandExo/Pandeia 2.0. Please always ensure that your reference data is up to date with the software (e.g. reference data 2.0 should match software release 2.0)
 
-The new reference data is located `here for V1p5 <https://stsci.app.box.com/v/pandeia-refdata-v1p5>`_. Hopefully backwards compatibility issues will subside as Pandeia becomes more mature.
+The new reference data is located `here for v2p0 <https://stsci.app.box.com/v/pandeia-refdata-v2p0-jwst>`_. More information on `pandeia installation can be found here <https://outerspace.stsci.edu/display/PEN/Pandeia+Engine+Installation>`_
 
 
-After you have downloaded the reference data, create environment variable: 
+After you have downloaded the reference data, create environment variable (`more resources on how to create environment variables are located here <https://natashabatalha.github.io/picaso/installation.html#create-environment-variable>`_). 
 
 .. code-block:: bash 
 
     echo 'export pandeia_refdata="$USRDIR/pandeia_data"' >>~/.bash_profile
 
-Stellar SEDs 
+Stellar SEDs  
 ````````````
-Likewise, the user may wish to install specific data for use with the PySynPhot package Pandeia uses. We will only be using the Phoenix stellar atlas, which can be downloaded `here <ftp://ftp.stsci.edu/cdbs/tarfiles/synphot5.tar.gz>`_.
+PandExo uses Pysynphot's Phoenix stellar atlas, which can be `downloaded here <https://archive.stsci.edu/hlsps/reference-atlases/hlsp_reference-atlases_hst_multi_pheonix-models_multi_v3_synphot5.tar>`_.
 
-More reference files can be downloaded via ftp: 
+Once untarred, the files will produce a directory tree of `grp/redcat/trds`. The pandeia.engine uses the contents of the `trds` directory.
 
-- ftp archive.stsci.edu
-- username "anonymous"
-- password is your e-mail address
-- cd pub/hst/pysynphot
-- download desired files. 
+**Environment variable: $PYSYN_CDBS must point to the trds directory (NOT grp)**
 
-*Note* that the tar.gz files downloaded from the STScI anonymous FTP site will untar into the directory structure "grp/hst/cdbs", with the actual data files in an assortment of directories under "cdbs". pysynphot (and pandeia) expect that the "PYSYN_CDBS" environment variable will point to the "cdbs" directory. As such, you can either move the files out of "grp/hst/" to wherever you would like to store them, or point "PYSYN_CDBS" to "/path/to/data/files/grp/hst/cdbs" in order to allow pysynphot and pandeia to properly detect the reference files.
-
-Finally, create your environment variable:
+Create your environment variable:
 
 .. code-block:: bash 
 
-    echo 'export PYSYN_CDBS="$USRDIR/path/to/data/files/grp/hst/cdbs"' >>~/.bash_profile
+    echo 'export PYSYN_CDBS="$USRDIR/grp/redcat/trds"' >>~/.bash_profile
+
+Normalization Files  
+````````````````````
+New to PandExo 2.0, **users now have to download the master table of all pysynphot throughput tables.** 
+
+`Download the file here <https://archive.stsci.edu/hlsps/reference-atlases/hlsp_reference-atlases_hst_multi_everything_multi_v11_sed.tar>`_
+
+Once untarred this will also produce a directory tree of `grp/redcat/trds` with two folders `comp` and `mtab`. Place these folders into the folder you created above `$USRDIR/grp/redcat/trds` 
+
+.. code-block:: bash 
+
+    >> ls $USRDIR/grp/redcat/trds
+    comp grid mtab
+
+Now you should have three folders in your `trds` folder. 
 
 Fortney+ 20210  Planet Grid (Optional)
 ````````````````````````````````````````
@@ -56,20 +64,13 @@ After downloading the Fortney files, create an environmental variable to point t
 
 .. code-block:: bash 
 
-    echo 'export FORTGRID_DIR="$USRDIR/path/to/data/files/fortney_models.db"' >>~/.bash_profile
+    echo 'export FORTGRID_DIR="$USRDIR/fortney_models.db"' >>~/.bash_profile
 
 
 Installation with Pip or Git
 ============================
 
-Install STScI specific packages
-
-.. code-block:: bash
-
-    conda config --add channels http://ssb.stsci.edu/astroconda
-    conda install pyfftw
-
-Now, install `pandexo`. 
+Install with pip: 
 
 .. code-block:: bash
 
@@ -82,7 +83,7 @@ OR Download PandExo's repository via Github. The Github also has helpful noteboo
 
     git clone --recursive https://github.com/natashabatalha/pandexo
     cd pandexo
-    python setup.py install
+    pip install .
 
 
 
@@ -108,80 +109,32 @@ There is a `run_test.py` in the `github`. Test that you're code is working:
 Troubleshooting-Common Errors
 =============================
 
-PyFFTW
-````````
-PyFFTW is needed to run PandExo. In order to run PyFFTW you need to also isntall fftw. To do so, it is necessary to do so through Homebrew, if you do not have conda. 
 
-.. code-block:: bash 
-
-    brew install fftw
-    pip install pyfftw 
-
-Multiprocessing
-````````````````
-Python 2.7 users might need to install multiprocessing
-
-.. code-block:: bash 
-    
-    pip install multiprocessing
-
-RecursionError: maximum recursion depth exceeded while calling a Python object
-````````````````````````````````````````````````````````````````````````````````
-
-There is a known bug with Python 3.6 and Sphinx <1.6. Before updating or installing pandexo do the following:
-
-PIP USERS:
-
-.. code-block:: bash 
-
-    pip install sphinx==1.5.6
-
-CONDA USERS:
-
-.. code-block:: bash 
-
-    conda install sphinx=1.5.6
-
-TypeError: super() argument 1 must be type
-````````````````````````````````````````````
-
-This is the same error above with Sphinx, but for Python 2.7 users. The fix is the same: 
-
-PIP USERS:
-
-.. code-block:: bash 
-
-    pip install sphinx==1.5.6
-
-CONDA USERS:
-
-.. code-block:: bash 
-
-    conda install sphinx=1.5.6
-    
 
 The Importance of Upgrading PandExo
 ===================================
 
-It is crucial that your verison of PandExo remain up to date. Especially through commissioning and leading up to launch, there may be crucial changes to the code or the reference data. Updating PandExo requires three crucial steps. 
+It is crucial that your verison of PandExo is up to date. There were many critical updates in the reference files after launch, and as a result of the commissioning work. Updating PandExo requires three crucial steps: 
 
-Verify Reference Data is Current
-````````````````````````````````
-The link to the reference data is located on `Pandeia's PyPI page <https://pypi.python.org/pypi/pandeia.engine/>`_. Before doing a large batch of calculations, make sure that you have this version. 
 
-Verify pandeia.engine is Current
-````````````````````````````````
-
-.. code-block:: bash 
-
-    pip install pandeia.engine --upgrade 
-
-Verify pandexo.engine is Current 
-````````````````````````````````
+1) Verify pandexo.engine is Current 
+````````````````````````````````````
 
 .. code-block:: bash 
 
     pip install pandexo.engine --upgrade 
 
 
+2) Verify pandeia.engine version compatible
+````````````````````````````````````````````
 
+Currently PandExo requires pandeia.engine==2.0
+
+.. code-block:: bash 
+
+    pip install pandeia.engine==2.0
+
+3) Grab pandeia.engine data 2.0
+````````````````````````````````
+
+The reference data is located `here for v2p0 <https://stsci.app.box.com/v/pandeia-refdata-v2p0-jwst>`_.

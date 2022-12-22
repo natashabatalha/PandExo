@@ -1,9 +1,13 @@
 from bokeh.layouts import column,row
 import numpy as np
-from bokeh.plotting import Figure, output_file, show
+from bokeh.plotting import output_file, show
+from bokeh.plotting import figure as Figure
+
 from bokeh.embed import components
-from bokeh.models.widgets import Panel, Tabs
-from bokeh.models import CustomJS, ColumnDataSource, Slider,Select
+from bokeh.models import Tabs
+from bokeh.models import TabPanel as Panel
+from bokeh.models import  ColumnDataSource, Slider,Select
+from bokeh.models.callbacks import CustomJS
 from bokeh.io import curdoc
 from bokeh.layouts import row
 
@@ -70,7 +74,7 @@ def create_component_jwst(result_dict):
                  0.1*max(result_dict['OriginalInput']['model_spec'])+max(result_dict['OriginalInput']['model_spec'])]
     xlims = [min(result_dict['FinalSpectrum']['wave']), max(result_dict['FinalSpectrum']['wave'])]
 
-    plot_spectrum = Figure(plot_width=800, plot_height=300, x_range=xlims,
+    plot_spectrum = Figure(width=800, height=300, x_range=xlims,
                                y_range=ylims, tools=TOOLS,#responsive=True,
                                  x_axis_label=x_axis_label,
                                  y_axis_label=punit, 
@@ -83,8 +87,8 @@ def create_component_jwst(result_dict):
 
     callback = CustomJS(args=dict(source=source, original=original), code="""
             // Grab some references to the data
-            var sdata = source.get('data');
-            var odata = original.get('data');
+            var sdata = source.data;
+            var odata = original.data;
 
             // Create copies of the original data, store them as the source data
             sdata['x'] = odata['x'].slice(0);
@@ -114,14 +118,14 @@ def create_component_jwst(result_dict):
             var var_in = sdata['var_in'];
             var var_out = sdata['var_out'];
 
-            var wbin = wbin.get('value');
-            var ntran = ntran.get('value');
+            var wbin = wbin.value;
+            var ntran = ntran.value;
 
             var ind = [];
             ind.push(0);
             var start = 1;
 
-
+            var i=1;
             for (i = 0; i < x.length-1; i++) {
                 if (start == wbin) {
                     ind.push(i+1);
@@ -191,15 +195,19 @@ def create_component_jwst(result_dict):
                 y_err[i][1] = y[i] - new_err;            
             }
 
-            source.trigger('change');
+            source.change.emit();
         """)
 
     #var_tot = (frac/electrons_out)**2.0 * var_in + (electrons_in*frac/electrons_out**2.0)**2.0 * var_out
 
-    sliderWbin =  Slider(title="# pixels to bin", value=1, start=1, end=50, step= 1, callback=callback)
+    sliderWbin =  Slider(title="# pixels to bin", value=1, start=1, end=50, step= 1)
+    sliderWbin.js_on_change('value', callback)
     callback.args["wbin"] = sliderWbin
-    sliderTrans =  Slider(title="Num Trans", value=noccultations, start=1, end=50, step= 1, callback=callback)
+    
+    sliderTrans =  Slider(title="Num Trans", value=noccultations, start=1, end=50, step= 1)
+    sliderTrans.js_on_change('value', callback)
     callback.args["ntran"] = sliderTrans
+
     layout = column(row(sliderWbin,sliderTrans), plot_spectrum)
 
 
@@ -214,7 +222,7 @@ def create_component_jwst(result_dict):
     plot_flux_1d1 = Figure(tools=TOOLS,
                          x_axis_label='Wavelength [microns]',
                          y_axis_label='e-/integration', title="Flux Per Integration",
-                         plot_width=800, plot_height=300)
+                         width=800, height=300)
     plot_flux_1d1.line(x, y, line_width = 4, alpha = .7)
     tab1 = Panel(child=plot_flux_1d1, title="Flux per Int")
 
@@ -225,7 +233,7 @@ def create_component_jwst(result_dict):
     #plot_bg_1d1 = Figure(tools=TOOLS,
     #                     x_axis_label='Wavelength [microns]',
     #                     y_axis_label='Flux (e/s)', title="Background",
-    #                     plot_width=800, plot_height=300)
+    #                     width=800, height=300)
     #plot_bg_1d1.line(x, y, line_width = 4, alpha = .7)
     #tab2 = Panel(child=plot_bg_1d1, title="Background Flux")
 
@@ -236,7 +244,7 @@ def create_component_jwst(result_dict):
     plot_snr_1d1 = Figure(tools=TOOLS,
                          x_axis_label=x_axis_label,
                          y_axis_label='sqrt(e-)/integration', title="SNR per integration",
-                         plot_width=800, plot_height=300)
+                         width=800, height=300)
     plot_snr_1d1.line(x, y, line_width = 4, alpha = .7)
     tab3 = Panel(child=plot_snr_1d1, title="SNR per Int")
 
@@ -254,14 +262,14 @@ def create_component_jwst(result_dict):
     plot_noise_1d1 = Figure(tools=TOOLS,#responsive=True,
                          x_axis_label=x_axis_label,
                          y_axis_label='Spectral Precision (ppm)', title="Spectral Precision",
-                         plot_width=800, plot_height=300, y_range = [0,2.0*ymed])
+                         width=800, height=300, y_range = [0,2.0*ymed])
     ymed = np.median(y)
     plot_noise_1d1.circle('x', 'y', line_width = 4, alpha = .7, source=source2)
 
     callback2 = CustomJS(args=dict(source=source2, original=original2), code="""
             // Grab some references to the data
-            var sdata = source.get('data');
-            var odata = original.get('data');
+            var sdata = source.data;
+            var odata = original.data;
 
             // Create copies of the original data, store them as the source data
             sdata['x'] = odata['x'].slice(0);
@@ -273,14 +281,14 @@ def create_component_jwst(result_dict):
 
             var og_ntran = sdata['nocc'];
 
-            var wbin = wbin.get('value');
-            var ntran = ntran.get('value');
+            var wbin = wbin.value;
+            var ntran = ntran.value;
 
             var ind = [];
             ind.push(0);
             var start = 1;
 
-
+            var i=1;
             for (i = 0; i < x.length-1; i++) {
                 if (start == wbin) {
                     ind.push(i+1);
@@ -324,18 +332,22 @@ def create_component_jwst(result_dict):
                 y[i] = new_err       
             }
 
-            source.trigger('change');
+            source.change.emit();
         """)    
 
-    sliderWbin2 =  Slider(title="# pixels to bin", value=1, start=1, end=50, step= 1, callback=callback2)
-    callback2.args["wbin"] = sliderWbin2   
-    sliderTrans2 =  Slider(title="Num Trans", value=noccultations, start=1, end=50, step= 1, callback=callback2)
+    sliderWbin2 =  Slider(title="# pixels to bin", value=1, start=1, end=50, step= 1)
+    sliderWbin2.js_on_change('value', callback2)
+    callback2.args["wbin"] = sliderWbin2  
+
+    sliderTrans2 =  Slider(title="Num Trans", value=noccultations, start=1, end=50, step= 1)
+    sliderTrans2.js_on_change('value', callback2)
     callback2.args["ntran"] = sliderTrans2
+    
     noise_lay = column(row(sliderWbin2, sliderTrans2) , plot_noise_1d1)
     tab4 = Panel(child=noise_lay, title="Precision")
 
     #Not happy? Need help picking a different mode? 
-    plot_spectrum2 = Figure(plot_width=800, plot_height=300, x_range=xlims,y_range=ylims, tools=TOOLS,
+    plot_spectrum2 = Figure(width=800, height=300, x_range=xlims,y_range=ylims, tools=TOOLS,
                              x_axis_label=x_axis_label,
                              y_axis_label=punit, title="Original Model",y_axis_type="log")
 
@@ -359,7 +371,7 @@ def create_component_jwst(result_dict):
                          x_range=[0, yr], y_range=[0, xr],
                          x_axis_label='Pixel', y_axis_label='Spatial',
                          title="2D Detector Image",
-                        plot_width=800, plot_height=300)
+                        width=800, height=300)
     
     plot_detector_2d.image(image=[data], x=[0], y=[0], dh=[xr], dw=[yr],
                       palette="Spectral11")
@@ -375,7 +387,7 @@ def create_component_jwst(result_dict):
                          x_range=[0, yr], y_range=[0, xr],
                          x_axis_label='Pixel', y_axis_label='Spatial',
                          title="Signal-to-Noise Ratio",
-                        plot_width=800, plot_height=300)
+                        width=800, height=300)
     
     plot_snr_2d.image(image=[data], x=[0], y=[0], dh=[xr], dw=[yr],
                       palette="Spectral11")
@@ -390,7 +402,7 @@ def create_component_jwst(result_dict):
                          x_range=[0, yr], y_range=[0, xr],
                          x_axis_label='Pixel', y_axis_label='Spatial',
                          title="Saturation",
-                        plot_width=800, plot_height=300)
+                        width=800, height=300)
     
     plot_sat_2d.image(image=[data], x=[0], y=[0], dh=[xr], dw=[yr],
                       palette="Spectral11")
@@ -446,7 +458,7 @@ def create_component_hst(result_dict):
     elif eventType =='eclipse':
         y_axis='Fp/F*'
 
-    plot_spectrum = Figure(plot_width=800, plot_height=300, x_range=xlims,
+    plot_spectrum = Figure(width=800, height=300, x_range=xlims,
                                y_range=ylims, tools=TOOLS,#responsive=True,
                                  x_axis_label='Wavelength [microns]',
                                  y_axis_label=y_axis, 
@@ -488,7 +500,7 @@ def create_component_hst(result_dict):
         np.array(x_err2.append((px, px)))
         np.array(y_err2.append((py - yerr, py + yerr)))
 
-    early = Figure(plot_width=400, plot_height=300,
+    early = Figure(width=400, height=300,
                                tools=TOOLS,#responsive=True,
                                  x_axis_label='Orbital Phase',
                                  y_axis_label='Flux', 
@@ -498,7 +510,7 @@ def create_component_hst(result_dict):
     early.circle(obsphase1, obstr1, line_width=3, line_alpha=0.6)
     early.multi_line(x_err1, y_err1)
      
-    late = Figure(plot_width=400, plot_height=300, 
+    late = Figure(width=400, height=300, 
                                 tools=TOOLS,#responsive=True,
                                  x_axis_label='Orbital Phase',
                                  y_axis_label='Flux', 
@@ -542,7 +554,7 @@ def create_component_hst(result_dict):
     else:
         title_description =" (Ramp Removed)"
 
-    early = Figure(plot_width=400, plot_height=300,
+    early = Figure(width=400, height=300,
                                tools=TOOLS,#responsive=True,
                                  x_axis_label='Orbital Phase',
                                  y_axis_label='Flux [electrons/pixel]',
@@ -553,7 +565,7 @@ def create_component_hst(result_dict):
     early.circle(obsphase1, counts1, line_width=3, line_alpha=0.6)
     early.multi_line(x_err1, y_err1)
 
-    late = Figure(plot_width=400, plot_height=300,
+    late = Figure(width=400, height=300,
                   tools=TOOLS,  # responsive=True,
                   x_axis_label='Orbital Phase',
                   y_axis_label='Flux [electrons/pixel]',
