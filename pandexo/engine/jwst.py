@@ -75,7 +75,7 @@ def compute_full_sim(dictinput,verbose=False):
     
     #if optimize is in the ngroups section, this will throw an error 
     #so create temp conf with 2 groups 
-    if 'optimize' in conf['detector']['ngroup']: 
+    if 'optimize' in str(conf['detector']['ngroup']): 
         conf_temp = deepcopy(conf) 
         conf_temp['detector']['ngroup'] = 2
     else: 
