@@ -28,7 +28,7 @@ Citation: `PandExo: A Community Tool for Transiting Exoplanet Science with JWST 
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    
    includeme 
    installation

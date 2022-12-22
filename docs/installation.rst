@@ -1,4 +1,4 @@
-.. warning::
+.. note::
     Before reading further, if you do not wish to install PandExo,\
     there is an online version of the code here at \
     `STScI's ExoCTK <https://exoctk.stsci.edu/pandexo/>`_. 
@@ -49,7 +49,7 @@ Once untarred this will also produce a directory tree of `grp/redcat/trds` with 
 
 .. code-block:: bash 
 
-    ls $USRDIR/grp/redcat/trds
+    >> ls $USRDIR/grp/redcat/trds
     comp grid mtab
 
 Now you should have three folders in your `trds` folder. 
@@ -110,71 +110,31 @@ Troubleshooting-Common Errors
 =============================
 
 
-Multiprocessing
-````````````````
-Python 2.7 users might need to install multiprocessing
-
-.. code-block:: bash 
-    
-    pip install multiprocessing
-
-RecursionError: maximum recursion depth exceeded while calling a Python object
-````````````````````````````````````````````````````````````````````````````````
-
-There is a known bug with Python 3.6 and Sphinx <1.6. Before updating or installing pandexo do the following:
-
-PIP USERS:
-
-.. code-block:: bash 
-
-    pip install sphinx==1.5.6
-
-CONDA USERS:
-
-.. code-block:: bash 
-
-    conda install sphinx=1.5.6
-
-TypeError: super() argument 1 must be type
-````````````````````````````````````````````
-
-This is the same error above with Sphinx, but for Python 2.7 users. The fix is the same: 
-
-PIP USERS:
-
-.. code-block:: bash 
-
-    pip install sphinx==1.5.6
-
-CONDA USERS:
-
-.. code-block:: bash 
-
-    conda install sphinx=1.5.6
-    
 
 The Importance of Upgrading PandExo
 ===================================
 
-It is crucial that your verison of PandExo remain up to date. Especially through commissioning and leading up to launch, there may be crucial changes to the code or the reference data. Updating PandExo requires three crucial steps. 
+It is crucial that your verison of PandExo is up to date. There were many critical updates in the reference files after launch, and as a result of the commissioning work. Updating PandExo requires three crucial steps: 
 
-Verify Reference Data is Current
-````````````````````````````````
-The link to the reference data is located on `Pandeia's PyPI page <https://pypi.python.org/pypi/pandeia.engine/>`_. Before doing a large batch of calculations, make sure that you have this version. 
 
-Verify pandeia.engine is Current
-````````````````````````````````
-
-.. code-block:: bash 
-
-    pip install pandeia.engine --upgrade 
-
-Verify pandexo.engine is Current 
-````````````````````````````````
+1) Verify pandexo.engine is Current 
+````````````````````````````````````
 
 .. code-block:: bash 
 
     pip install pandexo.engine --upgrade 
 
 
+2) Verify pandeia.engine version compatible
+````````````````````````````````````````````
 
+Currently PandExo requires pandeia.engine==2.0
+
+.. code-block:: bash 
+
+    pip install pandeia.engine==2.0
+
+3) Grab pandeia.engine data 2.0
+````````````````````````````````
+
+The reference data is located `here for v2p0 <https://stsci.app.box.com/v/pandeia-refdata-v2p0-jwst>`_.
