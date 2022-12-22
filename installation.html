@@ -85,22 +85,17 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Pre-installation Data Download</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#jwst-reference-data">JWST Reference Data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#stellar-seds">Stellar SEDs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#normalization-files">Normalization Files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#fortney-20210-planet-grid-optional">Fortney+ 20210  Planet Grid (Optional)</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="#installation-with-pip-or-git">Installation with Pip or Git</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#final-test-for-success">Final Test for Success</a></li>
-<li class="toctree-l1"><a class="reference internal" href="#troubleshooting-common-errors">Troubleshooting-Common Errors</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#pyfftw">PyFFTW</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#multiprocessing">Multiprocessing</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#recursionerror-maximum-recursion-depth-exceeded-while-calling-a-python-object">RecursionError: maximum recursion depth exceeded while calling a Python object</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#typeerror-super-argument-1-must-be-type">TypeError: super() argument 1 must be type</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="#troubleshooting-common-errors">Troubleshooting-Common Errors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#the-importance-of-upgrading-pandexo">The Importance of Upgrading PandExo</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#verify-reference-data-is-current">Verify Reference Data is Current</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#verify-pandeia-engine-is-current">Verify pandeia.engine is Current</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#verify-pandexo-engine-is-current">Verify pandexo.engine is Current</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#verify-pandexo-engine-is-current">1) Verify pandexo.engine is Current</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#verify-pandeia-engine-version-compatible">2) Verify pandeia.engine version compatible</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#grab-pandeia-engine-data-2-0">3) Grab pandeia.engine data 2.0</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="installation_windows.html">Windows Installing Guide for PandExo</a></li>
@@ -173,43 +168,46 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="admonition warning">
-<p class="admonition-title">Warning</p>
+  <div class="admonition note">
+<p class="admonition-title">Note</p>
 <p>Before reading further, if you do not wish to install PandExo,there is an online version of the code here at <a class="reference external" href="https://exoctk.stsci.edu/pandexo/">STScI’s ExoCTK</a>.</p>
 </div>
 <div class="section" id="pre-installation-data-download">
 <h1>Pre-installation Data Download<a class="headerlink" href="#pre-installation-data-download" title="Permalink to this headline">¶</a></h1>
-<p>PandExo requires: JWST instrument info and stellar SEDs. Users must set up these two environment variables before proceeding.</p>
+<p>PandExo requires downloading <strong>three folders</strong>: 1) JWST instrument info, 2) stellar SEDs, and 3) normalization bandasses. It also requires setting up <strong>two environment variables</strong>.</p>
 <div class="section" id="jwst-reference-data">
 <h2>JWST Reference Data<a class="headerlink" href="#jwst-reference-data" title="Permalink to this headline">¶</a></h2>
-<p>JWST Reference data has been updated to 1.5!</p>
+<p>JWST Reference data has been updated to 2.0!</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>Reference data for OLD 1.3 is NOT backwards compatible with PandExo/Pandeia 1.4/1.5. The old reference data
-can be found <a class="reference external" href="http://ssb.stsci.edu/pandeia/engine/1.3/pandeia_data-1.3.tar.gz">here</a> if you still wish to use PandExo v1.3. It is important to make sure that the version number of <cite>PandExo</cite> matches the version number of your reference data.</p>
+<p>Reference data for PandExo/Pandeia 1.X is not compatible with PandExo/Pandeia 2.0. Please always ensure that your reference data is up to date with the software (e.g. reference data 2.0 should match software release 2.0)</p>
 </div>
-<p>The new reference data is located <a class="reference external" href="https://stsci.app.box.com/v/pandeia-refdata-v1p6">here for V1p6</a>. Hopefully backwards compatibility issues will subside as Pandeia becomes more mature.</p>
-<p>After you have downloaded the reference data, create environment variable:</p>
+<p>The new reference data is located <a class="reference external" href="https://stsci.app.box.com/v/pandeia-refdata-v2p0-jwst">here for v2p0</a>. More information on <a class="reference external" href="https://outerspace.stsci.edu/display/PEN/Pandeia+Engine+Installation">pandeia installation can be found here</a></p>
+<p>After you have downloaded the reference data, create environment variable (<a class="reference external" href="https://natashabatalha.github.io/picaso/installation.html#create-environment-variable">more resources on how to create environment variables are located here</a>).</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">echo</span> <span class="s1">&#39;export pandeia_refdata=&quot;$USRDIR/pandeia_data&quot;&#39;</span> &gt;&gt;~/.bash_profile
 </pre></div>
 </div>
 </div>
 <div class="section" id="stellar-seds">
 <h2>Stellar SEDs<a class="headerlink" href="#stellar-seds" title="Permalink to this headline">¶</a></h2>
-<p>Likewise, the user may wish to install specific data for use with the PySynPhot package Pandeia uses. We will only be using the Phoenix stellar atlas, which can be downloaded <a class="reference external" href="ftp://ftp.stsci.edu/cdbs/tarfiles/synphot5.tar.gz">here</a>.</p>
-<p>More reference files can be downloaded via ftp:</p>
-<ul class="simple">
-<li><p>ftp archive.stsci.edu</p></li>
-<li><p>username “anonymous”</p></li>
-<li><p>password is your e-mail address</p></li>
-<li><p>cd pub/hst/pysynphot</p></li>
-<li><p>download desired files.</p></li>
-</ul>
-<p><em>Note</em> that the tar.gz files downloaded from the STScI anonymous FTP site will untar into the directory structure “grp/hst/cdbs”, with the actual data files in an assortment of directories under “cdbs”. pysynphot (and pandeia) expect that the “PYSYN_CDBS” environment variable will point to the “cdbs” directory. As such, you can either move the files out of “grp/hst/” to wherever you would like to store them, or point “PYSYN_CDBS” to “/path/to/data/files/grp/hst/cdbs” in order to allow pysynphot and pandeia to properly detect the reference files.</p>
-<p>Finally, create your environment variable:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">echo</span> <span class="s1">&#39;export PYSYN_CDBS=&quot;$USRDIR/path/to/data/files/grp/hst/cdbs&quot;&#39;</span> &gt;&gt;~/.bash_profile
+<p>PandExo uses Pysynphot’s Phoenix stellar atlas, which can be <a class="reference external" href="https://archive.stsci.edu/hlsps/reference-atlases/hlsp_reference-atlases_hst_multi_pheonix-models_multi_v3_synphot5.tar">downloaded here</a>.</p>
+<p>Once untarred, the files will produce a directory tree of <cite>grp/redcat/trds</cite>. The pandeia.engine uses the contents of the <cite>trds</cite> directory.</p>
+<p><strong>Environment variable: $PYSYN_CDBS must point to the trds directory (NOT grp)</strong></p>
+<p>Create your environment variable:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">echo</span> <span class="s1">&#39;export PYSYN_CDBS=&quot;$USRDIR/grp/redcat/trds&quot;&#39;</span> &gt;&gt;~/.bash_profile
 </pre></div>
 </div>
+</div>
+<div class="section" id="normalization-files">
+<h2>Normalization Files<a class="headerlink" href="#normalization-files" title="Permalink to this headline">¶</a></h2>
+<p>New to PandExo 2.0, <strong>users now have to download the master table of all pysynphot throughput tables.</strong></p>
+<p><a class="reference external" href="https://archive.stsci.edu/hlsps/reference-atlases/hlsp_reference-atlases_hst_multi_everything_multi_v11_sed.tar">Download the file here</a></p>
+<p>Once untarred this will also produce a directory tree of <cite>grp/redcat/trds</cite> with two folders <cite>comp</cite> and <cite>mtab</cite>. Place these folders into the folder you created above <cite>$USRDIR/grp/redcat/trds</cite></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&gt;&gt; ls <span class="nv">$USRDIR</span>/grp/redcat/trds
+comp grid mtab
+</pre></div>
+</div>
+<p>Now you should have three folders in your <cite>trds</cite> folder.</p>
 </div>
 <div class="section" id="fortney-20210-planet-grid-optional">
 <h2>Fortney+ 20210  Planet Grid (Optional)<a class="headerlink" href="#fortney-20210-planet-grid-optional" title="Permalink to this headline">¶</a></h2>
@@ -218,26 +216,21 @@ can be found <a class="reference external" href="http://ssb.stsci.edu/pandeia/en
 <li><p><a class="reference external" href="https://github.com/ExoCTK/exoctk#obtain-the-exoctk-data">The ExoCTK Website</a>.</p></li>
 </ul>
 <p>After downloading the Fortney files, create an environmental variable to point to them.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">echo</span> <span class="s1">&#39;export FORTGRID_DIR=&quot;$USRDIR/path/to/data/files/fortney_models.db&quot;&#39;</span> &gt;&gt;~/.bash_profile
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">echo</span> <span class="s1">&#39;export FORTGRID_DIR=&quot;$USRDIR/fortney_models.db&quot;&#39;</span> &gt;&gt;~/.bash_profile
 </pre></div>
 </div>
 </div>
 </div>
 <div class="section" id="installation-with-pip-or-git">
 <h1>Installation with Pip or Git<a class="headerlink" href="#installation-with-pip-or-git" title="Permalink to this headline">¶</a></h1>
-<p>Install STScI specific packages</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda config --add channels http://ssb.stsci.edu/astroconda
-conda install pyfftw
-</pre></div>
-</div>
-<p>Now, install <cite>pandexo</cite>.</p>
+<p>Install with pip:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install pandexo.engine
 </pre></div>
 </div>
 <p>OR Download PandExo’s repository via Github. The Github also has helpful notebooks for getting started!</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git clone --recursive https://github.com/natashabatalha/pandexo
 <span class="nb">cd</span> pandexo
-python setup.py install
+pip install .
 </pre></div>
 </div>
 </div>
@@ -259,64 +252,26 @@ SUCCESS
 </div>
 <div class="section" id="troubleshooting-common-errors">
 <h1>Troubleshooting-Common Errors<a class="headerlink" href="#troubleshooting-common-errors" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="pyfftw">
-<h2>PyFFTW<a class="headerlink" href="#pyfftw" title="Permalink to this headline">¶</a></h2>
-<p>PyFFTW is needed to run PandExo. In order to run PyFFTW you need to also isntall fftw. To do so, it is necessary to do so through Homebrew, if you do not have conda.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>brew install fftw
-pip install pyfftw
-</pre></div>
-</div>
-</div>
-<div class="section" id="multiprocessing">
-<h2>Multiprocessing<a class="headerlink" href="#multiprocessing" title="Permalink to this headline">¶</a></h2>
-<p>Python 2.7 users might need to install multiprocessing</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install multiprocessing
-</pre></div>
-</div>
-</div>
-<div class="section" id="recursionerror-maximum-recursion-depth-exceeded-while-calling-a-python-object">
-<h2>RecursionError: maximum recursion depth exceeded while calling a Python object<a class="headerlink" href="#recursionerror-maximum-recursion-depth-exceeded-while-calling-a-python-object" title="Permalink to this headline">¶</a></h2>
-<p>There is a known bug with Python 3.6 and Sphinx &lt;1.6. Before updating or installing pandexo do the following:</p>
-<p>PIP USERS:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install <span class="nv">sphinx</span><span class="o">==</span><span class="m">1</span>.5.6
-</pre></div>
-</div>
-<p>CONDA USERS:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda install <span class="nv">sphinx</span><span class="o">=</span><span class="m">1</span>.5.6
-</pre></div>
-</div>
-</div>
-<div class="section" id="typeerror-super-argument-1-must-be-type">
-<h2>TypeError: super() argument 1 must be type<a class="headerlink" href="#typeerror-super-argument-1-must-be-type" title="Permalink to this headline">¶</a></h2>
-<p>This is the same error above with Sphinx, but for Python 2.7 users. The fix is the same:</p>
-<p>PIP USERS:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install <span class="nv">sphinx</span><span class="o">==</span><span class="m">1</span>.5.6
-</pre></div>
-</div>
-<p>CONDA USERS:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda install <span class="nv">sphinx</span><span class="o">=</span><span class="m">1</span>.5.6
-</pre></div>
-</div>
-</div>
 </div>
 <div class="section" id="the-importance-of-upgrading-pandexo">
 <h1>The Importance of Upgrading PandExo<a class="headerlink" href="#the-importance-of-upgrading-pandexo" title="Permalink to this headline">¶</a></h1>
-<p>It is crucial that your verison of PandExo remain up to date. Especially through commissioning and leading up to launch, there may be crucial changes to the code or the reference data. Updating PandExo requires three crucial steps.</p>
-<div class="section" id="verify-reference-data-is-current">
-<h2>Verify Reference Data is Current<a class="headerlink" href="#verify-reference-data-is-current" title="Permalink to this headline">¶</a></h2>
-<p>The link to the reference data is located on <a class="reference external" href="https://pypi.python.org/pypi/pandeia.engine/">Pandeia’s PyPI page</a>. Before doing a large batch of calculations, make sure that you have this version.</p>
-</div>
-<div class="section" id="verify-pandeia-engine-is-current">
-<h2>Verify pandeia.engine is Current<a class="headerlink" href="#verify-pandeia-engine-is-current" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install pandeia.engine --upgrade
-</pre></div>
-</div>
-</div>
+<p>It is crucial that your verison of PandExo is up to date. There were many critical updates in the reference files after launch, and as a result of the commissioning work. Updating PandExo requires three crucial steps:</p>
 <div class="section" id="verify-pandexo-engine-is-current">
-<h2>Verify pandexo.engine is Current<a class="headerlink" href="#verify-pandexo-engine-is-current" title="Permalink to this headline">¶</a></h2>
+<h2>1) Verify pandexo.engine is Current<a class="headerlink" href="#verify-pandexo-engine-is-current" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install pandexo.engine --upgrade
 </pre></div>
 </div>
+</div>
+<div class="section" id="verify-pandeia-engine-version-compatible">
+<h2>2) Verify pandeia.engine version compatible<a class="headerlink" href="#verify-pandeia-engine-version-compatible" title="Permalink to this headline">¶</a></h2>
+<p>Currently PandExo requires pandeia.engine==2.0</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install pandeia.engine<span class="o">==</span><span class="m">2</span>.0
+</pre></div>
+</div>
+</div>
+<div class="section" id="grab-pandeia-engine-data-2-0">
+<h2>3) Grab pandeia.engine data 2.0<a class="headerlink" href="#grab-pandeia-engine-data-2-0" title="Permalink to this headline">¶</a></h2>
+<p>The reference data is located <a class="reference external" href="https://stsci.app.box.com/v/pandeia-refdata-v2p0-jwst">here for v2p0</a>.</p>
 </div>
 </div>
 

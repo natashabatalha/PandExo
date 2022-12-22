@@ -93,8 +93,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#step-3">Step 3</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#step-4">Step 4</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#step-5">Step 5</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#step-6">Step 6</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#step-7-setting-reference-data">Step 7: Setting Reference Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#step-6-setting-reference-data">Step 6: Setting Reference Data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#step-7-installing-needed-packages">Step 7: Installing needed Packages</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#step-8-run-test">Step 8: Run Test</a></li>
 </ul>
@@ -196,17 +195,12 @@ Univesity of Amsterdam and VU University Amsterdam</p>
 <h2>Step 5<a class="headerlink" href="#step-5" title="Permalink to this headline">¶</a></h2>
 <p><a class="reference external" href="https://natashabatalha.github.io/PandExo/installation.html">Follow PandExo Installation guide in getting files</a></p>
 <ul class="simple">
-<li><p>get pandeia_data      (pandeia_data-1.2.tar.gz)</p></li>
-<li><p>get pysynphot_data        (synphot5.tar.gz)</p></li>
-<li><p>get PandExo github folder (pandexo-master.zip)</p></li>
+<li><p>get pandeia_data</p></li>
+<li><p>get pysynphot_data (includes phoenix models and throughputs)</p></li>
 </ul>
 </div>
-<div class="section" id="step-6">
-<h2>Step 6<a class="headerlink" href="#step-6" title="Permalink to this headline">¶</a></h2>
-<p>Open pandexo.sh in your favorite text editor (eg. Notepad++) and read through installation steps. Below we will follow these steps but with Windows commands.</p>
-</div>
-<div class="section" id="step-7-setting-reference-data">
-<h2>Step 7: Setting Reference Data<a class="headerlink" href="#step-7-setting-reference-data" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="step-6-setting-reference-data">
+<h2>Step 6: Setting Reference Data<a class="headerlink" href="#step-6-setting-reference-data" title="Permalink to this headline">¶</a></h2>
 <p>Using an achiver (eg. Winrar, 7Zip) extract Pandeia and Pysynphot data in two seperate folders.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>C:/Users/USERNAME/pandeia_data
 C:/Users/USERNAME/pysynphot_data
@@ -226,39 +220,11 @@ SETX pandeia_refdata <span class="s1">&#39;C:/Users/USERNAME/pysynphot_data&#39;
 </div>
 <div class="section" id="step-7-installing-needed-packages">
 <h2>Step 7: Installing needed Packages<a class="headerlink" href="#step-7-installing-needed-packages" title="Permalink to this headline">¶</a></h2>
-<p>Add conda channel, in CMD:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda config --add channels http://ssb.stsci.edu/astroconda
-</pre></div>
-</div>
-<p>Check needed packages, at the moment:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>numpy synphot joblib scipy <span class="nv">astropy</span><span class="o">==</span><span class="m">2</span>.0.2 pyfftw pysynphot photutils <span class="nv">sphinx</span><span class="o">=</span><span class="m">1</span>.5.6 <span class="nv">bokeh</span><span class="o">=</span><span class="m">0</span>.12.6
-</pre></div>
-</div>
-<p>All but <cite>Pyfftw</cite> can be installed using:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda install PACKAGE
-</pre></div>
-</div>
-<p>or</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install PACKAGE
-</pre></div>
-</div>
-<p>If they fail check in the error if you are missing a certain .dll or look online.</p>
-<p>For <cite>Pyfftw</cite> get a prebuiled wheel from <a class="reference external" href="https://bintray.com/hgomersall/generic/PyFFTW-development-builds/view#files">here</a>.</p>
-<p>Get a matching cp36-cp36 for your python version.
-For Python 3.6.4 64-bit I used:</p>
-<ul class="simple">
-<li><p><cite>pyFFTW-0.10.5.dev0+d45d7fe-cp36-cp36m-win_amd64.whl</cite></p></li>
-</ul>
-<p>Navigate to download folder and install</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> <span class="s1">&#39;C:\Users\USERNAME\Downloads&#39;</span>
-pip install pyFFTW-0.10.5.dev0+d45d7fe-cp36-cp36m-win_amd64.whl
-</pre></div>
-</div>
-<p>With your fingers crossed, install PandExo Engine</p>
+<p>Install PandExo Engine</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install pandexo.engine
 </pre></div>
 </div>
-<p>Probabily fail, look what I/you missed and try again. <a class="reference external" href="https://natashabatalha.github.io/PandExo/installation.html#troubleshooting-common-errors">Troubleshooting here</a>.</p>
+<p>Check troubleshooting if you run into problems. <a class="reference external" href="https://natashabatalha.github.io/PandExo/installation.html#troubleshooting-common-errors">Troubleshooting here</a>.</p>
 </div>
 <div class="section" id="step-8-run-test">
 <h2>Step 8: Run Test<a class="headerlink" href="#step-8-run-test" title="Permalink to this headline">¶</a></h2>

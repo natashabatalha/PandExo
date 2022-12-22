@@ -305,12 +305,14 @@
 	<span class="n">newx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">newx</span><span class="p">)</span>
 	<span class="n">szmod</span><span class="o">=</span><span class="n">newx</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 	<span class="n">delta</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">szmod</span><span class="p">)</span>
-	<span class="n">ynew</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">szmod</span><span class="p">)</span>
-	<span class="n">bin_dy</span> <span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">szmod</span><span class="p">)</span>
+	<span class="n">ynew</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">szmod</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+	<span class="n">bin_dy</span> <span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">szmod</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
 	<span class="n">bin_n</span> <span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">szmod</span><span class="p">)</span>
 
 	<span class="n">delta</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">=</span><span class="n">newx</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">-</span><span class="n">newx</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>  
-	<span class="n">delta</span><span class="p">[</span><span class="n">szmod</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">=</span><span class="n">delta</span><span class="p">[</span><span class="n">szmod</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> 
+	<span class="n">delta</span><span class="p">[</span><span class="n">szmod</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">=</span><span class="n">delta</span><span class="p">[</span><span class="n">szmod</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+	
+	<span class="n">missing_bool</span> <span class="o">=</span> <span class="kc">False</span>
     
 	<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">szmod</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
 		<span class="n">i</span><span class="o">=</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span>
@@ -321,12 +323,10 @@
 			<span class="k">if</span> <span class="n">dy</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> 
 				<span class="n">bin_dy</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dy</span><span class="p">[</span><span class="n">loc</span><span class="p">]</span><span class="o">**</span><span class="mf">2.0</span><span class="p">))</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">loc</span><span class="p">])</span>
 			<span class="n">bin_n</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">loc</span><span class="p">])</span>
-		<span class="c1">#if not give empty slice a nan</span>
-		<span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">loc</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="ow">is</span> <span class="mi">0</span> <span class="p">:</span> 
-			<span class="n">warn</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="ne">UserWarning</span><span class="p">(</span><span class="s2">&quot;Empty slice exists within specified new x, replacing value with nan&quot;</span><span class="p">))</span>
-			<span class="n">ynew</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span>
-			<span class="n">bin_n</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span> 
-
+		<span class="c1">#if not remember and give warning later</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="n">missing_bool</span> <span class="o">=</span> <span class="kc">True</span>
+			
 	<span class="c1">#fill in zeroth entry</span>
 	<span class="n">loc</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">((</span><span class="n">x</span> <span class="o">&gt;</span> <span class="n">newx</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mf">0.5</span><span class="o">*</span><span class="n">delta</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">x</span> <span class="o">&lt;</span> <span class="n">newx</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="mf">0.5</span><span class="o">*</span><span class="n">delta</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
 	<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">loc</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span> 
@@ -334,11 +334,12 @@
 		<span class="n">bin_n</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">loc</span><span class="p">])</span>
 		<span class="k">if</span> <span class="n">dy</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> 
 			<span class="n">bin_dy</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dy</span><span class="p">[</span><span class="n">loc</span><span class="p">]</span><span class="o">**</span><span class="mf">2.0</span><span class="p">))</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">loc</span><span class="p">])</span>
-	<span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">loc</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="ow">is</span> <span class="mi">0</span> <span class="p">:</span> 
-		<span class="n">ynew</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span>
-		<span class="n">bin_n</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
-		<span class="k">if</span> <span class="n">dy</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-			<span class="n">bin_dy</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span> 
+	<span class="k">else</span><span class="p">:</span>
+		<span class="n">missing_bool</span> <span class="o">=</span> <span class="kc">True</span>
+	
+	<span class="c1">#warn user if there was an empty slice</span>
+	<span class="k">if</span> <span class="n">missing_bool</span><span class="p">:</span>
+		<span class="n">warn</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="ne">UserWarning</span><span class="p">(</span><span class="s2">&quot;Empty slice exists within specified new x, replacing value with nan&quot;</span><span class="p">))</span>
 	
 	<span class="c1">#remove nans if requested</span>
 	<span class="n">out</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;bin_y&#39;</span><span class="p">:</span><span class="n">ynew</span><span class="p">,</span> <span class="s1">&#39;bin_x&#39;</span><span class="p">:</span><span class="n">newx</span><span class="p">,</span> <span class="s1">&#39;bin_dy&#39;</span><span class="p">:</span><span class="n">bin_dy</span><span class="p">,</span> <span class="s1">&#39;bin_n&#39;</span><span class="p">:</span><span class="n">bin_n</span><span class="p">})</span>

@@ -543,7 +543,7 @@
                                     <span class="s2">&quot;running or pending.&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">cause</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">bpe</span><span class="o">.</span><span class="n">__cause__</span> <span class="o">=</span> <span class="n">_RemoteTraceback</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&#39;&#39;&#39;</span><span class="se">\n</span><span class="si">{</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cause</span><span class="p">)</span><span class="si">}</span><span class="s2">&#39;&#39;&#39;&quot;</span><span class="p">)</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&#39;&#39;&#39;</span><span class="se">\n</span><span class="s2">{&#39;&#39;.join(cause)}&#39;&#39;&#39;&quot;</span><span class="p">)</span>
             <span class="c1"># All futures in flight must be marked failed</span>
             <span class="k">for</span> <span class="n">work_id</span><span class="p">,</span> <span class="n">work_item</span> <span class="ow">in</span> <span class="n">pending_work_items</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="n">work_item</span><span class="o">.</span><span class="n">future</span><span class="o">.</span><span class="n">set_exception</span><span class="p">(</span><span class="n">bpe</span><span class="p">)</span>
@@ -676,7 +676,7 @@
             <span class="k">elif</span> <span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">platform</span> <span class="o">==</span> <span class="s1">&#39;win32&#39;</span> <span class="ow">and</span>
                 <span class="n">max_workers</span> <span class="o">&gt;</span> <span class="n">_MAX_WINDOWS_WORKERS</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;max_workers must be &lt;= </span><span class="si">{</span><span class="n">_MAX_WINDOWS_WORKERS</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="sa">f</span><span class="s2">&quot;max_workers must be &lt;= </span><span class="si">{_MAX_WINDOWS_WORKERS}</span><span class="s2">&quot;</span><span class="p">)</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">_max_workers</span> <span class="o">=</span> <span class="n">max_workers</span>
 

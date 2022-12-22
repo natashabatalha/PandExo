@@ -12,6 +12,11 @@
    </div>
    <br/><br/>
 
+News 
+=====
+
+PandExo 2.0 is now available for download!!
+
 The Documentation
 =================
 
@@ -28,7 +33,7 @@ Citation: `PandExo: A Community Tool for Transiting Exoplanet Science with JWST 
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    
    includeme 
    installation
