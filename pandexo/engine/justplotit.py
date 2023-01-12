@@ -7,7 +7,7 @@ import numpy as np
 from bokeh.layouts import row
 import pandas as pd
 def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', output_file = 'data.html',legend = False,
-        R=False,  num_tran = False, plot_width=800, plot_height=400,x_range=[1,10],y_range=None, plot=True,
+        R=False,  num_tran = False, width=800, height=400,x_range=[1,10],y_range=None, plot=True,
         output_notebook=True):
     """Plots 1d simulated spectrum and rebin or rescale for more transits
 
@@ -34,9 +34,9 @@ def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', out
         no binning. Here I adopt R as w[1]/(w[2] - w[0]) to maintain consistency with `pandeia.engine`
     num_tran : float
         (Optional) Scales data by number of transits to improve error by sqrt(`num_trans`)
-    plot_width : int
+    width : int
         (Optional) Sets the width of the plot. Default = 800
-    plot_height : int
+    height : int
         (Optional) Sets the height of the plot. Default = 400
     y_range : list of int
         (Optional) sets y range of plot. Defaut is +- 10% of max and min
@@ -188,7 +188,7 @@ def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', out
                  0.1*max(dictt['OriginalInput']['model_spec'])+max(dictt['OriginalInput']['model_spec'])]
 
             fig1d = Figure(x_range=x_range, y_range = ylims,
-               width = plot_width, height =plot_height,title=title,x_axis_label=x_axis_label,
+               width = width, height =height,title=title,x_axis_label=x_axis_label,
               y_axis_label = y_axis_label, tools=TOOLS, background_fill_color = 'white')
 
 
