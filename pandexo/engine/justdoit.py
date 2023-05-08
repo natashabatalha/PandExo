@@ -201,7 +201,7 @@ def load_mode_dict(inst):
     """
     return SetDefaultModes(inst).pick()
 
-def get_thruput(inst, niriss=1, nirspec='f100lp'):
+def get_thruput(inst, niriss=1, nirspec='f100lp', wmin='default', wmax='default'):
     """Returns complete instrument photon to electron conversion efficiency
     Pulls complete instrument photon to electron conversion efficiency
     (PCE) based on instrument key input
@@ -215,6 +215,12 @@ def get_thruput(inst, niriss=1, nirspec='f100lp'):
     nirspec : str
         (Optional) for NIRISS G140M/H there are two available filters (f100lp and f070lp)
         if you are selecting G140M or G140H, this allows you to pick which one
+    wmin : str / float 
+        (Optional) minimum wavlength to compute PCE across, 'default' will use
+        values from Pandeia.
+    wmax : str / float 
+        (Optional) maximum wavlength to compute PCE across, 'default' will use
+        values from Pandeia. 
     Returns
     -------
     dict
@@ -236,7 +242,11 @@ def get_thruput(inst, niriss=1, nirspec='f100lp'):
         conf["instrument"]["disperser"] = conf["instrument"]["disperser"] +'_'+str(niriss)
         i = InstrumentFactory(config=conf)
         wr = i.get_wave_range()
-        wave = np.linspace(wr['wmin'], wr['wmax'], num=500)
+        if wmin == 'default':
+            wmin = wr['wmin']
+        if wmax == 'default':
+            wmax = wr['wmax']
+        wave = np.linspace(wmin, wmax, num=500)
         pce = i.get_total_eff(wave)
         return {'wave':wave,'pce':0.663*pce}
     elif (conf['instrument']['instrument'].lower() =='nirspec') and ('g140' in conf["instrument"]["disperser"]):
@@ -244,7 +254,11 @@ def get_thruput(inst, niriss=1, nirspec='f100lp'):
 
     i = InstrumentFactory(config=conf)
     wr = i.get_wave_range()
-    wave = np.linspace(wr['wmin'], wr['wmax'], num=500)
+    if wmin == 'default':
+        wmin = wr['wmin']
+    if wmax == 'default':
+        wmax = wr['wmax']
+    wave = np.linspace(wmin, wmax, num=500) #
     pce = i.get_total_eff(wave)
     return {'wave':wave,'pce':pce}
 
