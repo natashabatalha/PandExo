@@ -296,8 +296,9 @@ class CalculationNewHandler(BaseHandler):
 
         all_planets =  pd.read_csv('https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=select+pl_name+from+PSCompPars&format=csv')
         all_planets = sorted(all_planets['pl_name'].values)
+        unique_temps = sorted(self.header.temp.unique())
         self.render("new.html", id=id,
-                                 temp=list(map(str, header.temp.unique())), 
+                                 temp=list(map(str, unique_temps)),
                                  planets=all_planets,
                                  data=exodata, data_json=json.dumps(form_data))
 
@@ -385,9 +386,10 @@ class CalculationNewHandler(BaseHandler):
                 'ray' : ['NO GRID DB FOUND'],
                 'flat':['NO GRID DB FOUND']})
             all_planets =  pd.read_csv('https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=select+pl_name+from+PSCompPars&format=csv')
-            all_planets = sorted(all_planets['pl_name'].values)
+            all_planets = sorted(all_planets['pl_name'].values)            
+            unique_temps = sorted(self.header.temp.unique())
             return self.render("new.html", id=id,
-                                temp=list(map(str, self.header.temp.unique())),
+                                temp=list(map(str, unique_temps)),
                                 data=exodata, data_json=None,
                                 planets=all_planets)
 
@@ -583,9 +585,10 @@ class CalculationNewHSTHandler(BaseHandler):
             exodata = json.load(data_file)
 
         all_planets =  pd.read_csv('https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=select+pl_name+from+PSCompPars&format=csv')
-        all_planets = sorted(all_planets['pl_name'].values)
+        all_planets = sorted(all_planets['pl_name'].values)        
+        unique_temps = sorted(self.header.temp.unique())
         self.render("newHST.html", id=id,
-                    temp=list(map(str, self.header.temp.unique())),
+                    temp=list(map(str, unique_temps)),
                     data=exodata,
                     planets=all_planets)
 
@@ -674,9 +677,10 @@ class CalculationNewHSTHandler(BaseHandler):
                 'flat':['NO GRID DB FOUND']})
 
             all_planets =  pd.read_csv('https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=select+pl_name+from+PSCompPars&format=csv')
-            all_planets = sorted(all_planets['pl_name'].values)
+            all_planets = sorted(all_planets['pl_name'].values)            
+            unique_temps = sorted(self.header.temp.unique())
             return self.render("newHST.html", id=id,
-                                temp=list(map(str, self.header.temp.unique())),
+                                temp=list(map(str, unique_temps)),
                                 data=exodata,
                                 planets=all_planets)
 
