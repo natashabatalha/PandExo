@@ -32,22 +32,22 @@
 
     <div class="col-md-3 col-md-offset-3">
         <div class="input-group">
-            <input type="text" class="form-control" id="temp" name="temp" value="{{ data['star']['temp'] }}">
+            <input type="number" step="any" class="form-control" id="temp" name="temp" value="{{ data['star']['temp'] }}">
             <span class="input-group-addon">&deg; Kelvin</span>
         </div>
         <p class="help-block">Stellar temperature</p>
     </div>
     <div class="col-md-3">
-        <input type="text" class="form-control" id="metal" name="metal" value="{{ data['star']['metal'] }}">
+        <input type="number" step="any" class="form-control" id="metal" name="metal" value="{{ data['star']['metal'] }}">
         <p class="help-block">Stellar metallicity</p>
     </div>
     <div class="col-md-3">
-        <input type="text" class="form-control" id="logg" name="logg" value="{{ data['star']['logg'] }}">
+        <input type="number" step="any" class="form-control" id="logg" name="logg" value="{{ data['star']['logg'] }}">
         <p class="help-block">Stellar log g</p>
     </div>
 
     <div class="col-md-offset-3 col-md-4 form-inline">
-        <input type="text" class="form-control" id="mag" name="mag" style="width: 70%;" value="{{ data['star']['jmag'] }}">
+        <input type="number" step="any" class="form-control" id="mag" name="mag" style="width: 70%;" value="{{ data['star']['jmag'] }}">
         <div class="input-group-btn" style="width: 20%;left: -4px;display: inline-block;">
             <select id="ref_wave" name="ref_wave" class="form-control" data-placeholder="Select Magnitude Units">
                 <!--<option value=""></option>-->
@@ -60,7 +60,7 @@
     </div>
 
     <div class="col-md-offset-3 col-md-4 form-inline">
-        <input type="text" class="form-control" id="rstarc" name="rstarc" style="width: 70%;" value="{{ data['star']['radius'] }}">
+        <input type="number" step="any" class="form-control" id="rstarc" name="rstarc" style="width: 70%;" value="{{ data['star']['radius'] }}">
         <div class="input-group-btn" style="width: 20%;left: -4px;display: inline-block;">
             <select id="rstar_unitc" name="rstar_unitc" class="form-control">
             <option value='R_sun'>R<sub>S</sub></option>
@@ -73,7 +73,7 @@
         <p class="help-block">Stellar Radius</p>
     </div>
     <div class="col-md-4 form-inline">
-        <input type="text" class="form-control" id="refradc" name="refradc" style="width: 70%;" value="{{ data['planet']['radius'] }}">
+        <input type="number" step="any" class="form-control" id="refradc" name="refradc" style="width: 70%;" value="{{ data['planet']['radius'] }}">
         <div class="input-group-btn" style="width: 20%;left: -4px;display: inline-block;">
             <select id="r_unitc" name="r_unitc" class="form-control">
             <option value='R_jup'>R<sub>J</sub></option>   
@@ -88,7 +88,7 @@
 
     <label class="col-md-3 control-label" for="transit_duration">Transit Duration</label>
     <div class="col-md-4 form-inline">
-            <input type="text" class="form-control" id="transit_duration" name="transit_duration" style="width: 70%;" value= "{{ data['planet']['transit_duration'] }}">
+      <input type="number" step="any" class="form-control" id="transit_duration" name="transit_duration" style="width: 70%;" value= "{{ data['planet']['transit_duration'] }}">
         <div class="input-group-btn" style="width: 20%;left: -4px;display: inline-block;">
             <select id="td_unit" name="td_unit" class="form-control">
             <option value='s'>sec</option>
@@ -212,7 +212,7 @@
         </div> 
         
         <div class="col-md-4 col-md-offset-3 form-inline">
-            <input type="text" class="form-control" id="pmass" name="pmass" style="width: 70%;" value="1.5">
+            <input type="number" step="any" class="form-control" id="pmass" name="pmass" style="width: 70%;" value="1.5" required>
         <div class="input-group-btn" style="width: 20%;left: -4px;display: inline-block;">
             <select id="m_unit" name="m_unit" class="form-control">
                 <option value='M_jup'>M<sub>J</sub></option>   
@@ -228,7 +228,7 @@
 
     <div class="form-group hidden upload-planet-section">
         <div class="col-md-3 col-md-offset-3">
-            <button class="btn btn-block niceFileBtn" type="button">Choose File</button>
+            <button class="btn btn-block niceFileBtn" type="button" id="planFile_button">Choose File</button>
             <input type="file" id="planFile" name="planFile" style="display: none">
             <p class="help-block text-center">Column 1: wave or time <br>Column 2: Model, no header</p>
         </div>
@@ -275,7 +275,7 @@
     <div class="form-group">
         <label class="col-md-3 control-label" for="baseline">Baseline</label>
         <div class="col-md-4">
-            <input type="text" class="form-control" id="baseline" name="baseline" value = "1">
+            <input type="number" step="any" class="form-control" id="baseline" name="baseline" value = "1" required>
             <p class="help-block">Define length of out of transit observing time</p>
         </div>
         <div class="col-md-3">
@@ -290,7 +290,7 @@
     <div class="form-group">
         <label class="col-md-3 control-label" for="numtrans">Number of Transits</label>
         <div class="col-md-4">
-            <input type="text" class="form-control" id="numtrans" name="numtrans" value=1>
+            <input type="number" step="1" min="1" class="form-control" id="numtrans" name="numtrans" value="1" required>
             <p class="help-block">Or number of phase observations</p>
         </div>
     </div>
@@ -409,7 +409,7 @@
         <label class="col-md-3 control-label" for="satlevel">Saturation Limit</label>
         <div class="col-md-3">
             <div class="input-group">
-                <input type="text" class="form-control" id="satlevel" name="satlevel" >
+                <input type="number" step="any" class="form-control" id="satlevel" name="satlevel" value="90" required>
             </div>
             <p class="help-block">Percent fullwell or number of electrons.</p>
         </div>
@@ -452,7 +452,7 @@
     <div class="form-group hidden constant-noise-section">
         <div class="col-md-3 col-md-offset-3">
             <div class="input-group">
-                <input type="text" class="form-control" id="noisefloor" name="noisefloor" value="0">
+                <input type="number" step="any" class="form-control" id="noisefloor" name="noisefloor" value="0" required>
                 <span class="input-group-addon">ppm</span>
             </div>
             <p class="help-block">Constant Minimum Noise</p>
@@ -474,8 +474,47 @@
 <script src="{{ static_url('js/starter.form.js') }}"></script>
 <script src="{{ static_url('js/select2.min.js') }}"></script>
 
-<script type="text/javascript">  
-  $(document).ready(function(){     
+<script type="text/javascript">
+  function checkRequiredFields(requiredFields) {
+      for (let i=0; i < requiredFields.length; i++) {
+	  if ($("#" + requiredFields[i]).val() == "") {
+	      alert("Field '" + requiredFields[i] + "' is required");
+	      return false;
+	  }
+      }
+      return true;
+  }
+  
+  $(document).ready(function(){
+
+
+      
+      $("#calculation-form").submit(function() {
+	  var clickedButton = $(document.activeElement).attr("name");
+	  if (clickedButton == "resolve_target") return true;
+	  	  
+	  //verify form inputs
+	  if ($(".upload-planet-section").is(":visible")) {
+	      if (!checkRequiredFields(["planFile", "planwunits", "planfunits"]))
+		  return false;
+	  }
+
+	  if ($(".upload-stellar-section").is(":visible")) {
+	      if (!checkRequiredFields(["starFile", "starwunits", "starfunits"]))
+		  return false;
+	  }
+
+	  if ($(".upload-noise-section").is(":visible") && $("#noiseFile").val() == "") {
+	      alert("Must select noise file to upload!");
+	      return false;
+	  }
+
+	  if (!checkRequiredFields(["temp", "metal", "logg", "mag", "rstarc", "refradc", "transit_duration"]))
+	      return false;
+	  
+	  return true;
+      });
+      
         $("select").select2({
             theme: "bootstrap",
             width: "100%",
@@ -561,7 +600,6 @@
       if (!jQuery.isEmptyObject(obj)) {
 	  var radioNames = $('form :radio').map((_, radio) => radio.name).get();	  
 	  var dropdownNames = $('form select').map((_, radio) => radio.name).get();
-	  
 	  $.each(obj, function(name, value) {
 	      if (radioNames.includes(name)) {
 		  $(`input[name='${name}']`).val([value]); //.trigger("click");
