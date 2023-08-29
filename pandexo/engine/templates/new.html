@@ -263,7 +263,7 @@
         </div> 
         <div class="col-md-4">
             <div class="input-group">
-                <input type="text" class="form-control" id="ptempc" name="ptempc" value="Only for Used Secondary">
+                <input type="text" class="form-control" id="ptempc" name="ptempc" value="1000">
                 <span class="input-group-addon">&deg; Kelvin</span>
             </div>
             <p class="help-block">Needed for secondary eclipse only</p>
@@ -357,14 +357,14 @@
 
         <div class="col-md-6" id="NIRCam">
             <div class="col-md-6" style="padding-left: 0;">
-                <select id="nircammode" name="nircammode" onchange="showForm()" class="form-control" data-placeholder="Select NIRCam Mode">
+                <select id="nircammode" name="nircammode" class="form-control" data-placeholder="Select NIRCam Mode">
                     <option value=""></option>
                     <option value="f322w2">F322W2, 2.7-4 um</option>
                     <option value="f444w">F444W, 4-5 um</option>
                 </select>
             </div>
             <div class="col-md-6" style="padding-right: 0;">
-                <select id="nircamsubarray" name="nircamsubarray" onchange="showForm()" class="form-control" data-placeholder="Select NIRCam Subarray">
+                <select id="nircamsubarray" name="nircamsubarray" class="form-control" data-placeholder="Select NIRCam Subarray">
                     <option value=""></option>
                     <option value="subgrism64">SUBGRISM64, 4 outs(tframe=0.34)</option>
                     <option value="subgrism128">SUBGRISM128, 4 outs(tframe=0.67)</option>
@@ -377,7 +377,7 @@
         </div>
 
         <div class="col-md-4" id="NIRISS">
-            <select id="nirissmode" name="nirissmode" onchange="showForm()" class="form-control" data-placeholder="Select NIRISS Mode">
+            <select id="nirissmode" name="nirissmode" class="form-control" data-placeholder="Select NIRISS Mode">
                 <option value=""></option>
                 <option value="substrip96">Substrip 96</option>
                 <option value="substrip256">Substrip 256</option>
@@ -414,7 +414,7 @@
             <p class="help-block">Percent fullwell or number of electrons.</p>
         </div>
         <div class="col-md-3">
-            <select id="sat_unit" name="sat_unit" class="form-control"" data-placeholder="Select e- or % fullwell">
+            <select id="sat_unit" name="sat_unit" class="form-control" data-placeholder="Select e- or % fullwell">
             <option value="%">% Full Well</option>
             <option value="e">Electrons</option>
             </select>
@@ -474,8 +474,8 @@
 <script src="{{ static_url('js/starter.form.js') }}"></script>
 <script src="{{ static_url('js/select2.min.js') }}"></script>
 
-<script type="text/javascript">
-    $(document).ready(function(){
+<script type="text/javascript">  
+  $(document).ready(function(){     
         $("select").select2({
             theme: "bootstrap",
             width: "100%",
@@ -555,6 +555,27 @@
                     break;
             }
         });
+
+      //if we're editing, set the form values to what it was before
+      var obj = JSON.parse({% raw json_encode(data_json) %});
+      if (!jQuery.isEmptyObject(obj)) {
+	  var radioNames = $('form :radio').map((_, radio) => radio.name).get();	  
+	  var dropdownNames = $('form select').map((_, radio) => radio.name).get();
+	  
+	  $.each(obj, function(name, value) {
+	      if (radioNames.includes(name)) {
+		  $(`input[name='${name}']`).val([value]); //.trigger("click");
+		  $(`input[name='${name}'][value='${value}']`).trigger("click");
+	      }
+	      else if (dropdownNames.includes(name)) { 
+		  $(`select[name='${name}']`).val(value).trigger("change");
+	      }
+	      else {
+		  $("#" + name).val(value);
+	      }
+	  });
+      }
+      
     });
 
     function pickStar() {

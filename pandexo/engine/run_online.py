@@ -19,6 +19,7 @@ import numpy as np
 import requests
 from astroquery.simbad import Simbad
 import astropy.units as u
+import pdb
 
 from .pandexo import wrapper
 from .utils.plotters import create_component_jwst, create_component_hst
@@ -49,7 +50,7 @@ define("workers", default=4, help="maximum number of simultaneous async tasks")
 
 # Define a simple named tuple to keep track for submitted calculations
 CalculationTask = namedtuple('CalculationTask', ['id', 'name', 'task',
-                                                 'cookie', 'count'])
+                                                 'cookie', 'count', 'form_data'])
 
 def getStarName(planet_name):
     """
@@ -89,6 +90,7 @@ class Application(tornado.web.Application):
             (r"/tables", TablesHandler),
             (r"/helpfulplots", HelpfulPlotsHandler),
             (r"/calculation/new", CalculationNewHandler),
+            (r"/calculation/new/([^/]+)", CalculationNewHandler),
             (r"/calculation/newHST", CalculationNewHSTHandler),
             (r"/calculation/status/([^/]+)", CalculationStatusHandler),
             (r"/calculation/statushst/([^/]+)", CalculationStatusHSTHandler),
@@ -193,21 +195,20 @@ class BaseHandler(tornado.web.RequestHandler):
         """
         calc_task = self.buffer.get(id)
         task = calc_task.task
-
         return task.result()
 
-    def _add_task(self, id, name, task):
+    def _add_task(self, id, name, task, form_data):
         """
         This creates the task and adds it to the buffer.
         """
         self.buffer[id] = CalculationTask(id=id, name=name, task=task,
                                           count=len(self.buffer)+1,
-                                          cookie=self.get_cookie("pandexo_user"))
+                                          cookie=self.get_cookie("pandexo_user"),
+                                          form_data=form_data)
 
         # Only allow 100 tasks **globally**. This will delete old tasks first.
         if len(self.buffer) > 100:
             self.buffer.popitem(last=False)
-
 
 class HomeHandler(BaseHandler):
     def get(self):
@@ -270,12 +271,13 @@ class DashboardHSTHandler(BaseHandler):
         self.render("dashboardhst.html", calculations=task_responses[::-1])
 
 
+        
 class CalculationNewHandler(BaseHandler):
     """
     This request handler deals with processing the form data and submitting
     a new calculation task to the parallelized workers.
     """
-    def get(self):
+    def get(self, id=None):
         try: 
             header= pd.read_sql_table('header',db_fort)
         except:
@@ -287,13 +289,19 @@ class CalculationNewHandler(BaseHandler):
         with open(os.path.join(os.path.dirname(__file__), "reference",
                                "exo_input.json")) as data_file:
             exodata = json.load(data_file)
+
+        form_data = None
+        if id is not None:            
+            form_data = self.buffer[id].form_data
+
         all_planets =  pd.read_csv('https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=select+pl_name+from+PSCompPars&format=csv')
         all_planets = sorted(all_planets['pl_name'].values)
         self.render("new.html", id=id,
                                  temp=list(map(str, header.temp.unique())), 
                                  planets=all_planets,
-                                 data=exodata)
+                                 data=exodata, data_json=json.dumps(form_data))
 
+    
     def post(self):
         """
         The post method contains the returned data from the form data (
@@ -303,6 +311,10 @@ class CalculationNewHandler(BaseHandler):
         
         #print(self.request.body)
         
+        form_data = {}
+        for key in self.request.arguments:
+            form_data[key] = self.get_argument(key)
+
         id = str(uuid.uuid4())+'e'
        
         # Read data from exoMAST, print it on the webpage:
@@ -376,7 +388,7 @@ class CalculationNewHandler(BaseHandler):
             all_planets = sorted(all_planets['pl_name'].values)
             return self.render("new.html", id=id,
                                 temp=list(map(str, self.header.temp.unique())),
-                                data=exodata,
+                                data=exodata, data_json=None,
                                 planets=all_planets)
 
 
@@ -542,7 +554,7 @@ class CalculationNewHandler(BaseHandler):
             task = self.executor.submit(wrapper, finaldata)
 
 
-            self._add_task(id, self.get_argument("calcName"), task)
+            self._add_task(id, self.get_argument("calcName"), task, form_data)
 
             response = self._get_task_response(id)
             response['info'] = {}
@@ -557,7 +569,6 @@ class CalculationNewHSTHandler(BaseHandler):
     This request handler deals with processing the form data and submitting
     a new HST calculation task to the parallelized workers.
     """
-
 
     def get(self):
         try: 
@@ -862,6 +873,7 @@ class CalculationDownloadHandler(BaseHandler):
         self.finish()
 
 
+      
 
 class CalculationDownloadPandInHandler(BaseHandler):
     """
