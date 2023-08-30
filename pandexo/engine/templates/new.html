@@ -263,7 +263,7 @@
         </div> 
         <div class="col-md-4">
             <div class="input-group">
-                <input type="number" step="any" class="form-control" id="ptempc" name="ptempc" value="1000">
+                <input type="number" step="any" class="form-control" id="ptempc" name="ptempc">
                 <span class="input-group-addon">&deg; Kelvin</span>
             </div>
             <p class="help-block">Needed for secondary eclipse only</p>
@@ -514,8 +514,12 @@
 		  return false;
 	  }
 
+	  if ($(".constant-transit-section").is(":visible") && $("#constant_unit").val() == "fp/f*") {
+	      if (!checkRequiredFields(["ptempc"])) return false;
+	  }
+
 	  if (!checkRequiredFields(["temp", "metal", "logg", "mag", "rstarc", "refradc", "transit_duration"]))
-	      return false;
+	      return false;	  
 	  
 	  return true;
       });
