@@ -1,4 +1,5 @@
 {
+    "calcName": "My New Calculation",
     "calculation":"fml",
     "url": null,
     "url_err": null,
