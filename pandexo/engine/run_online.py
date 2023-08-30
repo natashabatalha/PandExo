@@ -332,6 +332,7 @@ class CalculationNewHandler(BaseHandler):
             try:
                 planet_name = self.get_argument("planetname")
                 planet_data = get_target_data(planet_name)[0]
+                exodata['calcName'] = self.get_argument('calcName');
                 exodata['planet']['planetname'] = planet_data['canonical_name']
                 # for item in planet_data:
                 #     print("{}: {}".format(item, planet_data[item]))
