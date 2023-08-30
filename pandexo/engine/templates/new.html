@@ -509,6 +509,11 @@
 	      return false;
 	  }
 
+	  if ($(".select-from-grid").is(":visible")) {
+	      if (!checkRequiredFields(["ptempg", "pchem", "cloud"]))
+		  return false;
+	  }
+
 	  if (!checkRequiredFields(["temp", "metal", "logg", "mag", "rstarc", "refradc", "transit_duration"]))
 	      return false;
 	  
