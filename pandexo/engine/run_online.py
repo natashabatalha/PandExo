@@ -296,7 +296,7 @@ class CalculationNewHandler(BaseHandler):
 
         all_planets =  pd.read_csv('https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=select+pl_name+from+PSCompPars&format=csv')
         all_planets = sorted(all_planets['pl_name'].values)
-        unique_temps = sorted(self.header.temp.unique())
+        unique_temps = sorted(header.temp.unique())
         self.render("new.html", id=id,
                                  temp=list(map(str, unique_temps)),
                                  planets=all_planets,

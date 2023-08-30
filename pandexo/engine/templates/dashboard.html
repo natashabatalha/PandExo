@@ -2,8 +2,10 @@
 
 {% block body %}
 <h1 class="page-header">Dashboard JWST</h1>
+<a type="button" class="btn btn-success" href="/calculation/new">New Calculation</a>
+
 {% if len(calculations) == 0 %}
-<p class="bg-info">You have no recent or running calculations. Create one my clicking the green button at the top.</p>
+<p class="bg-info">You have no recent or running calculations. Create one by clicking the green button at the top.</p>
 {% else %}
 <table id="calculation-table" class="table table-hover">
     <thead>
