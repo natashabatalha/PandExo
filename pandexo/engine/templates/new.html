@@ -486,9 +486,6 @@
   }
   
   $(document).ready(function(){
-
-
-      
       $("#calculation-form").submit(function() {
 	  var clickedButton = $(document.activeElement).attr("name");
 	  if (clickedButton == "resolve_target") return true;
@@ -611,7 +608,6 @@
 	  var dropdownNames = $('form select').map((_, radio) => radio.name).get();
 	  $.each(obj, function(name, value) {
 	      if (radioNames.includes(name)) {
-		  $(`input[name='${name}']`).val([value]); //.trigger("click");
 		  $(`input[name='${name}'][value='${value}']`).trigger("click");
 	      }
 	      else if (dropdownNames.includes(name)) { 
@@ -621,6 +617,13 @@
 		  $("#" + name).val(value);
 	      }
 	  });
+      }
+      else {
+	  //default radio options
+	  $(`input[name='stellarModel'][value='phoenix']`).trigger("click");
+	  $(`input[name='planetModel'][value='constant']`).trigger("click");
+	  $(`input[name='noiseModel'][value='constant-noise']`).trigger("click");
+	  
       }
       
     });
