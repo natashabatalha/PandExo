@@ -97,6 +97,7 @@ class Application(tornado.web.Application):
             (r"/calculation/view/([^/]+)", CalculationViewHandler),
             (r"/calculation/viewhst/([^/]+)", CalculationViewHSTHandler),
             (r"/calculation/download/([^/]+)", CalculationDownloadHandler),
+            (r"/calculation/downloadtext/([^/]+)", CalculationDownloadTextHandler),
             (r"/calculation/downloadpandin/([^/]+)", CalculationDownloadPandInHandler)
         ]
         settings = dict(
@@ -844,6 +845,25 @@ class CalculationStatusHSTHandler(BaseHandler):
 
         self.write(dict(response))                
 
+class CalculationDownloadTextHandler(BaseHandler):
+    def get(self, id):
+        result = self._get_task_result(id)
+  
+        if self.request.connection.stream.closed():
+            return
+
+        self.set_header('Content-Type', 'text/plain; charset=utf-8')
+        self.set_header('Content-Disposition', 'attachment; filename=sim_obs.txt')
+
+        output = "#wave spectrum spectrum_w_rand error_w_floor\n"
+        spec = result["FinalSpectrum"]
+        for i in range(len(spec["wave"])):
+            output += "{} {} {} {}\n".format(
+                spec["wave"][i], spec["spectrum"][i], spec["spectrum_w_rand"][i], spec["error_w_floor"][i])
+        self.write(output)
+        self.finish()
+
+        
 class CalculationDownloadHandler(BaseHandler):
     """
     Handlers returning the downloaded data of a particular calculation task.
