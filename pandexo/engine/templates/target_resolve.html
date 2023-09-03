@@ -9,21 +9,7 @@
         </select>
             <span id="helpBlock" class="help-block">The name of a target to resolve in ExoMAST</span>
             <div class="input-group">
-                <button type="submit" class="btn btn-success" name="resolve_target" value='exomast'>Resolve Target</button>
-            </div>
-            
-            {% set planetname = "{{data['planet']['planetname']}}" %}
-
-            {% if planetname == "null" %}
-                <br>
-                <div>
-                    <a href='{{data["url"]}}'>Target found: {{ data['planet']['planetname'] }}</a>
-                </div>
-            {% end %}
-
-            {% if planetname == "null" %}
-                <br>
-                <p style="color: red; margin-bottom: 0;">{{ data['url_err'] }}</p>
-            {% end %}
+              <button type="button" class="btn btn-success" id="resolve_target_btn" name="resolve_target" value='exomast'>Resolve Target</button>	      
+            </div>            
     </div>
 </div>
