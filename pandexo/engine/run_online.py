@@ -366,6 +366,7 @@ class CalculationNewHandler(BaseHandler):
                 cname_star = id+'star' + extn_star
                 fh_star = open(os.path.join(__TEMP__, cname_star), 'wb')
                 fh_star.write(fileinfo_star['body'])
+                fh_star.close()
 
                 exodata["star"]["starpath"] = os.path.join(__TEMP__, cname_star)
                 exodata["star"]["f_unit"] = self.get_argument("starfunits")
@@ -382,6 +383,7 @@ class CalculationNewHandler(BaseHandler):
                 cname_plan = id+'planet' + extn_plan
                 fh_plan = open(os.path.join(__TEMP__, cname_plan), 'wb')
                 fh_plan.write(fileinfo_plan['body'])
+                fh_plan.close()
 
                 exodata["planet"]["exopath"] = os.path.join(__TEMP__, cname_plan)
                 exodata["planet"]["w_unit"] = self.get_argument("planwunits")
@@ -422,6 +424,7 @@ class CalculationNewHandler(BaseHandler):
                     cname_noise = id + 'noise' + extn_noise
                     fh_noise = open(os.path.join(__TEMP__, cname_noise), 'wb')
                     fh_noise.write(fileinfo_star['body'])
+                    fh_noise.close()
                     exodata["observation"]["noise_floor"] = os.path.join(__TEMP__, cname_noise)
                 else:
                     exodata["observation"]["noise_floor"] = float(self.get_argument("noisefloor"))
@@ -674,6 +677,7 @@ class CalculationNewHSTHandler(BaseHandler):
                     cname_plan = id+'planet' + extn_plan
                     fh_plan = open(os.path.join(__TEMP__, cname_plan), 'wb')
                     fh_plan.write(fileinfo_plan['body'])
+                    fh_plan.close()
 
                     exodata["planet"]["exopath"] = os.path.join(__TEMP__, cname_plan)
                     exodata["planet"]["w_unit"] = self.get_argument("planwunits")
