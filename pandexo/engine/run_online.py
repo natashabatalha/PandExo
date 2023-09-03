@@ -199,7 +199,7 @@ class BaseHandler(tornado.web.RequestHandler):
         task = calc_task.task
         return task.result()
 
-    def _add_task(self, id, name, task, form_data):
+    def _add_task(self, id, name, task, form_data=None):
         """
         This creates the task and adds it to the buffer.
         """

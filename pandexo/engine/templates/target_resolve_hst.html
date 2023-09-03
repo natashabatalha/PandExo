@@ -1,0 +1,29 @@
+<div class="form-group resolve-target">
+    <label for='' class="col-md-3 control-label">Target Name (optional)</label>
+    <div class="col-md-5">
+        <select id="planetname" name="planetname" class="form-control" data-placeholder="{{data['planet']['planetname']}}">
+            <option value=""></option> 
+            {% for i in planets %}
+                <option {{ escape(i) }} value="{{ escape(i) }}">{{ escape(i) }}</option>
+            {% end %}               
+        </select>
+            <span id="helpBlock" class="help-block">The name of a target to resolve in ExoMAST</span>
+            <div class="input-group">
+                <button type="submit" class="btn btn-success" name="resolve_target" value='exomast'>Resolve Target</button>
+            </div>
+            
+            {% set planetname = "{{data['planet']['planetname']}}" %}
+
+            {% if planetname == "null" %}
+                <br>
+                <div>
+                    <a href='{{data["url"]}}'>Target found: {{ data['planet']['planetname'] }}</a>
+                </div>
+            {% end %}
+
+            {% if planetname == "null" %}
+                <br>
+                <p style="color: red; margin-bottom: 0;">{{ data['url_err'] }}</p>
+            {% end %}
+    </div>
+</div>
