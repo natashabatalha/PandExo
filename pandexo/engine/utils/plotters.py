@@ -356,8 +356,26 @@ def create_component_jwst(result_dict):
     tab5 = Panel(child=plot_spectrum2, title="Original Model")
 
 
+    plot_partial_sat = Figure(width=800, height=300, x_range=xlims, tools=TOOLS,
+                             x_axis_label=x_axis_label,
+                             y_axis_label="# saturated", title="Partial saturation")
+
+    plot_partial_sat.line(result_dict['PandeiaOutTrans']['1d']['n_partial_saturated'][0],
+                        result_dict['PandeiaOutTrans']['1d']['n_partial_saturated'][1],
+                        line_width = 4,alpha = .7)
+    tab6 = Panel(child=plot_partial_sat, title="Partial saturation")
+
+    plot_full_sat = Figure(width=800, height=300, x_range=xlims, tools=TOOLS,
+                             x_axis_label=x_axis_label,
+                             y_axis_label="# saturated", title="Full saturation")
+
+    plot_full_sat.line(result_dict['PandeiaOutTrans']['1d']['n_full_saturated'][0],
+                        result_dict['PandeiaOutTrans']['1d']['n_full_saturated'][1],
+                        line_width = 4,alpha = .7)
+    tab7 = Panel(child=plot_full_sat, title="Full saturation")
+    
     #create set of five tabs 
-    tabs1d = Tabs(tabs=[ tab1,tab3, tab4, tab5])
+    tabs1d = Tabs(tabs=[ tab1,tab3, tab4, tab5, tab6, tab7])
 
 
 
