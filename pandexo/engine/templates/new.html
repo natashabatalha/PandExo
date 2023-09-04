@@ -124,11 +124,11 @@
 
     <div class="form-group hidden upload-stellar-section">
         <div class="col-md-3 col-md-offset-3">
-            <input type="file" id="starFile" name="starFile" class="user-star-inputs">
+            <input type="file" id="starFile" name="starFile" >
             <p class="help-block text-center">Column 1: wavelength <br>Column 2: flux, no header</p>
         </div>
         <div class="col-md-3">
-            <select id="starwunits" name="starwunits" class="form-control user-star-inputs" data-placeholder="Select Wavelength Units">
+            <select id="starwunits" name="starwunits" class="form-control" data-placeholder="Select Wavelength Units">
                 <option value=""></option>
                 <option value="um">micron</option>
                 <option value="nm">nanometer</option>
@@ -138,7 +138,7 @@
             </select>
         </div>
         <div class="col-md-3">
-            <select id="starfunits" name="starfunits" class="form-control user-star-inputs" data-placeholder="Select Flux Units" >
+            <select id="starfunits" name="starfunits" class="form-control" data-placeholder="Select Flux Units" >
                 <option value=""></option>
                 <option value="Jy">Jy</option>
                 <option value="FLAM">erg/cm2/s/Angs</option>
@@ -548,14 +548,6 @@
             }
         });
 
-        /* File Browsing Button */
-        $(".niceFileBtn").click(function () {
-            $(this).parent().find("input").click().change(function () {
-                $(this).parent().find(".btn").css("display", "none");
-                $(this).css("display", "block");
-            });
-        });
-
       $("#constant_unit").change(function () {
 	  if ($("#constant_unit").val() == "fp/f*") {
 	      $("#ptempc").attr("required", true);
@@ -607,10 +599,8 @@
 	  $(`input[name='stellarModel'][value='phoenix']`).trigger("click");
 	  $(`input[name='planetModel'][value='constant']`).trigger("click");
 	  $(`input[name='noiseModel'][value='constant-noise']`).trigger("click");
-	  
-      }
-      
-    });
+      }   
+  });
 
     function pickStar() {
         $("#starFile, #starwunits, #starfunits, #phoenix").addClass("hidden");
