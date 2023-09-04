@@ -22,38 +22,16 @@
         </div>
     </div>
 
-    <!-- <hr class="col-md-11 col-md-offset-1"> -->
-
-    <!-- <div class="form-group">
-        <label class="col-md-3 control-label" for="" style="top: 35px;">Star/Planet Properties</label>
-        <div class="col-md-9">
-            <div class="radio-chooser">
-                <div class="radio-chooser-item">
-                    <label class="radio-chooser-content" for="ResolveTarget">
-                        <input type="radio" name="properties" id="ResolveTarget" value="exomast" />
-                        <div class="radio-chooser-title">Load Target Properties</div>
-                    </label>
-                </div>
-                <div class="radio-chooser-item">
-                    <label class="radio-chooser-content" for="UserDefine">
-                        <input type="radio" name="properties" id="UserDefine" value="user" />
-                        <div class="radio-chooser-title">User Defined Properties</div>
-                    </label>
-                </div>
-            </div>
-        </div>
-    </div>  -->
-
     <hr class="col-md-11">
 
-    {% include 'target_resolve_hst.html' %}
+    {% include 'target_resolve.html' %}
 
     <hr class="col-md-11">
 
     <div class="form-group define-properties">
         <div class="col-md-offset-3 col-md-3">
             <div class="input-group">
-                <input type="text" class="form-control" id="Jmag" name="Jmag" value="{{ data['star']['jmag'] }}">
+                <input type="number" step="any" class="form-control" id="Jmag" name="Jmag" required>
                 <span class="input-group-addon">J</span>
             </div>
             <p class="help-block">Magnitude for the Host Star</p>
@@ -61,7 +39,7 @@
 
         <div class="col-md-3">
             <div class="input-group">
-                <input type="text" class="form-control" id="Hmag" name="Hmag" value="{{ data['star']['hmag'] }}">
+                <input type="number" step="any" class="form-control" id="Hmag" name="Hmag" >
                 <span class="input-group-addon">H</span>
             </div>
             <p class="help-block">Color correction for higher accuracy</p>
@@ -69,7 +47,7 @@
 
         <div class="col-md-3">
             <div class="input-group">
-                <input type="text" class="form-control" id="stempc" name="stempc" value="{{ data['star']['temp'] }}">
+                <input type="number" step="any" class="form-control" id="stempc" name="stempc" >
             </div>
             <p class="help-block">Stellar Teff(K)</p>
         </div>
@@ -79,10 +57,10 @@
 
     <div class="form-group define-properties">
         <div class="col-md-offset-3 col-md-3 form-inline">
-            <input type="text" class="form-control" id="refradc" name="refradc" style="width: 60%;" value="{{ data['planet']['radius'] }}">
+            <input type="number" step="any" class="form-control" id="refradc" name="refradc" style="width: 60%;" required>
             <div class="input-group-btn" style="width: 30%;left: -4px;display: inline-block;">
-                <select id="r_unitc" name="r_unitc" class="form-control">
-                <option value='R_jup'>R<sub>J</sub></option>
+                <select id="r_unitc" name="r_unitc" class="form-control" required>
+                <option value='R_jupiter'>R<sub>J</sub></option>
                 <option value='kilometer'>Km</option>
                 <option value='m'>m</option>
                 <option value='R_earth'>R<sub>E</sub></option>
@@ -93,14 +71,14 @@
         </div>
 
         <div class="col-md-3 form-inline">
-            <input type="text" class="form-control" id="rstarc" name="rstarc" style="width: 60%;" value="{{ data['star']['radius'] }}">
+            <input type="number" step="any" class="form-control" id="rstarc" name="rstarc" style="width: 60%;" required>
             <div class="input-group-btn" style="width: 30%;left: -4px;display: inline-block;">
-                <select id="rstar_unitc" name="rstar_unitc" class="form-control">
+                <select id="rstar_unitc" name="rstar_unitc" class="form-control" required>
                 <option value='R_sun'>R<sub>S</sub></option>
                 <option value='kilometer'>Km</option>
                 <option value='m'>m</option>
                 <option value='R_earth'>R<sub>E</sub></option>
-                <option value='R_jup'>R<sub>J</sub></option>
+                <option value='R_jupiter'>R<sub>J</sub></option>
                 </select>
             </div>
             <p class="help-block">Stellar Radius</p>
@@ -109,37 +87,32 @@
 
     <div class="form-group define-properties">
         <div class="col-md-offset-3 col-md-3">
-            <input type="text" class="form-control" id="period" name="period" value="{{ data['planet']['period'] }}">
+            <input type="number" step="any" class="form-control" id="period" name="period" required>
             <p class="help-block">Orbital period in days.</p>
         </div>
 
         <div class="col-md-3">
-            <input type="text" class="form-control" id="transit_duration" name="transit_duration" value= "{{ data['planet']['transit_duration'] }}">
+            <input type="number" step="any" class="form-control" id="transit_duration" name="transit_duration" required>
             <p class="help-block">Full transit/eclipse duration in days.</p>
         </div>
 
-        <!--div class="col-md-3">
-            <input type="text" class="form-control" id="depth" name="depth">
-            <p class="help-block">Approximate transit/eclipse depth for plotting purposes.</p>
-        </div-->
-
         <div class="col-md-3">
-            <input type="text" class="form-control" id="i" name="i" value="{{ data['planet']['i'] }}">
+            <input type="number" step="any" class="form-control" id="i" name="i" required>
             <p class="help-block">Orbital inclination in degrees.</p>
         </div>
 
         <div class="col-md-3 col-md-offset-3">
-            <input type="text" class="form-control" id="ars" name="ars" value="{{ data['planet']['ars'] }}">
+            <input type="number" step="any" class="form-control" id="ars" name="ars" required>
             <p class="help-block">Semi-major axis in units of stellar radii (a/R<sub>*</sub>).</p>
         </div>
 
         <div class="col-md-3">
-            <input type="text" class="form-control" id="ecc" name="ecc" value="{{ data['planet']['ecc'] }}">
+            <input type="number" step="any" class="form-control" id="ecc" name="ecc" value="0" required>
             <p class="help-block">Orbital eccentricity.</p>
         </div>
 
         <div class="col-md-3">
-            <input type="text" class="form-control" id="w" name="w" value="{{ data['planet']['w'] }}">
+            <input type="number" step="any" class="form-control" id="w" name="w" >
             <p class="help-block">Longitude of periastron in degrees.<br>Leave blank if eccentricity is zero.</p>
         </div>
     </div>
@@ -173,7 +146,7 @@
     </div>
 
     <div class="form-group hidden select-from-grid">
-        <div class="col-md-3 col-md-offset-3"">
+        <div class="col-md-3 col-md-offset-3">
             <select id="ptempg" name="ptempg" class="form-control" data-placeholder="Select Temp (K)">
                 <option value=""></option>
                 {% for i in temp %}
@@ -207,7 +180,7 @@
         </div>
 
         <div class="col-md-4 col-md-offset-3 form-inline">
-            <input type="text" class="form-control" id="pmass" name="pmass" style="width: 70%;" value="1.5">
+            <input type="number" step="any" class="form-control" id="pmass" name="pmass" style="width: 70%;" value="1.5">
         <div class="input-group-btn" style="width: 20%;left: -4px;display: inline-block;">
             <select id="m_unit" name="m_unit" class="form-control">
                 <option value='M_jup'>M<sub>J</sub></option>
@@ -223,8 +196,7 @@
 
     <div class="form-group hidden upload-planet-section">
         <div class="col-md-3 col-md-offset-3">
-            <button class="btn btn-block niceFileBtn" type="button">Choose File</button>
-            <input type="file" id="planFile" name="planFile" style="display: none">
+            <input type="file" id="planFile" name="planFile">
             <p class="help-block text-center">Column 1: wave or time <br>Column 2: Model, no header</p>
         </div>
         <div class="col-md-3">
@@ -258,7 +230,7 @@
         </div>
         <div class="col-md-3">
             <div class="input-group">
-                <input type="text" class="form-control" id="ptempc" name="ptempc" value="Only for Secondary">
+                <input type="number" class="form-control" id="ptempc" name="ptempc" value="Only for Secondary">
             </div>
             <p class="help-block">Planet Temp(K)</p>
         </div>
@@ -269,17 +241,17 @@
     <div class="form-group">
         <label class="col-md-3 control-label" for="obsParams">Observation Parameters</label>
         <div class="col-md-3">
-            <input type="text" class="form-control" id="norbits" name="norbits" >
+            <input type="number" step="1" min="1" class="form-control" id="norbits" name="norbits" >
             <p class="help-block">Number of HST orbits per visit. Leave blank to let the program determine this value.</p>
         </div>
 
         <div class="col-md-3">
-            <input type="text" class="form-control" id="noccultations" name="noccultations" >
+            <input type="number" step="1" min="1" value="1" class="form-control" id="noccultations" name="noccultations" required>
             <p class="help-block">Number of transits/eclipses.</p>
         </div>
 
         <div class="col-md-3">
-            <input type="text" class="form-control" id="nchan" name="nchan" >
+            <input type="number" step="1" min="1" class="form-control" id="nchan" name="nchan" value="20" required>
             <p class="help-block">Number of spectrophotometric channels.</p>
         </div>
 
@@ -287,7 +259,7 @@
 
         <div class="col-md-3 col-md-offset-3">
             <div class="input-group">
-                <input type="text" class="form-control" id="windowSize" name="windowSize" value="20">
+                <input type="number" step="1" min="1" class="form-control" id="windowSize" name="windowSize" value="20">
                 <span class="input-group-addon">min</span>
             </div>
             <p class="help-block">Observation start window size.</p>
@@ -301,7 +273,7 @@
         </div>
 
         <div class="col-md-3">
-            <input type="text" class="form-control" id="targetFluence" name="targetFluence" value="30000" >
+            <input type="number" class="form-control" id="targetFluence" name="targetFluence" value="30000" required>
             <p class="help-block">Target fluence in electrons per pixel.</p>
         </div>
 
@@ -312,10 +284,10 @@
     <div class="form-group">
         <label class="col-md-3 control-label" for="instrument">Instrument</label>
         <div class="col-md-3">
-            <select id="instrument" name="instrument" class="form-control" data-placeholder="Select Instrument">
-                <option value=""></option>
-                <option value="STIS">STIS (Not currently supported)</option>
-                <option value="WFC3">WFC3</option>
+          <select id="instrument" name="instrument" class="form-control" data-placeholder="Select Instrument" required>
+	    <option value=""></option>
+            <option value="STIS" disabled>STIS (Not currently supported)</option>
+            <option value="WFC3" >WFC3</option>
             </select>
         </div>
     </div>
@@ -405,7 +377,31 @@
 <script src="{{ static_url('js/select2.min.js') }}"></script>
 
 <script type="text/javascript">
-    $(document).ready(function(){
+  $(document).ready(function(){
+      $("#resolve_target_btn").click(function() {
+	  $.get("/resolve?name=" + encodeURIComponent($("#planetname").val()), function(data) {
+	      data = JSON.parse(data)
+	      $("#Jmag").val(data["Jmag"]);
+	      $("#Hmag").val(data["Hmag"]);
+	      $("#stempc").val(data["Teff"]);
+
+	      $("#refradc").val(data["Rp"]);
+	      $("#r_unitc").val(data["Rp_unit"][0] + data["Rp_unit"].substring(1).toLowerCase());
+	      $("#rstarc").val(data["Rs"]);
+	      $("#rstar_unitc").val(data["Rs_unit"][0] + data["Rs_unit"].substring(1).toLowerCase());
+
+	      $("#period").val(data["orbital_period"]);
+	      $("#transit_duration").val(data["transit_duration"]);
+	      $("#i").val(data["inclination"]);
+	      $("#ars").val(data["a/Rs"]);
+	      $("#ecc").val(data["eccentricity"]);
+	      $("#w").val(data["omega"]);
+	      
+	      var day_temp = data["Teff"] / Math.sqrt(data["a/Rs"]) * Math.pow(2.0/3, 0.25);
+	      $("#ptempc").val(Math.round(day_temp));
+	  });
+      });
+      
         $("select").select2({
             theme: "bootstrap",
             width: "100%",
@@ -417,76 +413,91 @@
             $(".radio-chooser-item").removeClass("radio-chooser-selected");
             $(this).parent().addClass("radio-chooser-selected");
             switch ( $(this).find("input").attr("id") ) {
-                case "UserDefine":
-                    $(".resolve-target").addClass("hidden");
-                    $(".define-properties").removeClass("hidden");
-                    break;
-                case "ResolveTarget":
-                    $(".resolve-target").removeClass("hidden");
-                    $(".define-properties").addClass("hidden");
-                    break;
-                case "planetModelConstant":
+		 case "planetModelConstant":
                     $(".upload-planet-section").addClass("hidden");
+	    	    $(".upload-planet-section").find("input, select").attr("required", false);
                     $(".constant-transit-section").removeClass("hidden");
+		    $(".constant-transit-section").find("input, select").attr("required", true);
                     $(".select-from-grid").addClass("hidden");
+	            $(".select-from-grid").find("input, select").attr("required", false);
                     break;
                 case "planetModelUser":
                     $(".constant-transit-section").addClass("hidden");
+	 	    $(".constant-transit-section").find("input, select").attr("required", false);
                     $(".upload-planet-section").removeClass("hidden");
+		    $(".upload-planet-section").find("input, select").attr("required", true);
                     $(".select-from-grid").addClass("hidden");
+		    $(".select-from-grid").find("input, select").attr("required", false);
                     break;
                 case "planetModelGrid":
                     $(".constant-transit-section").addClass("hidden");
+		    $(".constant-transit-section").find("input, select").attr("required", false);
                     $(".upload-planet-section").addClass("hidden");
+		    $(".upload-planet-section").find("input, select").attr("required", false);
                     $(".select-from-grid").removeClass("hidden");
-                    break;
-                    break;
+		    $(".select-from-grid").find("input, select").attr("required", true);
+                    break;		
             }
         });
 
-        /* File Browsing Button */
-        $(".niceFileBtn").click(function () {
-            $(this).parent().find("input").click().change(function () {
-                $(this).parent().find(".btn").css("display", "none");
-                $(this).css("display", "block");
-            });
-        });
-
+      $("#constant_unit").change(function () {
+	  if ($("#constant_unit").val() == "fp/f*") {
+	      $("#ptempc").attr("required", true);
+	  }
+	  else
+	      $("#ptempc").attr("required", false);
+      });
+      
         /* Instrument Selection */
-        $("#instrument").change(function () {
-            $("#instrument-mode-section").removeClass("hidden");
-            $("#STIS, #WFC3").addClass("hidden");
+      $("#instrument").change(function () {
+          $("#instrument-mode-section").removeClass("hidden");
+          $("#STIS, #WFC3").addClass("hidden");
+	  $("#STIS select, #WFC3 select").attr("required", false);
             var selopt = $("#instrument").val();
             switch (selopt) {
                 case "STIS":
-                    $("#STIS").removeClass("hidden");
+                    $("#STIS").removeClass("hidden");		
+		    $("#STIS select").attr("required", true);
                     break;
                 case "WFC3":
-                    $("#WFC3").removeClass("hidden");
+                    $("#WFC3").removeClass("hidden");		
+		    $("#WFC3 select").attr("required", true);
                     break;
             }
-        });
-    });
+      });
 
-    function pickStar() {
+      //if we're editing, set the form values to what it was before
+      var obj = JSON.parse({% raw json_encode(data_json) %});
+      if (!jQuery.isEmptyObject(obj)) {
+	  $("#planetModelConstant").trigger("click");
+	  
+	  var radioNames = $('form :radio').map((_, radio) => radio.name).get();	  
+	  var dropdownNames = $('form select').map((_, radio) => radio.name).get();
+	  $.each(obj, function(name, value) {
+	      if (radioNames.includes(name))
+		  $(`input[name='${name}'][value='${value}']`).trigger("click");
+	      else if (dropdownNames.includes(name))
+		  $(`select[name='${name}']`).val(value).trigger("change");
+	      else
+		  $("#" + name).val(value);
+	  });
+      }
+      else {
+	  $(`input[name='planetModel'][value='constant']`).trigger("click");
+	  $("#instrument").val("WFC3").trigger("change");
+      }
+  });
+
+      function pickStar() {
+        $("#starFile, #starwunits, #starfunits, #phoenix").addClass("hidden");
         var selopt1 = document.getElementById("type").value;
-        if (selopt1 == "user") {
-            document.getElementById("starFile").style.display = "block";
-            document.getElementById("starwunits").style.display = "block";
-            document.getElementById("starfunits").style.display = "block";
-            document.getElementById("phoenix").style.display = "none";
-        }
-        if (selopt1 == "phoenix") {
-            document.getElementById("starFile").style.display = "none";
-            document.getElementById("starwunits").style.display = "none";
-            document.getElementById("starfunits").style.display = "none";
-            document.getElementById("phoenix").style.display = "block";
-        }
-        if (selopt1 == "0") {
-            document.getElementById("starFile").style.display = "none";
-            document.getElementById("starwunits").style.display = "none";
-            document.getElementById("starfunits").style.display = "none";
-            document.getElementById("phoenix").style.display = "none";
+        switch (selopt1) {
+            case "user":
+                $("#starFile, #starwunits, #starfunits").removeClass("hidden");
+                break;
+            case "phoenix":
+                $("#phoenix").removeClass("hidden");
+                break;
         }
     }
 </script>
