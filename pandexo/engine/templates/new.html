@@ -487,7 +487,11 @@
 		  $("#td_unit").val(data["transit_duration_unit"]);
 	      var day_temp = data["Teff"] / Math.sqrt(data["a/Rs"]) * Math.pow(2.0/3, 0.25);
 	      $("#ptempc").val(Math.round(day_temp));
-	  });
+				  }).fail(function(xhr, textStatus, errorThrown) {
+				      alert("Resolve failed. xhr: " + JSON.stringify(xhr));
+				      alert("Resolve failed. textStatus:" + textStatus);
+				      alert("Resolve failed. errorThrown: " + errorThrown);
+				  });
       });
       
         $("select").select2({
