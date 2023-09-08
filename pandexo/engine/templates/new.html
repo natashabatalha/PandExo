@@ -469,7 +469,9 @@
 <script type="text/javascript"> 
   $(document).ready(function(){
       $("#resolve_target_btn").click(function() {
-	  $.get("/resolve?name=" + encodeURIComponent($("#planetname").val()), function(data) {
+	  $.post("/resolve", data={"name": $("#planetname").val(),
+				   "_xsrf": $("[name='_xsrf']").val()
+				  }, function(data) {
 	      data = JSON.parse(data)
 	      $("#temp").val(data["Teff"]);
 	      $("#logg").val(data["stellar_gravity"]);

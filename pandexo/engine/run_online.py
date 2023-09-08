@@ -496,8 +496,7 @@ class ResolveHandler(tornado.web.RequestHandler):
     """
     Resolves a planet by name and returns data on its system
     """
-    def get(self):
-        print("In resolve handler")
+    def post(self):
         name = self.get_argument("name")
 
         try:
