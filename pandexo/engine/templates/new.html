@@ -469,7 +469,7 @@
 <script type="text/javascript"> 
   $(document).ready(function(){
       $("#resolve_target_btn").click(function() {
-	  $.post("/resolve", data={"name": $("#planetname").val(),
+	  $.post("../resolve", data={"name": $("#planetname").val(),
 				   "_xsrf": $("[name='_xsrf']").val()
 				  }, function(data) {
 	      data = JSON.parse(data)
