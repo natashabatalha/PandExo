@@ -469,9 +469,7 @@
 <script type="text/javascript"> 
   $(document).ready(function(){
       $("#resolve_target_btn").click(function() {
-	  $.post("../resolve", data={"name": $("#planetname").val(),
-				   "_xsrf": $("[name='_xsrf']").val()
-				  }, function(data) {
+	  $.get("../resolve?name=" + encodeURIComponent($("#planetname").val()), function(data) {
 	      data = JSON.parse(data)
 	      $("#temp").val(data["Teff"]);
 	      $("#logg").val(data["stellar_gravity"]);
@@ -488,9 +486,7 @@
 	      var day_temp = data["Teff"] / Math.sqrt(data["a/Rs"]) * Math.pow(2.0/3, 0.25);
 	      $("#ptempc").val(Math.round(day_temp));
 				  }).fail(function(xhr, textStatus, errorThrown) {
-				      alert("Resolve failed. xhr: " + JSON.stringify(xhr));
-				      alert("Resolve failed. textStatus:" + textStatus);
-				      alert("Resolve failed. errorThrown: " + errorThrown);
+				      alert("Resolve failed. Contact support and include this error: " + JSON.stringify(xhr));
 				  });
       });
       

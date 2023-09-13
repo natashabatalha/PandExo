@@ -379,7 +379,7 @@
 <script type="text/javascript">
   $(document).ready(function(){
       $("#resolve_target_btn").click(function() {
-	  $.get("/resolve?name=" + encodeURIComponent($("#planetname").val()), function(data) {
+	  $.get("../resolve?name=" + encodeURIComponent($("#planetname").val()), function(data) {
 	      data = JSON.parse(data)
 	      $("#Jmag").val(data["Jmag"]);
 	      $("#Hmag").val(data["Hmag"]);
@@ -399,7 +399,9 @@
 	      
 	      var day_temp = data["Teff"] / Math.sqrt(data["a/Rs"]) * Math.pow(2.0/3, 0.25);
 	      $("#ptempc").val(Math.round(day_temp));
-	  });
+	  }).fail(function(xhr, textStatus, errorThrown) {
+				      alert("Resolve failed. Contact support and include this error: " + JSON.stringify(xhr));
+				  });
       });
       
         $("select").select2({
