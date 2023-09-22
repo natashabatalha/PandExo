@@ -367,11 +367,18 @@ def create_component_jwst(result_dict):
     
     xr, yr = data.shape
     
+    if 'miri' in result_dict['input']['Instrument']: 
+        width=300
+        height=800
+    else: 
+        width=800
+        height=300
+        
     plot_detector_2d = Figure(tools="pan,wheel_zoom,box_zoom,reset,hover,save",
                          x_range=[0, yr], y_range=[0, xr],
                          x_axis_label='Pixel', y_axis_label='Spatial',
                          title="2D Detector Image",
-                        width=800, height=300)
+                        width=width, height=height)
     
     plot_detector_2d.image(image=[data], x=[0], y=[0], dh=[xr], dw=[yr],
                       palette="Spectral11")
@@ -387,7 +394,7 @@ def create_component_jwst(result_dict):
                          x_range=[0, yr], y_range=[0, xr],
                          x_axis_label='Pixel', y_axis_label='Spatial',
                          title="Signal-to-Noise Ratio",
-                        width=800, height=300)
+                        width=width, height=height)
     
     plot_snr_2d.image(image=[data], x=[0], y=[0], dh=[xr], dw=[yr],
                       palette="Spectral11")
@@ -402,7 +409,7 @@ def create_component_jwst(result_dict):
                          x_range=[0, yr], y_range=[0, xr],
                          x_axis_label='Pixel', y_axis_label='Spatial',
                          title="Saturation",
-                        width=800, height=300)
+                        width=width, height=height)
     
     plot_sat_2d.image(image=[data], x=[0], y=[0], dh=[xr], dw=[yr],
                       palette="Spectral11")
