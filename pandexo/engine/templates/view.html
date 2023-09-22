@@ -6,6 +6,11 @@
 {% end %}
 
 {% block body %}
+
+<h1 class="page-header">Navigate</h1>
+<a type="button" class="btn btn-primary" href="/calculation/new/{{ id }}">Edit</a>
+<a type="button" class="btn btn-primary" href="/dashboard">Dashboard</a>
+
 <h1 class="page-header">Analyze</h1>
 
 <a type="button" class="btn btn-success" href="#plots">1D Plots</a>
@@ -75,7 +80,8 @@
 </div>
 
 <div class="container">
-    <a type="button" class="btn btn-success" href="/calculation/download/{{ id }}">Download Data</a>
+  <a type="button" class="btn btn-success" href="/calculation/download/{{ id }}">Download Data</a>
+  <a type="button" class="btn btn-success" href="/calculation/downloadtext/{{ id }}">Download simulated observations with errors (text)</a>
 </div>
 
 {% end %}
