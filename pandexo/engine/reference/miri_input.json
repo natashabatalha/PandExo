@@ -6,10 +6,19 @@
             "target": true,
             "position": {
                 "ang_unit": "arcsec",
-                "xoff": 0.0,
-                "yoff": 0.0
+                "x_offset": 0.0,
+                "y_offset": 0.0
+            },
+            "shape":{
+                "geometry": "point"
             },
             "spectrum": {
+                "extinction": {
+                    "bandpass": "j",
+                    "law": "mw_rv_31",
+                    "unit": "mag",
+                    "value": 0.0                    
+                },
                 "normalization": {
                      "type": "none"},
                 "sed": {
