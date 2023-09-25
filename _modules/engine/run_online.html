@@ -1,83 +1,42 @@
-
-
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>engine.run_online &mdash; PandExo  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
-
-  
-  
-  
-  
-
-  
-  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
-  
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../_static/language_data.js"></script>
-    
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
-
-    
-
-  
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+        <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
 
           
-            <a href="../../index.html" class="icon icon-home"> PandExo
           
-
-          
+          <a href="../../index.html" class="icon icon-home">
+            PandExo
           </a>
-
-          
-            
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../includeme.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html">Pre-installation Data Download</a></li>
@@ -93,66 +52,30 @@
 <li class="toctree-l1"><a class="reference internal" href="../../engine.html">The Code</a></li>
 </ul>
 
-            
-          
         </div>
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../index.html">PandExo</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="../../index.html">Docs</a> &raquo;</li>
-        
-          <li><a href="../index.html">Module code</a> &raquo;</li>
-        
-      <li>engine.run_online</li>
-    
-    
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">engine.run_online</li>
       <li class="wy-breadcrumbs-aside">
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
+             
   <h1>Source code for engine.run_online</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">os</span>
@@ -207,8 +130,10 @@
 <span class="n">CalculationTask</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;CalculationTask&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;task&#39;</span><span class="p">,</span>
                                                  <span class="s1">&#39;cookie&#39;</span><span class="p">,</span> <span class="s1">&#39;count&#39;</span><span class="p">])</span>
 
-<div class="viewcode-block" id="getStarName"><a class="viewcode-back" href="../../engine.html#engine.run_online.getStarName">[docs]</a><span class="k">def</span> <span class="nf">getStarName</span><span class="p">(</span><span class="n">planet_name</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="getStarName">
+<a class="viewcode-back" href="../../engine.html#engine.run_online.getStarName">[docs]</a>
+<span class="k">def</span> <span class="nf">getStarName</span><span class="p">(</span><span class="n">planet_name</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Given a string with a (supposed) planet name, this function returns the star name. For example:</span>
 
 <span class="sd">    - If `planet_name` is &#39;HATS-5b&#39; this returns &#39;HATS-5&#39;.</span>
@@ -230,8 +155,11 @@
     <span class="c1"># Return trimmed string:</span>
     <span class="k">return</span> <span class="n">star_name</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="Application"><a class="viewcode-back" href="../../engine.html#engine.run_online.Application">[docs]</a><span class="k">class</span> <span class="nc">Application</span><span class="p">(</span><span class="n">tornado</span><span class="o">.</span><span class="n">web</span><span class="o">.</span><span class="n">Application</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Gobal settings of the server</span>
+
+<div class="viewcode-block" id="Application">
+<a class="viewcode-back" href="../../engine.html#engine.run_online.Application">[docs]</a>
+<span class="k">class</span> <span class="nc">Application</span><span class="p">(</span><span class="n">tornado</span><span class="o">.</span><span class="n">web</span><span class="o">.</span><span class="n">Application</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Gobal settings of the server</span>
 <span class="sd">    This defines the global settings of the server. This parses out the</span>
 <span class="sd">    handlers, and includes settings for if ever we want to tie this to a</span>
 <span class="sd">    database.</span>
@@ -264,15 +192,18 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">Application</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">handlers</span><span class="p">,</span> <span class="o">**</span><span class="n">settings</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="BaseHandler"><a class="viewcode-back" href="../../engine.html#engine.run_online.BaseHandler">[docs]</a><span class="k">class</span> <span class="nc">BaseHandler</span><span class="p">(</span><span class="n">tornado</span><span class="o">.</span><span class="n">web</span><span class="o">.</span><span class="n">RequestHandler</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="BaseHandler">
+<a class="viewcode-back" href="../../engine.html#engine.run_online.BaseHandler">[docs]</a>
+<span class="k">class</span> <span class="nc">BaseHandler</span><span class="p">(</span><span class="n">tornado</span><span class="o">.</span><span class="n">web</span><span class="o">.</span><span class="n">RequestHandler</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Logic to handle user information and database access might go here.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">executor</span> <span class="o">=</span> <span class="n">ProcessPoolExecutor</span><span class="p">(</span><span class="n">max_workers</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
     <span class="n">buffer</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">_get_task_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Simple function to grab a calculation that&#39;s stored in the buffer,</span>
 <span class="sd">        and return a dictionary/json-like response to the front-end.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -299,7 +230,7 @@
 
  
     <span class="k">def</span> <span class="nf">_get_task_response_hst</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Simple function to grab a calculation that&#39;s stored in the buffer,</span>
 <span class="sd">        and return a dictionary/json-like response to the front-end.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -325,8 +256,10 @@
 
         <span class="k">return</span> <span class="n">response</span>
         
-<div class="viewcode-block" id="BaseHandler.write_error"><a class="viewcode-back" href="../../engine.html#engine.run_online.BaseHandler.write_error">[docs]</a>    <span class="k">def</span> <span class="nf">write_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">status_code</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="BaseHandler.write_error">
+<a class="viewcode-back" href="../../engine.html#engine.run_online.BaseHandler.write_error">[docs]</a>
+    <span class="k">def</span> <span class="nf">write_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">status_code</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This renders a customized error page</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">reason</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reason</span>
@@ -342,8 +275,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s1">&#39;errors.html&#39;</span><span class="p">,</span><span class="n">page</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="n">status_code</span><span class="p">,</span> <span class="n">reason</span><span class="o">=</span><span class="n">reason</span><span class="p">,</span> <span class="n">error_log</span><span class="o">=</span><span class="n">trace_print</span><span class="p">)</span></div>
 
 
+
     <span class="k">def</span> <span class="nf">_get_task_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method grabs only the result returned from the python `Future`</span>
 <span class="sd">        object. This contains the stuff that Pandeia returns.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -353,7 +287,7 @@
         <span class="k">return</span> <span class="n">task</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">_add_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">task</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This creates the task and adds it to the buffer.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">CalculationTask</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">task</span><span class="o">=</span><span class="n">task</span><span class="p">,</span>
@@ -365,73 +299,114 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="o">.</span><span class="n">popitem</span><span class="p">(</span><span class="n">last</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="HomeHandler"><a class="viewcode-back" href="../../engine.html#engine.run_online.HomeHandler">[docs]</a><span class="k">class</span> <span class="nc">HomeHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
-<div class="viewcode-block" id="HomeHandler.get"><a class="viewcode-back" href="../../engine.html#engine.run_online.HomeHandler.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="HomeHandler">
+<a class="viewcode-back" href="../../engine.html#engine.run_online.HomeHandler">[docs]</a>
+<span class="k">class</span> <span class="nc">HomeHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
+<div class="viewcode-block" id="HomeHandler.get">
+<a class="viewcode-back" href="../../engine.html#engine.run_online.HomeHandler.get">[docs]</a>
+    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This sets an **unsecured** cookie. If user accounts gets</span>
 <span class="sd">        implemented, this must be changed to a secure cookie.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cookie</span><span class="p">(</span><span class="s2">&quot;pandexo_user&quot;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">set_cookie</span><span class="p">(</span><span class="s2">&quot;pandexo_user&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()))</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">&quot;home.html&quot;</span><span class="p">)</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">&quot;home.html&quot;</span><span class="p">)</span></div>
+</div>
+
         
-<div class="viewcode-block" id="AboutHandler"><a class="viewcode-back" href="../../engine.html#engine.run_online.AboutHandler">[docs]</a><span class="k">class</span> <span class="nc">AboutHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
-<div class="viewcode-block" id="AboutHandler.get"><a class="viewcode-back" href="../../engine.html#engine.run_online.AboutHandler.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="AboutHandler">
+<a class="viewcode-back" href="../../engine.html#engine.run_online.AboutHandler">[docs]</a>
+<span class="k">class</span> <span class="nc">AboutHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
+<div class="viewcode-block" id="AboutHandler.get">
+<a class="viewcode-back" href="../../engine.html#engine.run_online.AboutHandler.get">[docs]</a>
+    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Render about PandExo Page</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">&quot;about.html&quot;</span><span class="p">)</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">&quot;about.html&quot;</span><span class="p">)</span></div>
+</div>
 
-<div class="viewcode-block" id="TablesHandler"><a class="viewcode-back" href="../../engine.html#engine.run_online.TablesHandler">[docs]</a><span class="k">class</span> <span class="nc">TablesHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
-<div class="viewcode-block" id="TablesHandler.get"><a class="viewcode-back" href="../../engine.html#engine.run_online.TablesHandler.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="TablesHandler">
+<a class="viewcode-back" href="../../engine.html#engine.run_online.TablesHandler">[docs]</a>
+<span class="k">class</span> <span class="nc">TablesHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
+<div class="viewcode-block" id="TablesHandler.get">
+<a class="viewcode-back" href="../../engine.html#engine.run_online.TablesHandler.get">[docs]</a>
+    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Render tables with confirmed candidates</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">&quot;tables.html&quot;</span><span class="p">)</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">&quot;tables.html&quot;</span><span class="p">)</span></div>
+</div>
 
-<div class="viewcode-block" id="HelpfulPlotsHandler"><a class="viewcode-back" href="../../engine.html#engine.run_online.HelpfulPlotsHandler">[docs]</a><span class="k">class</span> <span class="nc">HelpfulPlotsHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
-<div class="viewcode-block" id="HelpfulPlotsHandler.get"><a class="viewcode-back" href="../../engine.html#engine.run_online.HelpfulPlotsHandler.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="HelpfulPlotsHandler">
+<a class="viewcode-back" href="../../engine.html#engine.run_online.HelpfulPlotsHandler">[docs]</a>
+<span class="k">class</span> <span class="nc">HelpfulPlotsHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
+<div class="viewcode-block" id="HelpfulPlotsHandler.get">
+<a class="viewcode-back" href="../../engine.html#engine.run_online.HelpfulPlotsHandler.get">[docs]</a>
+    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Renders helpful bokeh plots</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">&quot;helpfulplots.html&quot;</span><span class="p">)</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">&quot;helpfulplots.html&quot;</span><span class="p">)</span></div>
+</div>
 
 
-<div class="viewcode-block" id="DashboardHandler"><a class="viewcode-back" href="../../engine.html#engine.run_online.DashboardHandler">[docs]</a><span class="k">class</span> <span class="nc">DashboardHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="DashboardHandler">
+<a class="viewcode-back" href="../../engine.html#engine.run_online.DashboardHandler">[docs]</a>
+<span class="k">class</span> <span class="nc">DashboardHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Request handler for the dashboard page. This will retrieve and render</span>
 <span class="sd">    the html template, along with the list of current task objects.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="DashboardHandler.get"><a class="viewcode-back" href="../../engine.html#engine.run_online.DashboardHandler.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="DashboardHandler.get">
+<a class="viewcode-back" href="../../engine.html#engine.run_online.DashboardHandler.get">[docs]</a>
+    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">task_responses</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_task_response</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span> <span class="k">for</span> <span class="nb">id</span><span class="p">,</span> <span class="n">nt</span> <span class="ow">in</span>
                           <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
                           <span class="k">if</span> <span class="p">((</span><span class="n">nt</span><span class="o">.</span><span class="n">cookie</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cookie</span><span class="p">(</span><span class="s2">&quot;pandexo_user&quot;</span><span class="p">))</span>
                           <span class="o">&amp;</span> <span class="p">(</span><span class="nb">id</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;e&#39;</span><span class="p">))]</span>
         
-        <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">&quot;dashboard.html&quot;</span><span class="p">,</span> <span class="n">calculations</span><span class="o">=</span><span class="n">task_responses</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">&quot;dashboard.html&quot;</span><span class="p">,</span> <span class="n">calculations</span><span class="o">=</span><span class="n">task_responses</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span></div>
+</div>
 
 
-<div class="viewcode-block" id="DashboardHSTHandler"><a class="viewcode-back" href="../../engine.html#engine.run_online.DashboardHSTHandler">[docs]</a><span class="k">class</span> <span class="nc">DashboardHSTHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="DashboardHSTHandler">
+<a class="viewcode-back" href="../../engine.html#engine.run_online.DashboardHSTHandler">[docs]</a>
+<span class="k">class</span> <span class="nc">DashboardHSTHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Request handler for the dashboard page. This will retrieve and render</span>
 <span class="sd">    the html template, along with the list of current task objects.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="DashboardHSTHandler.get"><a class="viewcode-back" href="../../engine.html#engine.run_online.DashboardHSTHandler.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="DashboardHSTHandler.get">
+<a class="viewcode-back" href="../../engine.html#engine.run_online.DashboardHSTHandler.get">[docs]</a>
+    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">task_responses</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_task_response_hst</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span> <span class="k">for</span> <span class="nb">id</span><span class="p">,</span> <span class="n">nt</span> <span class="ow">in</span>
                           <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
                           <span class="k">if</span> <span class="p">((</span><span class="n">nt</span><span class="o">.</span><span class="n">cookie</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cookie</span><span class="p">(</span><span class="s2">&quot;pandexo_user&quot;</span><span class="p">))</span>
                           <span class="o">&amp;</span> <span class="p">(</span><span class="nb">id</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;h&#39;</span><span class="p">))]</span>
         
-        <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">&quot;dashboardhst.html&quot;</span><span class="p">,</span> <span class="n">calculations</span><span class="o">=</span><span class="n">task_responses</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">&quot;dashboardhst.html&quot;</span><span class="p">,</span> <span class="n">calculations</span><span class="o">=</span><span class="n">task_responses</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span></div>
+</div>
 
 
-<div class="viewcode-block" id="CalculationNewHandler"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationNewHandler">[docs]</a><span class="k">class</span> <span class="nc">CalculationNewHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="CalculationNewHandler">
+<a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationNewHandler">[docs]</a>
+<span class="k">class</span> <span class="nc">CalculationNewHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This request handler deals with processing the form data and submitting</span>
 <span class="sd">    a new calculation task to the parallelized workers.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="CalculationNewHandler.get"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationNewHandler.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="CalculationNewHandler.get">
+<a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationNewHandler.get">[docs]</a>
+    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span> 
             <span class="n">header</span><span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_sql_table</span><span class="p">(</span><span class="s1">&#39;header&#39;</span><span class="p">,</span><span class="n">db_fort</span><span class="p">)</span>
         <span class="k">except</span><span class="p">:</span>
@@ -450,8 +425,11 @@
                                  <span class="n">planets</span><span class="o">=</span><span class="n">all_planets</span><span class="p">,</span>
                                  <span class="n">data</span><span class="o">=</span><span class="n">exodata</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="CalculationNewHandler.post"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationNewHandler.post">[docs]</a>    <span class="k">def</span> <span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="CalculationNewHandler.post">
+<a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationNewHandler.post">[docs]</a>
+    <span class="k">def</span> <span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The post method contains the returned data from the form data (</span>
 <span class="sd">        accessed by using `self.get_argument(...)` for specific arguments,</span>
 <span class="sd">        or `self.request.body` to grab the entire returned object.</span>
@@ -706,16 +684,22 @@
             
             
             <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">response</span><span class="p">))</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;../dashboard&quot;</span><span class="p">)</span></div></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;../dashboard&quot;</span><span class="p">)</span></div>
+</div>
 
-<div class="viewcode-block" id="CalculationNewHSTHandler"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationNewHSTHandler">[docs]</a><span class="k">class</span> <span class="nc">CalculationNewHSTHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="CalculationNewHSTHandler">
+<a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationNewHSTHandler">[docs]</a>
+<span class="k">class</span> <span class="nc">CalculationNewHSTHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This request handler deals with processing the form data and submitting</span>
 <span class="sd">    a new HST calculation task to the parallelized workers.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 
-<div class="viewcode-block" id="CalculationNewHSTHandler.get"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationNewHSTHandler.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="CalculationNewHSTHandler.get">
+<a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationNewHSTHandler.get">[docs]</a>
+    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span> 
             <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_sql_table</span><span class="p">(</span><span class="s1">&#39;header&#39;</span><span class="p">,</span><span class="n">db_fort</span><span class="p">)</span>
         <span class="k">except</span><span class="p">:</span>
@@ -734,8 +718,11 @@
                     <span class="n">data</span><span class="o">=</span><span class="n">exodata</span><span class="p">,</span>
                     <span class="n">planets</span><span class="o">=</span><span class="n">all_planets</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="CalculationNewHSTHandler.post"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationNewHSTHandler.post">[docs]</a>    <span class="k">def</span> <span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="CalculationNewHSTHandler.post">
+<a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationNewHSTHandler.post">[docs]</a>
+    <span class="k">def</span> <span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The post method contains the retured data from the form data (</span>
 <span class="sd">        accessed by using `self.get_argument(...)` for specific arguments,</span>
 <span class="sd">        or `self.request.body` to grab the entire returned object.</span>
@@ -957,39 +944,57 @@
             
             
             <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">response</span><span class="p">))</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;../dashboardhst&quot;</span><span class="p">)</span></div></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;../dashboardhst&quot;</span><span class="p">)</span></div>
+</div>
 
-<div class="viewcode-block" id="CalculationStatusHandler"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationStatusHandler">[docs]</a><span class="k">class</span> <span class="nc">CalculationStatusHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="CalculationStatusHandler">
+<a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationStatusHandler">[docs]</a>
+<span class="k">class</span> <span class="nc">CalculationStatusHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Handlers returning the status of a particular JWST calculation task.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="CalculationStatusHandler.get"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationStatusHandler.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+<div class="viewcode-block" id="CalculationStatusHandler.get">
+<a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationStatusHandler.get">[docs]</a>
+    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
         <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_task_response</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">closed</span><span class="p">():</span>
             <span class="k">return</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">response</span><span class="p">))</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">response</span><span class="p">))</span></div>
+</div>
+
 
         
-<div class="viewcode-block" id="CalculationStatusHSTHandler"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationStatusHSTHandler">[docs]</a><span class="k">class</span> <span class="nc">CalculationStatusHSTHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="CalculationStatusHSTHandler">
+<a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationStatusHSTHandler">[docs]</a>
+<span class="k">class</span> <span class="nc">CalculationStatusHSTHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Handlers returning the status of a particular HST calculation task.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="CalculationStatusHSTHandler.get"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationStatusHSTHandler.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+<div class="viewcode-block" id="CalculationStatusHSTHandler.get">
+<a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationStatusHSTHandler.get">[docs]</a>
+    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
         <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_task_response_hst</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">closed</span><span class="p">():</span>
             <span class="k">return</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">response</span><span class="p">))</span>                </div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">response</span><span class="p">))</span>                </div>
+</div>
 
-<div class="viewcode-block" id="CalculationDownloadHandler"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationDownloadHandler">[docs]</a><span class="k">class</span> <span class="nc">CalculationDownloadHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="CalculationDownloadHandler">
+<a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationDownloadHandler">[docs]</a>
+<span class="k">class</span> <span class="nc">CalculationDownloadHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Handlers returning the downloaded data of a particular calculation task.</span>
 <span class="sd">    Handlers returning the status of a particular calculation task.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="CalculationDownloadHandler.get"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationDownloadHandler.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+<div class="viewcode-block" id="CalculationDownloadHandler.get">
+<a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationDownloadHandler.get">[docs]</a>
+    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
         <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_task_result</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
   
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">closed</span><span class="p">():</span>
@@ -1015,16 +1020,22 @@
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">allfiles</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
                 <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">__TEMP__</span><span class="p">,</span><span class="n">i</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">finish</span><span class="p">()</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">finish</span><span class="p">()</span></div>
+</div>
 
 
 
-<div class="viewcode-block" id="CalculationDownloadPandInHandler"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationDownloadPandInHandler">[docs]</a><span class="k">class</span> <span class="nc">CalculationDownloadPandInHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="CalculationDownloadPandInHandler">
+<a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationDownloadPandInHandler">[docs]</a>
+<span class="k">class</span> <span class="nc">CalculationDownloadPandInHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Handlers returning the downloaded data of a particular calculation task.</span>
 <span class="sd">    Handlers returning the status of a particular calculation task.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="CalculationDownloadPandInHandler.get"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationDownloadPandInHandler.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+<div class="viewcode-block" id="CalculationDownloadPandInHandler.get">
+<a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationDownloadPandInHandler.get">[docs]</a>
+    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
         <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_task_result</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
   
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">closed</span><span class="p">():</span>
@@ -1053,16 +1064,22 @@
                 <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">__TEMP__</span><span class="p">,</span><span class="n">i</span><span class="p">))</span>
 
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">finish</span><span class="p">()</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">finish</span><span class="p">()</span></div>
+</div>
 
 
 
-<div class="viewcode-block" id="CalculationViewHandler"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationViewHandler">[docs]</a><span class="k">class</span> <span class="nc">CalculationViewHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="CalculationViewHandler">
+<a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationViewHandler">[docs]</a>
+<span class="k">class</span> <span class="nc">CalculationViewHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This handler deals with passing the results from Pandeia to the</span>
 <span class="sd">    `create_component_jwst` function which generates the Bokeh interative plots.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="CalculationViewHandler.get"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationViewHandler.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+<div class="viewcode-block" id="CalculationViewHandler.get">
+<a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationViewHandler.get">[docs]</a>
+    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
         
         <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_task_result</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
         
@@ -1077,23 +1094,33 @@
             <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
                 <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">__TEMP__</span><span class="p">,</span><span class="n">i</span><span class="p">))</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">&quot;view.html&quot;</span><span class="p">,</span> <span class="n">script</span><span class="o">=</span><span class="n">script</span><span class="p">,</span> <span class="n">div</span><span class="o">=</span><span class="n">div</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="p">)</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">&quot;view.html&quot;</span><span class="p">,</span> <span class="n">script</span><span class="o">=</span><span class="n">script</span><span class="p">,</span> <span class="n">div</span><span class="o">=</span><span class="n">div</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="p">)</span></div>
+</div>
 
 
 
-<div class="viewcode-block" id="CalculationViewHSTHandler"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationViewHSTHandler">[docs]</a><span class="k">class</span> <span class="nc">CalculationViewHSTHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="CalculationViewHSTHandler">
+<a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationViewHSTHandler">[docs]</a>
+<span class="k">class</span> <span class="nc">CalculationViewHSTHandler</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This handler deals with passing the results from Pandeia to the</span>
 <span class="sd">    `create_component_hst` function which generates the Bokeh interative plots.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="CalculationViewHSTHandler.get"><a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationViewHSTHandler.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+<div class="viewcode-block" id="CalculationViewHSTHandler.get">
+<a class="viewcode-back" href="../../engine.html#engine.run_online.CalculationViewHSTHandler.get">[docs]</a>
+    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
         <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_task_result</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
         <span class="n">script</span><span class="p">,</span> <span class="n">div</span> <span class="o">=</span> <span class="n">create_component_hst</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
         <span class="n">div</span><span class="p">[</span><span class="s1">&#39;info_div&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;info_div&#39;</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">&quot;viewhst.html&quot;</span><span class="p">,</span> <span class="n">script</span><span class="o">=</span><span class="n">script</span><span class="p">,</span> <span class="n">div</span><span class="o">=</span><span class="n">div</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="p">)</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">&quot;viewhst.html&quot;</span><span class="p">,</span> <span class="n">script</span><span class="o">=</span><span class="n">script</span><span class="p">,</span> <span class="n">div</span><span class="o">=</span><span class="n">div</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="p">)</span></div>
+</div>
 
 
-<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../engine.html#engine.run_online.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+
+<div class="viewcode-block" id="main">
+<a class="viewcode-back" href="../../engine.html#engine.run_online.main">[docs]</a>
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">tornado</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">parse_command_line</span><span class="p">()</span>
     <span class="n">BaseHandler</span><span class="o">.</span><span class="n">executor</span> <span class="o">=</span> <span class="n">ProcessPoolExecutor</span><span class="p">(</span><span class="n">max_workers</span><span class="o">=</span><span class="n">options</span><span class="o">.</span><span class="n">workers</span><span class="p">)</span>
     <span class="n">http_server</span> <span class="o">=</span> <span class="n">tornado</span><span class="o">.</span><span class="n">httpserver</span><span class="o">.</span><span class="n">HTTPServer</span><span class="p">(</span><span class="n">Application</span><span class="p">())</span>
@@ -1101,47 +1128,36 @@
     <span class="n">tornado</span><span class="o">.</span><span class="n">ioloop</span><span class="o">.</span><span class="n">IOLoop</span><span class="o">.</span><span class="n">current</span><span class="p">()</span><span class="o">.</span><span class="n">start</span><span class="p">()</span></div>
 
 
+
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="n">main</span><span class="p">()</span>
 </pre></div>
 
            </div>
-           
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &copy; Copyright Updated 2022
-
-    </p>
+    <p>&#169; Copyright Updated 2022.</p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
-
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

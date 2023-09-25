@@ -1,83 +1,42 @@
-
-
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>engine.justplotit &mdash; PandExo  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
-
-  
-  
-  
-  
-
-  
-  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
-  
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../_static/language_data.js"></script>
-    
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
-
-    
-
-  
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+        <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
 
           
-            <a href="../../index.html" class="icon icon-home"> PandExo
           
-
-          
+          <a href="../../index.html" class="icon icon-home">
+            PandExo
           </a>
-
-          
-            
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../includeme.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html">Pre-installation Data Download</a></li>
@@ -93,66 +52,30 @@
 <li class="toctree-l1"><a class="reference internal" href="../../engine.html">The Code</a></li>
 </ul>
 
-            
-          
         </div>
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../index.html">PandExo</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="../../index.html">Docs</a> &raquo;</li>
-        
-          <li><a href="../index.html">Module code</a> &raquo;</li>
-        
-      <li>engine.justplotit</li>
-    
-    
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">engine.justplotit</li>
       <li class="wy-breadcrumbs-aside">
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
+             
   <h1>Source code for engine.justplotit</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">bokeh.plotting</span> <span class="kn">import</span> <span class="n">show</span>
 <span class="kn">from</span> <span class="nn">bokeh.plotting</span> <span class="kn">import</span> <span class="n">figure</span> <span class="k">as</span> <span class="n">Figure</span>
@@ -162,10 +85,12 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">bokeh.layouts</span> <span class="kn">import</span> <span class="n">row</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<div class="viewcode-block" id="jwst_1d_spec"><a class="viewcode-back" href="../../engine.html#engine.justplotit.jwst_1d_spec">[docs]</a><span class="k">def</span> <span class="nf">jwst_1d_spec</span><span class="p">(</span><span class="n">result_dict</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Model + Data + Error Bars&#39;</span><span class="p">,</span> <span class="n">output_file</span> <span class="o">=</span> <span class="s1">&#39;data.html&#39;</span><span class="p">,</span><span class="n">legend</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<div class="viewcode-block" id="jwst_1d_spec">
+<a class="viewcode-back" href="../../engine.html#engine.justplotit.jwst_1d_spec">[docs]</a>
+<span class="k">def</span> <span class="nf">jwst_1d_spec</span><span class="p">(</span><span class="n">result_dict</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Model + Data + Error Bars&#39;</span><span class="p">,</span> <span class="n">output_file</span> <span class="o">=</span> <span class="s1">&#39;data.html&#39;</span><span class="p">,</span><span class="n">legend</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">R</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="n">num_tran</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">plot_width</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span> <span class="n">plot_height</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span><span class="n">x_range</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">10</span><span class="p">],</span><span class="n">y_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">output_notebook</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Plots 1d simulated spectrum and rebin or rescale for more transits</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Plots 1d simulated spectrum and rebin or rescale for more transits</span>
 
 <span class="sd">    Plots 1d data points with model in the background (if wanted). Designed to read in exact</span>
 <span class="sd">    output of run_pandexo.</span>
@@ -371,8 +296,11 @@
     <span class="k">return</span> <span class="n">outx</span><span class="p">,</span><span class="n">outy</span><span class="p">,</span><span class="n">oute</span></div>
 
 
-<div class="viewcode-block" id="bin_wave_to_R"><a class="viewcode-back" href="../../engine.html#engine.justplotit.bin_wave_to_R">[docs]</a><span class="k">def</span> <span class="nf">bin_wave_to_R</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">R</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Creates new wavelength axis at specified resolution</span>
+
+<div class="viewcode-block" id="bin_wave_to_R">
+<a class="viewcode-back" href="../../engine.html#engine.justplotit.bin_wave_to_R">[docs]</a>
+<span class="k">def</span> <span class="nf">bin_wave_to_R</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">R</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Creates new wavelength axis at specified resolution</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -422,8 +350,11 @@
             <span class="n">wave</span> <span class="o">+=</span> <span class="p">[</span><span class="n">tracker</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">wave</span></div>
 
-<div class="viewcode-block" id="uniform_tophat_sum"><a class="viewcode-back" href="../../engine.html#engine.justplotit.uniform_tophat_sum">[docs]</a><span class="k">def</span> <span class="nf">uniform_tophat_sum</span><span class="p">(</span><span class="n">xnew</span><span class="p">,</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Adapted from Mike R. Line to rebin spectra</span>
+
+<div class="viewcode-block" id="uniform_tophat_sum">
+<a class="viewcode-back" href="../../engine.html#engine.justplotit.uniform_tophat_sum">[docs]</a>
+<span class="k">def</span> <span class="nf">uniform_tophat_sum</span><span class="p">(</span><span class="n">xnew</span><span class="p">,</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Adapted from Mike R. Line to rebin spectra</span>
 
 <span class="sd">    Takes sum of group of points in bin of wave points</span>
 <span class="sd">    Parameters</span>
@@ -464,8 +395,11 @@
     <span class="n">ynew</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">loc</span><span class="p">])</span>
     <span class="k">return</span> <span class="n">ynew</span></div>
 
-<div class="viewcode-block" id="uniform_tophat_mean"><a class="viewcode-back" href="../../engine.html#engine.justplotit.uniform_tophat_mean">[docs]</a><span class="k">def</span> <span class="nf">uniform_tophat_mean</span><span class="p">(</span><span class="n">xnew</span><span class="p">,</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Adapted from Mike R. Line to rebin spectra</span>
+
+<div class="viewcode-block" id="uniform_tophat_mean">
+<a class="viewcode-back" href="../../engine.html#engine.justplotit.uniform_tophat_mean">[docs]</a>
+<span class="k">def</span> <span class="nf">uniform_tophat_mean</span><span class="p">(</span><span class="n">xnew</span><span class="p">,</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Adapted from Mike R. Line to rebin spectra</span>
 
 <span class="sd">    Takes average of group of points in bin</span>
 
@@ -506,8 +440,11 @@
     <span class="n">ynew</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">loc</span><span class="p">])</span>
     <span class="k">return</span> <span class="n">ynew</span></div>
 
-<div class="viewcode-block" id="jwst_1d_flux"><a class="viewcode-back" href="../../engine.html#engine.justplotit.jwst_1d_flux">[docs]</a><span class="k">def</span> <span class="nf">jwst_1d_flux</span><span class="p">(</span><span class="n">result_dict</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">output_file</span><span class="o">=</span> <span class="s1">&#39;flux.html&#39;</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Plot flux rate in e/s</span>
+
+<div class="viewcode-block" id="jwst_1d_flux">
+<a class="viewcode-back" href="../../engine.html#engine.justplotit.jwst_1d_flux">[docs]</a>
+<span class="k">def</span> <span class="nf">jwst_1d_flux</span><span class="p">(</span><span class="n">result_dict</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">output_file</span><span class="o">=</span> <span class="s1">&#39;flux.html&#39;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot flux rate in e/s</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -542,15 +479,18 @@
                          <span class="n">x_axis_label</span><span class="o">=</span><span class="s1">&#39;Wavelength [microns]&#39;</span><span class="p">,</span>
                          <span class="n">y_axis_label</span><span class="o">=</span><span class="s1">&#39;Flux (e/s)&#39;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Out of Transit Flux Rate&quot;</span><span class="p">,</span>
                          <span class="n">width</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
-    <span class="n">plot_flux_1d1</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">line_width</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="o">.</span><span class="mi">7</span><span class="p">)</span>
+    <span class="n">plot_flux_1d1</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">line_width</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="mf">.7</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">plot</span><span class="p">:</span>
         <span class="n">outputfile</span><span class="p">(</span><span class="n">output_file</span><span class="p">)</span>
         <span class="n">show</span><span class="p">(</span><span class="n">plot_flux_1d1</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span></div>
 
-<div class="viewcode-block" id="jwst_1d_snr"><a class="viewcode-back" href="../../engine.html#engine.justplotit.jwst_1d_snr">[docs]</a><span class="k">def</span> <span class="nf">jwst_1d_snr</span><span class="p">(</span><span class="n">result_dict</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">output_file</span><span class="o">=</span><span class="s1">&#39;snr.html&#39;</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Plot SNR</span>
+
+<div class="viewcode-block" id="jwst_1d_snr">
+<a class="viewcode-back" href="../../engine.html#engine.justplotit.jwst_1d_snr">[docs]</a>
+<span class="k">def</span> <span class="nf">jwst_1d_snr</span><span class="p">(</span><span class="n">result_dict</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">output_file</span><span class="o">=</span><span class="s1">&#39;snr.html&#39;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot SNR</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -585,14 +525,17 @@
                          <span class="n">x_axis_label</span><span class="o">=</span><span class="s1">&#39;Wavelength (micron)&#39;</span><span class="p">,</span>
                          <span class="n">y_axis_label</span><span class="o">=</span><span class="s1">&#39;SNR&#39;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;SNR Out of Trans&quot;</span><span class="p">,</span>
                          <span class="n">width</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
-    <span class="n">plot_snr_1d1</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">line_width</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="o">.</span><span class="mi">7</span><span class="p">)</span>
+    <span class="n">plot_snr_1d1</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">line_width</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="mf">.7</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">plot</span><span class="p">:</span>
         <span class="n">outputfile</span><span class="p">(</span><span class="n">output_file</span><span class="p">)</span>
         <span class="n">show</span><span class="p">(</span><span class="n">plot_snr_1d1</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span></div>
 
-<div class="viewcode-block" id="jwst_1d_bkg"><a class="viewcode-back" href="../../engine.html#engine.justplotit.jwst_1d_bkg">[docs]</a><span class="k">def</span> <span class="nf">jwst_1d_bkg</span><span class="p">(</span><span class="n">result_dict</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">output_file</span><span class="o">=</span><span class="s1">&#39;bkg.html&#39;</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Plot background</span>
+
+<div class="viewcode-block" id="jwst_1d_bkg">
+<a class="viewcode-back" href="../../engine.html#engine.justplotit.jwst_1d_bkg">[docs]</a>
+<span class="k">def</span> <span class="nf">jwst_1d_bkg</span><span class="p">(</span><span class="n">result_dict</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">output_file</span><span class="o">=</span><span class="s1">&#39;bkg.html&#39;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot background</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -626,14 +569,17 @@
                          <span class="n">x_axis_label</span><span class="o">=</span><span class="s1">&#39;Wavelength [microns]&#39;</span><span class="p">,</span>
                          <span class="n">y_axis_label</span><span class="o">=</span><span class="s1">&#39;Flux (e/s)&#39;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Background&quot;</span><span class="p">,</span>
                          <span class="n">width</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
-    <span class="n">plot_bg_1d1</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">line_width</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="o">.</span><span class="mi">7</span><span class="p">)</span>
+    <span class="n">plot_bg_1d1</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">line_width</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="mf">.7</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">plot</span><span class="p">:</span>
         <span class="n">outputfile</span><span class="p">(</span><span class="n">output_file</span><span class="p">)</span>
         <span class="n">show</span><span class="p">(</span><span class="n">plot_bg_1d1</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span></div>
 
-<div class="viewcode-block" id="jwst_noise"><a class="viewcode-back" href="../../engine.html#engine.justplotit.jwst_noise">[docs]</a><span class="k">def</span> <span class="nf">jwst_noise</span><span class="p">(</span><span class="n">result_dict</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">output_file</span><span class="o">=</span> <span class="s1">&#39;noise.html&#39;</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Plot background</span>
+
+<div class="viewcode-block" id="jwst_noise">
+<a class="viewcode-back" href="../../engine.html#engine.justplotit.jwst_noise">[docs]</a>
+<span class="k">def</span> <span class="nf">jwst_noise</span><span class="p">(</span><span class="n">result_dict</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">output_file</span><span class="o">=</span> <span class="s1">&#39;noise.html&#39;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot background</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -670,14 +616,17 @@
                          <span class="n">y_axis_label</span><span class="o">=</span><span class="s1">&#39;Error on Spectrum (PPM)&#39;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Error Curve&quot;</span><span class="p">,</span>
                          <span class="n">width</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">y_range</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mf">2.0</span><span class="o">*</span><span class="n">ymed</span><span class="p">])</span>
     <span class="n">ymed</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-    <span class="n">plot_noise_1d1</span><span class="o">.</span><span class="n">circle</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">line_width</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="o">.</span><span class="mi">7</span><span class="p">)</span>
+    <span class="n">plot_noise_1d1</span><span class="o">.</span><span class="n">circle</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">line_width</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="mf">.7</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">plot</span><span class="p">:</span>
         <span class="n">outputfile</span><span class="p">(</span><span class="n">output_file</span><span class="p">)</span>
         <span class="n">show</span><span class="p">(</span><span class="n">plot_noise_1d1</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span></div>
 
-<div class="viewcode-block" id="jwst_2d_det"><a class="viewcode-back" href="../../engine.html#engine.justplotit.jwst_2d_det">[docs]</a><span class="k">def</span> <span class="nf">jwst_2d_det</span><span class="p">(</span><span class="n">result_dict</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">output_file</span><span class="o">=</span><span class="s1">&#39;det2d.html&#39;</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Plot 2d detector image</span>
+
+<div class="viewcode-block" id="jwst_2d_det">
+<a class="viewcode-back" href="../../engine.html#engine.justplotit.jwst_2d_det">[docs]</a>
+<span class="k">def</span> <span class="nf">jwst_2d_det</span><span class="p">(</span><span class="n">result_dict</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">output_file</span><span class="o">=</span><span class="s1">&#39;det2d.html&#39;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot 2d detector image</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -704,6 +653,12 @@
     <span class="n">out</span> <span class="o">=</span> <span class="n">result_dict</span><span class="p">[</span><span class="s1">&#39;PandeiaOutTrans&#39;</span><span class="p">]</span>
     <span class="n">data</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;2d&#39;</span><span class="p">][</span><span class="s1">&#39;detector&#39;</span><span class="p">]</span>
 
+    <span class="k">if</span> <span class="s1">&#39;miri&#39;</span> <span class="ow">in</span> <span class="n">result_dict</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;Instrument&#39;</span><span class="p">]:</span> 
+        <span class="n">width</span><span class="o">=</span><span class="mi">300</span>
+        <span class="n">height</span><span class="o">=</span><span class="mi">800</span>
+    <span class="k">else</span><span class="p">:</span> 
+        <span class="n">width</span><span class="o">=</span><span class="mi">800</span>
+        <span class="n">height</span><span class="o">=</span><span class="mi">300</span>
 
     <span class="n">xr</span><span class="p">,</span> <span class="n">yr</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span>
 
@@ -711,7 +666,7 @@
                          <span class="n">x_range</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">yr</span><span class="p">],</span> <span class="n">y_range</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">xr</span><span class="p">],</span>
                          <span class="n">x_axis_label</span><span class="o">=</span><span class="s1">&#39;Pixel&#39;</span><span class="p">,</span> <span class="n">y_axis_label</span><span class="o">=</span><span class="s1">&#39;Spatial&#39;</span><span class="p">,</span>
                          <span class="n">title</span><span class="o">=</span><span class="s2">&quot;2D Detector Image&quot;</span><span class="p">,</span>
-                        <span class="n">width</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+                        <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">)</span>
 
     <span class="n">plot_detector_2d</span><span class="o">.</span><span class="n">image</span><span class="p">(</span><span class="n">image</span><span class="o">=</span><span class="p">[</span><span class="n">data</span><span class="p">],</span> <span class="n">x</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dh</span><span class="o">=</span><span class="p">[</span><span class="n">xr</span><span class="p">],</span> <span class="n">dw</span><span class="o">=</span><span class="p">[</span><span class="n">yr</span><span class="p">],</span>
                       <span class="n">palette</span><span class="o">=</span><span class="s2">&quot;Spectral11&quot;</span><span class="p">)</span>
@@ -721,8 +676,11 @@
     <span class="k">return</span> <span class="n">data</span></div>
 
 
-<div class="viewcode-block" id="jwst_2d_sat"><a class="viewcode-back" href="../../engine.html#engine.justplotit.jwst_2d_sat">[docs]</a><span class="k">def</span> <span class="nf">jwst_2d_sat</span><span class="p">(</span><span class="n">result_dict</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">output_file</span><span class="o">=</span><span class="s1">&#39;sat2d.html&#39;</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Plot 2d saturation profile</span>
+
+<div class="viewcode-block" id="jwst_2d_sat">
+<a class="viewcode-back" href="../../engine.html#engine.justplotit.jwst_2d_sat">[docs]</a>
+<span class="k">def</span> <span class="nf">jwst_2d_sat</span><span class="p">(</span><span class="n">result_dict</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">output_file</span><span class="o">=</span><span class="s1">&#39;sat2d.html&#39;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot 2d saturation profile</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -749,11 +707,19 @@
     <span class="n">out</span> <span class="o">=</span> <span class="n">result_dict</span><span class="p">[</span><span class="s1">&#39;PandeiaOutTrans&#39;</span><span class="p">]</span>
     <span class="n">data</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;2d&#39;</span><span class="p">][</span><span class="s1">&#39;saturation&#39;</span><span class="p">]</span>
     <span class="n">xr</span><span class="p">,</span> <span class="n">yr</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span>
+
+    <span class="k">if</span> <span class="s1">&#39;miri&#39;</span> <span class="ow">in</span> <span class="n">result_dict</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;Instrument&#39;</span><span class="p">]:</span> 
+        <span class="n">width</span><span class="o">=</span><span class="mi">300</span>
+        <span class="n">height</span><span class="o">=</span><span class="mi">800</span>
+    <span class="k">else</span><span class="p">:</span> 
+        <span class="n">width</span><span class="o">=</span><span class="mi">800</span>
+        <span class="n">height</span><span class="o">=</span><span class="mi">300</span>
+        
     <span class="n">plot_sat_2d</span> <span class="o">=</span> <span class="n">Figure</span><span class="p">(</span><span class="n">tools</span><span class="o">=</span><span class="n">TOOLS</span><span class="p">,</span>
                          <span class="n">x_range</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">yr</span><span class="p">],</span> <span class="n">y_range</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">xr</span><span class="p">],</span>
                          <span class="n">x_axis_label</span><span class="o">=</span><span class="s1">&#39;Pixel&#39;</span><span class="p">,</span> <span class="n">y_axis_label</span><span class="o">=</span><span class="s1">&#39;Spatial&#39;</span><span class="p">,</span>
                          <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Saturation&quot;</span><span class="p">,</span>
-                        <span class="n">width</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+                        <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">)</span>
 
     <span class="n">plot_sat_2d</span><span class="o">.</span><span class="n">image</span><span class="p">(</span><span class="n">image</span><span class="o">=</span><span class="p">[</span><span class="n">data</span><span class="p">],</span> <span class="n">x</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dh</span><span class="o">=</span><span class="p">[</span><span class="n">xr</span><span class="p">],</span> <span class="n">dw</span><span class="o">=</span><span class="p">[</span><span class="n">yr</span><span class="p">],</span>
                       <span class="n">palette</span><span class="o">=</span><span class="s2">&quot;Spectral11&quot;</span><span class="p">)</span>
@@ -762,8 +728,11 @@
         <span class="n">show</span><span class="p">(</span><span class="n">plot_sat_2d</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">data</span></div>
 
-<div class="viewcode-block" id="hst_spec"><a class="viewcode-back" href="../../engine.html#engine.justplotit.hst_spec">[docs]</a><span class="k">def</span> <span class="nf">hst_spec</span><span class="p">(</span><span class="n">result_dict</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">output_file</span> <span class="o">=</span><span class="s1">&#39;hstspec.html&#39;</span><span class="p">,</span> <span class="n">model</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">output_notebook</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Plot 1d spec with error bars for hst</span>
+
+<div class="viewcode-block" id="hst_spec">
+<a class="viewcode-back" href="../../engine.html#engine.justplotit.hst_spec">[docs]</a>
+<span class="k">def</span> <span class="nf">hst_spec</span><span class="p">(</span><span class="n">result_dict</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">output_file</span> <span class="o">=</span><span class="s1">&#39;hstspec.html&#39;</span><span class="p">,</span> <span class="n">model</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">output_notebook</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot 1d spec with error bars for hst</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -834,8 +803,11 @@
 
     <span class="k">return</span> <span class="n">binwave</span><span class="p">,</span> <span class="n">binspec</span><span class="p">,</span> <span class="n">error</span><span class="p">,</span> <span class="n">mwave</span><span class="p">,</span> <span class="n">mspec</span></div>
 
-<div class="viewcode-block" id="hst_time"><a class="viewcode-back" href="../../engine.html#engine.justplotit.hst_time">[docs]</a><span class="k">def</span> <span class="nf">hst_time</span><span class="p">(</span><span class="n">result_dict</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">output_file</span> <span class="o">=</span><span class="s1">&#39;hsttime.html&#39;</span><span class="p">,</span> <span class="n">model</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">output_notebook</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Plot earliest and latest start times for hst observation</span>
+
+<div class="viewcode-block" id="hst_time">
+<a class="viewcode-back" href="../../engine.html#engine.justplotit.hst_time">[docs]</a>
+<span class="k">def</span> <span class="nf">hst_time</span><span class="p">(</span><span class="n">result_dict</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">output_file</span> <span class="o">=</span><span class="s1">&#39;hsttime.html&#39;</span><span class="p">,</span> <span class="n">model</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">output_notebook</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot earliest and latest start times for hst observation</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -925,8 +897,11 @@
     <span class="k">return</span> <span class="n">obsphase1</span><span class="p">,</span> <span class="n">obstr1</span><span class="p">,</span> <span class="n">obsphase2</span><span class="p">,</span> <span class="n">obstr2</span><span class="p">,</span><span class="n">rms</span></div>
 
 
-<div class="viewcode-block" id="hst_simulated_lightcurve"><a class="viewcode-back" href="../../engine.html#engine.justplotit.hst_simulated_lightcurve">[docs]</a><span class="k">def</span> <span class="nf">hst_simulated_lightcurve</span><span class="p">(</span><span class="n">result_dict</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">output_file</span> <span class="o">=</span><span class="s1">&#39;hsttime.html&#39;</span><span class="p">,</span> <span class="n">model</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">output_notebook</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Plot simulated HST light curves (in fluece) for earliest and latest start times</span>
+
+<div class="viewcode-block" id="hst_simulated_lightcurve">
+<a class="viewcode-back" href="../../engine.html#engine.justplotit.hst_simulated_lightcurve">[docs]</a>
+<span class="k">def</span> <span class="nf">hst_simulated_lightcurve</span><span class="p">(</span><span class="n">result_dict</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">output_file</span> <span class="o">=</span><span class="s1">&#39;hsttime.html&#39;</span><span class="p">,</span> <span class="n">model</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">output_notebook</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot simulated HST light curves (in fluece) for earliest and latest start times</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -1021,45 +996,34 @@
         <span class="n">show</span><span class="p">(</span><span class="n">start_time</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">obsphase1</span><span class="p">,</span> <span class="n">counts1</span><span class="p">,</span> <span class="n">obsphase2</span><span class="p">,</span> <span class="n">counts2</span><span class="p">,</span> <span class="n">rms</span></div>
+
 </pre></div>
 
            </div>
-           
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &copy; Copyright Updated 2022
-
-    </p>
+    <p>&#169; Copyright Updated 2022.</p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
-
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

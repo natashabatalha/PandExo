@@ -11,15 +11,30 @@ PandExo requires downloading **three folders**: 1) JWST instrument info, 2) stel
 
 JWST Reference Data
 ````````````````````
-JWST Reference data has been updated to 2.0!
+JWST Reference data has been updated to 3.0!
 
 .. warning::
-    Reference data for PandExo/Pandeia 1.X is not compatible with PandExo/Pandeia 2.0. Please always ensure that your reference data is up to date with the software (e.g. reference data 2.0 should match software release 2.0)
+    Reference data must match the software version. For example Pandeia reference data 3.0 should match Pandeia verions software release 3.0, and that should match PandExo 3.0)
 
-The new reference data is located `here for v2p0 <https://stsci.app.box.com/v/pandeia-refdata-v2p0-jwst>`_. More information on `pandeia installation can be found here <https://outerspace.stsci.edu/display/PEN/Pandeia+Engine+Installation>`_
+The new reference data is located `here for v3p0 <https://stsci.app.box.com/v/pandeia-refdata-v3p0-jwst>`_. More information on `pandeia installation can be found here <https://outerspace.stsci.edu/display/PEN/Pandeia+Engine+Installation>`_
 
 
 After you have downloaded the reference data, create environment variable (`more resources on how to create environment variables are located here <https://natashabatalha.github.io/picaso/installation.html#create-environment-variable>`_). 
+
+You can verify your installation by opening up a terminal with access to the conda installation, and type
+
+.. code-block:: bash 
+
+    python -c "import pandeia.engine; pandeia.engine.pandeia_version()"
+
+If properly installed and configured, it should show the refdata version and synphot data directory, like this:
+
+.. code-block:: bash 
+
+    Pandeia Engine version:  3.0
+    Pandeia RefData version:  3.0
+    Pysynphot Data:  /your/data/directory/synphot
+
 
 .. code-block:: bash 
 
@@ -41,7 +56,7 @@ Create your environment variable:
 
 Normalization Files  
 ````````````````````
-New to PandExo 2.0, **users now have to download the master table of all pysynphot throughput tables.** 
+New to PandExo >2.0, **users now have to download the master table of all pysynphot throughput tables.** 
 
 `Download the file here <https://archive.stsci.edu/hlsps/reference-atlases/hlsp_reference-atlases_hst_multi_everything_multi_v11_sed.tar>`_
 
