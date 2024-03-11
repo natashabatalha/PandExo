@@ -237,8 +237,6 @@ def get_thruput(inst, niriss=1, nirspec='f100lp', wmin='default', wmax='default'
     conf['detector']['ngroup'] = 2
 
     if conf['instrument']['instrument'].lower() =='niriss':
-        #pandeia handles slit losses inside the 2d engine. So, you need to account for the
-        #extra .663 here
         conf["instrument"]["disperser"] = conf["instrument"]["disperser"] +'_'+str(niriss)
         i = InstrumentFactory(config=conf)
         wr = i.get_wave_range()
@@ -248,7 +246,7 @@ def get_thruput(inst, niriss=1, nirspec='f100lp', wmin='default', wmax='default'
             wmax = wr['wmax']
         wave = np.linspace(wmin, wmax, num=500)
         pce = i.get_total_eff(wave)
-        return {'wave':wave,'pce':0.663*pce}
+        return {'wave':wave,'pce':pce}
     elif (conf['instrument']['instrument'].lower() =='nirspec') and ('g140' in conf["instrument"]["disperser"]):
         conf["instrument"]["filter"] = nirspec
 
