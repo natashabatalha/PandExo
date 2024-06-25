@@ -524,7 +524,7 @@ class CalculationNewHandler(BaseHandler):
                     pandata["configuration"]["detector"]["subarray"] = nirissmode
 
                     if pandata["configuration"]["detector"]["subarray"] == "substrip256":
-                        pandata['strategy']['order'] = 2
+                        pandata['strategy']['order'] = int(self.get_argument('nirissorders'))
 
             pandata['configuration']['instrument']['instrument'] = instrument
             
