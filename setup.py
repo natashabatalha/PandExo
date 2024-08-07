@@ -41,14 +41,11 @@ PY_V = sys.version_info
 # also be placed in the setup.cfg, as will be demonstrated in a future update
 # to this sample package.
 
-if sys.version_info < (3,0): 
-    pandas_version = '==0.24.0'
-else:
-    pandas_version = '>=0.25.0'
+
 setup(
 
     name='pandexo.engine',
-    version='2.0.0',
+    version='4.0.0',
     summary='pandexo transiting exoplanet simulator',
     description_file='README.rst',
     author='Natasha Batalha at NASA Ames',
@@ -92,18 +89,20 @@ setup(
     # },
 
     install_requires=[
-          'pandeia.engine==2.0',
-          'numpy',
-          'bokeh==3.0.2',
+          'pandeia.engine==4.0',
+          'numpy>=1.21',
+          'bokeh==3.5.1',
           'tornado',
-          'pandas'+pandas_version,
+          'pandas',
           'joblib',
           'photutils',
           'astropy',
+          'synphot>=1.0',
+          'stsynphot>=1.0',
           'pysynphot',
           'sqlalchemy',
           'astroquery',
-          'scipy',
+          'scipy>=1.9.2',
           'batman-package'
           ],
     entry_points = {

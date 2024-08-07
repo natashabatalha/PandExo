@@ -523,6 +523,9 @@ class CalculationNewHandler(BaseHandler):
                     nirissmode = self.get_argument("nirissmode")
                     pandata["configuration"]["detector"]["subarray"] = nirissmode
 
+                    if pandata["configuration"]["detector"]["subarray"] == "substrip256":
+                        pandata['strategy']['order'] = int(self.get_argument('nirissorders'))
+
             pandata['configuration']['instrument']['instrument'] = instrument
             
             # write in optimal groups or set a number

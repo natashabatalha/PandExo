@@ -548,6 +548,12 @@ def jwst_2d_det(result_dict, plot=True, output_file='det2d.html'):
     out = result_dict['PandeiaOutTrans']
     data = out['2d']['detector']
 
+    if 'miri' in result_dict['input']['Instrument']: 
+        width=300
+        height=800
+    else: 
+        width=800
+        height=300
 
     xr, yr = data.shape
 
@@ -555,7 +561,7 @@ def jwst_2d_det(result_dict, plot=True, output_file='det2d.html'):
                          x_range=[0, yr], y_range=[0, xr],
                          x_axis_label='Pixel', y_axis_label='Spatial',
                          title="2D Detector Image",
-                        width=800, height=300)
+                        width=width, height=height)
 
     plot_detector_2d.image(image=[data], x=[0], y=[0], dh=[xr], dw=[yr],
                       palette="Spectral11")
@@ -593,11 +599,19 @@ def jwst_2d_sat(result_dict, plot=True, output_file='sat2d.html'):
     out = result_dict['PandeiaOutTrans']
     data = out['2d']['saturation']
     xr, yr = data.shape
+
+    if 'miri' in result_dict['input']['Instrument']: 
+        width=300
+        height=800
+    else: 
+        width=800
+        height=300
+        
     plot_sat_2d = Figure(tools=TOOLS,
                          x_range=[0, yr], y_range=[0, xr],
                          x_axis_label='Pixel', y_axis_label='Spatial',
                          title="Saturation",
-                        width=800, height=300)
+                        width=width, height=height)
 
     plot_sat_2d.image(image=[data], x=[0], y=[0], dh=[xr], dw=[yr],
                       palette="Spectral11")
