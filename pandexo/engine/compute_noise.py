@@ -56,14 +56,15 @@ class ExtractSpec():
         self.nint_out = timing["Num Integrations Out of Transit"]
         self.nint_in = timing["Num Integrations In Transit"]
         self.tframe = timing["Seconds per Frame"]
+        self.frame_zero_dead = timing["Zero Frame Efficiency Loss"]
         self.rn = rn 
         self.extraction_area = extraction_area
 
         #on source out versus in 
-        self.exptime_per_int = self.tframe * (self.ngroups_per_int-1.0)
+        self.exptime_per_int = self.tframe * (self.ngroups_per_int+self.frame_zero_dead )
 
-        self.on_source_in = self.tframe * (self.ngroups_per_int-1.0) * self.nint_in
-        self.on_source_out = self.tframe * (self.ngroups_per_int-1.0) * self.nint_out
+        self.on_source_in = self.tframe * (self.ngroups_per_int+self.frame_zero_dead) * self.nint_in
+        self.on_source_out = self.tframe * (self.ngroups_per_int+self.frame_zero_dead) * self.nint_out
 
     def loopingL(self, cen, signal_col, noise_col, bkg_col):
         """Finds bottom of the optimal extraction region.
