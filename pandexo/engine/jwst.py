@@ -77,6 +77,9 @@ def compute_full_sim(dictinput,verbose=False):
     #so create temp conf with 2 groups 
     if 'optimize' in str(conf['detector']['ngroup']): 
         conf_temp = deepcopy(conf) 
+        if 'dhs' in conf['instrument']['aperture']: 
+            #for DHS also need to swap to bright mode to get only the highest throughput spectra 
+            conf_temp['instrument']['aperture'] = 'dhs0bright'
         conf_temp['detector']['ngroup'] = 2
     else: 
         conf_temp = conf
@@ -944,7 +947,7 @@ def as_dict(out, both_spec ,binned, timing, mag, sat_level, warnings, punit, unb
    	 "Aperture": out['input']['configuration']['instrument']['aperture'], 
    	 "Disperser": out['input']['configuration']['instrument']['disperser'], 
    	 "Subarray": out['input']['configuration']['detector']['subarray'], 
-   	 "Readmode": out['input']['configuration']['detector']['readmode'], 
+   	 "Readmode": out['input']['configuration']['detector']['readout_pattern'], 
  	 "Filter": out['input']['configuration']['instrument']['filter'],
  	 "Primary/Secondary": punit
     }

@@ -25,7 +25,8 @@ ALL = {"WFC3 G141":False,
        "NIRSpec G395H":False,
        "NIRSpec Prism":False,
        "NIRCam F322W2":False,
-       "NIRCam F444W":False}
+       "NIRCam F444W":False,
+       "NIRCam DHS":False}
 
 
 def print_instruments(verbose=True):

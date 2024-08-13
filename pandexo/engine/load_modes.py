@@ -24,6 +24,7 @@ class SetDefaultModes():
        - "NIRSpec Prism"
        - "NIRCam F322W2"
        - "NIRCam F444W"
+       - "NIRCam DHS"
        - "WFC3 G102"
        - "WFC3 G141"
        
@@ -34,8 +35,10 @@ class SetDefaultModes():
     """
 
     def __init__(self, inst):
-        self.instrument = inst[0:inst.find(' ')].lower()
-        self.config = inst[inst.find(' ')+1:len(inst)].lower()   
+        self.user_input=inst
+        self.instrument = inst.split(' ')[0].lower()
+        self.config =inst.split(' ')[1].lower()  
+
     
     def pick(self): 
         """Points to specific instrument based on key choice
@@ -87,10 +90,17 @@ class SetDefaultModes():
     def nircam(self):
         """Handles NIRCam template
         """
+        if 'dhs' in self.config: 
+            add='dhs_'
+        else: 
+            add=''
         with open(os.path.join(os.path.dirname(__file__), "reference",
-                               "nircam_input.json")) as data_file:
+                               f"nircam_{add}input.json")) as data_file:
             pandeia_data = json.load(data_file)
-            pandeia_data["configuration"]["instrument"]["filter"]  = self.config           
+        
+        if 'dhs' not in self.config: 
+            pandeia_data["configuration"]["instrument"]["filter"]  = self.config
+
         return pandeia_data
 
     def miri(self):
