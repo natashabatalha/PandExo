@@ -168,7 +168,7 @@ def compute_full_sim(dictinput,verbose=False):
     #Simulate out trans and in transit
     if verbose: print("Starting Out of Transit Simulation")
     out = perform_out(pandeia_input, pandexo_input,timing, both_spec)
-    
+
     #extract extraction area before dict conversion
     extraction_area = out.extraction_area
     out = out.as_dict()
@@ -256,14 +256,16 @@ def compute_full_sim(dictinput,verbose=False):
         
     
     if calculation == 'phase_spec':
-        to = (timing["APT: Num Groups per Integration"]-1)*tframe
-        ti = (timing["APT: Num Groups per Integration"]-1)*tframe
+        to = (timing["APT: Num Groups per Integration"]+
+            timing["Zero Frame Efficiency Loss"])*tframe
+        ti = (timing["APT: Num Groups per Integration"]+
+            timing["Zero Frame Efficiency Loss"])*tframe
     else: 
         #otherwise error propagation and account for different 
         #times in transit and out 
         to = result['on_source_out']
         ti = result['on_source_in']
-        
+
     var_tot = (to/ti/photon_out_bin)**2.0 * var_in_bin + (photon_in_bin*to/ti/photon_out_bin**2.0)**2.0 * var_out_bin
     error_spec = np.sqrt(var_tot)
         
@@ -347,7 +349,7 @@ def compute_maxexptime_per_int(pandeia_input, sat_level):
     
     report = perform_calculation(pandeia_input, dict_report=False)
     report_dict = report.as_dict() 
-    
+
     # count rate on the detector in e-/second/pixel
     #det = report_dict['2d']['detector']
     det = report.signal.rate_plus_bg_list[0]['fp_pix']
@@ -459,7 +461,11 @@ def compute_timing(m,transit_duration,expfact_out,noccultations):
         nframes_per_int = mingroups
         flag_default = "Something went wrong. SET TO NGROUPS="+str(mingroups)
 
-          
+    if ngroups_per_int == 1: 
+        frame_zero_dead = 0 
+    else: 
+        frame_zero_dead = -1
+
     #the integration time is related to the number of groups and the time of each 
     #group 
     exptime_per_int = ngroups_per_int*tframe
@@ -468,7 +474,7 @@ def compute_timing(m,transit_duration,expfact_out,noccultations):
     clocktime_per_int = (ngroups_per_int+1.0)*tframe
     
     #observing efficiency (i.e. what percentage of total time is spent on soure)
-    eff = (ngroups_per_int - 1.0)/(ngroups_per_int + 1.0)
+    eff = (ngroups_per_int + frame_zero_dead)/(ngroups_per_int + 1.0)
     
     #this says "per occultation" but this is just the in transit frames.. See below
     # transit duration / ((ngroups + reset)*frame time)
@@ -485,7 +491,7 @@ def compute_timing(m,transit_duration,expfact_out,noccultations):
         ngroups_per_int = np.floor(ngroups_per_int/min_nint_trans)
         exptime_per_int = (ngroups_per_int)*tframe
         clocktime_per_int = ngroups_per_int*tframe
-        eff = (ngroups_per_int - 1.0)/(ngroups_per_int + 1.0)
+        eff = (ngroups_per_int + frame_zero_dead)/(ngroups_per_int + 1.0)
         nint_per_occultation =  transit_duration/((ngroups_per_int+1.0)*tframe)
         nint_in = np.ceil(nint_per_occultation)
         nint_out = np.ceil(nint_in/expfact_out)
@@ -503,9 +509,10 @@ def compute_timing(m,transit_duration,expfact_out,noccultations):
         "APT: Num Integrations per Occultation":int(nint_out+nint_in),
         "Observing Efficiency (%)": eff*100.0,
         "Transit+Baseline, no overhead (hrs)": (nint_out+nint_in)*clocktime_per_int/60.0/60.0, 
-        "Number of Transits": noccultations
+        "Number of Transits": noccultations,
+        "Zero Frame Efficiency Loss":frame_zero_dead
         }      
-        
+
     return timing, {'flag_default':flag_default,'flag_high':flag_high}
 
 def remove_QY(pandeia_dict, instrument):
@@ -684,6 +691,8 @@ def add_warnings(pand_dict, timing, sat_level, flags,instrument):
 
     if (sat_level > .80) & (ngroups_per_int <3):
         flag_low = "% full well>80% & only " + str(ngroups_per_int) + " groups"
+    if ngroups_per_int==1:
+        flag_low+='. Ngroups=1 is a new mode since Cycle 4 and has not been rigorously tested. Proceed with caution.'
     if (sat_level > .80): 
         flag_perc = "% full well>80%"
 
@@ -926,7 +935,7 @@ def as_dict(out, both_spec ,binned, timing, mag, sat_level, warnings, punit, unb
 
     p=1.0
     if punit == 'fp/f*': p = -1.0
-
+    timing.pop("Zero Frame Efficiency Loss")
     timing_div = pd.DataFrame.from_dict(timing, orient='index')
     timing_div.columns = ['Value']
     timing_div = timing_div.to_html()

@@ -264,7 +264,7 @@ def create_component_jwst(result_dict):
                          y_axis_label='Spectral Precision (ppm)', title="Spectral Precision",
                          width=800, height=300, y_range = [0,2.0*ymed])
     ymed = np.median(y)
-    plot_noise_1d1.circle('x', 'y', line_width = 4, alpha = .7, source=source2)
+    plot_noise_1d1.step('x', 'y', line_width = 4, alpha = .7, source=source2)
 
     callback2 = CustomJS(args=dict(source=source2, original=original2), code="""
             // Grab some references to the data
@@ -478,7 +478,9 @@ def create_component_hst(result_dict):
         np.array(y_err.append((py - yerr, py + yerr)))
 
     plot_spectrum.line(mwave,mspec, color= "black", alpha = 0.5, line_width = 4)
-    plot_spectrum.circle(binwave,binspec, line_width=3, line_alpha=0.6)
+    radius_size = np.diff(ylims)[0]/20
+    plot_spectrum.circle(binwave,binspec, line_width=3, line_alpha=0.6,
+        radius=radius_size)
     plot_spectrum.multi_line(x_err, y_err)
     
     

@@ -3,8 +3,8 @@
 {% block css %}
 
 
-<link rel="stylesheet" href="http://cdn.pydata.org/bokeh/release/bokeh-3.0.2.min.css" type="text/css"/>
-<link rel="stylesheet" href="http://cdn.pydata.org/bokeh/release/bokeh-widgets-3.0.2.min.css" type="text/css"/>
+<link rel="stylesheet" href="http://cdn.pydata.org/bokeh/release/bokeh-3.5.1.min.css" type="text/css"/>
+<link rel="stylesheet" href="http://cdn.pydata.org/bokeh/release/bokeh-widgets-3.5.1.min.css" type="text/css"/>
 <link href="{{ static_url('css/select2.min.css')}}" rel="stylesheet">
 <link href="{{ static_url('css/select2-bootstrap-theme.min.css')}}" rel="stylesheet">
 <link href="{{ static_url('css/icheck-bootstrap.min.css')}}" rel="stylesheet">
@@ -377,12 +377,30 @@
         </div>
 
         <div class="col-md-4" id="NIRISS">
-            <select id="nirissmode" name="nirissmode" onchange="showForm()" class="form-control" data-placeholder="Select NIRISS Mode">
+            <select id="nirissmode" name="nirissmode" onchange="show_dropdown()" class="form-control" data-placeholder="Select NIRISS Mode">
                 <option value=""></option>
                 <option value="substrip96">Substrip 96</option>
                 <option value="substrip256">Substrip 256</option>
             </select>
+            <div id="order2_dropdown" style="display:none">
+                <select id="nirissorders" name="nirissorders" class="form-control">
+                    <option value="1">Order 1</option>
+                    <option value="2">Order 2</option>
+                </select>
+                <p class="help-block">Order to run calculation on. If optimizing number of groups, we recommend optimizing for Order 1 first, and using that optimum for the Order 2 calculations.</p>
+            </div>
         </div>
+
+        <script type="text/javascript">
+            function show_dropdown() {
+                if(document.getElementById('nirissmode').value == "substrip96") {
+                    document.getElementById('order2_dropdown').style.display = 'none';
+                } else {
+                    document.getElementById('order2_dropdown').style.display = 'block';
+                }
+            }
+        </script>
+
     </div>
     <!--
     <div class="form-group">
@@ -577,11 +595,11 @@ $(function () {
 
 </script>
 
-<script src="https://cdn.bokeh.org/bokeh/release/bokeh-3.0.2.min.js"></script>
-<script src="https://cdn.bokeh.org/bokeh/release/bokeh-widgets-3.0.2.min.js"></script>
-<script src="https://cdn.bokeh.org/bokeh/release/bokeh-tables-3.0.2.min.js"></script>
-<script src="https://cdn.bokeh.org/bokeh/release/bokeh-gl-3.0.2.min.js"></script>
-<script src="https://cdn.bokeh.org/bokeh/release/bokeh-mathjax-3.0.2.min.js"></script>
+<script src="https://cdn.bokeh.org/bokeh/release/bokeh-3.5.1.min.js"></script>
+<script src="https://cdn.bokeh.org/bokeh/release/bokeh-widgets-3.5.1.min.js"></script>
+<script src="https://cdn.bokeh.org/bokeh/release/bokeh-tables-3.5.1.min.js"></script>
+<script src="https://cdn.bokeh.org/bokeh/release/bokeh-gl-3.5.1.min.js"></script>
+<script src="https://cdn.bokeh.org/bokeh/release/bokeh-mathjax-3.5.1.min.js"></script>
 
 
 {% end %}

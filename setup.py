@@ -45,7 +45,7 @@ PY_V = sys.version_info
 setup(
 
     name='pandexo.engine',
-    version='3.0.0',
+    version='4.0.0',
     summary='pandexo transiting exoplanet simulator',
     description_file='README.rst',
     author='Natasha Batalha at NASA Ames',
@@ -89,18 +89,20 @@ setup(
     # },
 
     install_requires=[
-          'pandeia.engine==3.0',
-          'numpy',
-          'bokeh==3.0.2',
+          'pandeia.engine==4.0',
+          'numpy>=1.21',
+          'bokeh==3.5.1',
           'tornado',
           'pandas',
           'joblib',
           'photutils',
           'astropy',
+          'synphot>=1.0',
+          'stsynphot>=1.0',
           'pysynphot',
           'sqlalchemy',
           'astroquery',
-          'scipy',
+          'scipy>=1.9.2',
           'batman-package'
           ],
     entry_points = {

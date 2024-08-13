@@ -12,6 +12,11 @@
    </div>
    <br/><br/>
 
+News 
+=====
+
+PandExo 2.0 is now available for download!!
+
 The Documentation
 =================
 
