@@ -313,7 +313,8 @@
                 <option value=""></option>
                 <option value="MIRI">MIRI Low Resolution Spectroscopy</option>
                 <option value="NIRSpec">NIRSpec Bright Object Time Series</option>
-                <option value="NIRCam">NIRCam Grism Time Series</option>
+                <option value="NIRCam">NIRCam Long Wave Only Grism Time Series</option>
+                <option value="NIRCamDHS">NIRCam Long Wave & Short Wave Grism Time Series</option>
                 <option value="NIRISS">NIRISS Single Object Slitless Spectroscopy</option>
             </select>
         </div>
@@ -375,6 +376,40 @@
                 </select>
             </div>
         </div>
+
+        <div class="col-md-9" id="NIRCamDHS">
+            <div class="col-md-3" style="padding-left: 0;">
+                <select id="nircamsw" name="nircamsw" onchange="showForm()" class="form-control" data-placeholder="Select SW Filter">
+                    <option value=""></option>
+                    <option value="f070w">F070W, ~0.6-0.8 um</option>
+                    <option value="f090w">F090W, ~0.8-1 um</option>
+                    <option value="f115w">F115W, ~1-1.2 um</option>
+                    <option value="f150w2">F150W2, ~1-1.9 um</option>
+                    <option value="f200w">F200W, ~1.7-2 um</option>
+                </select>
+            </div>            
+            <div class="col-md-3" style="padding-left: 0;">
+                <select id="nircamlw" name="nircamlw" onchange="showForm()" class="form-control" data-placeholder="Select LW Filter">
+                    <option value=""></option>
+                    <option value="f322w2">F322W2, 2.7-4 um</option>
+                    <option value="f444w">F444W, 4-5 um</option>
+                </select>
+            </div>
+            <div class="col-md-3" style="padding-right: 0;">
+                <select id="nircamsubarray" name="nircamsubarray" onchange="showForm()" class="form-control" data-placeholder="Select NIRCam Subarray">
+                    <option value=""></option>
+                    <option value="sub40stripe1_dhs">sub40stripe1 DHS (tframe=0.21)</option>
+                    <option value="sub80stripe2_dhs">sub80stripe2 DHS (tframe=0.42)</option>
+                    <option value="sub160stripe4_dhs"> sub160stripe4 DHS (tframe=0.84)</option>
+                    <option value="sub256stripe4_dhs">sub256stripe4 DHS (tframe=1.3)</option>
+                </select>
+            </div>
+            <div class="col-md-9" style="padding-right: 0;">
+            <p class="help-block">1) There are separate calculations for the short and long wavelength channels even though these observations occur simultaneously. Take caution to use the same Instrument Setup and Detector Setup in both the SW Grism Time Series and LW Grism Time Series calculations for a given target to correctly evaluate expected SNR. </p>
+            <p class="help-block">2) SW Filter wavelength ranges cited in the dropdown menu are only for guidance. The exact numbers dependt on the choice of LW filter <a href="https://jwst-docs.stsci.edu/jwst-near-infrared-camera/nircam-observing-modes/nircam-time-series-observations/nircam-short-wavelength-grism-time-series#gsc.tab=0">(see JDOX Table 3)</a></p>
+            </div>
+        </div>
+
 
         <div class="col-md-4" id="NIRISS">
             <select id="nirissmode" name="nirissmode" onchange="show_dropdown()" class="form-control" data-placeholder="Select NIRISS Mode">
@@ -556,7 +591,7 @@
         /* Instrument Selection */
         $("#instrument").change(function () {
             $("#instrument-mode-section").removeClass("hidden");
-            $("#MIRI, #NIRSpec, #NIRISS, #NIRCam").addClass("hidden");
+            $("#MIRI, #NIRSpec, #NIRISS, #NIRCam, #NIRCamDHS").addClass("hidden");
             var selopt = $("#instrument").val();
             switch (selopt) {
                 case "MIRI":
@@ -570,6 +605,9 @@
                     break;
                 case "NIRCam":
                     $("#NIRCam").removeClass("hidden");
+                    break;
+                case "NIRCamDHS":
+                    $("#NIRCamDHS").removeClass("hidden");
                     break;
             }
         });
