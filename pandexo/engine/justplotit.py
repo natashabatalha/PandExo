@@ -506,6 +506,7 @@ def jwst_noise(result_dict, plot=True, output_file= 'noise.html'):
     y = result_dict['FinalSpectrum']['error_w_floor']*1e6
     x = x[~np.isnan(y)]
     y = y[~np.isnan(y)]
+
     ymed = np.median(y)
 
 
