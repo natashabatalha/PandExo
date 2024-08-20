@@ -97,7 +97,7 @@ def compute_full_sim(dictinput,verbose=False):
     exp_pars = i.the_detector.exposure_spec
     tframe =exp_pars.tframe
     nframe = exp_pars.nframe
-    nskip = exp_pars.nsample_skip
+    nskip = exp_pars.ndrop2
 
     sat_unit = pandexo_input['observation']['sat_unit']
 
