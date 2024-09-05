@@ -15,7 +15,10 @@ from pandeia.engine.calc_utils import build_default_calc, build_default_source
 
 #constant parameters.. consider putting these into json file 
 #max groups in integration
-max_ngroup = 65536.0 
+max_ngroup = {'nirspec':65536.0 ,
+              'miri':65536.0 ,
+              'niriss':65536.0 ,
+              'nircam':30}
 #minimum number of integrations
 min_nint_trans = 1
 
@@ -163,7 +166,8 @@ def compute_full_sim(dictinput,verbose=False):
         if verbose: print("Finished Duty Cycle Calc")
 
     #calculate all timing info
-    timing, flags = compute_timing(m,transit_duration,expfact_out,noccultations)
+    max_ngroup_instrument = max_ngroup[pandeia_input["configuration"]["instrument"]["instrument"]]
+    timing, flags = compute_timing(m,transit_duration,expfact_out,noccultations,max_ngroup_instrument)
     
     #Simulate out trans and in transit
     if verbose: print("Starting Out of Transit Simulation")
@@ -370,7 +374,7 @@ def compute_maxexptime_per_int(pandeia_input, sat_level):
     
     return maxexptime_per_int
         
-def compute_timing(m,transit_duration,expfact_out,noccultations): 
+def compute_timing(m,transit_duration,expfact_out,noccultations,max_ngroup_instrument): 
     """Computes all timing info for observation
     
     Computes all JWST specific timing info for observation including. Some pertinent 
@@ -440,8 +444,8 @@ def compute_timing(m,transit_duration,expfact_out,noccultations):
         #if you exceed that limit, set it to the maximum value instead.
         #also set another check for saturation
 
-        if ngroups_per_int > max_ngroup:
-            ngroups_per_int = max_ngroup
+        if ngroups_per_int > max_ngroup_instrument:
+            ngroups_per_int = max_ngroup_instrument
             flag_high = "Groups/int > max num of allowed groups"
  
         if (ngroups_per_int < mingroups) | np.isnan(ngroups_per_int):
