@@ -81,7 +81,7 @@ def compute_full_sim(dictinput,verbose=False):
         substripe = pandeia_input['configuration']['detector']['subarray']
         nspectra = 2*int(substripe[substripe.find('stripe')+6])
         pandeia_input['configuration']['instrument']['aperture'] = f'dhs0spec{nspectra}'
-    
+
     #if optimize is in the ngroups section, this will throw an error 
     #so create temp conf with 2 groups 
     if 'optimize' in str(conf['detector']['ngroup']): 
@@ -957,7 +957,16 @@ def as_dict(out, both_spec ,binned, timing, mag, sat_level, warnings, punit, unb
     warnings_div = warnings_div.to_html()
     warnings_div = '<table class="table table-striped"> \n' + warnings_div[36:len(warnings_div)]
     warnings_div = warnings_div.encode()
-       
+    
+    map_dhs_names = {'sub40stripe1_dhs':'SUB40S1_2-SPECTRA',
+                     'sub80stripe2_dhs':'SUB80S2_4-SPECTRA',
+                     'sub160stripe4_dhs':'SUB160S4_8-SPECTRA',
+                     'sub256stripe4_dhs':'SUB256S4_8-SPECTRA'
+            }
+    subarray = out['input']['configuration']['detector']['subarray']
+    for idhs in map_dhs_names.keys(): 
+        subarray = subarray.replace(idhs, f'{idhs} (ETC Name)/ {map_dhs_names[idhs]} (APT Name)')
+
     input_dict = {
    	 "Target Mag": mag , 
    	 "Saturation Level (electons)": sat_level, 
@@ -965,7 +974,7 @@ def as_dict(out, both_spec ,binned, timing, mag, sat_level, warnings, punit, unb
    	 "Mode": out['input']['configuration']['instrument']['mode'], 
    	 "Aperture": out['input']['configuration']['instrument']['aperture'], 
    	 "Disperser": out['input']['configuration']['instrument']['disperser'], 
-   	 "Subarray": out['input']['configuration']['detector']['subarray'], 
+   	 "Subarray": subarray, 
    	 "Readmode": out['input']['configuration']['detector']['readout_pattern'], 
  	 "Filter": out['input']['configuration']['instrument']['filter'],
  	 "Primary/Secondary": punit
