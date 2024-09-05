@@ -530,7 +530,6 @@ class CalculationNewHandler(BaseHandler):
                     pandata["configuration"]["instrument"]["filter"] = self.get_argument(filter_to_sim)
                     pandata["configuration"]["instrument"]["pandexofilterpair"] = self.get_argument(pair_filter)
                     pandata["configuration"]["detector"]["subarray"] = self.get_argument("nircamsubarray")
-
             if instrument == "niriss":
                 with open(os.path.join(os.path.dirname(__file__), "reference", "niriss_input.json")) as data_file:
                     pandata = json.load(data_file)
