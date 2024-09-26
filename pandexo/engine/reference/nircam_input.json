@@ -53,7 +53,7 @@
             "disperser": "grismr"
         },
     "detector": {
-            "readout_pattern":"shallow2",
+            "readout_pattern":"rapid",
             "subarray": "subgrism64",
             "ngroup": "optimize",
             "nint": 1,

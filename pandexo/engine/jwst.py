@@ -82,6 +82,12 @@ def compute_full_sim(dictinput,verbose=False):
         nspectra = 2*int(substripe[substripe.find('stripe')+6])
         pandeia_input['configuration']['instrument']['aperture'] = f'dhs0spec{nspectra}'
 
+        #if long wave setup with dhs is asked for change to lw grism 
+        if (('32' in pandeia_input['configuration']['instrument']['filter']) or 
+            ('44' in pandeia_input['configuration']['instrument']['filter'])): 
+            pandeia_input['configuration']['instrument']['mode']='lw_tsgrism'
+            pandeia_input['configuration']['instrument']['aperture']='lw' 
+            pandeia_input['configuration']['instrument']['disperser']='grismr' 
     #if optimize is in the ngroups section, this will throw an error 
     #so create temp conf with 2 groups 
     if 'optimize' in str(conf['detector']['ngroup']): 
@@ -270,12 +276,15 @@ def compute_full_sim(dictinput,verbose=False):
             timing["Zero Frame Efficiency Loss"])*tframe
         ti = (timing["APT: Num Groups per Integration"]+
             timing["Zero Frame Efficiency Loss"])*tframe
+        nint_in = 1
+        nint_out = 1
     else: 
         #otherwise error propagation and account for different 
         #times in transit and out 
         to = result['on_source_out']
         ti = result['on_source_in']
-
+        nint_in = result['nint_in']
+        nint_out = result['nint_out']
     var_tot = (to/ti/photon_out_bin)**2.0 * var_in_bin + (photon_in_bin*to/ti/photon_out_bin**2.0)**2.0 * var_out_bin
     error_spec = np.sqrt(var_tot)
         
@@ -306,6 +315,8 @@ def compute_full_sim(dictinput,verbose=False):
     rawstuff = {
                 'electrons_out':photon_out_bin*nocc, 
                 'electrons_in':photon_in_bin*nocc,
+                'electron_per_int':photon_out_bin/nint_out, 
+                'snr_int':[out['1d']['sn'][0],out['1d']['sn'][1]],
                 'var_in':var_in_bin*nocc, 
                 'var_out':var_out_bin*nocc,
                 'e_rate_out':photon_out_bin/to,
@@ -583,7 +594,7 @@ def perform_out(pandeia_input, pandexo_input,timing, both_spec):
     """
     #pandeia inputs, simulate one integration at a time 
     pandeia_input['configuration']['detector']['ngroup'] = int(timing['APT: Num Groups per Integration'])
-    pandeia_input['configuration']['detector']['nint'] = int(timing['Num Integrations Out of Transit'])
+    pandeia_input['configuration']['detector']['nint'] = 1#int(timing['Num Integrations Out of Transit'])
     pandeia_input['configuration']['detector']['nexp'] = 1 
 
     report_out = perform_calculation(pandeia_input, dict_report=False)
@@ -636,7 +647,7 @@ def perform_in(pandeia_input, pandexo_input,timing, both_spec, out, calculation)
         #only run pandeia a third time if doing slope method and need accurate run for the 
         #nint and timing
         pandeia_input['configuration']['detector']['ngroup'] = int(timing['APT: Num Groups per Integration'])
-        pandeia_input['configuration']['detector']['nint'] = int(timing['Num Integrations In Transit'])
+        pandeia_input['configuration']['detector']['nint'] = 1#int(timing['Num Integrations In Transit'])
         pandeia_input['configuration']['detector']['nexp'] = 1
   
         in_transit_spec = np.array([both_spec['wave'], both_spec['flux_in_trans']])
@@ -945,8 +956,11 @@ def as_dict(out, both_spec ,binned, timing, mag, sat_level, warnings, punit, unb
 
     p=1.0
     if punit == 'fp/f*': p = -1.0
+    frame_loss = timing['Zero Frame Efficiency Loss']
     timing.pop("Zero Frame Efficiency Loss")
     timing_div = pd.DataFrame.from_dict(timing, orient='index')
+    #add back in so its not in html, but in timing dict 
+    timing["Zero Frame Efficiency Loss"]=frame_loss
     timing_div.columns = ['Value']
     timing_div = timing_div.to_html()
     timing_div = '<table class="table table-striped"> \n' + timing_div[36:len(timing_div)] 
@@ -963,6 +977,7 @@ def as_dict(out, both_spec ,binned, timing, mag, sat_level, warnings, punit, unb
                      'sub160stripe4_dhs':'SUB160S4_8-SPECTRA',
                      'sub256stripe4_dhs':'SUB256S4_8-SPECTRA'
             }
+    
     subarray = out['input']['configuration']['detector']['subarray']
     for idhs in map_dhs_names.keys(): 
         subarray = subarray.replace(idhs, f'{idhs} (ETC Name)/ {map_dhs_names[idhs]} (APT Name)')
