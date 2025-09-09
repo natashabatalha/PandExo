@@ -215,9 +215,10 @@ def create_component_jwst(result_dict):
     raw = result_dict['RawData']
     
     # Flux 1d
-    x, y = raw['wave'], raw['e_rate_out']*result_dict['timing']['Seconds per Frame']*(timing["APT: Num Groups per Integration"]-1)
-    x = x[~np.isnan(y)]
-    y = y[~np.isnan(y)]
+    #x, y = raw['wave'], raw['e_rate_out']*result_dict['timing']['Seconds per Frame']*(timing["APT: Num Groups per Integration"]+timing["Zero Frame Efficiency Loss"])
+    #x = x[~np.isnan(y)]
+    #y = y[~np.isnan(y)]
+    x,y = raw['wave'],raw['electron_per_int']
 
     plot_flux_1d1 = Figure(tools=TOOLS,
                          x_axis_label='Wavelength [microns]',
@@ -238,7 +239,7 @@ def create_component_jwst(result_dict):
     #tab2 = Panel(child=plot_bg_1d1, title="Background Flux")
 
     # SNR 
-    y = np.sqrt(y) #this is computing the SNR (sqrt of photons in a single integration)
+    x,y = raw['snr_int'][0],raw['snr_int'][1] #this is computing the SNR (sqrt of photons in a single integration)
 
 
     plot_snr_1d1 = Figure(tools=TOOLS,

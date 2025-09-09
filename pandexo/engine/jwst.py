@@ -15,7 +15,10 @@ from pandeia.engine.calc_utils import build_default_calc, build_default_source
 
 #constant parameters.. consider putting these into json file 
 #max groups in integration
-max_ngroup = 65536.0 
+max_ngroup = {'nirspec':65536.0 ,
+              'miri':65536.0 ,
+              'niriss':65536.0 ,
+              'nircam':30}
 #minimum number of integrations
 min_nint_trans = 1
 
@@ -72,11 +75,26 @@ def compute_full_sim(dictinput,verbose=False):
     #which instrument 
     instrument = pandeia_input['configuration']['instrument']['instrument']
     conf = pandeia_input['configuration']
-    
+
+    #now fix DHS #of spectra depending on the subarray 
+    if 'dhs' in conf['instrument']['aperture']:
+        subarray = pandeia_input['configuration']['detector']['subarray']
+        nspectra = int(subarray.split('-spectra')[0][-1])#2*int(substripe[substripe.find('stripe')+6])
+        pandeia_input['configuration']['instrument']['aperture'] = f'dhs0spec{nspectra}'
+
+        #if long wave setup with dhs is asked for change to lw grism 
+        if (('32' in pandeia_input['configuration']['instrument']['filter']) or 
+            ('44' in pandeia_input['configuration']['instrument']['filter'])): 
+            pandeia_input['configuration']['instrument']['mode']='lw_tsgrism'
+            pandeia_input['configuration']['instrument']['aperture']='lw' 
+            pandeia_input['configuration']['instrument']['disperser']='grismr' 
     #if optimize is in the ngroups section, this will throw an error 
     #so create temp conf with 2 groups 
     if 'optimize' in str(conf['detector']['ngroup']): 
         conf_temp = deepcopy(conf) 
+        if 'dhs' in conf['instrument']['aperture']: 
+            #for DHS also need to swap to bright mode to get only the highest throughput spectra 
+            conf_temp['instrument']['aperture'] = 'dhs0bright'
         conf_temp['detector']['ngroup'] = 2
     else: 
         conf_temp = conf
@@ -94,7 +112,7 @@ def compute_full_sim(dictinput,verbose=False):
     exp_pars = i.the_detector.exposure_spec
     tframe =exp_pars.tframe
     nframe = exp_pars.nframe
-    nskip = exp_pars.nsample_skip
+    nskip = exp_pars.ndrop2
 
     sat_unit = pandexo_input['observation']['sat_unit']
 
@@ -160,7 +178,8 @@ def compute_full_sim(dictinput,verbose=False):
         if verbose: print("Finished Duty Cycle Calc")
 
     #calculate all timing info
-    timing, flags = compute_timing(m,transit_duration,expfact_out,noccultations)
+    max_ngroup_instrument = max_ngroup[pandeia_input["configuration"]["instrument"]["instrument"]]
+    timing, flags = compute_timing(m,transit_duration,expfact_out,noccultations,max_ngroup_instrument)
     
     #Simulate out trans and in transit
     if verbose: print("Starting Out of Transit Simulation")
@@ -257,12 +276,15 @@ def compute_full_sim(dictinput,verbose=False):
             timing["Zero Frame Efficiency Loss"])*tframe
         ti = (timing["APT: Num Groups per Integration"]+
             timing["Zero Frame Efficiency Loss"])*tframe
+        nint_in = 1
+        nint_out = 1
     else: 
         #otherwise error propagation and account for different 
         #times in transit and out 
         to = result['on_source_out']
         ti = result['on_source_in']
-
+        nint_in = result['nint_in']
+        nint_out = result['nint_out']
     var_tot = (to/ti/photon_out_bin)**2.0 * var_in_bin + (photon_in_bin*to/ti/photon_out_bin**2.0)**2.0 * var_out_bin
     error_spec = np.sqrt(var_tot)
         
@@ -293,6 +315,8 @@ def compute_full_sim(dictinput,verbose=False):
     rawstuff = {
                 'electrons_out':photon_out_bin*nocc, 
                 'electrons_in':photon_in_bin*nocc,
+                'electron_per_int':photon_out_bin/nint_out, 
+                'snr_int':[out['1d']['sn'][0],out['1d']['sn'][1]],
                 'var_in':var_in_bin*nocc, 
                 'var_out':var_out_bin*nocc,
                 'e_rate_out':photon_out_bin/to,
@@ -367,7 +391,7 @@ def compute_maxexptime_per_int(pandeia_input, sat_level):
     
     return maxexptime_per_int
         
-def compute_timing(m,transit_duration,expfact_out,noccultations): 
+def compute_timing(m,transit_duration,expfact_out,noccultations,max_ngroup_instrument): 
     """Computes all timing info for observation
     
     Computes all JWST specific timing info for observation including. Some pertinent 
@@ -437,8 +461,8 @@ def compute_timing(m,transit_duration,expfact_out,noccultations):
         #if you exceed that limit, set it to the maximum value instead.
         #also set another check for saturation
 
-        if ngroups_per_int > max_ngroup:
-            ngroups_per_int = max_ngroup
+        if ngroups_per_int > max_ngroup_instrument:
+            ngroups_per_int = max_ngroup_instrument
             flag_high = "Groups/int > max num of allowed groups"
  
         if (ngroups_per_int < mingroups) | np.isnan(ngroups_per_int):
@@ -570,7 +594,7 @@ def perform_out(pandeia_input, pandexo_input,timing, both_spec):
     """
     #pandeia inputs, simulate one integration at a time 
     pandeia_input['configuration']['detector']['ngroup'] = int(timing['APT: Num Groups per Integration'])
-    pandeia_input['configuration']['detector']['nint'] = int(timing['Num Integrations Out of Transit'])
+    pandeia_input['configuration']['detector']['nint'] = 1#int(timing['Num Integrations Out of Transit'])
     pandeia_input['configuration']['detector']['nexp'] = 1 
 
     report_out = perform_calculation(pandeia_input, dict_report=False)
@@ -623,7 +647,7 @@ def perform_in(pandeia_input, pandexo_input,timing, both_spec, out, calculation)
         #only run pandeia a third time if doing slope method and need accurate run for the 
         #nint and timing
         pandeia_input['configuration']['detector']['ngroup'] = int(timing['APT: Num Groups per Integration'])
-        pandeia_input['configuration']['detector']['nint'] = int(timing['Num Integrations In Transit'])
+        pandeia_input['configuration']['detector']['nint'] = 1#int(timing['Num Integrations In Transit'])
         pandeia_input['configuration']['detector']['nexp'] = 1
   
         in_transit_spec = np.array([both_spec['wave'], both_spec['flux_in_trans']])
@@ -932,8 +956,11 @@ def as_dict(out, both_spec ,binned, timing, mag, sat_level, warnings, punit, unb
 
     p=1.0
     if punit == 'fp/f*': p = -1.0
+    frame_loss = timing['Zero Frame Efficiency Loss']
     timing.pop("Zero Frame Efficiency Loss")
     timing_div = pd.DataFrame.from_dict(timing, orient='index')
+    #add back in so its not in html, but in timing dict 
+    timing["Zero Frame Efficiency Loss"]=frame_loss
     timing_div.columns = ['Value']
     timing_div = timing_div.to_html()
     timing_div = '<table class="table table-striped"> \n' + timing_div[36:len(timing_div)] 
@@ -944,7 +971,17 @@ def as_dict(out, both_spec ,binned, timing, mag, sat_level, warnings, punit, unb
     warnings_div = warnings_div.to_html()
     warnings_div = '<table class="table table-striped"> \n' + warnings_div[36:len(warnings_div)]
     warnings_div = warnings_div.encode()
-       
+    
+    map_dhs_names = {'sub40stripe1_dhs':'SUB40S1_2-SPECTRA',
+                     'sub80stripe2_dhs':'SUB80S2_4-SPECTRA',
+                     'sub160stripe4_dhs':'SUB160S4_8-SPECTRA',
+                     'sub256stripe4_dhs':'SUB256S4_8-SPECTRA'
+            }
+    
+    subarray = out['input']['configuration']['detector']['subarray']
+    for idhs in map_dhs_names.keys(): 
+        subarray = subarray.replace(idhs, f'{idhs} (ETC Name)/ {map_dhs_names[idhs]} (APT Name)')
+
     input_dict = {
    	 "Target Mag": mag , 
    	 "Saturation Level (electons)": sat_level, 
@@ -952,8 +989,8 @@ def as_dict(out, both_spec ,binned, timing, mag, sat_level, warnings, punit, unb
    	 "Mode": out['input']['configuration']['instrument']['mode'], 
    	 "Aperture": out['input']['configuration']['instrument']['aperture'], 
    	 "Disperser": out['input']['configuration']['instrument']['disperser'], 
-   	 "Subarray": out['input']['configuration']['detector']['subarray'], 
-   	 "Readmode": out['input']['configuration']['detector']['readmode'], 
+   	 "Subarray": subarray, 
+   	 "Readmode": out['input']['configuration']['detector']['readout_pattern'], 
  	 "Filter": out['input']['configuration']['instrument']['filter'],
  	 "Primary/Secondary": punit
     }

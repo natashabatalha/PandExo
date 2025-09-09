@@ -62,7 +62,6 @@ class ExtractSpec():
 
         #on source out versus in 
         self.exptime_per_int = self.tframe * (self.ngroups_per_int+self.frame_zero_dead )
-
         self.on_source_in = self.tframe * (self.ngroups_per_int+self.frame_zero_dead) * self.nint_in
         self.on_source_out = self.tframe * (self.ngroups_per_int+self.frame_zero_dead) * self.nint_out
 
@@ -352,27 +351,38 @@ class ExtractSpec():
 
         #In the following the SN is changed to incorporate number of occultations 
         #i.e. multiply by sqrt(n) 
-        sn_in = curves_inn['sn'][1]
-        sn_out = curves_out['sn'][1]
+        #sn_in = curves_inn['sn'][1]*np.sqrt(self.nint_in)
+        #sn_out = curves_out['sn'][1]*np.sqrt(self.nint_out)
 
-        extracted_flux_inn = curves_inn['extracted_flux'][1]*on_source_in
+        #extracted_flux_inn = curves_inn['extracted_flux'][1]*on_source_in
         
-        extracted_noise_inn = curves_inn['extracted_flux'][1]/(sn_in)
+        #extracted_noise_inn = curves_inn['extracted_flux'][1]/(sn_in)
 
-        extracted_flux_out = curves_out['extracted_flux'][1]*on_source_out
+        #extracted_flux_out = curves_out['extracted_flux'][1]*on_source_out
         
-        extracted_noise_out = curves_out['extracted_flux'][1]/(sn_out)
+        #extracted_noise_out = curves_out['extracted_flux'][1]/(sn_out)
+
+        extracted_flux_inn = curves_inn['extracted_flux'][1] * self.nint_in
+
+        extracted_flux_out = curves_out['extracted_flux'][1] * self.nint_out
+
+        extracted_noise_inn = curves_inn['extracted_noise'][1] * np.sqrt(self.nint_in)
+
+        extracted_noise_out = curves_out['extracted_noise'][1] * np.sqrt(self.nint_out)
 
         #units of this unconventional.. sigma/s
         #because snr = extracted flux / extracted noise and 
         #extracted flux in units of electrons /s
-        varin = (extracted_noise_inn*on_source_in)**2.0
-        varout = (extracted_noise_out*on_source_out)**2.0
+        #varin = (extracted_noise_inn*on_source_in)**2.0
+        #varout = (extracted_noise_out*on_source_out)**2.0
+        varin = extracted_noise_inn**2
+        varout = extracted_noise_out**2
 
         return {'photon_out_1d':extracted_flux_out, 'photon_in_1d':extracted_flux_inn, 
                     'var_in_1d':varin, 'var_out_1d': varout,'on_source_in':self.on_source_in, 
                 'on_source_out':self.on_source_out,'bkg[out,in]':[bkg_flux_out,bkg_flux_inn],
-                'rn[out,in]':[rn_var_out,rn_var_inn]}
+                'rn[out,in]':[rn_var_out,rn_var_inn], 
+                'nint_in':self.nint_in, 'nint_out':self.nint_out}
     
     
     def run_f_minus_l(self):
@@ -419,7 +429,8 @@ class ExtractSpec():
         return {'photon_out_1d':extracted_flux_out, 'photon_in_1d':extracted_flux_inn, 
                     'var_in_1d':varin, 'var_out_1d': varout,'on_source_in':self.on_source_in, 
                 'on_source_out':self.on_source_out, 'rn[out,in]':[rn_var_out,rn_var_inn], 
-                'bkg[out,in]':[bkg_flux_out,bkg_flux_inn]}
+                'bkg[out,in]':[bkg_flux_out,bkg_flux_inn], 
+                'nint_in':self.nint_in, 'nint_out':self.nint_out}
     
 
     

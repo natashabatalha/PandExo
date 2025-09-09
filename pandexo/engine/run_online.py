@@ -330,7 +330,7 @@ class CalculationNewHandler(BaseHandler):
 
                 star_name = getStarName(planet_name)
 
-                exodata["star"]["jmag"] = Simbad.query_object(star_name)['FLUX_J'][0] #planet_data['Jmag']
+                exodata["star"]["jmag"] = Simbad.query_object(star_name)['J'][0] #planet_data['Jmag']
                 exodata["star"]["ref_wave"] = 1.25
 
                 # optional star radius
@@ -374,6 +374,7 @@ class CalculationNewHandler(BaseHandler):
                 'flat':['NO GRID DB FOUND']})
             all_planets =  pd.read_csv('https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=select+pl_name+from+PSCompPars&format=csv')
             all_planets = sorted(all_planets['pl_name'].values)
+
             return self.render("new.html", id=id,
                                 temp=list(map(str, self.header.temp.unique())),
                                 data=exodata,
@@ -517,6 +518,19 @@ class CalculationNewHandler(BaseHandler):
                     pandata["configuration"]["instrument"]["filter"] = self.get_argument("nircammode")
                     pandata["configuration"]["detector"]["subarray"] = self.get_argument("nircamsubarray")
 
+            if instrument == "nircamdhs":
+                with open(os.path.join(os.path.dirname(__file__), "reference", "nircam_dhs_input.json")) as data_file:
+                    pandata = json.load(data_file)
+                    #sw or lw for display?
+                    sw_or_lw = self.get_argument("nircammode") 
+                    filter_to_sim = f'nircam{sw_or_lw}'
+                    if 'sw' in filter_to_sim: 
+                        pair_filter='nircamlw'
+                    else: 
+                        pair_filter='nircamsw'
+                    pandata["configuration"]["instrument"]["filter"] = self.get_argument(filter_to_sim)
+                    pandata["configuration"]["instrument"]["pandexofilterpair"] = self.get_argument(pair_filter)
+                    pandata["configuration"]["detector"]["subarray"] = self.get_argument("nircamsubarray")
             if instrument == "niriss":
                 with open(os.path.join(os.path.dirname(__file__), "reference", "niriss_input.json")) as data_file:
                     pandata = json.load(data_file)
@@ -526,7 +540,7 @@ class CalculationNewHandler(BaseHandler):
                     if pandata["configuration"]["detector"]["subarray"] == "substrip256":
                         pandata['strategy']['order'] = int(self.get_argument('nirissorders'))
 
-            pandata['configuration']['instrument']['instrument'] = instrument
+            pandata['configuration']['instrument']['instrument'] = instrument.replace('dhs','')
             
             # write in optimal groups or set a number
             try:

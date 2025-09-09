@@ -17,7 +17,8 @@
         "scanDirection": "Forward or Round Trip",
         "schedulability":"30 or 100",
         "windowSize": 20, 
-        "useFirstOrbit":false
+        "useFirstOrbit":false, 
+        "calculateRamp":false
 
     }
 }
