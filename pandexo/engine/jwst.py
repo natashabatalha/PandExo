@@ -78,8 +78,8 @@ def compute_full_sim(dictinput,verbose=False):
 
     #now fix DHS #of spectra depending on the subarray 
     if 'dhs' in conf['instrument']['aperture']:
-        substripe = pandeia_input['configuration']['detector']['subarray']
-        nspectra = 2*int(substripe[substripe.find('stripe')+6])
+        subarray = pandeia_input['configuration']['detector']['subarray']
+        nspectra = int(subarray.split('-spectra')[0][-1])#2*int(substripe[substripe.find('stripe')+6])
         pandeia_input['configuration']['instrument']['aperture'] = f'dhs0spec{nspectra}'
 
         #if long wave setup with dhs is asked for change to lw grism 

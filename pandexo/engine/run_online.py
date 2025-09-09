@@ -330,7 +330,7 @@ class CalculationNewHandler(BaseHandler):
 
                 star_name = getStarName(planet_name)
 
-                exodata["star"]["jmag"] = Simbad.query_object(star_name)['FLUX_J'][0] #planet_data['Jmag']
+                exodata["star"]["jmag"] = Simbad.query_object(star_name)['J'][0] #planet_data['Jmag']
                 exodata["star"]["ref_wave"] = 1.25
 
                 # optional star radius
@@ -374,6 +374,7 @@ class CalculationNewHandler(BaseHandler):
                 'flat':['NO GRID DB FOUND']})
             all_planets =  pd.read_csv('https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=select+pl_name+from+PSCompPars&format=csv')
             all_planets = sorted(all_planets['pl_name'].values)
+
             return self.render("new.html", id=id,
                                 temp=list(map(str, self.header.temp.unique())),
                                 data=exodata,

@@ -54,7 +54,7 @@
         },
     "detector": {
             "readout_pattern":"rapid",
-            "subarray": "sub256stripe4_dhs",
+            "subarray": "sub260s4_8-spectra",
             "ngroup": "optimize",
             "nint": 1,
             "nexp": 10
