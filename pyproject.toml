@@ -1,0 +1,63 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pandexo.engine"
+version = "4.0.0"
+authors = [
+  { name="Natasha Batalha at NASA Ames", email="natasha.e.batalha@nasa.gov" },
+]
+description = "pandexo transiting exoplanet simulator"
+readme = "README.rst"
+license = { text="GPL" }
+requires-python = ">=3.6"
+classifiers = [
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: Astronomy",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "pandeia.engine==4.0",
+    "numpy>=1.21,<2.0",
+    "bokeh==3.5.1",
+    "tornado",
+    "pandas",
+    "joblib",
+    "photutils",
+    "astropy",
+    "synphot>=1.0",
+    "stsynphot>=1.0",
+    "pysynphot",
+    "sqlalchemy",
+    "astroquery",
+    "scipy>=1.9.2",
+    "batman-package",
+]
+
+[project.urls]
+Homepage = "https://natashabatalha.github.io/PandExo"
+"Source Code" = "https://github.com/natashabatalha/PandExo"
+
+[project.scripts]
+start_pandexo = "pandexo.engine.run_online:main"
+
+[tool.setuptools]
+packages = [
+    "pandexo",
+    "pandexo.engine",
+    "pandexo.engine.reference",
+    "pandexo.engine.static",
+    "pandexo.engine.static.css",
+    "pandexo.engine.static.fonts",
+    "pandexo.engine.static.img",
+    "pandexo.engine.static.js",
+    "pandexo.engine.temp",
+    "pandexo.engine.templates",
+    "pandexo.engine.utils",
+]
+include-package-data = true
