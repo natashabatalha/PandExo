@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pandexo.engine"
-version = "4.0.0"
+version = "5.0.0"
 authors = [
   { name="Natasha Batalha at NASA Ames", email="natasha.e.batalha@nasa.gov" },
 ]
@@ -22,17 +22,15 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 dependencies = [
-    "pandeia.engine==4.0",
-    "numpy>=1.21,<2.0",
+    "pandeia.engine==2025.7",
+    "numpy>=1.21",
     "bokeh==3.5.1",
     "tornado",
     "pandas",
-    "joblib",
     "photutils",
     "astropy",
     "synphot>=1.0",
     "stsynphot>=1.0",
-    "pysynphot",
     "sqlalchemy",
     "astroquery",
     "scipy>=1.9.2",

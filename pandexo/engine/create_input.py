@@ -6,10 +6,18 @@ import astropy.units as u
 import astropy.constants as c
 import os 
 from astropy.modeling.models import BlackBody
-import warnings
-with warnings.catch_warnings():
-    warnings.filterwarnings("ignore")
-    import pysynphot as psyn
+#import warnings
+#with warnings.catch_warnings():
+#    warnings.filterwarnings("ignore")
+#    import pysynphot as psyn
+
+from synphot.models import Empirical1D
+from synphot import SourceSpectrum
+from synphot import units
+import stsynphot as sts
+import synphot as syn
+from pandeia.engine import constants 
+VEGA_FILE=constants.VEGA_FILE
     
 def outTrans(input) :
     """Compute out of transit spectra
@@ -79,21 +87,26 @@ def outTrans(input) :
         else: 
             raise Exception('Units are not correct. Pick FLAM or Jy or erg/cm2/s/Hz')
 
-        sp = psyn.ArraySpectrum(wave, flux, waveunits=PANDEIA_WAVEUNITS, fluxunits=PANDEIA_FLUXUNITS)        #Convert evrything to nanometer for converstion based on gemini.edu  
-        sp.convert("nm")
-        sp.convert('jy')
+        ST_SS = SourceSpectrum(Empirical1D, points=wave*u.Unit(PANDEIA_WAVEUNITS), lookup_table=flux*u.Unit(PANDEIA_FLUXUNITS))
+        #sp = psyn.ArraySpectrum(wave, flux, waveunits=PANDEIA_WAVEUNITS, fluxunits=PANDEIA_FLUXUNITS)        #Convert evrything to nanometer for converstion based on gemini.edu  
+        #sp.convert("nm")
+        #sp.convert('jy')
+        #flux_star = ST_SS(ST_SS.waveset,flux_unit=u.Unit('erg*cm^(-3)*s^(-1)')).value
 
     ############ PHOENIX ################################################
     elif input['type'] =='phoenix':
+        
+
         #make sure metal is not out of bounds
         if input['metal'] > 0.5: input['metal'] = 0.5
-        sp = psyn.Icat("phoenix", input['temp'], input['metal'], input['logg'])
-        sp.convert("nm")
-        sp.convert("jy")
-        wave = sp.wave
-        flux = sp.flux
-        input['w_unit'] ='nm'
-        input['f_unit'] = 'jy'
+        ST_SS = sts.grid_to_spec('phoenix', input['temp'], input['metal'], input['logg'])
+        #sp = psyn.Icat("phoenix", input['temp'], input['metal'], input['logg'])
+        #sp.convert("nm")
+        #sp.convert("jy")
+        #wave = sp.wave
+        #flux = sp.flux
+        #input['w_unit'] ='nm'
+        #input['f_unit'] = 'jy'
         
     else: 
         raise Exception('Wrong input type for stellar spectra')
@@ -119,20 +132,25 @@ def outTrans(input) :
     if not os.path.exists(bp_path): 
         raise Exception("Oops! PandExo 2.0 now requires users to download this file https://archive.stsci.edu/hlsps/reference-atlases/hlsp_reference-atlases_hst_multi_everything_multi_v11_sed.tar it will untar with the structure grp/redcat/trds. Please place the directories nonhst and comp into this folder: "+refdata)
 
-    bp = psyn.FileBandpass(bp_path)
+    default_refdata_directory = os.environ['pandeia_refdata']
+    VEGA = syn.spectrum.SourceSpectrum.from_file(f"{default_refdata_directory}/sed/hst_calspec/{VEGA_FILE}")
+    bp = syn.spectrum.SpectralElement.from_file(bp_path)#psyn.FileBandpass(bp_path)
 
-    sp.convert('angstroms')
-    bp.convert('angstroms')
+    #sp.convert('angstroms')
+    #bp.convert('angstroms')
 
-    rn_sp = sp.renorm(mag, 'vegamag', bp)
+    #rn_sp = sp.renorm(mag, 'vegamag', bp)
 
 
-    rn_sp.convert("microns")
-    rn_sp.convert("mjy")
+    #rn_sp.convert("microns")
+    #rn_sp.convert("mjy")
 
-    flux_out_trans = rn_sp.flux
-    wave = rn_sp.wave
-    return {'flux_out_trans': flux_out_trans, 'wave': wave,'phoenix':sp} 
+    ST_SS_norm = ST_SS.normalize(
+         mag * units.VEGAMAG, band=bp, vegaspec=VEGA)
+
+    flux_out_trans = ST_SS_norm(ST_SS_norm.waveset,flux_unit=u.Unit('mJy')).value#rn_sp.flux
+    wave = (ST_SS_norm.waveset).to(u.um).value #rn_sp.wave
+    return {'flux_out_trans': flux_out_trans, 'wave': wave,'phoenix':ST_SS_norm} 
 
 
 def bothTrans(out_trans, planet,star=None) :
