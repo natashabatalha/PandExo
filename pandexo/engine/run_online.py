@@ -516,9 +516,10 @@ class CalculationNewHandler(BaseHandler):
             if instrument == "nircam":
                 with open(os.path.join(os.path.dirname(__file__), "reference", "nircam_input.json")) as data_file:
                     pandata = json.load(data_file) 
-                    pandata["configuration"]["instrument"]["filter"] = self.get_argument("nircammode")
+                    sw_or_lw = self.get_argument("nircammode") 
+                    filter_to_sim = f'nircam{sw_or_lw}'
+                    pandata["configuration"]["instrument"]["filter"] = self.get_argument(filter_to_sim)
                     pandata["configuration"]["detector"]["subarray"] = self.get_argument("nircamsubarray")
-
             if instrument == "nircamdhs":
                 with open(os.path.join(os.path.dirname(__file__), "reference", "nircam_dhs_input.json")) as data_file:
                     pandata = json.load(data_file)
@@ -526,7 +527,7 @@ class CalculationNewHandler(BaseHandler):
                     sw_or_lw = self.get_argument("nircammode") 
                     filter_to_sim = f'nircam{sw_or_lw}'
                     if 'sw' in filter_to_sim: 
-                        pair_filter='nircamlw'
+                        pair_filter='nircamlw'#the pair is the opposite
                     else: 
                         pair_filter='nircamsw'
                     pandata["configuration"]["instrument"]["filter"] = self.get_argument(filter_to_sim)
@@ -853,7 +854,7 @@ class CalculationDownloadHandler(BaseHandler):
     """
     def get(self, id):
         result = self._get_task_result(id)
-  
+
         if self.request.connection.stream.closed():
             return
         file_name = "ETC-calculation" +id+".p"
