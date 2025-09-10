@@ -99,7 +99,6 @@ def compute_full_sim(dictinput,verbose=False):
     else: 
         conf_temp = conf
 
-
     i = InstrumentFactory(config=conf_temp)
     
     #detector parameters

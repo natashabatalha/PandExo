@@ -495,6 +495,7 @@ class CalculationNewHandler(BaseHandler):
                     exodata["observation"]["noise_floor"] = 0.0
 
             instrument = self.get_argument("instrument").lower()
+
             if instrument == "miri":
                 with open(os.path.join(os.path.dirname(__file__), "reference", "miri_input.json")) as data_file:
                     pandata = json.load(data_file)       
@@ -530,7 +531,7 @@ class CalculationNewHandler(BaseHandler):
                         pair_filter='nircamsw'
                     pandata["configuration"]["instrument"]["filter"] = self.get_argument(filter_to_sim)
                     pandata["configuration"]["instrument"]["pandexofilterpair"] = self.get_argument(pair_filter)
-                    pandata["configuration"]["detector"]["subarray"] = self.get_argument("nircamsubarray")
+                    pandata["configuration"]["detector"]["subarray"] = self.get_argument("nircamsubarraydhs")
             if instrument == "niriss":
                 with open(os.path.join(os.path.dirname(__file__), "reference", "niriss_input.json")) as data_file:
                     pandata = json.load(data_file)
