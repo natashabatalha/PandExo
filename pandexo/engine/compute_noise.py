@@ -62,8 +62,8 @@ class ExtractSpec():
 
         #on source out versus in 
         self.exptime_per_int = self.tframe * (self.ngroups_per_int+self.frame_zero_dead )
-        self.on_source_in = self.tframe * (self.ngroups_per_int+self.frame_zero_dead) * self.nint_in
-        self.on_source_out = self.tframe * (self.ngroups_per_int+self.frame_zero_dead) * self.nint_out
+        self.on_source_in =  self.inn['scalar']['measurement_time'] * self.nint_in #self.tframe * (self.ngroups_per_int+self.frame_zero_dead)
+        self.on_source_out = self.out['scalar']['measurement_time'] * self.nint_out #self.tframe * (self.ngroups_per_int+self.frame_zero_dead) 
 
     def loopingL(self, cen, signal_col, noise_col, bkg_col):
         """Finds bottom of the optimal extraction region.
@@ -408,7 +408,7 @@ class ExtractSpec():
         on_source_out = self.on_source_out
 
         #calculate rn 
-        rn_var = self.rn**2.0
+        rn_var = 2* self.rn**2.0
                 
         #1d rn     = rn/pix * # of integrations   * #pixs
         rn_var_inn = rn_var * self.nint_in * self.extraction_area 
