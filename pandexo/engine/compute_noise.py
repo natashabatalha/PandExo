@@ -408,7 +408,7 @@ class ExtractSpec():
         on_source_out = self.on_source_out
 
         #calculate rn 
-        rn_var = 2* self.rn**2.0
+        rn_var = self.rn**2.0
                 
         #1d rn     = rn/pix * # of integrations   * #pixs
         rn_var_inn = rn_var * self.nint_in * self.extraction_area 
