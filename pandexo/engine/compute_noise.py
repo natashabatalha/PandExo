@@ -341,7 +341,7 @@ class ExtractSpec():
         bkg_flux_out = curves_out['extracted_bg_only'][1] * on_source_out
 
         #calculate rn 
-        rn_var = 2.0*self.rn**2.0
+        rn_var = self.rn**2.0
                 
         #1d rn     = rn/pix * # of integrations * #extraction area 
         #not used for noise calcualtions here 
