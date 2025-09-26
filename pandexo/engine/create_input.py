@@ -16,6 +16,7 @@ from synphot import SourceSpectrum
 from synphot import units
 import stsynphot as sts
 import synphot as syn
+import copy 
 from pandeia.engine import constants 
 VEGA_FILE=constants.VEGA_FILE
     
@@ -144,13 +145,13 @@ def outTrans(input) :
 
     #rn_sp.convert("microns")
     #rn_sp.convert("mjy")
-
+    ST_return = copy.deepcopy(ST_SS)
     ST_SS_norm = ST_SS.normalize(
          mag * units.VEGAMAG, band=bp, vegaspec=VEGA)
 
     flux_out_trans = ST_SS_norm(ST_SS_norm.waveset,flux_unit=u.Unit('mJy')).value#rn_sp.flux
     wave = (ST_SS_norm.waveset).to(u.um).value #rn_sp.wave
-    return {'flux_out_trans': flux_out_trans, 'wave': wave,'phoenix':ST_SS_norm} 
+    return {'flux_out_trans': flux_out_trans, 'wave': wave,'phoenix':ST_return} 
 
 
 def bothTrans(out_trans, planet,star=None) :
@@ -210,7 +211,9 @@ def bothTrans(out_trans, planet,star=None) :
         elif planet['f_unit'] == 'fp/f*':
             planet['w_unit'] = 'um'
             wave_planet = out_trans['wave'][(out_trans['wave']>0.5) & (out_trans['wave']<15)]
-            flux_star = (out_trans['phoenix'].flux*(u.Jy)).to(u.mJy)[(out_trans['wave']>0.5) & (out_trans['wave']<15)]
+            flux_star = out_trans['phoenix'](out_trans['phoenix'].waveset,flux_unit=u.Unit('mJy')).value
+            flux_star = flux_star[(out_trans['wave']>0.5) & (out_trans['wave']<15)]
+            #flux_star = (out_trans['phoenix'].flux*(u.Jy)).to(u.mJy)[(out_trans['wave']>0.5) & (out_trans['wave']<15)]
             #MAKING SURE TO ADD IN SUPID PI FOR PER STERADIAN!!!!
             bb = BlackBody(temperature=planet['temp']*u.K) 
             flux_planet = (bb(wave_planet*u.micron)*np.pi*u.sr).to(u.mJy)
