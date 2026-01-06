@@ -91,7 +91,7 @@ setup(
     install_requires=[
           'pandeia.engine==3.0',
           'numpy',
-          'bokeh==3.0.2',
+          'bokeh==3.8.2',
           'tornado',
           'pandas',
           'joblib',
