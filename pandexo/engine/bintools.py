@@ -3,7 +3,7 @@ import numpy as np
 import warnings
 with warnings.catch_warnings():
 	warnings.filterwarnings("ignore")
-	import pysynphot.binning as astrobin 
+	import synphot.binning as astrobin 
 import warnings as warn
 import astropy.units as u
 def binning(x, y,  dy=None, binwidth=None, r=None,newx= None, log = False, nan=False):
