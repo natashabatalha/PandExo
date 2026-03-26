@@ -81,8 +81,8 @@ def create_component_jwst(result_dict):
                                title="Original Model with Observation")
     
     plot_spectrum.line(result_dict['OriginalInput']['model_wave'],result_dict['OriginalInput']['model_spec'], color= "black", alpha = 0.5, line_width = 4)
-        
-    plot_spectrum.circle('x', 'y', source=source, line_width=3, line_alpha=0.6)
+    radius_size = np.diff(ylims)[0]/20
+    plot_spectrum.circle('x', 'y', source=source, line_width=3, line_alpha=0.6,radius=radius_size)
     plot_spectrum.multi_line('x_err', 'y_err', source=source)
 
     callback = CustomJS(args=dict(source=source, original=original), code="""
@@ -515,9 +515,9 @@ def create_component_hst(result_dict):
                                  x_axis_label='Orbital Phase',
                                  y_axis_label='Flux', 
                                title="Earliest Start Time")
-    
+    radius = (np.max(trmodel1)-np.min(trmodel1))/20
     early.line(phase1, trmodel1, color='black',alpha=0.5, line_width = 4)
-    early.circle(obsphase1, obstr1, line_width=3, line_alpha=0.6)
+    early.circle(obsphase1, obstr1, line_width=3, line_alpha=0.6,radius=radius)
     early.multi_line(x_err1, y_err1)
      
     late = Figure(width=400, height=300, 
@@ -526,7 +526,7 @@ def create_component_hst(result_dict):
                                  y_axis_label='Flux', 
                                title="Latest Start Time")
     late.line(phase2, trmodel2, color='black',alpha=0.5, line_width = 3)
-    late.circle(obsphase2, obstr2, line_width=3, line_alpha=0.6)
+    late.circle(obsphase2, obstr2, line_width=3, line_alpha=0.6,radius=radius)
     late.multi_line(x_err2, y_err2)
         
     start_time = row(early, late)
@@ -570,9 +570,10 @@ def create_component_hst(result_dict):
                                  y_axis_label='Flux [electrons/pixel]',
                                title="Earliest Start Time" + title_description)
 
-
+    
     early.line(phase1, model_counts1, color='black', alpha=0.5, line_width=4)
-    early.circle(obsphase1, counts1, line_width=3, line_alpha=0.6)
+    radius = (np.max(counts1)-np.min(counts1))/20
+    early.circle(obsphase1, counts1, line_width=3, line_alpha=0.6,radius=radius)
     early.multi_line(x_err1, y_err1)
 
     late = Figure(width=400, height=300,
@@ -582,7 +583,8 @@ def create_component_hst(result_dict):
                   title="Latest Start Time" + title_description)
 
     late.line(phase2, model_counts2, color='black', alpha=0.5, line_width=3)
-    late.circle(obsphase2, counts2, line_width=3, line_alpha=0.6)
+    radius = (np.max(counts2)-np.min(counts2))/20
+    late.circle(obsphase2, counts2, line_width=3, line_alpha=0.6,radius=radius)
     late.multi_line(x_err2, y_err2)
 
     start_time = row(early, late)
