@@ -79,12 +79,12 @@ def outTrans(input) :
         #convert to photons/s/nm/m^2 for flux normalization based on 
         #http://www.gemini.edu/sciops/instruments/integration-time-calculators/itc-help/source-definition
         if input['f_unit'] == 'Jy':
-            PANDEIA_FLUXUNITS = 'jy' 
+            PANDEIA_FLUXUNITS = 'Jy' 
         elif input['f_unit'] == 'FLAM' :
             PANDEIA_FLUXUNITS = 'FLAM'
         elif input['f_unit'] == 'erg/cm2/s/Hz':
             flux = flux*1e23
-            PANDEIA_FLUXUNITS = 'jy' 
+            PANDEIA_FLUXUNITS = 'Jy' 
         else: 
             raise Exception('Units are not correct. Pick FLAM or Jy or erg/cm2/s/Hz')
 
