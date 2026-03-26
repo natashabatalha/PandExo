@@ -421,9 +421,14 @@
         <div class="col-md-4" id="NIRISS">
             <select id="nirissmode" name="nirissmode" onchange="show_dropdown()" class="form-control" data-placeholder="Select NIRISS Mode">
                 <option value=""></option>
-                <option value="substrip96">Substrip 96</option>
-                <option value="substrip256">Substrip 256</option>
+                <option value="substrip256">Substrip 256 (bright limit=8.5)</option>
+                <option value="substrip96">Substrip 96 (bright limit=6.3)</option>
+                <option value="sub17stripe_soss">MULTISTRIPE SUB17</option>
+                <option value="sub60stripe_soss">MULTISTRIPE SUB60</option>
+                <option value="sub204stripe_soss">MULTISTRIPE SUB204</option>
+                <option value="sub680stripe_soss">MULTISTRIPE SUB680</option>
             </select>
+            <p class="help-block">Are you dimmer than 8.5? Pick sub256, Between mag of 6.3-8.5, don't care about Order 2? Pick sub96. Otherwise, explore trade offs between worse SNR in multistripe and/or partial saturation in sub96/sub256. </p>
             <div id="order2_dropdown" style="display:none">
                 <select id="nirissorders" name="nirissorders" class="form-control">
                     <option value="1">Order 1</option>
@@ -435,10 +440,10 @@
 
         <script type="text/javascript">
             function show_dropdown() {
-                if(document.getElementById('nirissmode').value == "substrip96") {
-                    document.getElementById('order2_dropdown').style.display = 'none';
-                } else {
+                if(document.getElementById('nirissmode').value == "substrip256") {
                     document.getElementById('order2_dropdown').style.display = 'block';
+                } else {
+                    document.getElementById('order2_dropdown').style.display = 'none';
                 }
             }
         </script>

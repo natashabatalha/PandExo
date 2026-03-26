@@ -460,7 +460,12 @@ def subarrays(inst):
   print("Subarray field stored in inst_dict['configuration']['detector']['subarray']")
 
   if inst.lower() == 'niriss':
-    return {'substrip96':2.2129,'substrip256':5.4913}
+    return {'substrip96':2.2129,'substrip256':5.4913, 
+            "sub17stripe_soss":0.06164,
+            "sub60stripe_soss":0.17688,
+            "sub204stripe_soss":0.5628,
+            "sub680stripe_soss": 1.83848
+            }
   elif inst.lower() == 'nirspec':
     return {'sub1024a':0.451,'sub1024b':0.451,'sub2048':0.90156,'sub512':0.22572,'sub512s':0.14392}
   elif inst.lower() == 'miri':
