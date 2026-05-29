@@ -18,7 +18,7 @@ except ImportError:
     from ez_setup import use_setuptools
     use_setuptools()
     from setuptools import setup
-import sys 
+import sys
 PY_V = sys.version_info
 
 docs_requires = [
@@ -121,8 +121,8 @@ setup(
     install_requires=[
           'pandeia.engine==3.0',
           'numpy<2',  # Needed to avoid deprecations
-          'bokeh==3.0.2',
-          'ipython<9',  # Needed for bokeh==3.0.2 notebook display compatibility
+          'bokeh>=3.4,<4',
+          'ipython',
           'tornado',
           'pandas',
           'joblib',
