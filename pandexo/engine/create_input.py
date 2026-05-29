@@ -247,11 +247,15 @@ def bothTrans(out_trans, planet,star=None) :
             planet['flat'] = 0 
             planet['ray'] = 0 
 
-        #we are only using gravity of 25 and scaling by mass from there 
-        fort_grav = 25.0*u.m/u.s/u.s
+        #we are only using gravity of 25 m/s2 and scaling by mass from there
+        fort_grav = 25.0
+        fort_grav_unit = fort_grav*u.m/u.s/u.s
         df = header.loc[(header.gravity==fort_grav) & (header.temp==planet['temp'])
                            & (header.noTiO==planet['noTiO']) & (header.ray==planet['ray']) &
                            (header.flat==planet['flat'])]
+        if len(df) == 0:
+            raise ValueError('No Fortney grid model found for temp={}, chem={}, cloud={}'.format(
+                planet['temp'], planet['chem'], planet['cloud']))
         wave_planet=np.array(pd.read_sql_table(df['name'].values[0],db)['wavelength'])[::-1]
 
         r_lambda=np.array(pd.read_sql_table(df['name'].values[0],db)['radius'])*u.km
@@ -263,11 +267,11 @@ def bothTrans(out_trans, planet,star=None) :
             gravity = c.G*(mass)/(rplan.to(u.m))**2.0 #convert radius to m for gravity units
             #scale lambbda (this technically ignores the fact that scaleheight is altitude dependent)
             #therefore, it will not be valide for very very low gravities
-            z_lambda = z_lambda*fort_grav/gravity
+            z_lambda = z_lambda*fort_grav_unit/gravity
         except: 
             #keep original z lambda 
             gravity=25.0
-            z_lambda = z_lambda*fort_grav/fort_grav
+            z_lambda = z_lambda*fort_grav_unit/fort_grav_unit
             print('Default Planet Gravity of 25 m/s2 given')  
         
         #create new wavelength dependent R based on scaled ravity
@@ -449,11 +453,15 @@ def hst_spec(planet,star) :
             planet['flat'] = 0 
             planet['ray'] = 0 
 
-        #we are only using gravity of 25 and scaling by mass from there 
-        fort_grav = 25.0*u.m/u.s/u.s
+        #we are only using gravity of 25 m/s2 and scaling by mass from there
+        fort_grav = 25.0
+        fort_grav_unit = fort_grav*u.m/u.s/u.s
         df = header.loc[(header.gravity==fort_grav) & (header.temp==planet['temp'])
                            & (header.noTiO==planet['noTiO']) & (header.ray==planet['ray']) &
                            (header.flat==planet['flat'])]
+        if len(df) == 0:
+            raise ValueError('No Fortney grid model found for temp={}, chem={}, cloud={}'.format(
+                planet['temp'], planet['chem'], planet['cloud']))
         wave_planet=np.array(pd.read_sql_table(df['name'].values[0],db)['wavelength'])[::-1]
 
         r_lambda=np.array(pd.read_sql_table(df['name'].values[0],db)['radius'])*u.km
@@ -465,11 +473,11 @@ def hst_spec(planet,star) :
             gravity = c.G*(mass)/(rplan.to(u.m))**2.0 #convert radius to m for gravity units
             #scale lambbda (this technically ignores the fact that scaleheight is altitude dependent)
             #therefore, it will not be valide for very very low gravities
-            z_lambda = z_lambda*fort_grav/gravity
+            z_lambda = z_lambda*fort_grav_unit/gravity
         except: 
             #keep original z lambda 
             gravity=25.0
-            z_lambda = z_lambda*fort_grav/fort_grav
+            z_lambda = z_lambda*fort_grav_unit/fort_grav_unit
             print('Default Planet Gravity of 25 m/s2 given')  
         
         #create new wavelength dependent R based on scaled ravity

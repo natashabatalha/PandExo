@@ -26,6 +26,17 @@ exo_dict['planet']['r_unit'] = 'R_jup'
 exo_dict['planet']['transit_duration'] = 2.0*60.0*60.0 
 exo_dict['planet']['td_unit'] = 's'
 exo_dict['planet']['f_unit'] = 'rp^2/r*^2'
+
+
+def assert_sorted_wavelengths(result, inst):
+    wave = np.asarray(result['FinalSpectrum']['wave'])
+    assert np.all(np.diff(wave) >= 0), f'{inst} produced unsorted wavelengths'
+
+
 print('Starting TEST run')
-jdi.run_pandexo(exo_dict, ['NIRSpec G140H'], save_file=False)
+nirspec_result = jdi.run_pandexo(exo_dict, ['NIRSpec G140H'], save_file=False)
+assert_sorted_wavelengths(nirspec_result, 'NIRSpec G140H')
+
+miri_result = jdi.run_pandexo(exo_dict, ['MIRI LRS'], save_file=False)
+assert_sorted_wavelengths(miri_result, 'MIRI LRS')
 print('SUCCESS') 
