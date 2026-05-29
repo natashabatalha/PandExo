@@ -222,9 +222,11 @@ def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', out
 
 
         if legend:
-            fig1d.circle(data['x'], data['y'], color=colors[i], legend = legend_keys[i])
+            fig1d.scatter(data['x'], data['y'], marker='circle', color=colors[i],
+                          size=6, legend_label=legend_keys[i])
         else:
-            fig1d.circle(data['x'], data['y'], color=colors[i])
+            fig1d.scatter(data['x'], data['y'], marker='circle', color=colors[i],
+                          size=6)
         outx += [data['x'].values]
         outy += [data['y'].values]
         oute += [data['err'].values]
@@ -534,7 +536,8 @@ def jwst_noise(result_dict, plot=True, output_file= 'noise.html'):
                          y_axis_label='Error on Spectrum (PPM)', title="Error Curve",
                          width=800, height=300, y_range = [0,2.0*ymed])
     ymed = np.median(y)
-    plot_noise_1d1.circle(x, y, line_width = 4, alpha = .7)
+    plot_noise_1d1.scatter(x, y, marker='circle', size=6, line_width = 4,
+                           alpha = .7)
     if plot:
         outputfile(output_file)
         show(plot_noise_1d1)
@@ -699,7 +702,8 @@ def hst_spec(result_dict, plot=True, output_file ='hstspec.html', model = True, 
         np.array(y_err.append((py - yerr, py + yerr)))
     if model:
         plot_spectrum.line(mwave,mspec, color= "black", alpha = 0.5, line_width = 4)
-    plot_spectrum.circle(binwave,binspec, line_width=3, line_alpha=0.6)
+    plot_spectrum.scatter(binwave,binspec, marker='circle', size=6,
+                          line_width=3, line_alpha=0.6)
     plot_spectrum.multi_line(x_err, y_err)
 
     if output_notebook & plot:
@@ -777,7 +781,8 @@ def hst_time(result_dict, plot=True, output_file ='hsttime.html', model = True, 
                                title="Earliest Start Time")
 
     if model: early.line(phase1, trmodel1, color='black',alpha=0.5, line_width = 4)
-    early.circle(obsphase1, obstr1, line_width=3, line_alpha=0.6)
+    early.scatter(obsphase1, obstr1, marker='circle', size=6, line_width=3,
+                  line_alpha=0.6)
     early.multi_line(x_err1, y_err1)
 
     late = Figure(width=400, height=300,
@@ -786,7 +791,8 @@ def hst_time(result_dict, plot=True, output_file ='hsttime.html', model = True, 
                                  y_axis_label='Flux',
                                title="Latest Start Time")
     if model: late.line(phase2, trmodel2, color='black',alpha=0.5, line_width = 3)
-    late.circle(obsphase2, obstr2, line_width=3, line_alpha=0.6)
+    late.scatter(obsphase2, obstr2, marker='circle', size=6, line_width=3,
+                 line_alpha=0.6)
     late.multi_line(x_err2, y_err2)
 
     start_time = row(early, late)
@@ -876,7 +882,8 @@ def hst_simulated_lightcurve(result_dict, plot=True, output_file ='hsttime.html'
 
     if model:
         early.line(phase1, model_counts1, color='black', alpha=0.5, line_width=4)
-    early.circle(obsphase1, counts1, line_width=3, line_alpha=0.6)
+    early.scatter(obsphase1, counts1, marker='circle', size=6, line_width=3,
+                  line_alpha=0.6)
     early.multi_line(x_err1, y_err1)
 
     late = Figure(width=400, height=300,
@@ -886,7 +893,8 @@ def hst_simulated_lightcurve(result_dict, plot=True, output_file ='hsttime.html'
                   title="Latest Start Time" + title_description)
     if model:
         late.line(phase2, model_counts2, color='black', alpha=0.5, line_width=3)
-    late.circle(obsphase2, counts2, line_width=3, line_alpha=0.6)
+    late.scatter(obsphase2, counts2, marker='circle', size=6, line_width=3,
+                 line_alpha=0.6)
     late.multi_line(x_err2, y_err2)
 
     start_time = row(early, late)

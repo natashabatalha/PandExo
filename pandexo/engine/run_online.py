@@ -9,6 +9,7 @@ import tornado.ioloop
 import tornado.options
 import tornado.web
 from tornado.options import define, options
+from bokeh.resources import CDN
 
 import traceback
 from sqlalchemy import *
@@ -119,6 +120,14 @@ class BaseHandler(tornado.web.RequestHandler):
     """
     executor = ProcessPoolExecutor(max_workers=16)
     buffer = OrderedDict()
+
+    def get_template_namespace(self):
+        namespace = super(BaseHandler, self).get_template_namespace()
+        namespace.update({
+            'bokeh_css': CDN.render_css(),
+            'bokeh_js': CDN.render_js(),
+        })
+        return namespace
 
     def _get_task_response(self, id):
         """

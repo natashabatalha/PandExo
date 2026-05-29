@@ -82,7 +82,8 @@ def create_component_jwst(result_dict):
     
     plot_spectrum.line(result_dict['OriginalInput']['model_wave'],result_dict['OriginalInput']['model_spec'], color= "black", alpha = 0.5, line_width = 4)
         
-    plot_spectrum.circle('x', 'y', source=source, line_width=3, line_alpha=0.6)
+    plot_spectrum.scatter('x', 'y', source=source, marker='circle', size=6,
+                          line_width=3, line_alpha=0.6)
     plot_spectrum.multi_line('x_err', 'y_err', source=source)
 
     callback = CustomJS(args=dict(source=source, original=original), code="""
@@ -264,7 +265,8 @@ def create_component_jwst(result_dict):
                          y_axis_label='Spectral Precision (ppm)', title="Spectral Precision",
                          width=800, height=300, y_range = [0,2.0*ymed])
     ymed = np.median(y)
-    plot_noise_1d1.circle('x', 'y', line_width = 4, alpha = .7, source=source2)
+    plot_noise_1d1.scatter('x', 'y', marker='circle', size=6,
+                           line_width = 4, alpha = .7, source=source2)
 
     callback2 = CustomJS(args=dict(source=source2, original=original2), code="""
             // Grab some references to the data
@@ -496,7 +498,8 @@ def create_component_hst(result_dict):
         np.array(y_err.append((py - yerr, py + yerr)))
 
     plot_spectrum.line(mwave,mspec, color= "black", alpha = 0.5, line_width = 4)
-    plot_spectrum.circle(binwave,binspec, line_width=3, line_alpha=0.6)
+    plot_spectrum.scatter(binwave,binspec, marker='circle', size=6,
+                          line_width=3, line_alpha=0.6)
     plot_spectrum.multi_line(x_err, y_err)
     
     
@@ -532,7 +535,8 @@ def create_component_hst(result_dict):
                                title="Earliest Start Time")
     
     early.line(phase1, trmodel1, color='black',alpha=0.5, line_width = 4)
-    early.circle(obsphase1, obstr1, line_width=3, line_alpha=0.6)
+    early.scatter(obsphase1, obstr1, marker='circle', size=6, line_width=3,
+                  line_alpha=0.6)
     early.multi_line(x_err1, y_err1)
      
     late = Figure(width=400, height=300, 
@@ -541,7 +545,8 @@ def create_component_hst(result_dict):
                                  y_axis_label='Flux', 
                                title="Latest Start Time")
     late.line(phase2, trmodel2, color='black',alpha=0.5, line_width = 3)
-    late.circle(obsphase2, obstr2, line_width=3, line_alpha=0.6)
+    late.scatter(obsphase2, obstr2, marker='circle', size=6, line_width=3,
+                 line_alpha=0.6)
     late.multi_line(x_err2, y_err2)
         
     start_time = row(early, late)
@@ -587,7 +592,8 @@ def create_component_hst(result_dict):
 
 
     early.line(phase1, model_counts1, color='black', alpha=0.5, line_width=4)
-    early.circle(obsphase1, counts1, line_width=3, line_alpha=0.6)
+    early.scatter(obsphase1, counts1, marker='circle', size=6, line_width=3,
+                  line_alpha=0.6)
     early.multi_line(x_err1, y_err1)
 
     late = Figure(width=400, height=300,
@@ -597,7 +603,8 @@ def create_component_hst(result_dict):
                   title="Latest Start Time" + title_description)
 
     late.line(phase2, model_counts2, color='black', alpha=0.5, line_width=3)
-    late.circle(obsphase2, counts2, line_width=3, line_alpha=0.6)
+    late.scatter(obsphase2, counts2, marker='circle', size=6, line_width=3,
+                 line_alpha=0.6)
     late.multi_line(x_err2, y_err2)
 
     start_time = row(early, late)
