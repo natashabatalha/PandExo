@@ -2,10 +2,34 @@ from bokeh.plotting import show
 from bokeh.plotting import figure as Figure
 from bokeh.io import output_file as outputfile
 from bokeh.io import output_notebook  as outnotebook
+from bokeh.embed import file_html
+from bokeh.resources import CDN
 import pickle as pk
 import numpy as np
 from bokeh.layouts import row
 import pandas as pd
+
+
+def _show_bokeh(plot_obj, output_file, output_notebook):
+    if output_notebook:
+        try:
+            outnotebook()
+            show(plot_obj)
+            return
+        except TypeError as exc:
+            if 'publish_display_data' not in str(exc):
+                raise
+            try:
+                from IPython.display import HTML, display
+                display(HTML(file_html(plot_obj, CDN, output_file)))
+                return
+            except Exception:
+                pass
+
+    outputfile(output_file)
+    show(plot_obj)
+
+
 def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', output_file = 'data.html',legend = False,
         R=False,  num_tran = False, plot_width=800, plot_height=400,x_range=[1,10],y_range=None, plot=True,
         output_notebook=True):
@@ -71,10 +95,6 @@ def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', out
     outy=[]
     oute=[]
     TOOLS = "pan,wheel_zoom,box_zoom,reset,save"
-    if output_notebook & plot:
-        outnotebook()
-    elif plot:
-        outputfile(output_file)
     colors = ['black','blue','red','orange','yellow','purple','pink','cyan','grey','brown']
     #make sure its iterable
     if type(result_dict) != list:
@@ -211,7 +231,7 @@ def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', out
         fig1d.multi_line(x_err, y_err,color=colors[i])
         i += 1
     if plot:
-        show(fig1d)
+        _show_bokeh(fig1d, output_file, output_notebook)
     return outx,outy,oute
 
 

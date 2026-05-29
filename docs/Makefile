@@ -4,6 +4,7 @@
 # You can set these variables from the command line.
 SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
+PYTHON        = python
 PAPER         =
 BUILDDIR      = ../../pandexo-docs
 PDFBUILDDIR   = /tmp
@@ -21,10 +22,12 @@ ALLSPHINXOPTS   = -d $(BUILDDIR)/doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
 # the i18n builder cannot share the environment and doctrees with the others
 I18NSPHINXOPTS  = $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
 
-.PHONY: help clean html dirhtml singlehtml pickle json htmlhelp qthelp devhelp epub latex latexpdf text man changes linkcheck doctest gettext
+.PHONY: help clean tutorials check-tutorials html dirhtml singlehtml pickle json htmlhelp qthelp devhelp epub latex latexpdf text man changes linkcheck doctest gettext
 
 help:
 	@echo "Please use \`make <target>' where <target> is one of"
+	@echo "  tutorials  to regenerate RST tutorials from notebooks"
+	@echo "  check-tutorials to verify generated tutorial RST is up to date"
 	@echo "  html       to make standalone HTML files"
 	@echo "  dirhtml    to make HTML files named index.html in directories"
 	@echo "  singlehtml to make a single large HTML file"
@@ -51,7 +54,13 @@ help:
 clean:
 	rm -rf $(BUILDDIR)/*
 
-html:
+tutorials:
+	$(PYTHON) generate_tutorial_rst.py
+
+check-tutorials:
+	$(PYTHON) generate_tutorial_rst.py --check
+
+html: tutorials
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
