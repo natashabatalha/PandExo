@@ -39,8 +39,10 @@ Requires
 - Python >=3.8
 - Installation: https://natashabatalha.github.io/PandExo/installation.html 
 - PandExo requires downloading reference data for 1) JWST instrument info
-  (from pandeia), 2) stellar SEDs used by synphot/stsynphot, and 3)
-  normalization bandpasses. See installation for further instructions:
+  (from Pandeia), 2) JWST PSFs, 3) stellar SEDs used by
+  synphot/stsynphot, and 4) normalization bandpasses. It also requires
+  setting up ``pandeia_refdata``, ``PSF_DIR``, and ``PYSYN_CDBS``. See
+  installation for further instructions:
   https://natashabatalha.github.io/PandExo/installation.html
 
 
