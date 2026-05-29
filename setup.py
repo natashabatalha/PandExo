@@ -121,7 +121,7 @@ setup(
     install_requires=[
           'pandeia.engine==3.0',
           'numpy<2',  # Needed to avoid deprecations
-          'bokeh==3.8.2',
+          'bokeh>=3.4,<4',
           'ipython',
           'tornado',
           'pandas',
