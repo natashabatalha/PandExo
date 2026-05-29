@@ -20,6 +20,36 @@ except ImportError:
     from setuptools import setup
 import sys 
 PY_V = sys.version_info
+
+docs_requires = [
+    'sphinx',
+    'sphinx-rtd-theme',
+    'nbconvert',
+    'nbformat',
+]
+
+notebook_requires = [
+    'jupyter',
+    'ipykernel',
+]
+
+test_requires = [
+    'pytest',
+]
+
+build_requires = [
+    'build',
+    'twine',
+    'wheel',
+]
+
+dev_requires = (
+    docs_requires
+    + notebook_requires
+    + test_requires
+    + build_requires
+)
+
 # The standard setup() call.  Notice, however, that most of the arguments
 # normally passed to setup() are absent.  They will instead be read from the
 # setup.cfg file using d2to1.
@@ -90,19 +120,28 @@ setup(
 
     install_requires=[
           'pandeia.engine==3.0',
-          'numpy',
+          'numpy<2',  # Needed to avoid deprecations
           'bokeh==3.0.2',
+          'ipython<9',  # Needed for bokeh==3.0.2 notebook display compatibility
           'tornado',
           'pandas',
           'joblib',
           'photutils',
-          'astropy',
+          'astropy<7',  # Needed to avoid deprecations
           'pysynphot',
+          'setuptools<81',  # Needed for pkg_resources deprecation
           'sqlalchemy',
           'astroquery',
-          'scipy',
+          'scipy<1.15',  # Needed to avoid deprecations
           'batman-package'
           ],
+    extras_require={
+        'docs': docs_requires,
+        'notebooks': notebook_requires,
+        'test': test_requires,
+        'dev': dev_requires,
+        'all': dev_requires,
+    },
     entry_points = {
         'console_scripts':
             ['start_pandexo=pandexo.engine.run_online:main']

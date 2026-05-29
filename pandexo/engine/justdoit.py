@@ -1,4 +1,24 @@
 import numpy as np
+import warnings
+
+warnings.filterwarnings(
+    "ignore",
+    message="pkg_resources is deprecated as an API.*",
+    module="pandeia.engine.config",
+)
+warnings.filterwarnings(
+    "ignore",
+    message='"Reader" was deprecated.*',
+    module="pandeia.engine.extinction",
+)
+warnings.filterwarnings(
+    "ignore",
+    # Pandeia's report formatter evaluates log(0) before checking for zero.
+    message="divide by zero encountered in log",
+    category=RuntimeWarning,
+    module="pandeia.engine.report",
+)
+
 from pandeia.engine.instrument_factory import InstrumentFactory
 from .pandexo import wrapper
 from .load_modes import SetDefaultModes
@@ -297,7 +317,8 @@ def run_param_space(i,exo,inst,param_space, verbose=False):
     #load in correct dict format
     inst_dict = load_mode_dict(inst)
     name = os.path.split(str(i))[1]
-    return {name: wrapper({"pandeia_input": inst_dict , "pandexo_input":exo}, verbose=verbose)}
+    run_verbose = "{}={}".format(param_space, name) if verbose else False
+    return {name: wrapper({"pandeia_input": inst_dict , "pandexo_input":exo}, verbose=run_verbose)}
 
 def run_inst_space(inst,exo, verbose=False):
     """Changes inst dictionary and submits run
@@ -322,7 +343,8 @@ def run_inst_space(inst,exo, verbose=False):
     """
     #load in correct dict format
     inst_dict = load_mode_dict(inst)
-    return {inst: wrapper({"pandeia_input": inst_dict , "pandexo_input":exo}, verbose=verbose)}
+    run_verbose = inst if verbose else False
+    return {inst: wrapper({"pandeia_input": inst_dict , "pandexo_input":exo}, verbose=run_verbose)}
 
 
 def run_pandexo(exo, inst, param_space = 0, param_range = 0,save_file = True,
@@ -418,9 +440,12 @@ def run_pandexo(exo, inst, param_space = 0, param_range = 0,save_file = True,
             return results
 
         #if there are parameters to cycle through this will run
-        if verbose: print("Running through exo parameters in parallel: " + param_space)
+        if verbose: print("Running through exo parameters in parallel: " + param_space, flush=True)
         #run the above function in parallel
-        results = Parallel(n_jobs=num_cores)(delayed(run_param_space)(i,exo,inst[0],param_space) for i in param_range)
+        results = Parallel(n_jobs=num_cores)(
+            delayed(run_param_space)(i, exo, inst[0], param_space, verbose=verbose) for i in param_range
+        )
+        if verbose: print("Finished exo parameter grid", flush=True)
 
         #Default dump all results [an array of dictionaries] into single file
         #and return results immediately to user
@@ -431,10 +456,13 @@ def run_pandexo(exo, inst, param_space = 0, param_range = 0,save_file = True,
         return results
 
     #run several different instrument modes and single planet
-    if verbose: print("Running select instruments")
     if len(inst)>1:
+        if verbose: print("Running select instruments: " + ", ".join(inst), flush=True)
 
-        results = Parallel(n_jobs=num_cores)(delayed(run_inst_space)(i, exo) for i in inst)
+        results = Parallel(n_jobs=num_cores)(
+            delayed(run_inst_space)(i, exo, verbose=verbose) for i in inst
+        )
+        if verbose: print("Finished select instruments", flush=True)
 
         #Default dump all results [an array of dictionaries] into single file
         #and return results immediately to user
@@ -445,8 +473,11 @@ def run_pandexo(exo, inst, param_space = 0, param_range = 0,save_file = True,
 
     #cycle through all options
     elif inst[0].lower() == 'run all':
-        if verbose: print("Running through all instruments")
-        results = Parallel(n_jobs=num_cores)(delayed(run_inst_space)(i, exo) for i in ALL.keys())
+        if verbose: print("Running through all instruments", flush=True)
+        results = Parallel(n_jobs=num_cores)(
+            delayed(run_inst_space)(i, exo, verbose=verbose) for i in ALL.keys()
+        )
+        if verbose: print("Finished running all instruments", flush=True)
 
         #Default dump all results [an array of dictionaries] into single file
         #and return results immediately to user
