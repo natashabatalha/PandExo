@@ -6,7 +6,6 @@ import pickle as pk
 import numpy as np
 from bokeh.layouts import row
 import pandas as pd
-from copy import copy
 def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', output_file = 'data.html',legend = False,
         R=False,  num_tran = False, plot_width=800, plot_height=400,x_range=[1,10],y_range=None, plot=True,
         output_notebook=True):
@@ -238,12 +237,6 @@ def bin_wave_to_R(w, R):
     >>> print(len(newwave))
     11
     """
-    w = copy(w)
-    reverse = False
-    if w[0] > w[1]:
-        # Need to reverse-sort MIRI data
-        w = w[::-1]
-        reverse = True
     wave = []
     tracker = min(w)
     i = 1
@@ -271,10 +264,6 @@ def bin_wave_to_R(w, R):
         else:
             tracker = max(w)
             wave += [tracker]
-
-    wave = np.array(wave)
-    if reverse:
-        wave = wave[::-1]
     return wave
 
 def uniform_tophat_sum(xnew,x, y):
@@ -304,16 +293,7 @@ def uniform_tophat_sum(xnew,x, y):
     >>> newy
     array([ 240.,  250.,  130.])
     """
-    xnew = copy(xnew)
-    x = copy(x)
-    y = copy(y)
-    reverse = False
-    if x[0] > x[1]:
-        # Need to reverse-sort MIRI data
-        xnew = xnew[::-1]
-        x = x[::-1]
-        y = y[::-1]
-        reverse = True
+    xnew = np.array(xnew)
     szmod=xnew.shape[0]
     delta=np.zeros(szmod)
     ynew=np.zeros(szmod)
@@ -326,8 +306,6 @@ def uniform_tophat_sum(xnew,x, y):
         ynew[i]=np.sum(y[loc])
     loc=np.where((x > xnew[0]-0.5*delta[0]) & (x < xnew[0]+0.5*delta[0]))
     ynew[0]=np.sum(y[loc])
-    if reverse:
-        ynew = ynew[::-1]
     return ynew
 
 def uniform_tophat_mean(xnew,x, y):
@@ -357,16 +335,7 @@ def uniform_tophat_mean(xnew,x, y):
     >>> newy
     array([ 240.,  250.,  130.])
     """
-    xnew = copy(xnew)
-    x = copy(x)
-    y = copy(y)
-    reverse = False
-    if x[0] > x[1]:
-        # Need to reverse-sort MIRI data
-        xnew = xnew[::-1]
-        x = x[::-1]
-        y = y[::-1]
-        reverse = True
+    xnew = np.array(xnew)
     szmod=xnew.shape[0]
     delta=np.zeros(szmod)
     ynew=np.zeros(szmod)
@@ -379,8 +348,6 @@ def uniform_tophat_mean(xnew,x, y):
         ynew[i]=np.mean(y[loc])
     loc=np.where((x > xnew[0]-0.5*delta[0]) & (x < xnew[0]+0.5*delta[0]))
     ynew[0]=np.mean(y[loc])
-    if reverse:
-        ynew = ynew[::-1]
     return ynew
 
 def jwst_1d_flux(result_dict, plot=True, output_file= 'flux.html'):
