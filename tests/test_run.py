@@ -1,7 +1,27 @@
+import contextlib
+import io
+
 import numpy as np
 import pytest
 
+import pandeia.engine
 import pandexo.engine.justdoit as jdi
+from pandexo.engine.jwst import compute_timing
+
+
+def _require_valid_pandeia_refdata():
+    output = io.StringIO()
+    with contextlib.redirect_stdout(output):
+        pandeia.engine.pandeia_version()
+    status = output.getvalue()
+
+    if "INVALID INSTALLATION" in status:
+        pytest.skip(
+            "Pandeia reference data is invalid for the installed pandeia.engine. "
+            "pandeia.engine 2026.2 requires matching 2026.2 refdata with detector "
+            "subarray nsuperstripe entries.\n"
+            + status
+        )
 
 
 def _default_smoke_exo_dict():
@@ -30,8 +50,35 @@ def _default_smoke_exo_dict():
     return exo_dict
 
 
+def test_compute_timing_keeps_first_minus_last_on_source_time_positive():
+    timing, flags = compute_timing(
+        {
+            "maxexptime_per_int": 0.1,
+            "tframe": 1.0,
+            "nframe": 1,
+            "mingroups": 1,
+            "nskip": 0,
+        },
+        transit_duration=10.0,
+        expfact_out=1.0,
+        noccultations=1,
+    )
+
+    assert timing["APT: Num Groups per Integration"] == 2
+    assert timing["Num Integrations In Transit"] > 0
+    assert (
+        timing["Seconds per Frame"]
+        * (timing["APT: Num Groups per Integration"] - 1)
+        * timing["Num Integrations In Transit"]
+        > 0
+    )
+    assert flags["flag_default"] == "NGROUPS<2SET TO NGROUPS=2"
+
+
 @pytest.mark.parametrize("instrument", ["NIRSpec G140H", "MIRI LRS"])
 def test_run_pandexo_smoke_has_sorted_wavelengths(instrument):
+    _require_valid_pandeia_refdata()
+
     result = jdi.run_pandexo(
         _default_smoke_exo_dict(),
         [instrument],

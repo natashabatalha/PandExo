@@ -119,8 +119,7 @@ setup(
     # },
 
     install_requires=[
-          'pandeia.engine==3.0',
-          # 'pandeia.engine==2026.2',
+          'pandeia.engine==2026.2',
           'numpy',
           'bokeh>=3.4,<4',
           'ipython',

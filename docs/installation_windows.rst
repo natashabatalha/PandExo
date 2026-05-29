@@ -31,19 +31,25 @@ Step 5
 
 `Follow PandExo Installation guide in getting files <https://natashabatalha.github.io/PandExo/installation.html>`_
 
-- get pandeia_data      
+- get Pandeia data v2026p2
+- get Pandeia PSFs v2026p2
 - get stellar reference data for synphot/stsynphot (includes phoenix models and
   throughputs)
 
 
 Step 6: Setting Reference Data
 ```````````````````````````````
-Using an achiver (eg. Winrar, 7Zip) extract Pandeia and the stellar reference
-data in two seperate folders.
+Using an achiver (eg. Winrar, 7Zip) extract Pandeia, the Pandeia PSFs, and the
+stellar reference data into separate folders. The 2026.2 JWST files are
+available here:
+
+- `Pandeia data v2026p2 JWST <https://stsci.box.com/v/pandeia-data-v2026p2-jwst>`_
+- `Pandeia PSFs v2026p2 JWST <https://stsci.box.com/v/pandeia-psfs-v2026p2-jwst>`_
 
 .. code-block:: bash
 
-    C:/Users/USERNAME/pandeia_data
+    C:/Users/USERNAME/pandeia-data-v2026p2-jwst
+    C:/Users/USERNAME/pandeia-psfs-v2026p2-jwst
     C:/Users/USERNAME/stellar_reference_data/grp/redcat/trds
 
 Check the variable names
@@ -53,14 +59,20 @@ Check the variable names
     echo 'export VARIABLE_NAME = ".."'
 
 
-In case nothing changes these should be `PYSYN_CDBS` & `pandeia_refdata`
+In case nothing changes these should be `pandeia_refdata`, `PSF_DIR`, and
+`PYSYN_CDBS`.
 
 Set these in Windows environment variables / registry using SETX. Open CMD or Anaconda Prompt and run:   
 
 .. code-block:: bash
 
+    SETX pandeia_refdata 'C:/Users/USERNAME/pandeia-data-v2026p2-jwst'
+    SETX PSF_DIR 'C:/Users/USERNAME/pandeia-psfs-v2026p2-jwst'
     SETX PYSYN_CDBS 'C:/Users/USERNAME/stellar_reference_data/grp/redcat/trds'
-    SETX pandeia_refdata 'C:/Users/USERNAME/pandeia_data'
+
+The ``SETX`` command persists these variables for future terminals, but it
+usually does not update the current open terminal. Close and reopen CMD,
+PowerShell, or Anaconda Prompt before checking the values.
 
 You can check this step by opening a new CMD and run > SET
 
@@ -86,4 +98,3 @@ Navigate to your pandexo-master and run the smoke test. Check in the `installati
 
 Congrats on being persevering/stubborn enough to get it on to work on Windows!
 There are some test Jupyter files to try out in `pandexo-master/notebooks`
-
