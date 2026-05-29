@@ -1,0 +1,42 @@
+import numpy as np
+import pytest
+
+import pandexo.engine.justdoit as jdi
+
+
+def _default_smoke_exo_dict():
+    exo_dict = jdi.load_exo_dict()
+    exo_dict["observation"]["sat_level"] = 80
+    exo_dict["observation"]["sat_unit"] = "%"
+    exo_dict["observation"]["noccultations"] = 2
+    exo_dict["observation"]["R"] = None
+    exo_dict["observation"]["baseline"] = 1.0
+    exo_dict["observation"]["baseline_unit"] = "frac"
+    exo_dict["observation"]["noise_floor"] = 0
+    exo_dict["star"]["type"] = "phoenix"
+    exo_dict["star"]["mag"] = 8.0
+    exo_dict["star"]["ref_wave"] = 1.25
+    exo_dict["star"]["temp"] = 5500
+    exo_dict["star"]["metal"] = 0.0
+    exo_dict["star"]["logg"] = 4.0
+    exo_dict["star"]["radius"] = 1
+    exo_dict["star"]["r_unit"] = "R_sun"
+    exo_dict["planet"]["type"] = "constant"
+    exo_dict["planet"]["radius"] = 1
+    exo_dict["planet"]["r_unit"] = "R_jup"
+    exo_dict["planet"]["transit_duration"] = 2.0 * 60.0 * 60.0
+    exo_dict["planet"]["td_unit"] = "s"
+    exo_dict["planet"]["f_unit"] = "rp^2/r*^2"
+    return exo_dict
+
+
+@pytest.mark.parametrize("instrument", ["NIRSpec G140H", "MIRI LRS"])
+def test_run_pandexo_smoke_has_sorted_wavelengths(instrument):
+    result = jdi.run_pandexo(
+        _default_smoke_exo_dict(),
+        [instrument],
+        save_file=False,
+    )
+
+    wave = np.asarray(result["FinalSpectrum"]["wave"])
+    assert np.all(np.diff(wave) >= 0), f"{instrument} produced unsorted wavelengths"

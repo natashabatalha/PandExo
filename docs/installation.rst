@@ -7,7 +7,7 @@
 Pre-installation Data Download
 ==============================
 
-PandExo requires downloading **three folders**: 1) JWST instrument info, 2) stellar SEDs, and 3) normalization bandasses. It also requires setting up **two environment variables**. 
+PandExo requires downloading **three folders**: 1) JWST instrument info, 2) stellar SEDs, and 3) normalization bandpasses. It also requires setting up **two environment variables**.
 
 JWST Reference Data
 ````````````````````
@@ -27,13 +27,14 @@ You can verify your installation by opening up a terminal with access to the con
 
     python -c "import pandeia.engine; pandeia.engine.pandeia_version()"
 
-If properly installed and configured, it should show the refdata version and synphot data directory, like this:
+If properly installed and configured, it should show the refdata version and
+stellar reference-data directory, like this:
 
 .. code-block:: bash 
 
     Pandeia Engine version:  3.0
     Pandeia RefData version:  3.0
-    Pysynphot Data:  /your/data/directory/synphot
+    Synphot Data:  /your/data/directory/synphot
 
 
 .. code-block:: bash 
@@ -42,7 +43,8 @@ If properly installed and configured, it should show the refdata version and syn
 
 Stellar SEDs  
 ````````````
-PandExo uses Pysynphot's Phoenix stellar atlas, which can be `downloaded here <https://archive.stsci.edu/hlsps/reference-atlases/hlsp_reference-atlases_hst_multi_pheonix-models_multi_v3_synphot5.tar>`_.
+PandExo uses synphot/stsynphot for stellar spectra and PHOENIX model
+interpolation. The PHOENIX reference atlas can be `downloaded here <https://archive.stsci.edu/hlsps/reference-atlases/hlsp_reference-atlases_hst_multi_pheonix-models_multi_v3_synphot5.tar>`_.
 
 Once untarred, the files will produce a directory tree of `grp/redcat/trds`. The pandeia.engine uses the contents of the `trds` directory.
 
@@ -56,7 +58,8 @@ Create your environment variable:
 
 Normalization Files  
 ````````````````````
-New to PandExo >2.0, **users now have to download the master table of all pysynphot throughput tables.** 
+PandExo also needs the STScI/CDBS-style throughput files used for J/H/K
+normalization bandpasses.
 
 `Download the file here <https://archive.stsci.edu/hlsps/reference-atlases/hlsp_reference-atlases_hst_multi_everything_multi_v11_sed.tar>`_
 
@@ -105,20 +108,11 @@ OR Download PandExo's repository via Github. The Github also has helpful noteboo
 Final Test for Success
 ======================
  
-There is a `run_test.py` in the `github`. Test that you're code is working: 
+Run the smoke test to confirm that your code is working:
 
 .. code-block:: bash 
 
-    python run_test.py
-    Starting TEST run
-    Running Single Case for: NIRSpec G140H
-    Optimization Reqested: Computing Duty Cycle
-    Finished Duty Cycle Calc
-    Starting Out of Transit Simulation
-    End out of Transit
-    Starting In Transit Simulation
-    End In Transit
-    SUCCESS
+    python -m pytest tests/test_run.py -q
 
 
 Troubleshooting-Common Errors

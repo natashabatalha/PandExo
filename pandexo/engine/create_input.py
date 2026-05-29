@@ -6,10 +6,22 @@ import astropy.units as u
 import astropy.constants as c
 import os 
 from astropy.modeling.models import BlackBody
-import warnings
-with warnings.catch_warnings():
-    warnings.filterwarnings("ignore")
-    import pysynphot as psyn
+try:
+    from .synphot_compat import (
+        load_bandpass_from_file,
+        load_phoenix_spectrum,
+        make_array_spectrum,
+        renormalize_to_vegamag,
+        sample_spectrum_micron_mjy,
+    )
+except ImportError:
+    from synphot_compat import (
+        load_bandpass_from_file,
+        load_phoenix_spectrum,
+        make_array_spectrum,
+        renormalize_to_vegamag,
+        sample_spectrum_micron_mjy,
+    )
     
 def outTrans(input) :
     """Compute out of transit spectra
@@ -49,49 +61,13 @@ def outTrans(input) :
         sort= sort[sort[:,0].argsort()]
         wave = sort[:,0]
         flux = sort[:,1] 
-        if input['w_unit'] == 'um':
-            PANDEIA_WAVEUNITS = 'um'
-            
-        elif input['w_unit'] == 'nm':
-            PANDEIA_WAVEUNITS = 'nm'
-      
-        elif input['w_unit'] == 'cm' :
-            PANDEIA_WAVEUNITS = 'cm'
-     
-        elif input['w_unit'] == 'Angs' :
-            PANDEIA_WAVEUNITS = 'angstrom'
-
-        elif input['w_unit'] == 'Hz' :
-            PANDEIA_WAVEUNITS = 'Hz'
-
-        else: 
-            raise Exception('Units are not correct. Pick um, nm, cm, hz, or Angs')        
-
-        #convert to photons/s/nm/m^2 for flux normalization based on 
-        #http://www.gemini.edu/sciops/instruments/integration-time-calculators/itc-help/source-definition
-        if input['f_unit'] == 'Jy':
-            PANDEIA_FLUXUNITS = 'jy' 
-        elif input['f_unit'] == 'FLAM' :
-            PANDEIA_FLUXUNITS = 'FLAM'
-        elif input['f_unit'] == 'erg/cm2/s/Hz':
-            flux = flux*1e23
-            PANDEIA_FLUXUNITS = 'jy' 
-        else: 
-            raise Exception('Units are not correct. Pick FLAM or Jy or erg/cm2/s/Hz')
-
-        sp = psyn.ArraySpectrum(wave, flux, waveunits=PANDEIA_WAVEUNITS, fluxunits=PANDEIA_FLUXUNITS)        #Convert evrything to nanometer for converstion based on gemini.edu  
-        sp.convert("nm")
-        sp.convert('jy')
+        sp = make_array_spectrum(wave, flux, input['w_unit'], input['f_unit'])
 
     ############ PHOENIX ################################################
     elif input['type'] =='phoenix':
         #make sure metal is not out of bounds
         if input['metal'] > 0.5: input['metal'] = 0.5
-        sp = psyn.Icat("phoenix", input['temp'], input['metal'], input['logg'])
-        sp.convert("nm")
-        sp.convert("jy")
-        wave = sp.wave
-        flux = sp.flux
+        sp = load_phoenix_spectrum(input['temp'], input['metal'], input['logg'])
         input['w_unit'] ='nm'
         input['f_unit'] = 'jy'
         
@@ -101,6 +77,8 @@ def outTrans(input) :
 
     ############ NORMALIZATION ################################################
     refdata = os.environ.get("PYSYN_CDBS")
+    if refdata is None:
+        raise Exception("PYSYN_CDBS must point to the trds directory containing the comp and grid folders")
 
     all_bps = {"H": 'bessell_h_004_syn.fits',
                  "J":'bessell_j_003_syn.fits' ,
@@ -119,20 +97,18 @@ def outTrans(input) :
     if not os.path.exists(bp_path): 
         raise Exception("Oops! PandExo 2.0 now requires users to download this file https://archive.stsci.edu/hlsps/reference-atlases/hlsp_reference-atlases_hst_multi_everything_multi_v11_sed.tar it will untar with the structure grp/redcat/trds. Please place the directories nonhst and comp into this folder: "+refdata)
 
-    bp = psyn.FileBandpass(bp_path)
+    bp = load_bandpass_from_file(bp_path)
+    rn_sp = renormalize_to_vegamag(sp, mag, bp)
 
-    sp.convert('angstroms')
-    bp.convert('angstroms')
-
-    rn_sp = sp.renorm(mag, 'vegamag', bp)
-
-
-    rn_sp.convert("microns")
-    rn_sp.convert("mjy")
-
-    flux_out_trans = rn_sp.flux
-    wave = rn_sp.wave
-    return {'flux_out_trans': flux_out_trans, 'wave': wave,'phoenix':sp} 
+    wave, flux_out_trans = sample_spectrum_micron_mjy(rn_sp)
+    _, stellar_flux = sample_spectrum_micron_mjy(sp, wavelengths=wave*u.micron)
+    return {
+        'flux_out_trans': flux_out_trans,
+        'wave': wave,
+        'phoenix': sp,
+        'stellar_flux': stellar_flux,
+        'stellar_wave': wave,
+    }
 
 
 def bothTrans(out_trans, planet,star=None) :
@@ -191,8 +167,14 @@ def bothTrans(out_trans, planet,star=None) :
         #constant fp/f* (using out_trans from user)
         elif planet['f_unit'] == 'fp/f*':
             planet['w_unit'] = 'um'
-            wave_planet = out_trans['wave'][(out_trans['wave']>0.5) & (out_trans['wave']<15)]
-            flux_star = (out_trans['phoenix'].flux*(u.Jy)).to(u.mJy)[(out_trans['wave']>0.5) & (out_trans['wave']<15)]
+            mask = (out_trans['wave']>0.5) & (out_trans['wave']<15)
+            wave_planet = out_trans['wave'][mask]
+            if 'stellar_flux' in out_trans:
+                flux_star = np.asarray(out_trans['stellar_flux'])[mask] * u.mJy
+            elif hasattr(out_trans.get('phoenix'), 'flux'):
+                flux_star = (out_trans['phoenix'].flux*(u.Jy)).to(u.mJy)[mask]
+            else:
+                flux_star = np.asarray(out_trans['flux_out_trans'])[mask] * u.mJy
             #MAKING SURE TO ADD IN SUPID PI FOR PER STERADIAN!!!!
             bb = BlackBody(temperature=planet['temp']*u.K) 
             flux_planet = (bb(wave_planet*u.micron)*np.pi*u.sr).to(u.mJy)
