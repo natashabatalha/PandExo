@@ -444,7 +444,10 @@ def compute_timing(m,transit_duration,expfact_out,noccultations):
     tframe = m['tframe']
     nframe = m['nframe']
     nskip = m['nskip']
-    mingroups = m['mingroups']
+    # PandExo's first-minus-last noise model needs two reads to measure a
+    # signal. Pandeia 2026.2 can report a detector minimum of one group, but
+    # that would make on-source time zero in ExtractSpec.
+    mingroups = max(2, m['mingroups'])
     overhead_per_int = tframe #overhead time added per integration 
     try: 
         #are we starting with a exposure time ?
@@ -493,6 +496,11 @@ def compute_timing(m,transit_duration,expfact_out,noccultations):
         ngroups_per_int = mingroups
         nframes_per_int = mingroups
         flag_default = "Something went wrong. SET TO NGROUPS="+str(mingroups)
+
+    if ngroups_per_int < mingroups:
+        ngroups_per_int = mingroups
+        nframes_per_int = mingroups
+        flag_default = "NGROUPS<"+str(mingroups)+"SET TO NGROUPS="+str(mingroups)
 
           
     #the integration time is related to the number of groups and the time of each 

@@ -75,7 +75,7 @@ dev_requires = (
 setup(
 
     name='pandexo.engine',
-    version='3.0.0',
+    version='2026.2',
     summary='pandexo transiting exoplanet simulator',
     description_file='README.rst',
     author='Natasha Batalha at NASA Ames',
@@ -89,9 +89,14 @@ setup(
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
+        'Programming Language :: Python :: 3.12',
+        'Programming Language :: Python :: 3.13',
         'Topic :: Scientific/Engineering :: Astronomy',
         'Topic :: Software Development :: Libraries :: Python Modules'
     ],
+    python_requires='>=3.10',
     packages=[
         'pandexo',
         'pandexo.engine',
@@ -119,20 +124,20 @@ setup(
     # },
 
     install_requires=[
-          'pandeia.engine==3.0',
-          'numpy<2',  # Needed to avoid deprecations
+          'pandeia.engine==2026.2',
+          'numpy',
           'bokeh>=3.4,<4',
           'ipython',
           'tornado',
           'pandas',
           'joblib',
           'photutils',
-          'astropy<7',  # Needed to avoid deprecations
-          'pysynphot',
-          'setuptools<81',  # Needed for pkg_resources deprecation
+          'astropy',
+          'synphot',
+          'stsynphot',
           'sqlalchemy',
           'astroquery',
-          'scipy<1.15',  # Needed to avoid deprecations
+          'scipy',
           'batman-package'
           ],
     extras_require={

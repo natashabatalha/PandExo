@@ -30,7 +30,8 @@ requirements:
     - joblib
     - photutils
     - astropy 
-    - pysynphot
+    - synphot
+    - stsynphot
     - sqlalchemy
     - sphinx 
   run:
@@ -42,7 +43,8 @@ requirements:
     - joblib
     - photutils
     - astropy 
-    - pysynphot
+    - synphot
+    - stsynphot
     - sqlalchemy
     - sphinx
 
