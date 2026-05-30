@@ -12,7 +12,8 @@ You may want to uninstall older python versions to prevent troubles along the wa
 Step 2
 ``````
 
-`Download most recent Anaconda version <https://www.anaconda.com/download/>`_ (tested with Python 3.6.4 64 bit) 
+`Download most recent Anaconda version <https://www.anaconda.com/download/>`_.
+PandExo supports Python 3.10 and newer.
     
 Step 3
 ``````

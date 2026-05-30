@@ -36,7 +36,7 @@ Do not install if...
 Requires
 ~~~~~~~~
 
-- Python >=3.8
+- Python >=3.10
 - Installation: https://natashabatalha.github.io/PandExo/installation.html 
 - PandExo requires downloading reference data for 1) JWST instrument info
   (from Pandeia), 2) JWST PSFs, 3) stellar SEDs used by
