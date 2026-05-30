@@ -10,9 +10,6 @@ import numpy as np
 import pytest
 from astropy.modeling.models import BlackBody
 
-import pandeia.engine
-import pandexo.engine.justdoit as jdi
-import pandexo.engine.jwst as jwst
 from pandexo.engine.create_input import bothTrans, outTrans
 
 pytestmark = pytest.mark.filterwarnings("ignore:.*alltrue.*:DeprecationWarning")
@@ -101,12 +98,18 @@ FPFS_STAR = {"radius": 1.0, "r_unit": "R_sun"}
 
 
 def _require_valid_pandeia_refdata():
+    try:
+        import pandeia.engine
+    except Exception as exc:
+        pytest.skip(f"Pandeia cannot be imported without configured refdata: {exc}")
+
     output = io.StringIO()
     with contextlib.redirect_stdout(output):
         pandeia.engine.pandeia_version()
     status = output.getvalue()
     invalid_pandeia = (
         "Pandeia RefData version: INVALID INSTALLATION" in status
+        or "Pandeia RefData version: ENVIRONMENT VARIABLE UNSET" in status
         or "Pandeia PSFs version:    INVALID INSTALLATION" in status
         or "Pandeia PSFs version:    ENVIRONMENT VARIABLE UNSET" in status
     )
@@ -118,6 +121,11 @@ def _require_valid_pandeia_refdata():
 
 
 def _default_smoke_exo_dict(star):
+    try:
+        import pandexo.engine.justdoit as jdi
+    except Exception as exc:
+        pytest.skip(f"Pandeia-dependent run machinery is unavailable: {exc}")
+
     exo_dict = jdi.load_exo_dict()
     exo_dict["observation"]["sat_level"] = 80
     exo_dict["observation"]["sat_unit"] = "%"
@@ -324,6 +332,12 @@ def test_live_constant_fpfs_matches_legacy_pysynphot():
 def test_live_nirspec_precision_matches_legacy_pysynphot_outtrans(monkeypatch):
     _require_valid_pandeia_refdata()
     legacy_out = _legacy_outtrans(PHOENIX_CASE)
+
+    try:
+        import pandexo.engine.justdoit as jdi
+        import pandexo.engine.jwst as jwst
+    except Exception as exc:
+        pytest.skip(f"Pandeia-dependent run machinery is unavailable: {exc}")
 
     exo_dict = _default_smoke_exo_dict(PHOENIX_CASE)
     new = jdi.run_pandexo(copy.deepcopy(exo_dict), ["NIRSpec G140H"], save_file=False)

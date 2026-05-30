@@ -4,18 +4,41 @@ import io
 import numpy as np
 import pytest
 
-import pandeia.engine
-import pandexo.engine.justdoit as jdi
-from pandexo.engine.jwst import compute_timing
+
+def _import_compute_timing():
+    try:
+        from pandexo.engine.jwst import compute_timing
+    except Exception as exc:
+        pytest.skip(f"Pandeia-dependent JWST module is unavailable: {exc}")
+    return compute_timing
+
+
+def _import_justdoit():
+    try:
+        import pandexo.engine.justdoit as jdi
+    except Exception as exc:
+        pytest.skip(f"Pandeia-dependent run machinery is unavailable: {exc}")
+    return jdi
 
 
 def _require_valid_pandeia_refdata():
+    try:
+        import pandeia.engine
+    except Exception as exc:
+        pytest.skip(f"Pandeia cannot be imported without configured refdata: {exc}")
+
     output = io.StringIO()
     with contextlib.redirect_stdout(output):
         pandeia.engine.pandeia_version()
     status = output.getvalue()
 
-    if "INVALID INSTALLATION" in status:
+    invalid_pandeia = (
+        "Pandeia RefData version: INVALID INSTALLATION" in status
+        or "Pandeia RefData version: ENVIRONMENT VARIABLE UNSET" in status
+        or "Pandeia PSFs version:    INVALID INSTALLATION" in status
+        or "Pandeia PSFs version:    ENVIRONMENT VARIABLE UNSET" in status
+    )
+    if invalid_pandeia:
         pytest.skip(
             "Pandeia reference data is invalid for the installed pandeia.engine. "
             "pandeia.engine 2026.2 requires matching 2026.2 refdata with detector "
@@ -24,7 +47,7 @@ def _require_valid_pandeia_refdata():
         )
 
 
-def _default_smoke_exo_dict():
+def _default_smoke_exo_dict(jdi):
     exo_dict = jdi.load_exo_dict()
     exo_dict["observation"]["sat_level"] = 80
     exo_dict["observation"]["sat_unit"] = "%"
@@ -51,6 +74,8 @@ def _default_smoke_exo_dict():
 
 
 def test_compute_timing_keeps_first_minus_last_on_source_time_positive():
+    compute_timing = _import_compute_timing()
+
     timing, flags = compute_timing(
         {
             "maxexptime_per_int": 0.1,
@@ -78,9 +103,10 @@ def test_compute_timing_keeps_first_minus_last_on_source_time_positive():
 @pytest.mark.parametrize("instrument", ["NIRSpec G140H", "MIRI LRS"])
 def test_run_pandexo_smoke_has_sorted_wavelengths(instrument):
     _require_valid_pandeia_refdata()
+    jdi = _import_justdoit()
 
     result = jdi.run_pandexo(
-        _default_smoke_exo_dict(),
+        _default_smoke_exo_dict(jdi),
         [instrument],
         save_file=False,
     )
