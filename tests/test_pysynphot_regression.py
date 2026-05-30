@@ -1,4 +1,6 @@
 import copy
+import contextlib
+import io
 import json
 import os
 from pathlib import Path
@@ -8,6 +10,9 @@ import numpy as np
 import pytest
 from astropy.modeling.models import BlackBody
 
+import pandeia.engine
+import pandexo.engine.justdoit as jdi
+import pandexo.engine.jwst as jwst
 from pandexo.engine.create_input import bothTrans, outTrans
 
 pytestmark = pytest.mark.filterwarnings("ignore:.*alltrue.*:DeprecationWarning")
@@ -65,6 +70,26 @@ PHOENIX_CASE = {
     "mag": 8.0,
 }
 
+PHOENIX_GRID_CASES = {
+    "phoenix_j_5000_m0_g45": PHOENIX_CASE,
+    "phoenix_h_3500_m0_g45": {
+        "type": "phoenix",
+        "temp": 3500,
+        "metal": 0.0,
+        "logg": 4.5,
+        "ref_wave": 1.65,
+        "mag": 8.0,
+    },
+    "phoenix_k_6000_m0_g45": {
+        "type": "phoenix",
+        "temp": 6000,
+        "metal": 0.0,
+        "logg": 4.5,
+        "ref_wave": 2.2,
+        "mag": 8.0,
+    },
+}
+
 FPFS_PLANET = {
     "type": "constant",
     "f_unit": "fp/f*",
@@ -73,6 +98,44 @@ FPFS_PLANET = {
     "temp": 1000,
 }
 FPFS_STAR = {"radius": 1.0, "r_unit": "R_sun"}
+
+
+def _require_valid_pandeia_refdata():
+    output = io.StringIO()
+    with contextlib.redirect_stdout(output):
+        pandeia.engine.pandeia_version()
+    status = output.getvalue()
+    invalid_pandeia = (
+        "Pandeia RefData version: INVALID INSTALLATION" in status
+        or "Pandeia PSFs version:    INVALID INSTALLATION" in status
+        or "Pandeia PSFs version:    ENVIRONMENT VARIABLE UNSET" in status
+    )
+    if invalid_pandeia:
+        pytest.skip(
+            "Pandeia reference data is invalid for the installed pandeia.engine.\n"
+            + status
+        )
+
+
+def _default_smoke_exo_dict(star):
+    exo_dict = jdi.load_exo_dict()
+    exo_dict["observation"]["sat_level"] = 80
+    exo_dict["observation"]["sat_unit"] = "%"
+    exo_dict["observation"]["noccultations"] = 2
+    exo_dict["observation"]["R"] = None
+    exo_dict["observation"]["baseline"] = 1.0
+    exo_dict["observation"]["baseline_unit"] = "frac"
+    exo_dict["observation"]["noise_floor"] = 0
+    exo_dict["star"].update(copy.deepcopy(star))
+    exo_dict["star"]["radius"] = 1
+    exo_dict["star"]["r_unit"] = "R_sun"
+    exo_dict["planet"]["type"] = "constant"
+    exo_dict["planet"]["radius"] = 1
+    exo_dict["planet"]["r_unit"] = "R_jup"
+    exo_dict["planet"]["transit_duration"] = 2.0 * 60.0 * 60.0
+    exo_dict["planet"]["td_unit"] = "s"
+    exo_dict["planet"]["f_unit"] = "rp^2/r*^2"
+    return exo_dict
 
 
 def _case_to_numpy(case):
@@ -232,9 +295,10 @@ def test_live_user_outtrans_matches_legacy_pysynphot(name, case):
     np.testing.assert_allclose(new["stellar_flux"], legacy["stellar_flux"], rtol=1e-10, atol=1e-8)
 
 
-def test_live_phoenix_outtrans_matches_legacy_pysynphot():
-    legacy = _legacy_outtrans(PHOENIX_CASE)
-    new = outTrans(copy.deepcopy(PHOENIX_CASE))
+@pytest.mark.parametrize("name,case", PHOENIX_GRID_CASES.items())
+def test_live_phoenix_outtrans_matches_legacy_pysynphot(name, case):
+    legacy = _legacy_outtrans(case)
+    new = outTrans(copy.deepcopy(case))
 
     np.testing.assert_allclose(new["wave"], legacy["wave"], rtol=0, atol=1e-10)
     # stsynphot and pysynphot load the same CDBS grid, but their normalization
@@ -255,6 +319,48 @@ def test_live_constant_fpfs_matches_legacy_pysynphot():
     np.testing.assert_allclose(new["wave"], legacy["wave"], rtol=0, atol=1e-12)
     np.testing.assert_allclose(new["model_spec"], legacy["model_spec"], rtol=1e-10, atol=1e-12)
     np.testing.assert_allclose(new["flux_in_trans"], legacy["flux_in_trans"], rtol=1e-4, atol=1e-8)
+
+
+def test_live_nirspec_precision_matches_legacy_pysynphot_outtrans(monkeypatch):
+    _require_valid_pandeia_refdata()
+    legacy_out = _legacy_outtrans(PHOENIX_CASE)
+
+    exo_dict = _default_smoke_exo_dict(PHOENIX_CASE)
+    new = jdi.run_pandexo(copy.deepcopy(exo_dict), ["NIRSpec G140H"], save_file=False)
+
+    def legacy_outtrans_for_jwst(star):
+        assert star["type"] == PHOENIX_CASE["type"]
+        assert star["temp"] == PHOENIX_CASE["temp"]
+        assert star["metal"] == PHOENIX_CASE["metal"]
+        assert star["logg"] == PHOENIX_CASE["logg"]
+        assert star["ref_wave"] == PHOENIX_CASE["ref_wave"]
+        assert star["mag"] == PHOENIX_CASE["mag"]
+        return legacy_out
+
+    monkeypatch.setattr(jwst.create, "outTrans", legacy_outtrans_for_jwst)
+    legacy = jdi.run_pandexo(copy.deepcopy(exo_dict), ["NIRSpec G140H"], save_file=False)
+
+    # This is the closest regression to the proposer-facing quantity: only the
+    # stellar-spectrum backend changes, while the full PandExo/Pandeia
+    # simulation and precision calculation are exercised.
+    np.testing.assert_allclose(
+        new["FinalSpectrum"]["wave"],
+        legacy["FinalSpectrum"]["wave"],
+        rtol=0,
+        atol=1e-12,
+    )
+    np.testing.assert_allclose(
+        new["FinalSpectrum"]["spectrum"],
+        legacy["FinalSpectrum"]["spectrum"],
+        rtol=1e-4,
+        atol=1e-12,
+    )
+    np.testing.assert_allclose(
+        new["FinalSpectrum"]["error_w_floor"],
+        legacy["FinalSpectrum"]["error_w_floor"],
+        rtol=1e-4,
+        atol=1e-12,
+    )
 
 
 def _load_frozen_reference():
