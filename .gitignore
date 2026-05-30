@@ -3,6 +3,9 @@
 *.p
 *.json~
 
+.vscode/
+*.code-workspace
+
 # Jupyter Notebooks
 .ipynb_checkpoints
 notebooks/*.html
