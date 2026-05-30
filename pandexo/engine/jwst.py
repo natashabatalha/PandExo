@@ -1,6 +1,7 @@
 import os
 import sys
 import json
+import warnings
 import numpy as np
 import pandas as pd
 from copy import deepcopy 
@@ -24,6 +25,16 @@ min_nint_trans = 1
 
 #refdata directory
 default_refdata_directory = os.environ.get("pandeia_refdata")
+
+def sort_by_wave_order(value, wave_order):
+    if isinstance(value, np.ndarray) and value.shape[:1] == (len(wave_order),):
+        return value[wave_order]
+    if isinstance(value, list):
+        return [sort_by_wave_order(item, wave_order) for item in value]
+    if isinstance(value, tuple):
+        return tuple(sort_by_wave_order(item, wave_order) for item in value)
+    return value
+
 
 def compute_full_sim(dictinput,verbose=False): 
     """Top level function to set up exoplanet obs. for JW
@@ -65,6 +76,12 @@ def compute_full_sim(dictinput,verbose=False):
     """
     pandeia_input = dictinput['pandeia_input']
     pandexo_input = dictinput['pandexo_input']    	
+
+    def log(message):
+        if isinstance(verbose, str):
+            print("[{}] {}".format(verbose, message), flush=True)
+        elif verbose:
+            print(message, flush=True)
 	
     #define the calculation we'll be doing 
     if pandexo_input['planet']['w_unit'] == 'sec':
@@ -158,7 +175,7 @@ def compute_full_sim(dictinput,verbose=False):
     #amount of exposure time out-of-occultation, as a fraction of in-occ time 
     try:
         expfact_out = pandexo_input['observation']['fraction'] 
-        print("WARNING: key input fraction has been replaced with new 'baseline option'. See notebook example")
+        log("WARNING: key input fraction has been replaced with new 'baseline option'. See notebook example")
         pandexo_input['observation']['baseline'] = pandexo_input['observation']['fraction'] 
         pandexo_input['observation']['baseline_unit'] ='frac'
     except:
@@ -183,19 +200,19 @@ def compute_full_sim(dictinput,verbose=False):
         m.update(exposure_time_inputs)
     else:
         #run pandeia once to determine max exposure time per int and get exposure params
-        if verbose: print("Optimization Reqested: Computing Duty Cycle")
+        log("Optimization Reqested: Computing Duty Cycle")
         m = {"maxexptime_per_int":compute_maxexptime_per_int(pandeia_input, sat_level) , 
             "tframe":tframe,"nframe":nframe,"mingroups":mingroups,"nskip":nskip,
             "nsuperstripe":nsuperstripe}
         m.update(exposure_time_inputs)
-        if verbose: print("Finished Duty Cycle Calc")
+        log("Finished Duty Cycle Calc")
 
     #calculate all timing info
     max_ngroup_instrument = max_ngroup[pandeia_input["configuration"]["instrument"]["instrument"]]
     timing, flags = compute_timing(m,transit_duration,expfact_out,noccultations,max_ngroup_instrument)
     
     #Simulate out trans and in transit
-    if verbose: print("Starting Out of Transit Simulation")
+    log("Starting Out of Transit Simulation")
     out = perform_out(pandeia_input, pandexo_input,timing, both_spec)
 
     #extract extraction area before dict conversion
@@ -203,16 +220,16 @@ def compute_full_sim(dictinput,verbose=False):
     out = out.as_dict()
     out.pop('3d')
     update_timing_measurement_time(timing, out['scalar']['measurement_time'])
-    if verbose: print("End out of Transit")
+    log("End out of Transit")
 
     #Remove effects of Quantum Yield from shot noise 
     out = remove_QY(out, instrument)
 
     #this kind of redundant going to compute inn from out instead 
     #keep perform_in but change inputs to (out, timing, both_spec)
-    if verbose: print("Starting In Transit Simulation")
+    log("Starting In Transit Simulation")
     inn = perform_in(pandeia_input, pandexo_input,timing, both_spec, out, calculation)
-    if verbose: print("End In Transit")
+    log("End In Transit")
     
 
 
@@ -256,6 +273,16 @@ def compute_full_sim(dictinput,verbose=False):
     varout = result['var_out_1d']
     extracted_flux_out = result['photon_out_1d']
     extracted_flux_inn = result['photon_in_1d']
+
+    input_wave_order = np.argsort(w, kind='mergesort')
+    if not np.array_equal(input_wave_order, np.arange(len(w))):
+        w = w[input_wave_order]
+        varin = varin[input_wave_order]
+        varout = varout[input_wave_order]
+        extracted_flux_out = extracted_flux_out[input_wave_order]
+        extracted_flux_inn = extracted_flux_inn[input_wave_order]
+        result['rn[out,in]'] = sort_by_wave_order(result['rn[out,in]'], input_wave_order)
+        result['bkg[out,in]'] = sort_by_wave_order(result['bkg[out,in]'], input_wave_order)
 
         
     #bin the data according to user input 
@@ -319,6 +346,18 @@ def compute_full_sim(dictinput,verbose=False):
     if pandexo_input['planet']['f_unit'] == 'fp/f*':
         sim_spec = -1.0*sim_spec
         raw_spec = -1.0*raw_spec    
+
+    wave_order = np.argsort(wbin, kind='mergesort')
+    if not np.array_equal(wave_order, np.arange(len(wbin))):
+        wbin = wbin[wave_order]
+        photon_out_bin = photon_out_bin[wave_order]
+        photon_in_bin = photon_in_bin[wave_order]
+        var_in_bin = var_in_bin[wave_order]
+        var_out_bin = var_out_bin[wave_order]
+        error_spec = error_spec[wave_order]
+        error_spec_nfloor = error_spec_nfloor[wave_order]
+        raw_spec = raw_spec[wave_order]
+        sim_spec = sim_spec[wave_order]
    
     #package processed data
     finalspec = {'wave':wbin,
@@ -337,8 +376,8 @@ def compute_full_sim(dictinput,verbose=False):
                 'e_rate_in':photon_in_bin/ti,
                 'wave':wbin,
                 'error_no_floor':error_spec, 
-                'rn[out,in]':result['rn[out,in]'],
-                'bkg[out,in]':result['bkg[out,in]']
+                'rn[out,in]':sort_by_wave_order(result['rn[out,in]'], wave_order),
+                'bkg[out,in]':sort_by_wave_order(result['bkg[out,in]'], wave_order)
                 }
  
     result_dict = as_dict(out,both_spec ,finalspec, 
@@ -405,7 +444,7 @@ def compute_maxexptime_per_int(pandeia_input, sat_level):
     
     return maxexptime_per_int
         
-def compute_timing(m,transit_duration,expfact_out,noccultations,max_ngroup_instrument): 
+def compute_timing(m,transit_duration,expfact_out,noccultations,max_ngroup_instrument=65536.0):
     """Computes all timing info for observation
     
     Computes all JWST specific timing info for observation including. Some pertinent 
@@ -501,7 +540,7 @@ def compute_timing(m,transit_duration,expfact_out,noccultations,max_ngroup_instr
             flag_high = "Groups/int > max num of allowed groups"
  
         if (ngroups_per_int < mingroups) | np.isnan(ngroups_per_int):
-            ngroups_per_int = mingroups  
+            ngroups_per_int = mingroups
             nframes_per_int = mingroups
             flag_default = "NGROUPS<"+str(mingroups)+"SET TO NGROUPS="+str(mingroups)
 

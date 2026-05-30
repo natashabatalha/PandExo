@@ -2,10 +2,36 @@ from bokeh.plotting import show
 from bokeh.plotting import figure as Figure
 from bokeh.io import output_file as outputfile
 from bokeh.io import output_notebook  as outnotebook
+from bokeh.embed import file_html
+from bokeh.resources import CDN
 import pickle as pk
 import numpy as np
 from bokeh.layouts import row
 import pandas as pd
+
+CIRCLE_SIZE = 6
+
+
+def _show_bokeh(plot_obj, output_file, output_notebook):
+    if output_notebook:
+        try:
+            outnotebook()
+            show(plot_obj)
+            return
+        except TypeError as exc:
+            if 'publish_display_data' not in str(exc):
+                raise
+            try:
+                from IPython.display import HTML, display
+                display(HTML(file_html(plot_obj, CDN, output_file)))
+                return
+            except Exception:
+                pass
+
+    outputfile(output_file)
+    show(plot_obj)
+
+
 def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', output_file = 'data.html',legend = False,
         R=False,  num_tran = False, plot_width=800, plot_height=400,x_range=[1,10],y_range=None, plot=True,
         output_notebook=True):
@@ -70,11 +96,7 @@ def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', out
     outx=[]
     outy=[]
     oute=[]
-    #TOOLS = "pan,wheel_zoom,box_zoom,reset,save"
-    if output_notebook & plot:
-        outnotebook()
-    elif plot:
-        outputfile(output_file)
+    TOOLS = "pan,wheel_zoom,box_zoom,reset,save"
     colors = ['black','blue','red','orange','yellow','purple','pink','cyan','grey','brown']
     #make sure its iterable
     if type(result_dict) != list:
@@ -189,7 +211,7 @@ def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', out
 
             fig1d = Figure(x_range=x_range, y_range = ylims,
                width = plot_width, height =plot_height,title=title,x_axis_label=x_axis_label,
-              y_axis_label = y_axis_label,  background_fill_color = 'white')
+              y_axis_label = y_axis_label, tools=TOOLS, background_fill_color = 'white')
 
 
         #plot model, data, and errors
@@ -200,18 +222,19 @@ def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', out
             model_line = pd.DataFrame({'x':x, 'my':my}).dropna()
             fig1d.line(model_line['x'],model_line['my'], color=colors[i],alpha=0.2, line_width = 4)
 
-        radius_size = np.diff(ylims)[0]/20
         if legend:
-            fig1d.circle(data['x'], data['y'], radius=radius_size,color=colors[i], legend = legend_keys[i])
+            fig1d.scatter(data['x'], data['y'], marker='circle', color=colors[i],
+                          size=CIRCLE_SIZE, legend_label=legend_keys[i])
         else:
-            fig1d.circle(data['x'], data['y'],radius=radius_size, color=colors[i])
+            fig1d.scatter(data['x'], data['y'], marker='circle', color=colors[i],
+                          size=CIRCLE_SIZE)
         outx += [data['x'].values]
         outy += [data['y'].values]
         oute += [data['err'].values]
         fig1d.multi_line(x_err, y_err,color=colors[i])
         i += 1
     if plot:
-        show(fig1d)
+        _show_bokeh(fig1d, output_file, output_notebook)
     return outx,outy,oute
 
 
@@ -680,7 +703,8 @@ def hst_spec(result_dict, plot=True, output_file ='hstspec.html', model = True, 
         np.array(y_err.append((py - yerr, py + yerr)))
     if model:
         plot_spectrum.line(mwave,mspec, color= "black", alpha = 0.5, line_width = 4)
-    plot_spectrum.circle(binwave,binspec, line_width=3, line_alpha=0.6)
+    plot_spectrum.scatter(binwave,binspec, marker='circle', size=CIRCLE_SIZE,
+                          line_width=3, line_alpha=0.6)
     plot_spectrum.multi_line(x_err, y_err)
 
     if output_notebook & plot:
@@ -758,7 +782,8 @@ def hst_time(result_dict, plot=True, output_file ='hsttime.html', model = True, 
                                title="Earliest Start Time")
 
     if model: early.line(phase1, trmodel1, color='black',alpha=0.5, line_width = 4)
-    early.circle(obsphase1, obstr1, line_width=3, line_alpha=0.6)
+    early.scatter(obsphase1, obstr1, marker='circle', size=CIRCLE_SIZE, line_width=3,
+                  line_alpha=0.6)
     early.multi_line(x_err1, y_err1)
 
     late = Figure(width=400, height=300,
@@ -767,7 +792,8 @@ def hst_time(result_dict, plot=True, output_file ='hsttime.html', model = True, 
                                  y_axis_label='Flux',
                                title="Latest Start Time")
     if model: late.line(phase2, trmodel2, color='black',alpha=0.5, line_width = 3)
-    late.circle(obsphase2, obstr2, line_width=3, line_alpha=0.6)
+    late.scatter(obsphase2, obstr2, marker='circle', size=CIRCLE_SIZE, line_width=3,
+                 line_alpha=0.6)
     late.multi_line(x_err2, y_err2)
 
     start_time = row(early, late)
@@ -857,7 +883,8 @@ def hst_simulated_lightcurve(result_dict, plot=True, output_file ='hsttime.html'
 
     if model:
         early.line(phase1, model_counts1, color='black', alpha=0.5, line_width=4)
-    early.circle(obsphase1, counts1, line_width=3, line_alpha=0.6)
+    early.scatter(obsphase1, counts1, marker='circle', size=CIRCLE_SIZE, line_width=3,
+                  line_alpha=0.6)
     early.multi_line(x_err1, y_err1)
 
     late = Figure(width=400, height=300,
@@ -867,7 +894,8 @@ def hst_simulated_lightcurve(result_dict, plot=True, output_file ='hsttime.html'
                   title="Latest Start Time" + title_description)
     if model:
         late.line(phase2, model_counts2, color='black', alpha=0.5, line_width=3)
-    late.circle(obsphase2, counts2, line_width=3, line_alpha=0.6)
+    late.scatter(obsphase2, counts2, marker='circle', size=CIRCLE_SIZE, line_width=3,
+                 line_alpha=0.6)
     late.multi_line(x_err2, y_err2)
 
     start_time = row(early, late)

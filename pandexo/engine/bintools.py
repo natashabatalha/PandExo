@@ -1,11 +1,11 @@
 import pandas as pd 
 import numpy as np 
-import warnings
-with warnings.catch_warnings():
-	warnings.filterwarnings("ignore")
-	import pysynphot.binning as astrobin 
 import warnings as warn
 import astropy.units as u
+try:
+	from .synphot_compat import calculate_bin_edges
+except ImportError:
+	from synphot_compat import calculate_bin_edges
 def binning(x, y,  dy=None, binwidth=None, r=None,newx= None, log = False, nan=False):
 	"""
 	This contains functionality for binning spectroscopy given an x, y and set of errors. 
@@ -89,14 +89,14 @@ def binning(x, y,  dy=None, binwidth=None, r=None,newx= None, log = False, nan=F
 	if newx is not None: 
 		bin_x = newx
 		bin_x, bin_y, bin_dy, bin_n = uniform_tophat_mean(bin_x,x, y, dy=dy,nan=nan)
-		bin_edge = astrobin.calculate_bin_edges(bin_x)
+		bin_edge = calculate_bin_edges(bin_x)
 
 		return {'bin_y':bin_y, 'bin_x':bin_x, 'bin_edge':bin_edge, 'bin_dy':bin_dy, 'bin_n':bin_n} 
 
 	elif r is not None:
 		bin_x = bin_wave_to_R(x, r)
 		bin_x, bin_y, bin_dy, bin_n = uniform_tophat_mean(bin_x,x, y, dy=dy,nan=nan)
-		bin_edge = astrobin.calculate_bin_edges(bin_x)
+		bin_edge = calculate_bin_edges(bin_x)
 
 		return {'bin_y':bin_y, 'bin_x':bin_x, 'bin_edge':bin_edge, 'bin_dy':bin_dy, 'bin_n':bin_n} 
  
@@ -111,7 +111,7 @@ def binning(x, y,  dy=None, binwidth=None, r=None,newx= None, log = False, nan=F
 		elif not log:
 			bin_x = np.arange(min(x),max(x),binwidth)
 		bin_x, bin_y, bin_dy, bin_n = uniform_tophat_mean(bin_x,x, y, dy=dy,nan=nan)
-		bin_edge = astrobin.calculate_bin_edges(bin_x)
+		bin_edge = calculate_bin_edges(bin_x)
 
 		return {'bin_y':bin_y, 'bin_x':bin_x, 'bin_edge':bin_edge, 'bin_dy':bin_dy, 'bin_n':bin_n} 
 
@@ -242,4 +242,3 @@ def bin_wave_to_R(w, R):
 	        tracker = max(w)
 	        wave += [tracker]
 	return wave
-

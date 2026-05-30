@@ -1,4 +1,24 @@
 import numpy as np
+import warnings
+
+warnings.filterwarnings(
+    "ignore",
+    message="pkg_resources is deprecated as an API.*",
+    module="pandeia.engine.config",
+)
+warnings.filterwarnings(
+    "ignore",
+    message='"Reader" was deprecated.*',
+    module="pandeia.engine.extinction",
+)
+warnings.filterwarnings(
+    "ignore",
+    # Pandeia's report formatter evaluates log(0) before checking for zero.
+    message="divide by zero encountered in log",
+    category=RuntimeWarning,
+    module="pandeia.engine.report",
+)
+
 from pandeia.engine.instrument_factory import InstrumentFactory
 from .pandexo import wrapper
 from .load_modes import SetDefaultModes
@@ -202,7 +222,7 @@ def load_mode_dict(inst):
     """
     return SetDefaultModes(inst).pick()
 
-def get_thruput(inst, niriss=1, nirspec='f100lp'):
+def get_thruput(inst, niriss=1, nirspec='f100lp', wmin='default', wmax='default'):
     """Returns complete instrument photon to electron conversion efficiency
     Pulls complete instrument photon to electron conversion efficiency
     (PCE) based on instrument key input
@@ -216,6 +236,12 @@ def get_thruput(inst, niriss=1, nirspec='f100lp'):
     nirspec : str
         (Optional) for NIRISS G140M/H there are two available filters (f100lp and f070lp)
         if you are selecting G140M or G140H, this allows you to pick which one
+    wmin : str / float
+        (Optional) minimum wavlength to compute PCE across, 'default' will use
+        values from Pandeia.
+    wmax : str / float
+        (Optional) maximum wavlength to compute PCE across, 'default' will use
+        values from Pandeia.
     Returns
     -------
     dict
@@ -232,20 +258,26 @@ def get_thruput(inst, niriss=1, nirspec='f100lp'):
     conf['detector']['ngroup'] = 2
 
     if conf['instrument']['instrument'].lower() =='niriss':
-        #pandeia handles slit losses inside the 2d engine. So, you need to account for the
-        #extra .663 here
         conf["instrument"]["disperser"] = conf["instrument"]["disperser"] +'_'+str(niriss)
         i = InstrumentFactory(config=conf)
         wr = i.get_wave_range()
-        wave = np.linspace(wr['wmin'], wr['wmax'], num=500)
+        if wmin == 'default':
+            wmin = wr['wmin']
+        if wmax == 'default':
+            wmax = wr['wmax']
+        wave = np.linspace(wmin, wmax, num=500)
         pce = i.get_total_eff(wave)
-        return {'wave':wave,'pce':0.663*pce}
+        return {'wave':wave,'pce':pce}
     elif (conf['instrument']['instrument'].lower() =='nirspec') and ('g140' in conf["instrument"]["disperser"]):
         conf["instrument"]["filter"] = nirspec
 
     i = InstrumentFactory(config=conf)
     wr = i.get_wave_range()
-    wave = np.linspace(wr['wmin'], wr['wmax'], num=500)
+    if wmin == 'default':
+        wmin = wr['wmin']
+    if wmax == 'default':
+        wmax = wr['wmax']
+    wave = np.linspace(wmin, wmax, num=500) #
     pce = i.get_total_eff(wave)
     return {'wave':wave,'pce':pce}
 
@@ -286,7 +318,8 @@ def run_param_space(i,exo,inst,param_space, verbose=False):
     #load in correct dict format
     inst_dict = load_mode_dict(inst)
     name = os.path.split(str(i))[1]
-    return {name: wrapper({"pandeia_input": inst_dict , "pandexo_input":exo}, verbose=verbose)}
+    run_verbose = "{}={}".format(param_space, name) if verbose else False
+    return {name: wrapper({"pandeia_input": inst_dict , "pandexo_input":exo}, verbose=run_verbose)}
 
 def run_inst_space(inst,exo, verbose=False):
     """Changes inst dictionary and submits run
@@ -311,7 +344,8 @@ def run_inst_space(inst,exo, verbose=False):
     """
     #load in correct dict format
     inst_dict = load_mode_dict(inst)
-    return {inst: wrapper({"pandeia_input": inst_dict , "pandexo_input":exo}, verbose=verbose)}
+    run_verbose = inst if verbose else False
+    return {inst: wrapper({"pandeia_input": inst_dict , "pandexo_input":exo}, verbose=run_verbose)}
 
 
 def run_pandexo(exo, inst, param_space = 0, param_range = 0,save_file = True,
@@ -407,9 +441,12 @@ def run_pandexo(exo, inst, param_space = 0, param_range = 0,save_file = True,
             return results
 
         #if there are parameters to cycle through this will run
-        if verbose: print("Running through exo parameters in parallel: " + param_space)
+        if verbose: print("Running through exo parameters in parallel: " + param_space, flush=True)
         #run the above function in parallel
-        results = Parallel(n_jobs=num_cores)(delayed(run_param_space)(i,exo,inst[0],param_space) for i in param_range)
+        results = Parallel(n_jobs=num_cores)(
+            delayed(run_param_space)(i, exo, inst[0], param_space, verbose=verbose) for i in param_range
+        )
+        if verbose: print("Finished exo parameter grid", flush=True)
 
         #Default dump all results [an array of dictionaries] into single file
         #and return results immediately to user
@@ -420,10 +457,13 @@ def run_pandexo(exo, inst, param_space = 0, param_range = 0,save_file = True,
         return results
 
     #run several different instrument modes and single planet
-    if verbose: print("Running select instruments")
     if len(inst)>1:
+        if verbose: print("Running select instruments: " + ", ".join(inst), flush=True)
 
-        results = Parallel(n_jobs=num_cores)(delayed(run_inst_space)(i, exo) for i in inst)
+        results = Parallel(n_jobs=num_cores)(
+            delayed(run_inst_space)(i, exo, verbose=verbose) for i in inst
+        )
+        if verbose: print("Finished select instruments", flush=True)
 
         #Default dump all results [an array of dictionaries] into single file
         #and return results immediately to user
@@ -434,8 +474,11 @@ def run_pandexo(exo, inst, param_space = 0, param_range = 0,save_file = True,
 
     #cycle through all options
     elif inst[0].lower() == 'run all':
-        if verbose: print("Running through all instruments")
-        results = Parallel(n_jobs=num_cores)(delayed(run_inst_space)(i, exo) for i in ALL.keys())
+        if verbose: print("Running through all instruments", flush=True)
+        results = Parallel(n_jobs=num_cores)(
+            delayed(run_inst_space)(i, exo, verbose=verbose) for i in ALL.keys()
+        )
+        if verbose: print("Finished running all instruments", flush=True)
 
         #Default dump all results [an array of dictionaries] into single file
         #and return results immediately to user

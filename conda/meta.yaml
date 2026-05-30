@@ -20,11 +20,12 @@ build:
    - CONDA_BLD_PATH
   entry_points:
     - start_pandexo=pandexo.engine.run_online:main
-  script: python setup.py install --single-version-externally-managed --record=record.txt
+  script: {{ PYTHON }} -m pip install . --no-deps --no-build-isolation -vv
 
 requirements:
   host:
     - python
+    - pip
     - setuptools
     - numpy 
     - bokeh
@@ -33,7 +34,8 @@ requirements:
     - joblib
     - photutils
     - astropy
-    - pysynphot
+    - synphot
+    - stsynphot
     - sqlalchemy
     - sphinx 
   run:
@@ -45,7 +47,8 @@ requirements:
     - joblib
     - photutils
     - astropy 
-    - pysynphot
+    - synphot
+    - stsynphot
     - sqlalchemy
     - sphinx 
 
