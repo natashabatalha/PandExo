@@ -36,6 +36,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           cache: pip
+          cache-dependency-path: setup.py
 
       - name: Install package and test dependencies
         run: |
