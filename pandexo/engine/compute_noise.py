@@ -53,15 +53,26 @@ class ExtractSpec():
         self.inn = inn
         self.out = out 
         self.ngroups_per_int = timing["APT: Num Groups per Integration"]
-        self.nint_out = timing["Num Integrations Out of Transit"]
-        self.nint_in = timing["Num Integrations In Transit"]
+        self.real_nint_out = timing["Num Integrations Out of Transit"]
+        self.real_nint_in = timing["Num Integrations In Transit"]
+        self.nsuperstripe = timing.get("Num Superstripes", 1)
+        self.nint_out = timing.get("Effective Integrations Out of Transit",
+                                   self.real_nint_out)
+        self.nint_in = timing.get("Effective Integrations In Transit",
+                                  self.real_nint_in)
         self.tframe = timing["Seconds per Frame"]
         self.frame_zero_dead = timing["Zero Frame Efficiency Loss"]
         self.rn = rn 
         self.extraction_area = extraction_area
 
-        #on source out versus in 
-        self.exptime_per_int = self.tframe * (self.ngroups_per_int+self.frame_zero_dead )
+        # Pandeia is run with nint=1. Its scalar measurement_time is the
+        # per-integration science time PandExo scales below. For SOSS
+        # multistripe modes that Pandeia value includes all superstripes, so
+        # timing supplies effective per-wavelength integration counts.
+        self.exptime_per_int = timing.get(
+            "Measurement Time per Integration (sec)",
+            self.tframe * (self.ngroups_per_int+self.frame_zero_dead) * self.nsuperstripe
+        )
         self.on_source_in =  self.inn['scalar']['measurement_time'] * self.nint_in #self.tframe * (self.ngroups_per_int+self.frame_zero_dead)
         self.on_source_out = self.out['scalar']['measurement_time'] * self.nint_out #self.tframe * (self.ngroups_per_int+self.frame_zero_dead) 
 
@@ -206,7 +217,10 @@ class ExtractSpec():
                 'var_in_1d':var_in_1d, 'var_out_1d':var_out_1d,
                 'rn[out,in]':[rn_out_1d,rn_in_1d],'bkg[out,in]': [sky_in_1d,sky_out_1d], 
                 'extract_info':extract_info,'on_source_in':self.on_source_in, 
-                'on_source_out':self.on_source_out}
+                'on_source_out':self.on_source_out,
+                'nint_in':self.nint_in, 'nint_out':self.nint_out,
+                'real_nint_in':self.real_nint_in,
+                'real_nint_out':self.real_nint_out}
 
     def extract_region(self): #second to last 
         """Determine extraction Region
@@ -382,7 +396,9 @@ class ExtractSpec():
                     'var_in_1d':varin, 'var_out_1d': varout,'on_source_in':self.on_source_in, 
                 'on_source_out':self.on_source_out,'bkg[out,in]':[bkg_flux_out,bkg_flux_inn],
                 'rn[out,in]':[rn_var_out,rn_var_inn], 
-                'nint_in':self.nint_in, 'nint_out':self.nint_out}
+                'nint_in':self.nint_in, 'nint_out':self.nint_out,
+                'real_nint_in':self.real_nint_in,
+                'real_nint_out':self.real_nint_out}
     
     
     def run_f_minus_l(self):
@@ -430,7 +446,9 @@ class ExtractSpec():
                     'var_in_1d':varin, 'var_out_1d': varout,'on_source_in':self.on_source_in, 
                 'on_source_out':self.on_source_out, 'rn[out,in]':[rn_var_out,rn_var_inn], 
                 'bkg[out,in]':[bkg_flux_out,bkg_flux_inn], 
-                'nint_in':self.nint_in, 'nint_out':self.nint_out}
+                'nint_in':self.nint_in, 'nint_out':self.nint_out,
+                'real_nint_in':self.real_nint_in,
+                'real_nint_out':self.real_nint_out}
     
 
     
@@ -476,4 +494,3 @@ class ExtractSpec():
                 'on_source_out':'N/A','rn[out,in]':[rn_var_out,rn_var_out], 
                 'bkg[out,in]':[bkg_flux_out,bkg_flux_out]}
         
-

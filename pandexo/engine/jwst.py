@@ -109,9 +109,17 @@ def compute_full_sim(dictinput,verbose=False):
         
     #exposure parameters 
     exp_pars = i.the_detector.exposure_spec
-    tframe =exp_pars.tframe
+    tframe = exp_pars.tframe
     nframe = exp_pars.nframe
     nskip = exp_pars.ndrop2
+    nsuperstripe = int(getattr(exp_pars, "nsuperstripe", 1) or 1)
+    exposure_time_per_int = getattr(exp_pars, "exposure_time", None)
+    exposure_time_inputs = {
+        "tfffr": getattr(exp_pars, "tfffr", None),
+        "nreset1": getattr(exp_pars, "nreset1", 1),
+        "ndrop1": getattr(exp_pars, "ndrop1", 0),
+        "ndrop3": getattr(exp_pars, "ndrop3", 0),
+    }
 
     sat_unit = pandexo_input['observation']['sat_unit']
 
@@ -168,12 +176,18 @@ def compute_full_sim(dictinput,verbose=False):
     
     if isinstance(pandeia_input["configuration"]["detector"]["ngroup"], (float,int)):
         m = {"ngroup":int(pandeia_input["configuration"]["detector"]["ngroup"]), "tframe":tframe,
-            "nframe":nframe,"mingroups":mingroups,"nskip":nskip}
+            "nframe":nframe,"mingroups":mingroups,"nskip":nskip,
+            "nsuperstripe":nsuperstripe,
+            "exposure_time_per_int":exposure_time_per_int,
+            "exposure_time_ngroup":int(pandeia_input["configuration"]["detector"]["ngroup"])}
+        m.update(exposure_time_inputs)
     else:
         #run pandeia once to determine max exposure time per int and get exposure params
         if verbose: print("Optimization Reqested: Computing Duty Cycle")
         m = {"maxexptime_per_int":compute_maxexptime_per_int(pandeia_input, sat_level) , 
-            "tframe":tframe,"nframe":nframe,"mingroups":mingroups,"nskip":nskip}
+            "tframe":tframe,"nframe":nframe,"mingroups":mingroups,"nskip":nskip,
+            "nsuperstripe":nsuperstripe}
+        m.update(exposure_time_inputs)
         if verbose: print("Finished Duty Cycle Calc")
 
     #calculate all timing info
@@ -188,6 +202,7 @@ def compute_full_sim(dictinput,verbose=False):
     extraction_area = out.extraction_area
     out = out.as_dict()
     out.pop('3d')
+    update_timing_measurement_time(timing, out['scalar']['measurement_time'])
     if verbose: print("End out of Transit")
 
     #Remove effects of Quantum Yield from shot noise 
@@ -432,6 +447,27 @@ def compute_timing(m,transit_duration,expfact_out,noccultations,max_ngroup_instr
     nframe = m['nframe']
     nskip = m['nskip']
     mingroups = m['mingroups']
+    nsuperstripe = int(m.get("nsuperstripe", 1) or 1)
+    if nsuperstripe < 1:
+        nsuperstripe = 1
+    def _clocktime_per_int(ngroups):
+        if nsuperstripe > 1:
+            if (m.get("exposure_time_per_int") is not None and
+                    ngroups == m.get("exposure_time_ngroup")):
+                return m["exposure_time_per_int"]/float(nsuperstripe)
+            if m.get("tfffr") is not None:
+                full_cycle = nsuperstripe * (
+                    m["tfffr"]
+                    + tframe * (
+                        m.get("nreset1", 1)
+                        + m.get("ndrop1", 0)
+                        + (ngroups - 1.0)*(nframe + nskip)
+                        + nframe
+                        + m.get("ndrop3", 0)
+                    )
+                )
+                return full_cycle/float(nsuperstripe)
+        return (ngroups+1.0)*tframe
     overhead_per_int = tframe #overhead time added per integration 
     try: 
         #are we starting with a exposure time ?
@@ -486,19 +522,30 @@ def compute_timing(m,transit_duration,expfact_out,noccultations,max_ngroup_instr
     else: 
         frame_zero_dead = -1
 
+    # FML normally measures the last frame minus the first frame. NGROUP=1
+    # has no true first-last baseline; Pandeia treats it as a measurement
+    # from the superbias frame to the end of the first group. Keep that
+    # positive timing convention while warning users downstream.
+    science_time_per_int = (ngroups_per_int + frame_zero_dead)*tframe*(nframe+nskip)
+    measurement_time_per_int = science_time_per_int*nsuperstripe
+
     #the integration time is related to the number of groups and the time of each 
     #group 
     exptime_per_int = ngroups_per_int*tframe
     
-    #clock time includes the reset frame 
-    clocktime_per_int = (ngroups_per_int+1.0)*tframe
+    #clock time includes the reset frame. For SOSS multistripe Pandeia's
+    #exposure_time is a full superstripe cycle, while PandExo keeps the
+    #historical integration count on a single-superstripe scale and divides
+    #by nsuperstripe for per-wavelength noise scaling.
+    clocktime_per_int = _clocktime_per_int(ngroups_per_int)
     
     #observing efficiency (i.e. what percentage of total time is spent on soure)
     eff = (ngroups_per_int + frame_zero_dead)/(ngroups_per_int + 1.0)
     
-    #this says "per occultation" but this is just the in transit frames.. See below
-    # transit duration / ((ngroups + reset)*frame time)
-    nint_per_occultation =  transit_duration/((ngroups_per_int+1.0)*tframe)
+    # this says "per occultation" but this is just the in-transit integration
+    # slots. For SOSS multistripe the clock is one superstripe slice of the
+    # full Pandeia exposure cycle.
+    nint_per_occultation =  transit_duration/clocktime_per_int
     
     #figure out how many integrations are in transit and how many are out of transit 
     nint_in = np.ceil(nint_per_occultation)
@@ -510,22 +557,46 @@ def compute_timing(m,transit_duration,expfact_out,noccultations,max_ngroup_instr
     if nint_in < min_nint_trans:
         ngroups_per_int = np.floor(ngroups_per_int/min_nint_trans)
         exptime_per_int = (ngroups_per_int)*tframe
-        clocktime_per_int = ngroups_per_int*tframe
+        if ngroups_per_int == 1:
+            frame_zero_dead = 0
+        else:
+            frame_zero_dead = -1
+        science_time_per_int = (ngroups_per_int + frame_zero_dead)*tframe*(nframe+nskip)
+        measurement_time_per_int = science_time_per_int*nsuperstripe
+        clocktime_per_int = _clocktime_per_int(ngroups_per_int)
         eff = (ngroups_per_int + frame_zero_dead)/(ngroups_per_int + 1.0)
-        nint_per_occultation =  transit_duration/((ngroups_per_int+1.0)*tframe)
+        nint_per_occultation =  transit_duration/clocktime_per_int
         nint_in = np.ceil(nint_per_occultation)
         nint_out = np.ceil(nint_in/expfact_out)
         
     if nint_out < min_nint_trans:
         nint_out = min_nint_trans
+
+    effective_nint_in = nint_in / float(nsuperstripe)
+    effective_nint_out = nint_out / float(nsuperstripe)
+    # measurement_time_per_int is the Pandeia value for one nint=1
+    # calculation. In SOSS multistripe modes it includes all superstripes,
+    # so the per-wavelength on-source time must use effective_nint_*.
+    on_source_in = effective_nint_in * measurement_time_per_int
+    on_source_out = effective_nint_out * measurement_time_per_int
+    effective_on_source_in = effective_nint_in * measurement_time_per_int
+    effective_on_source_out = effective_nint_out * measurement_time_per_int
    
     timing = {
         "Transit Duration" : (transit_duration)/60.0/60.0,
         "Seconds per Frame" : tframe,
         "Time/Integration incl reset (sec)":clocktime_per_int,
+        "Measurement Time per Integration (sec)":measurement_time_per_int,
         "APT: Num Groups per Integration" :int(ngroups_per_int), 
         "Num Integrations Out of Transit":int(nint_out),
         "Num Integrations In Transit":int(nint_in),
+        "Num Superstripes":nsuperstripe,
+        "Effective Integrations Out of Transit":effective_nint_out,
+        "Effective Integrations In Transit":effective_nint_in,
+        "On Source Time Out of Transit":on_source_out,
+        "On Source Time In Transit":on_source_in,
+        "Effective On Source Time Out of Transit":effective_on_source_out,
+        "Effective On Source Time In Transit":effective_on_source_in,
         "APT: Num Integrations per Occultation":int(nint_out+nint_in),
         "Observing Efficiency (%)": eff*100.0,
         "Transit+Baseline, no overhead (hrs)": (nint_out+nint_in)*clocktime_per_int/60.0/60.0, 
@@ -534,6 +605,28 @@ def compute_timing(m,transit_duration,expfact_out,noccultations,max_ngroup_instr
         }      
 
     return timing, {'flag_default':flag_default,'flag_high':flag_high}
+
+def update_timing_measurement_time(timing, measurement_time_per_int):
+    """Sync timing metadata to the measurement_time reported by Pandeia.
+
+    PandExo runs Pandeia with nint=1 and scales integrations internally. For
+    SOSS multistripe modes, Pandeia's one-integration measurement_time includes
+    all superstripes, so per-wavelength time uses the effective integration
+    counts in the timing dictionary.
+    """
+    nsuperstripe = float(timing.get("Num Superstripes", 1) or 1)
+    nint_in = timing["Num Integrations In Transit"]
+    nint_out = timing["Num Integrations Out of Transit"]
+    effective_nint_in = nint_in / nsuperstripe
+    effective_nint_out = nint_out / nsuperstripe
+
+    timing["Measurement Time per Integration (sec)"] = measurement_time_per_int
+    timing["Effective Integrations In Transit"] = effective_nint_in
+    timing["Effective Integrations Out of Transit"] = effective_nint_out
+    timing["On Source Time In Transit"] = effective_nint_in * measurement_time_per_int
+    timing["On Source Time Out of Transit"] = effective_nint_out * measurement_time_per_int
+    timing["Effective On Source Time In Transit"] = effective_nint_in * measurement_time_per_int
+    timing["Effective On Source Time Out of Transit"] = effective_nint_out * measurement_time_per_int
 
 def remove_QY(pandeia_dict, instrument):
     """Removes Quantum Yield from Pandeia Fluxes. Place Holder. 
@@ -1026,4 +1119,3 @@ def as_dict(out, both_spec ,binned, timing, mag, sat_level, warnings, punit, unb
     return final_dict
 
     
-
