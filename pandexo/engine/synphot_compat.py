@@ -9,7 +9,7 @@ import astropy.units as u
 from synphot import SourceSpectrum, SpectralElement, units
 from synphot.models import Empirical1D
 import stsynphot
-from stsynphot import catalog
+from stsynphot import catalog, exceptions
 
 
 def _wave_unit(name):
@@ -66,7 +66,22 @@ def make_array_spectrum(wave, flux, wave_unit, flux_unit):
 def load_phoenix_spectrum(teff, metallicity, logg):
     """Load/interpolate a PHOENIX model spectrum with ``stsynphot``."""
 
-    return catalog.grid_to_spec("phoenix", teff, metallicity, logg)
+    try:
+        return catalog.grid_to_spec("phoenix", teff, metallicity, logg)
+    except exceptions.ParameterOutOfBounds as exc:
+        raise ValueError(
+            "PandExo could not load a valid PHOENIX stellar spectrum for "
+            "teff={:.1f}, metallicity={:.2f}, logg={:.2f}. The requested "
+            "parameters map to a PHOENIX grid point with no valid flux data. "
+            "Try a nearby valid stellar parameter value, for example a lower "
+            "logg or metallicity, or provide a user stellar spectrum instead. "
+            "Original stsynphot error: {}".format(
+                float(teff),
+                float(metallicity),
+                float(logg),
+                exc,
+            )
+        ) from exc
 
 
 def load_bandpass_from_file(path):

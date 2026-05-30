@@ -8,6 +8,7 @@ from astropy.modeling.models import BlackBody
 from pandexo.engine.create_input import bothTrans, outTrans
 from pandexo.engine.synphot_compat import (
     calculate_bin_edges,
+    load_phoenix_spectrum,
     make_array_spectrum,
     sample_spectrum_micron_mjy,
 )
@@ -20,6 +21,13 @@ def _has_j_bandpass():
     return os.path.exists(
         os.path.join(refdata, "comp", "nonhst", "bessell_j_003_syn.fits")
     )
+
+
+def _has_phoenix_grid():
+    refdata = os.environ.get("PYSYN_CDBS")
+    if refdata is None:
+        return False
+    return os.path.exists(os.path.join(refdata, "grid", "phoenix"))
 
 
 def test_calculate_bin_edges_linear_grid():
@@ -124,6 +132,15 @@ def test_outtrans_phoenix_spectrum_when_reference_grid_is_available():
     assert np.all(np.diff(out["wave"]) > 0)
     assert np.all(np.isfinite(out["flux_out_trans"]))
     assert np.all(np.isfinite(out["stellar_flux"]))
+
+
+@pytest.mark.skipif(
+    not _has_phoenix_grid(),
+    reason="PYSYN_CDBS PHOENIX reference grid is unavailable",
+)
+def test_phoenix_invalid_grid_point_raises_clear_error():
+    with pytest.raises(ValueError, match="PHOENIX.*no valid flux data"):
+        load_phoenix_spectrum(4780.0, 0.31, 4.66)
 
 
 def test_bothtrans_constant_fpfs_uses_sampled_stellar_flux():
