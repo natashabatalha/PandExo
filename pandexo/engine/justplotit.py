@@ -197,7 +197,7 @@ def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', out
             if y_axis_label == 'fp/f*': p = -1.0
             else: y_axis_label = y_axis_label
 
-            if dictt['input']['Calculation Type'] =='phase_spec':
+            if dictt['input']['Calculation Type'].startswith('phase_spec'):
                 x_axis_label='Time (secs)'
                 x_range = [min(x), max(x)]
             else:

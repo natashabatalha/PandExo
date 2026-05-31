@@ -36,6 +36,21 @@ def sort_by_wave_order(value, wave_order):
     return value
 
 
+def select_calculation(planet_wave_unit, nsuperstripe, is_dhs=False):
+    """Choose the noise calculation from the detector readout mode."""
+    use_slope = is_dhs or nsuperstripe > 1
+    if planet_wave_unit == 'sec':
+        return 'phase_spec_slope' if use_slope else 'phase_spec_fml'
+    if use_slope:
+        return 'slope method'
+    return 'fml'
+
+
+def is_phase_spec(calculation):
+    """Return whether a selected calculation is a phase-curve calculation."""
+    return calculation.startswith('phase_spec')
+
+
 def compute_full_sim(dictinput,verbose=False): 
     """Top level function to set up exoplanet obs. for JW
     
@@ -83,18 +98,13 @@ def compute_full_sim(dictinput,verbose=False):
         elif verbose:
             print(message, flush=True)
 	
-    #define the calculation we'll be doing 
-    if pandexo_input['planet']['w_unit'] == 'sec':
-        calculation = 'phase_spec'
-    else: 
-        calculation = pandexo_input['calculation'].lower()
-
     #which instrument 
     instrument = pandeia_input['configuration']['instrument']['instrument']
     conf = pandeia_input['configuration']
 
-    #now fix DHS #of spectra depending on the subarray 
-    if 'dhs' in conf['instrument']['aperture']:
+    #now fix DHS #of spectra depending on the subarray
+    is_dhs = 'dhs' in conf['instrument']['aperture']
+    if is_dhs:
         subarray = pandeia_input['configuration']['detector']['subarray']
         nspectra = int(subarray.split('-spectra')[0][-1])#2*int(substripe[substripe.find('stripe')+6])
         pandeia_input['configuration']['instrument']['aperture'] = f'dhs0spec{nspectra}'
@@ -130,6 +140,13 @@ def compute_full_sim(dictinput,verbose=False):
     nframe = exp_pars.nframe
     nskip = exp_pars.ndrop2
     nsuperstripe = int(getattr(exp_pars, "nsuperstripe", 1) or 1)
+    # Multistripe readouts use Pandeia's slope-derived MULTIACCUM noise.
+    # SOSS exposes this as nsuperstripe > 1; DHS is identified separately
+    # because its multi-spectrum readouts report nsuperstripe == 1.
+    # Legacy readouts retain PandExo's historical first-minus-last method.
+    calculation = select_calculation(
+        pandexo_input['planet']['w_unit'], nsuperstripe, is_dhs=is_dhs
+    )
     exposure_time_per_int = getattr(exp_pars, "exposure_time", None)
     exposure_time_inputs = {
         "tfffr": getattr(exp_pars, "tfffr", None),
@@ -166,7 +183,7 @@ def compute_full_sim(dictinput,verbose=False):
     out_spectrum = np.array([both_spec['wave'], both_spec['flux_out_trans']])
     
     #get transit duration from phase curve or from input 
-    if calculation == 'phase_spec': 
+    if is_phase_spec(calculation):
         transit_duration = max(both_spec['time']) - min(both_spec['time'])
     else: 
         #convert to seconds, then remove quantity and convert back to float 
@@ -255,15 +272,18 @@ def compute_full_sim(dictinput,verbose=False):
         w = out['1d']['extracted_flux'][0]
         result = compNoise.run_2d_extract()
     
-    #this is the noise calculation that PandExo uses online. It derives 
+    #this is the historical noise calculation used for legacy readouts. It derives
     #its own calculation of readnoise and does not use MULTIACUMM 
     #noise formula  
     elif calculation == 'fml':
         w = out['1d']['extracted_flux'][0]
         result = compNoise.run_f_minus_l()
     
-    elif calculation == 'phase_spec':
-        result = compNoise.run_phase_spec()
+    elif calculation == 'phase_spec_fml':
+        result = compNoise.run_phase_spec_fml()
+        w = result['time']
+    elif calculation == 'phase_spec_slope':
+        result = compNoise.run_phase_spec_slope()
         w = result['time']
     else:
         result = None
@@ -312,11 +332,9 @@ def compute_full_sim(dictinput,verbose=False):
         photon_out_bin = photon_out_bin[photon_out_bin>0]
         
     
-    if calculation == 'phase_spec':
-        to = (timing["APT: Num Groups per Integration"]+
-            timing["Zero Frame Efficiency Loss"])*tframe
-        ti = (timing["APT: Num Groups per Integration"]+
-            timing["Zero Frame Efficiency Loss"])*tframe
+    if is_phase_spec(calculation):
+        to = timing["Measurement Time per Integration (sec)"]
+        ti = timing["Measurement Time per Integration (sec)"]
         nint_in = 1
         nint_out = 1
     else: 
@@ -753,8 +771,8 @@ def perform_in(pandeia_input, pandexo_input,timing, both_spec, out, calculation)
         out of transit dictionary from **perform_in**
     calculation : str
         key which speficies the kind of noise calcualtion 
-        (2d extract, slope method, fml, phase_spec). 
-        Recommended for transit transmisstion spectra = fml
+        (2d extract, slope method, fml, phase_spec_fml, phase_spec_slope).
+        Selected automatically from the detector readout mode.
 
     Returns
     -------
@@ -763,7 +781,7 @@ def perform_in(pandeia_input, pandexo_input,timing, both_spec, out, calculation)
     """
     
     #function to run pandeia for in transit
-    if calculation == 'phase_spec':
+    if is_phase_spec(calculation):
         #return the phase curve since it's all we need 
         report_in = {'time': both_spec['time'],'planet_phase': both_spec['planet_phase']}
     elif calculation == 'fml':

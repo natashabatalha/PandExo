@@ -46,8 +46,10 @@ class ExtractSpec():
         computes noise using multiaccum formulation
     run_f_minus_l
         computs noise using first minus last
-    run_phase_spec
-        computs noise for phase curve observations     
+    run_phase_spec_fml
+        computes first-minus-last noise for legacy phase curve observations
+    run_phase_spec_slope
+        computes Pandeia slope noise for multistripe phase curve observations
     """
     def __init__(self, inn, out, rn, extraction_area, timing):
         self.inn = inn
@@ -73,7 +75,8 @@ class ExtractSpec():
             "Measurement Time per Integration (sec)",
             self.tframe * (self.ngroups_per_int+self.frame_zero_dead) * self.nsuperstripe
         )
-        self.on_source_in =  self.inn['scalar']['measurement_time'] * self.nint_in #self.tframe * (self.ngroups_per_int+self.frame_zero_dead)
+        measurement_time_in = self.inn.get('scalar', self.out['scalar'])['measurement_time']
+        self.on_source_in = measurement_time_in * self.nint_in
         self.on_source_out = self.out['scalar']['measurement_time'] * self.nint_out #self.tframe * (self.ngroups_per_int+self.frame_zero_dead) 
 
     def loopingL(self, cen, signal_col, noise_col, bkg_col):
@@ -452,24 +455,28 @@ class ExtractSpec():
     
 
     
-    def run_phase_spec(self):
-        """Computes time dependent noise for phase curves.
+    def _phase_spec_inputs(self):
+        """Return the resampled phase curve and one-integration cadence."""
+        time = self.inn['time']
+        tint = self.exptime_per_int
+        new_t = np.arange(min(time), max(time), tint)
+        planet_phase = np.interp(new_t, time, self.inn['planet_phase'])
+        return tint, new_t, planet_phase
+
+
+    def run_phase_spec_fml(self):
+        """Compute time dependent first-minus-last noise for phase curves.
         
-        Computes noise for phase curve analysis instead of spectroscopy. 
-        Using MULTIACCUM formula here but this could be changed in the future.  Does not 
-        return a spectra for each time element... On your own for that. 
+        Computes white-light noise for a legacy readout instead of returning a
+        spectrum for each time element.
         
         Return
         ------
         dict 
             all optimally extracted 1d products        
         """
-        time = self.inn['time']
-        tint = self.exptime_per_int 
+        tint, new_t, planet_phase = self._phase_spec_inputs()
         curves_out = self.out['1d']
-        #don't input a ridiculously low res phase curve
-        new_t = np.arange(min(time), max(time), tint) 
-        planet_phase = np.interp(new_t, time, self.inn['planet_phase'])
 
         rn_var = 2.0*self.rn**2.0
 
@@ -489,8 +496,41 @@ class ExtractSpec():
         varin = flux_time_in + bkg_flux_out + rn_var_out
  
         
-        return {'photon_out_1d':flux_time_out, 'photon_in_1d':flux_time_in, 
-                    'var_in_1d':varin, 'var_out_1d': varout, 'time':new_t,'on_source_in':'N/A', 
-                'on_source_out':'N/A','rn[out,in]':[rn_var_out,rn_var_out], 
+        return {'photon_out_1d':flux_time_out, 'photon_in_1d':flux_time_in,
+                    'var_in_1d':varin, 'var_out_1d': varout, 'time':new_t,
+                'on_source_in':tint, 'on_source_out':tint,
+                'rn[out,in]':[rn_var_out,rn_var_out],
                 'bkg[out,in]':[bkg_flux_out,bkg_flux_out]}
-        
+
+
+    def run_phase_spec(self):
+        """Retain the historical phase-curve method for direct callers."""
+        return self.run_phase_spec_fml()
+
+
+    def run_phase_spec_slope(self):
+        """Compute time dependent Pandeia slope noise for phase curves.
+
+        Pandeia is evaluated for one out-of-event integration. The extracted
+        MULTIACCUM noise from that integration is used at every phase sample;
+        the supplied phase curve changes the white-light signal only.
+        """
+        tint, new_t, planet_phase = self._phase_spec_inputs()
+        curves_out = self.out['1d']
+
+        extracted_flux_out = np.sum(curves_out['extracted_flux'][1]) * tint
+        flux_time_out = extracted_flux_out + np.zeros(len(new_t))
+        flux_time_in = flux_time_out * (1.0 + planet_phase)
+
+        extracted_noise_out = curves_out['extracted_noise'][1] * tint
+        varout = np.sum(extracted_noise_out**2.0) + np.zeros(len(new_t))
+        varin = varout.copy()
+
+        bkg_flux_out = np.sum(curves_out['extracted_bg_only'][1]) * tint
+        rn_var_out = self.rn**2.0 * self.extraction_area
+
+        return {'photon_out_1d':flux_time_out, 'photon_in_1d':flux_time_in,
+                    'var_in_1d':varin, 'var_out_1d':varout, 'time':new_t,
+                'on_source_in':tint, 'on_source_out':tint,
+                'rn[out,in]':[rn_var_out,rn_var_out],
+                'bkg[out,in]':[bkg_flux_out,bkg_flux_out]}

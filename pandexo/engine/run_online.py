@@ -335,6 +335,8 @@ class CalculationNewHandler(BaseHandler):
 
             exodata = json.load(data_file)
             exodata["telescope"] = 'jwst'
+            # Retain the public input field; jwst.compute_full_sim selects the
+            # actual transit noise method from the detector readout mode.
             exodata["calculation"] = 'fml'
 
             #star

@@ -7,7 +7,11 @@ import numpy as np
 import pytest
 
 from pandexo.engine.compute_noise import ExtractSpec
-from pandexo.engine.jwst import compute_timing, update_timing_measurement_time
+from pandexo.engine.jwst import (
+    compute_timing,
+    select_calculation,
+    update_timing_measurement_time,
+)
 
 
 def _timing(nsuperstripe, ngroup=3, mingroups=2):
@@ -69,6 +73,44 @@ def _fml_result(timing):
     return ExtractSpec(inn, out, rn=0.0, extraction_area=1.0, timing=timing).run_f_minus_l()
 
 
+def _slope_result(timing):
+    wave = np.array([1.0, 2.0])
+    flux = np.array([100.0, 100.0])
+    noise = np.array([10.0, 10.0])
+    bg = np.array([0.0, 0.0])
+    out = {
+        "scalar": {"measurement_time": 10.0},
+        "1d": {
+            "extracted_flux": [wave, flux],
+            "extracted_noise": [wave, noise],
+            "extracted_bg_only": [wave, bg],
+        },
+    }
+    inn = deepcopy(out)
+    return ExtractSpec(inn, out, rn=0.0, extraction_area=1.0, timing=timing).run_slope_method()
+
+
+def _phase_result(timing, method):
+    wave = np.array([1.0, 2.0])
+    flux = np.array([100.0, 200.0])
+    noise = np.array([3.0, 4.0])
+    bg = np.array([1.0, 2.0])
+    out = {
+        "scalar": {"measurement_time": 12.0},
+        "1d": {
+            "extracted_flux": [wave, flux],
+            "extracted_noise": [wave, noise],
+            "extracted_bg_only": [wave, bg],
+        },
+    }
+    inn = {
+        "time": np.array([0.0, 24.0]),
+        "planet_phase": np.array([0.0, 0.01]),
+    }
+    extract = ExtractSpec(inn, out, rn=2.0, extraction_area=3.0, timing=timing)
+    return getattr(extract, method)()
+
+
 def _fractional_uncertainty(result):
     photon_out = result["photon_out_1d"]
     photon_in = result["photon_in_1d"]
@@ -81,6 +123,23 @@ def _fractional_uncertainty(result):
         + (photon_in * to / ti / photon_out ** 2.0) ** 2.0 * var_out
     )
     return np.sqrt(var_tot)
+
+
+@pytest.mark.parametrize(
+    ("planet_wave_unit", "nsuperstripe", "is_dhs", "expected"),
+    [
+        ("um", 1, False, "fml"),
+        ("um", 3, False, "slope method"),
+        ("um", 1, True, "slope method"),
+        ("sec", 1, False, "phase_spec_fml"),
+        ("sec", 3, False, "phase_spec_slope"),
+        ("sec", 1, True, "phase_spec_slope"),
+    ],
+)
+def test_calculation_depends_on_detector_readout(
+    planet_wave_unit, nsuperstripe, is_dhs, expected
+):
+    assert select_calculation(planet_wave_unit, nsuperstripe, is_dhs) == expected
 
 
 def test_nsuperstripe_one_preserves_effective_timing():
@@ -158,10 +217,10 @@ def test_multistripe_timing_uses_pandeia_full_cycle_clock_without_double_countin
     assert timing["On Source Time In Transit"] == pytest.approx(20.0)
 
 
-def test_fml_uncertainty_increases_by_sqrt_nsuperstripe():
+def test_slope_uncertainty_increases_by_sqrt_nsuperstripe():
     nsuperstripe = 9
-    normal = _fml_result(_timing(nsuperstripe=1))
-    multistripe = _fml_result(_timing(nsuperstripe=nsuperstripe))
+    normal = _slope_result(_timing(nsuperstripe=1))
+    multistripe = _slope_result(_timing(nsuperstripe=nsuperstripe))
 
     ratio = _fractional_uncertainty(multistripe) / _fractional_uncertainty(normal)
 
@@ -176,6 +235,26 @@ def test_single_group_fml_path_stays_finite():
 
     assert result["on_source_in"] > 0
     assert np.all(np.isfinite(uncertainty))
+
+
+def test_phase_spec_fml_uses_out_measurement_time_without_in_scalar():
+    result = _phase_result(_timing(nsuperstripe=1), "run_phase_spec_fml")
+
+    assert np.diff(result["time"]) == pytest.approx([4.0, 4.0, 4.0, 4.0, 4.0])
+    assert result["on_source_in"] == pytest.approx(4.0)
+    assert np.all(np.isfinite(_fractional_uncertainty(result)))
+
+
+def test_phase_spec_slope_uses_full_multistripe_measurement_time_and_pandeia_noise():
+    timing = _timing(nsuperstripe=3)
+    update_timing_measurement_time(timing, measurement_time_per_int=12.0)
+    result = _phase_result(timing, "run_phase_spec_slope")
+
+    assert np.diff(result["time"]) == pytest.approx([12.0])
+    assert result["on_source_in"] == pytest.approx(12.0)
+    assert result["photon_out_1d"] == pytest.approx([3600.0, 3600.0])
+    assert result["var_out_1d"] == pytest.approx([3600.0, 3600.0])
+    assert np.all(np.isfinite(_fractional_uncertainty(result)))
 
 
 def _skip_if_pandeia_refdata_invalid():
@@ -215,6 +294,7 @@ def test_pandeia_soss_multistripe_exposes_superstripes(subarray, expected_nsuper
     timing = _timing(nsuperstripe=int(getattr(exp_pars, "nsuperstripe", 1) or 1))
 
     assert exp_pars.nsuperstripe == expected_nsuperstripe
+    assert select_calculation("um", exp_pars.nsuperstripe) == "slope method"
     assert timing["Num Superstripes"] > 1
     assert "Num Integrations In Transit" in timing
     assert "Effective Integrations In Transit" in timing
@@ -231,5 +311,19 @@ def test_pandeia_standard_soss_substrips_have_one_superstripe(subarray):
     timing = _timing(nsuperstripe=int(getattr(exp_pars, "nsuperstripe", 1) or 1))
 
     assert exp_pars.nsuperstripe == 1
+    assert select_calculation("um", exp_pars.nsuperstripe) == "fml"
     assert timing["Num Superstripes"] == 1
     assert timing["Effective Integrations In Transit"] == timing["Num Integrations In Transit"]
+
+
+def test_pandeia_dhs_readout_uses_slope_without_superstripes():
+    _skip_if_pandeia_refdata_invalid()
+    from pandeia.engine.instrument_factory import InstrumentFactory
+
+    with open("pandexo/engine/reference/nircam_dhs_input.json") as handle:
+        conf = json.load(handle)["configuration"]
+    conf["detector"]["ngroup"] = 2
+    exp_pars = InstrumentFactory(config=conf).the_detector.exposure_spec
+
+    assert exp_pars.nsuperstripe == 1
+    assert select_calculation("um", exp_pars.nsuperstripe, is_dhs=True) == "slope method"
