@@ -5,14 +5,6 @@ import numpy as np
 import pytest
 
 
-def _import_compute_timing():
-    try:
-        from pandexo.engine.jwst import compute_timing
-    except Exception as exc:
-        pytest.skip(f"Pandeia-dependent JWST module is unavailable: {exc}")
-    return compute_timing
-
-
 def _import_justdoit():
     try:
         import pandexo.engine.justdoit as jdi
@@ -71,36 +63,6 @@ def _default_smoke_exo_dict(jdi):
     exo_dict["planet"]["td_unit"] = "s"
     exo_dict["planet"]["f_unit"] = "rp^2/r*^2"
     return exo_dict
-
-
-def test_compute_timing_keeps_single_group_on_source_time_positive():
-    compute_timing = _import_compute_timing()
-
-    timing, flags = compute_timing(
-        {
-            "maxexptime_per_int": 0.1,
-            "tframe": 1.0,
-            "nframe": 1,
-            "mingroups": 1,
-            "nskip": 0,
-        },
-        transit_duration=10.0,
-        expfact_out=1.0,
-        noccultations=1,
-    )
-
-    assert timing["APT: Num Groups per Integration"] == 1
-    assert timing["Num Integrations In Transit"] > 0
-    assert (
-        timing["Seconds per Frame"]
-        * (
-            timing["APT: Num Groups per Integration"]
-            + timing["Zero Frame Efficiency Loss"]
-        )
-        * timing["Num Integrations In Transit"]
-        > 0
-    )
-    assert flags["flag_default"] == "NGROUPS<1SET TO NGROUPS=1"
 
 
 @pytest.mark.parametrize("instrument", ["NIRSpec G140H", "MIRI LRS"])

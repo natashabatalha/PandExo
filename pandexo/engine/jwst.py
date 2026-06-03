@@ -46,6 +46,19 @@ def select_calculation(planet_wave_unit, nsuperstripe, is_dhs=False):
     return 'fml'
 
 
+def nirspec_valid_channel_mask(conf, extracted_noise):
+    """Mask NIRSpec channels that Pandeia marks as unobserved."""
+    instrument = conf.get('instrument', {})
+    if (
+        extracted_noise is None
+        or str(instrument.get('instrument', '')).lower() != 'nirspec'
+    ):
+        return None
+
+    extracted_noise = np.asarray(extracted_noise, dtype=float)
+    return np.isfinite(extracted_noise) & (extracted_noise > 0.0)
+
+
 def is_phase_spec(calculation):
     """Return whether a selected calculation is a phase-curve calculation."""
     return calculation.startswith('phase_spec')
@@ -293,6 +306,16 @@ def compute_full_sim(dictinput,verbose=False):
     varout = result['var_out_1d']
     extracted_flux_out = result['photon_out_1d']
     extracted_flux_inn = result['photon_in_1d']
+    pandeia_extracted_noise = None
+    pandeia_snr_int = None
+    if not is_phase_spec(calculation):
+        pandeia_extracted_noise = np.asarray(
+            out['1d']['extracted_noise'][1], dtype=float
+        )
+        pandeia_snr_int = [
+            np.asarray(out['1d']['sn'][0], dtype=float),
+            np.asarray(out['1d']['sn'][1], dtype=float),
+        ]
 
     input_wave_order = np.argsort(w, kind='mergesort')
     if not np.array_equal(input_wave_order, np.arange(len(w))):
@@ -303,6 +326,23 @@ def compute_full_sim(dictinput,verbose=False):
         extracted_flux_inn = extracted_flux_inn[input_wave_order]
         result['rn[out,in]'] = sort_by_wave_order(result['rn[out,in]'], input_wave_order)
         result['bkg[out,in]'] = sort_by_wave_order(result['bkg[out,in]'], input_wave_order)
+        if pandeia_extracted_noise is not None:
+            pandeia_extracted_noise = pandeia_extracted_noise[input_wave_order]
+        if pandeia_snr_int is not None:
+            pandeia_snr_int = sort_by_wave_order(pandeia_snr_int, input_wave_order)
+
+    valid_channel = nirspec_valid_channel_mask(
+        conf, pandeia_extracted_noise
+    )
+    if valid_channel is not None:
+        w = w[valid_channel]
+        varin = varin[valid_channel]
+        varout = varout[valid_channel]
+        extracted_flux_out = extracted_flux_out[valid_channel]
+        extracted_flux_inn = extracted_flux_inn[valid_channel]
+        result['rn[out,in]'] = sort_by_wave_order(result['rn[out,in]'], valid_channel)
+        result['bkg[out,in]'] = sort_by_wave_order(result['bkg[out,in]'], valid_channel)
+        pandeia_snr_int = sort_by_wave_order(pandeia_snr_int, valid_channel)
 
         
     #bin the data according to user input 
@@ -387,7 +427,11 @@ def compute_full_sim(dictinput,verbose=False):
                 'electrons_out':photon_out_bin*nocc, 
                 'electrons_in':photon_in_bin*nocc,
                 'electron_per_int':photon_out_bin/nint_out, 
-                'snr_int':[out['1d']['sn'][0],out['1d']['sn'][1]],
+                'snr_int': (
+                    pandeia_snr_int
+                    if pandeia_snr_int is not None
+                    else [out['1d']['sn'][0], out['1d']['sn'][1]]
+                ),
                 'var_in':var_in_bin*nocc, 
                 'var_out':var_out_bin*nocc,
                 'e_rate_out':photon_out_bin/to,

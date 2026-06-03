@@ -1,3 +1,5 @@
+"""JWST timing, calculation-routing, and noise-scaling regression tests."""
+
 import contextlib
 import io
 import json
@@ -160,6 +162,34 @@ def test_single_group_timing_uses_one_positive_measurement_frame():
     assert timing["Measurement Time per Integration (sec)"] == pytest.approx(2.0)
     assert timing["On Source Time In Transit"] > 0
     assert timing["Effective On Source Time In Transit"] > 0
+
+
+def test_compute_timing_keeps_single_group_on_source_time_positive():
+    timing, flags = compute_timing(
+        {
+            "maxexptime_per_int": 0.1,
+            "tframe": 1.0,
+            "nframe": 1,
+            "mingroups": 1,
+            "nskip": 0,
+        },
+        transit_duration=10.0,
+        expfact_out=1.0,
+        noccultations=1,
+    )
+
+    assert timing["APT: Num Groups per Integration"] == 1
+    assert timing["Num Integrations In Transit"] > 0
+    assert (
+        timing["Seconds per Frame"]
+        * (
+            timing["APT: Num Groups per Integration"]
+            + timing["Zero Frame Efficiency Loss"]
+        )
+        * timing["Num Integrations In Transit"]
+        > 0
+    )
+    assert flags["flag_default"] == "NGROUPS<1SET TO NGROUPS=1"
 
 
 def test_multigroup_measurement_time_preserves_first_minus_last_interval():
