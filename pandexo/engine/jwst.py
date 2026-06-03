@@ -59,6 +59,98 @@ def nirspec_valid_channel_mask(conf, extracted_noise):
     return np.isfinite(extracted_noise) & (extracted_noise > 0.0)
 
 
+def _no_valid_spectral_channels_message(conf, scalar):
+    """Describe an all-invalid spectral extraction without requiring Pandeia."""
+    instrument = conf.get('instrument', {})
+    detector = conf.get('detector', {})
+    details = [
+        'All spectral channels have non-positive or non-finite '
+        'Pandeia extracted_noise values.',
+        'The target may be fully saturated, or the requested setup may '
+        'not place any valid spectral channels on the detector.',
+        'Try a fainter target, fewer groups, or a different subarray.',
+    ]
+    for key, value in [
+        ('disperser', instrument.get('disperser')),
+        ('filter', instrument.get('filter')),
+        ('subarray', detector.get('subarray')),
+        ('readout_pattern', detector.get('readout_pattern')),
+        ('fraction_saturation', scalar.get('fraction_saturation')),
+        ('sat_ngroups', scalar.get('sat_ngroups')),
+    ]:
+        if value is not None:
+            details.append('{0}={1}'.format(key, value))
+    return ' '.join(details)
+
+
+def _saturation_warning_message(conf, scalar, pandeia_warning, saturation_kind):
+    """Describe a Pandeia saturation warning with setup context."""
+    instrument = conf.get('instrument', {})
+    detector = conf.get('detector', {})
+    details = [
+        'Pandeia reports {0} saturation for this observation.'.format(
+            saturation_kind
+        ),
+        str(pandeia_warning),
+    ]
+    for key, value in [
+        ('instrument', instrument.get('instrument')),
+        ('mode', instrument.get('mode')),
+        ('disperser', instrument.get('disperser')),
+        ('filter', instrument.get('filter')),
+        ('subarray', detector.get('subarray')),
+        ('readout_pattern', detector.get('readout_pattern')),
+        ('fraction_saturation', scalar.get('fraction_saturation')),
+        ('sat_ngroups', scalar.get('sat_ngroups')),
+    ]:
+        if value is not None:
+            details.append('{0}={1}'.format(key, value))
+    return ' '.join(details)
+
+
+def _pandeia_warning_is_active(value):
+    """Return whether a Pandeia warning field contains a real warning."""
+    if value is None or value is False:
+        return False
+    if isinstance(value, str):
+        return value != 'All good'
+    return True
+
+
+def validate_saturation_state(conf, pand_dict, extracted_noise):
+    """Warn on partial saturation and fail when no spectral channel is usable."""
+    pandeia_warnings = pand_dict.get('warnings') or {}
+    partial_warning = pandeia_warnings.get('partial_saturated')
+    full_warning = pandeia_warnings.get('full_saturated')
+    scalar = pand_dict.get('scalar') or {}
+
+    if extracted_noise is not None:
+        extracted_noise = np.asarray(extracted_noise, dtype=float)
+        valid_noise = np.isfinite(extracted_noise) & (extracted_noise > 0.0)
+        if not np.any(valid_noise):
+            raise ValueError(
+                _no_valid_spectral_channels_message(conf, scalar)
+            )
+
+    if _pandeia_warning_is_active(partial_warning):
+        warnings.warn(
+            _saturation_warning_message(
+                conf, scalar, partial_warning, 'partial'
+            ),
+            UserWarning,
+            stacklevel=2,
+        )
+
+    if _pandeia_warning_is_active(full_warning):
+        warnings.warn(
+            _saturation_warning_message(
+                conf, scalar, full_warning, 'full'
+            ),
+            UserWarning,
+            stacklevel=2,
+        )
+
+
 def is_phase_spec(calculation):
     """Return whether a selected calculation is a phase-curve calculation."""
     return calculation.startswith('phase_spec')
@@ -330,6 +422,8 @@ def compute_full_sim(dictinput,verbose=False):
             pandeia_extracted_noise = pandeia_extracted_noise[input_wave_order]
         if pandeia_snr_int is not None:
             pandeia_snr_int = sort_by_wave_order(pandeia_snr_int, input_wave_order)
+
+    validate_saturation_state(conf, out, pandeia_extracted_noise)
 
     valid_channel = nirspec_valid_channel_mask(
         conf, pandeia_extracted_noise

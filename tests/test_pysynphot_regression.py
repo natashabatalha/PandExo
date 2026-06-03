@@ -179,9 +179,20 @@ def _bandpass_path(case):
     return os.path.join(refdata, "comp", "nonhst", filenames[_filter_name(case["ref_wave"])])
 
 
+def _is_readable_file(path):
+    if path is None or not os.path.exists(path):
+        return False
+    try:
+        with open(path, "rb") as handle:
+            handle.read(1)
+    except OSError:
+        return False
+    return True
+
+
 def _skip_without_bandpass(case):
     path = _bandpass_path(case)
-    if path is None or not os.path.exists(path):
+    if not _is_readable_file(path):
         pytest.skip(f"required normalization bandpass is unavailable: {path}")
 
 
@@ -329,6 +340,12 @@ def test_live_constant_fpfs_matches_legacy_pysynphot():
     np.testing.assert_allclose(new["flux_in_trans"], legacy["flux_in_trans"], rtol=1e-4, atol=1e-8)
 
 
+@pytest.mark.filterwarnings(
+    "ignore:divide by zero encountered in divide:RuntimeWarning:pandeia\\.engine\\.report"
+)
+@pytest.mark.filterwarnings(
+    "ignore:divide by zero encountered in divide:RuntimeWarning:pandeia\\.engine\\.projection"
+)
 def test_live_nirspec_precision_matches_legacy_pysynphot_outtrans(monkeypatch):
     _require_valid_pandeia_refdata()
     legacy_out = _legacy_outtrans(PHOENIX_CASE)

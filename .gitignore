@@ -57,6 +57,7 @@ pip-wheel-metadata/
 *.fits
 *.h5
 *.hdf5
+regression_outputs
 
 # Logs and temporary files
 *.log

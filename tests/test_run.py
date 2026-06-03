@@ -1,8 +1,18 @@
 import contextlib
 import io
+import os
 
 import numpy as np
 import pytest
+
+KNOWN_PANDEIA_ZERO_NOISE_WARNINGS = [
+    pytest.mark.filterwarnings(
+        "ignore:divide by zero encountered in divide:RuntimeWarning:pandeia\\.engine\\.report"
+    ),
+    pytest.mark.filterwarnings(
+        "ignore:divide by zero encountered in divide:RuntimeWarning:pandeia\\.engine\\.projection"
+    ),
+]
 
 
 def _import_justdoit():
@@ -37,6 +47,21 @@ def _require_valid_pandeia_refdata():
             "subarray nsuperstripe entries.\n"
             + status
         )
+    _require_readable_phoenix_grid()
+
+
+def _require_readable_phoenix_grid():
+    refdata = os.environ.get("PYSYN_CDBS")
+    path = None
+    if refdata is not None:
+        path = os.path.join(refdata, "grid", "phoenix", "catalog.fits")
+    if path is None or not os.path.exists(path):
+        pytest.skip(f"PYSYN_CDBS PHOENIX reference grid is unavailable: {path}")
+    try:
+        with open(path, "rb") as handle:
+            handle.read(1)
+    except OSError as exc:
+        pytest.skip(f"PYSYN_CDBS PHOENIX reference grid is unreadable: {exc}")
 
 
 def _default_smoke_exo_dict(jdi):
@@ -65,7 +90,16 @@ def _default_smoke_exo_dict(jdi):
     return exo_dict
 
 
-@pytest.mark.parametrize("instrument", ["NIRSpec G140H", "MIRI LRS"])
+@pytest.mark.parametrize(
+    "instrument",
+    [
+        pytest.param(
+            "NIRSpec G140H",
+            marks=KNOWN_PANDEIA_ZERO_NOISE_WARNINGS,
+        ),
+        "MIRI LRS",
+    ],
+)
 def test_run_pandexo_smoke_has_sorted_wavelengths(instrument):
     _require_valid_pandeia_refdata()
     jdi = _import_justdoit()

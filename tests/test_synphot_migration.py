@@ -18,16 +18,27 @@ def _has_j_bandpass():
     refdata = os.environ.get("PYSYN_CDBS")
     if refdata is None:
         return False
-    return os.path.exists(
-        os.path.join(refdata, "comp", "nonhst", "bessell_j_003_syn.fits")
-    )
+    path = os.path.join(refdata, "comp", "nonhst", "bessell_j_003_syn.fits")
+    return _is_readable_file(path)
 
 
 def _has_phoenix_grid():
     refdata = os.environ.get("PYSYN_CDBS")
     if refdata is None:
         return False
-    return os.path.exists(os.path.join(refdata, "grid", "phoenix"))
+    path = os.path.join(refdata, "grid", "phoenix", "catalog.fits")
+    return _is_readable_file(path)
+
+
+def _is_readable_file(path):
+    if path is None or not os.path.exists(path):
+        return False
+    try:
+        with open(path, "rb") as handle:
+            handle.read(1)
+    except OSError:
+        return False
+    return True
 
 
 def test_calculate_bin_edges_linear_grid():
