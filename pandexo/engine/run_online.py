@@ -65,10 +65,14 @@ async def retrieve_url_to_file(url, filename):
     """Fetch a URL without blocking Tornado and atomically cache it on disk."""
     os.makedirs(os.path.dirname(filename), exist_ok=True)
     response = await AsyncHTTPClient().fetch(url)
-    tmp_filename = filename + ".tmp"
-    with open(tmp_filename, "wb") as write_file:
-        write_file.write(response.body)
-    os.replace(tmp_filename, filename)
+    tmp_filename = "{}.{}.tmp".format(filename, uuid.uuid4().hex)
+    try:
+        with open(tmp_filename, "wb") as write_file:
+            write_file.write(response.body)
+        os.replace(tmp_filename, filename)
+    finally:
+        if os.path.exists(tmp_filename):
+            os.remove(tmp_filename)
 
 
 async def get_cached_planet_names():
