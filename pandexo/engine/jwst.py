@@ -61,7 +61,55 @@ def select_calculation(planet_wave_unit, nsuperstripe, is_dhs=False):
     return 'fml'
 
 
-def nirspec_valid_channel_mask(conf, extracted_noise):
+def _pandeia_1d_values_at_wave(pand_dict, key, wave):
+    """Return a Pandeia 1D diagnostic sampled on PandExo's wavelength grid."""
+    pandeia_1d = pand_dict.get('1d') or {}
+    if key not in pandeia_1d:
+        return np.zeros(len(wave), dtype=float)
+
+    diagnostic_wave = np.asarray(pandeia_1d[key][0], dtype=float)
+    diagnostic_value = np.asarray(pandeia_1d[key][1], dtype=float)
+    wave = np.asarray(wave, dtype=float)
+
+    if (
+        diagnostic_wave.shape == wave.shape
+        and np.allclose(diagnostic_wave, wave, equal_nan=True)
+    ):
+        return diagnostic_value
+
+    finite = np.isfinite(diagnostic_wave) & np.isfinite(diagnostic_value)
+    if not np.any(finite):
+        return np.zeros(len(wave), dtype=float)
+
+    diagnostic_wave = diagnostic_wave[finite]
+    diagnostic_value = diagnostic_value[finite]
+    order = np.argsort(diagnostic_wave, kind='mergesort')
+    return np.interp(
+        wave,
+        diagnostic_wave[order],
+        diagnostic_value[order],
+        left=0.0,
+        right=0.0,
+    )
+
+
+def mask_fully_saturated_final_spectrum(finalspec, full_saturation_mask):
+    """Set final-spectrum values to NaN where Pandeia reports full saturation."""
+    full_saturation_mask = np.asarray(full_saturation_mask, dtype=bool)
+    if not np.any(full_saturation_mask):
+        finalspec['full_saturation_mask'] = full_saturation_mask
+        return finalspec
+
+    for key in ['spectrum', 'spectrum_w_rand', 'error_w_floor']:
+        values = np.asarray(finalspec[key], dtype=float).copy()
+        values[full_saturation_mask] = np.nan
+        finalspec[key] = values
+
+    finalspec['full_saturation_mask'] = full_saturation_mask
+    return finalspec
+
+
+def nirspec_valid_channel_mask(conf, extracted_noise, full_saturation=None):
     """Mask NIRSpec channels that Pandeia marks as unobserved."""
     instrument = conf.get('instrument', {})
     if (
@@ -71,7 +119,19 @@ def nirspec_valid_channel_mask(conf, extracted_noise):
         return None
 
     extracted_noise = np.asarray(extracted_noise, dtype=float)
-    return np.isfinite(extracted_noise) & (extracted_noise > 0.0)
+    valid_noise = np.isfinite(extracted_noise) & (extracted_noise > 0.0)
+    if full_saturation is None:
+        return valid_noise
+
+    full_saturation = np.asarray(full_saturation, dtype=float)
+    if full_saturation.shape != extracted_noise.shape:
+        return valid_noise
+
+    fully_saturated = (
+        np.isfinite(full_saturation)
+        & (full_saturation > 0.0)
+    )
+    return valid_noise | fully_saturated
 
 
 def _no_valid_spectral_channels_message(conf, scalar):
@@ -415,9 +475,13 @@ def compute_full_sim(dictinput,verbose=False):
     extracted_flux_inn = result['photon_in_1d']
     pandeia_extracted_noise = None
     pandeia_snr_int = None
+    pandeia_full_saturation = None
     if not is_phase_spec(calculation):
         pandeia_extracted_noise = np.asarray(
             out['1d']['extracted_noise'][1], dtype=float
+        )
+        pandeia_full_saturation = _pandeia_1d_values_at_wave(
+            out, 'n_full_saturated', w
         )
         pandeia_snr_int = [
             np.asarray(out['1d']['sn'][0], dtype=float),
@@ -435,13 +499,15 @@ def compute_full_sim(dictinput,verbose=False):
         result['bkg[out,in]'] = sort_by_wave_order(result['bkg[out,in]'], input_wave_order)
         if pandeia_extracted_noise is not None:
             pandeia_extracted_noise = pandeia_extracted_noise[input_wave_order]
+        if pandeia_full_saturation is not None:
+            pandeia_full_saturation = pandeia_full_saturation[input_wave_order]
         if pandeia_snr_int is not None:
             pandeia_snr_int = sort_by_wave_order(pandeia_snr_int, input_wave_order)
 
     validate_saturation_state(conf, out, pandeia_extracted_noise)
 
     valid_channel = nirspec_valid_channel_mask(
-        conf, pandeia_extracted_noise
+        conf, pandeia_extracted_noise, pandeia_full_saturation
     )
     if valid_channel is not None:
         w = w[valid_channel]
@@ -449,6 +515,7 @@ def compute_full_sim(dictinput,verbose=False):
         varout = varout[valid_channel]
         extracted_flux_out = extracted_flux_out[valid_channel]
         extracted_flux_inn = extracted_flux_inn[valid_channel]
+        pandeia_full_saturation = pandeia_full_saturation[valid_channel]
         result['rn[out,in]'] = sort_by_wave_order(result['rn[out,in]'], valid_channel)
         result['bkg[out,in]'] = sort_by_wave_order(result['bkg[out,in]'], valid_channel)
         pandeia_snr_int = sort_by_wave_order(pandeia_snr_int, valid_channel)
@@ -457,28 +524,45 @@ def compute_full_sim(dictinput,verbose=False):
     #bin the data according to user input 
     if R != None: 
         wbin = bin_wave_to_R(w, R)
+        saturated_channel = (
+            np.zeros(len(w), dtype=float)
+            if pandeia_full_saturation is None
+            else (pandeia_full_saturation > 0.0).astype(float)
+        )
 
         photon_out_bin = uniform_tophat_sum(wbin, w,extracted_flux_out)
         photon_in_bin = uniform_tophat_sum(wbin,w, extracted_flux_inn)
         var_in_bin = uniform_tophat_sum(wbin, w,varin)
         var_out_bin = uniform_tophat_sum(wbin,w, varout)
+        full_saturation_bin = (
+            uniform_tophat_sum(wbin, w, saturated_channel) > 0.0
+        )
 
-        wbin = wbin[photon_out_bin > 0 ]
-        photon_in_bin = photon_in_bin[photon_out_bin > 0 ]
-        var_in_bin = var_in_bin[photon_out_bin > 0 ]
-        var_out_bin = var_out_bin[photon_out_bin > 0 ]
-        photon_out_bin = photon_out_bin[photon_out_bin>0]
+        valid_photon = photon_out_bin > 0
+        wbin = wbin[valid_photon]
+        photon_in_bin = photon_in_bin[valid_photon]
+        var_in_bin = var_in_bin[valid_photon]
+        var_out_bin = var_out_bin[valid_photon]
+        full_saturation_bin = full_saturation_bin[valid_photon]
+        photon_out_bin = photon_out_bin[valid_photon]
     else: 
         wbin = w
         photon_out_bin = extracted_flux_out
-        wbin = wbin[photon_out_bin>0]
+        full_saturation_bin = (
+            np.zeros(len(wbin), dtype=bool)
+            if pandeia_full_saturation is None
+            else pandeia_full_saturation > 0.0
+        )
+        valid_photon = photon_out_bin > 0
+        wbin = wbin[valid_photon]
         photon_in_bin = extracted_flux_inn
-        photon_in_bin = photon_in_bin[photon_out_bin>0]
+        photon_in_bin = photon_in_bin[valid_photon]
         var_in_bin = varin
-        var_in_bin = var_in_bin[photon_out_bin>0]
+        var_in_bin = var_in_bin[valid_photon]
         var_out_bin = varout
-        var_out_bin = var_out_bin[photon_out_bin>0]
-        photon_out_bin = photon_out_bin[photon_out_bin>0]
+        var_out_bin = var_out_bin[valid_photon]
+        full_saturation_bin = full_saturation_bin[valid_photon]
+        photon_out_bin = photon_out_bin[valid_photon]
         
     
     if is_phase_spec(calculation):
@@ -525,12 +609,16 @@ def compute_full_sim(dictinput,verbose=False):
         error_spec_nfloor = error_spec_nfloor[wave_order]
         raw_spec = raw_spec[wave_order]
         sim_spec = sim_spec[wave_order]
+        full_saturation_bin = full_saturation_bin[wave_order]
    
     #package processed data
     finalspec = {'wave':wbin,
               'spectrum': raw_spec,
               'spectrum_w_rand':sim_spec,
               'error_w_floor':error_spec_nfloor}
+    finalspec = mask_fully_saturated_final_spectrum(
+        finalspec, full_saturation_bin
+    )
     
     rawstuff = {
                 'electrons_out':photon_out_bin*nocc, 
