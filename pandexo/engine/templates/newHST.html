@@ -11,6 +11,7 @@
 <h1 class="page-header">New HST Calculation</h1>
 
 <form enctype="multipart/form-data" class="form-horizontal" action="/calculation/newHST" method="post" id="calculation-form">
+    <input type="hidden" id="formDataJson" value="{{ data_json }}">
 
     <div class="form-group">
         <label class="col-md-3 control-label" for="calcName">Name</label>
@@ -119,7 +120,7 @@
     <hr class="col-md-11 col-md-offset-1">
 
     <div class="form-group">
-        <label class="col-md-3 control-label" for="" style="top: 35px;">Planet Model</label>
+        <label class="col-md-3 control-label" style="top: 35px;">Planet Model</label>
         <div class="col-md-9">
             <div class="radio-chooser">
                 <div class="radio-chooser-item">
@@ -468,7 +469,7 @@
       });
 
       //if we're editing, set the form values to what it was before
-      var obj = JSON.parse({% raw json_encode(data_json) %});
+      var obj = JSON.parse($("#formDataJson").val());
       if (!jQuery.isEmptyObject(obj)) {
 	  $("#planetModelConstant").trigger("click");
 
