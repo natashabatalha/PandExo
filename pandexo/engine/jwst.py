@@ -1,17 +1,15 @@
 import os
 import sys
 import json
+import warnings
 import numpy as np
 import pandas as pd
 from copy import deepcopy 
 from astropy.io import fits
-from pandeia.engine.instrument_factory import InstrumentFactory
-from pandeia.engine.perform_calculation import perform_calculation
 from . import create_input as create
 from .compute_noise import ExtractSpec
 import astropy.units as u
 import pickle
-from pandeia.engine.calc_utils import build_default_calc, build_default_source
 
 #constant parameters.. consider putting these into json file 
 #max groups in integration
@@ -24,6 +22,154 @@ min_nint_trans = 1
 
 #refdata directory
 default_refdata_directory = os.environ.get("pandeia_refdata")
+
+
+def _instrument_factory(config):
+    from pandeia.engine.instrument_factory import InstrumentFactory
+
+    return InstrumentFactory(config=config)
+
+
+def _perform_calculation(*args, **kwargs):
+    from pandeia.engine.perform_calculation import perform_calculation
+
+    return perform_calculation(*args, **kwargs)
+
+
+def _build_default_calc(*args, **kwargs):
+    from pandeia.engine.calc_utils import build_default_calc
+
+    return build_default_calc(*args, **kwargs)
+
+def sort_by_wave_order(value, wave_order):
+    if isinstance(value, np.ndarray) and value.shape[:1] == (len(wave_order),):
+        return value[wave_order]
+    if isinstance(value, list):
+        return [sort_by_wave_order(item, wave_order) for item in value]
+    if isinstance(value, tuple):
+        return tuple(sort_by_wave_order(item, wave_order) for item in value)
+    return value
+
+
+def select_calculation(planet_wave_unit, nsuperstripe, is_dhs=False):
+    """Choose the noise calculation from the detector readout mode."""
+    use_slope = is_dhs or nsuperstripe > 1
+    if planet_wave_unit == 'sec':
+        return 'phase_spec_slope' if use_slope else 'phase_spec_fml'
+    if use_slope:
+        return 'slope method'
+    return 'fml'
+
+
+def nirspec_valid_channel_mask(conf, extracted_noise):
+    """Mask NIRSpec channels that Pandeia marks as unobserved."""
+    instrument = conf.get('instrument', {})
+    if (
+        extracted_noise is None
+        or str(instrument.get('instrument', '')).lower() != 'nirspec'
+    ):
+        return None
+
+    extracted_noise = np.asarray(extracted_noise, dtype=float)
+    return np.isfinite(extracted_noise) & (extracted_noise > 0.0)
+
+
+def _no_valid_spectral_channels_message(conf, scalar):
+    """Describe an all-invalid spectral extraction without requiring Pandeia."""
+    instrument = conf.get('instrument', {})
+    detector = conf.get('detector', {})
+    details = [
+        'All spectral channels have non-positive or non-finite '
+        'Pandeia extracted_noise values.',
+        'The target may be fully saturated, or the requested setup may '
+        'not place any valid spectral channels on the detector.',
+        'Try a fainter target, fewer groups, or a different subarray.',
+    ]
+    for key, value in [
+        ('disperser', instrument.get('disperser')),
+        ('filter', instrument.get('filter')),
+        ('subarray', detector.get('subarray')),
+        ('readout_pattern', detector.get('readout_pattern')),
+        ('fraction_saturation', scalar.get('fraction_saturation')),
+        ('sat_ngroups', scalar.get('sat_ngroups')),
+    ]:
+        if value is not None:
+            details.append('{0}={1}'.format(key, value))
+    return ' '.join(details)
+
+
+def _saturation_warning_message(conf, scalar, pandeia_warning, saturation_kind):
+    """Describe a Pandeia saturation warning with setup context."""
+    instrument = conf.get('instrument', {})
+    detector = conf.get('detector', {})
+    details = [
+        'Pandeia reports {0} saturation for this observation.'.format(
+            saturation_kind
+        ),
+        str(pandeia_warning),
+    ]
+    for key, value in [
+        ('instrument', instrument.get('instrument')),
+        ('mode', instrument.get('mode')),
+        ('disperser', instrument.get('disperser')),
+        ('filter', instrument.get('filter')),
+        ('subarray', detector.get('subarray')),
+        ('readout_pattern', detector.get('readout_pattern')),
+        ('fraction_saturation', scalar.get('fraction_saturation')),
+        ('sat_ngroups', scalar.get('sat_ngroups')),
+    ]:
+        if value is not None:
+            details.append('{0}={1}'.format(key, value))
+    return ' '.join(details)
+
+
+def _pandeia_warning_is_active(value):
+    """Return whether a Pandeia warning field contains a real warning."""
+    if value is None or value is False:
+        return False
+    if isinstance(value, str):
+        return value != 'All good'
+    return True
+
+
+def validate_saturation_state(conf, pand_dict, extracted_noise):
+    """Warn on partial saturation and fail when no spectral channel is usable."""
+    pandeia_warnings = pand_dict.get('warnings') or {}
+    partial_warning = pandeia_warnings.get('partial_saturated')
+    full_warning = pandeia_warnings.get('full_saturated')
+    scalar = pand_dict.get('scalar') or {}
+
+    if extracted_noise is not None:
+        extracted_noise = np.asarray(extracted_noise, dtype=float)
+        valid_noise = np.isfinite(extracted_noise) & (extracted_noise > 0.0)
+        if not np.any(valid_noise):
+            raise ValueError(
+                _no_valid_spectral_channels_message(conf, scalar)
+            )
+
+    if _pandeia_warning_is_active(partial_warning):
+        warnings.warn(
+            _saturation_warning_message(
+                conf, scalar, partial_warning, 'partial'
+            ),
+            UserWarning,
+            stacklevel=2,
+        )
+
+    if _pandeia_warning_is_active(full_warning):
+        warnings.warn(
+            _saturation_warning_message(
+                conf, scalar, full_warning, 'full'
+            ),
+            UserWarning,
+            stacklevel=2,
+        )
+
+
+def is_phase_spec(calculation):
+    """Return whether a selected calculation is a phase-curve calculation."""
+    return calculation.startswith('phase_spec')
+
 
 def compute_full_sim(dictinput,verbose=False): 
     """Top level function to set up exoplanet obs. for JW
@@ -65,19 +211,20 @@ def compute_full_sim(dictinput,verbose=False):
     """
     pandeia_input = dictinput['pandeia_input']
     pandexo_input = dictinput['pandexo_input']    	
-	
-    #define the calculation we'll be doing 
-    if pandexo_input['planet']['w_unit'] == 'sec':
-        calculation = 'phase_spec'
-    else: 
-        calculation = pandexo_input['calculation'].lower()
 
+    def log(message):
+        if isinstance(verbose, str):
+            print("[{}] {}".format(verbose, message), flush=True)
+        elif verbose:
+            print(message, flush=True)
+	
     #which instrument 
     instrument = pandeia_input['configuration']['instrument']['instrument']
     conf = pandeia_input['configuration']
 
-    #now fix DHS #of spectra depending on the subarray 
-    if 'dhs' in conf['instrument']['aperture']:
+    #now fix DHS #of spectra depending on the subarray
+    is_dhs = 'dhs' in conf['instrument']['aperture']
+    if is_dhs:
         subarray = pandeia_input['configuration']['detector']['subarray']
         nspectra = int(subarray.split('-spectra')[0][-1])#2*int(substripe[substripe.find('stripe')+6])
         pandeia_input['configuration']['instrument']['aperture'] = f'dhs0spec{nspectra}'
@@ -99,7 +246,7 @@ def compute_full_sim(dictinput,verbose=False):
     else: 
         conf_temp = conf
 
-    i = InstrumentFactory(config=conf_temp)
+    i = _instrument_factory(config=conf_temp)
     
     #detector parameters
     det_pars = i.read_detector_pars()
@@ -109,9 +256,24 @@ def compute_full_sim(dictinput,verbose=False):
         
     #exposure parameters 
     exp_pars = i.the_detector.exposure_spec
-    tframe =exp_pars.tframe
+    tframe = exp_pars.tframe
     nframe = exp_pars.nframe
     nskip = exp_pars.ndrop2
+    nsuperstripe = int(getattr(exp_pars, "nsuperstripe", 1) or 1)
+    # Multistripe readouts use Pandeia's slope-derived MULTIACCUM noise.
+    # SOSS exposes this as nsuperstripe > 1; DHS is identified separately
+    # because its multi-spectrum readouts report nsuperstripe == 1.
+    # Legacy readouts retain PandExo's historical first-minus-last method.
+    calculation = select_calculation(
+        pandexo_input['planet']['w_unit'], nsuperstripe, is_dhs=is_dhs
+    )
+    exposure_time_per_int = getattr(exp_pars, "exposure_time", None)
+    exposure_time_inputs = {
+        "tfffr": getattr(exp_pars, "tfffr", None),
+        "nreset1": getattr(exp_pars, "nreset1", 1),
+        "ndrop1": getattr(exp_pars, "ndrop1", 0),
+        "ndrop3": getattr(exp_pars, "ndrop3", 0),
+    }
 
     sat_unit = pandexo_input['observation']['sat_unit']
 
@@ -141,7 +303,7 @@ def compute_full_sim(dictinput,verbose=False):
     out_spectrum = np.array([both_spec['wave'], both_spec['flux_out_trans']])
     
     #get transit duration from phase curve or from input 
-    if calculation == 'phase_spec': 
+    if is_phase_spec(calculation):
         transit_duration = max(both_spec['time']) - min(both_spec['time'])
     else: 
         #convert to seconds, then remove quantity and convert back to float 
@@ -150,7 +312,7 @@ def compute_full_sim(dictinput,verbose=False):
     #amount of exposure time out-of-occultation, as a fraction of in-occ time 
     try:
         expfact_out = pandexo_input['observation']['fraction'] 
-        print("WARNING: key input fraction has been replaced with new 'baseline option'. See notebook example")
+        log("WARNING: key input fraction has been replaced with new 'baseline option'. See notebook example")
         pandexo_input['observation']['baseline'] = pandexo_input['observation']['fraction'] 
         pandexo_input['observation']['baseline_unit'] ='frac'
     except:
@@ -168,36 +330,43 @@ def compute_full_sim(dictinput,verbose=False):
     
     if isinstance(pandeia_input["configuration"]["detector"]["ngroup"], (float,int)):
         m = {"ngroup":int(pandeia_input["configuration"]["detector"]["ngroup"]), "tframe":tframe,
-            "nframe":nframe,"mingroups":mingroups,"nskip":nskip}
+            "nframe":nframe,"mingroups":mingroups,"nskip":nskip,
+            "nsuperstripe":nsuperstripe,
+            "exposure_time_per_int":exposure_time_per_int,
+            "exposure_time_ngroup":int(pandeia_input["configuration"]["detector"]["ngroup"])}
+        m.update(exposure_time_inputs)
     else:
         #run pandeia once to determine max exposure time per int and get exposure params
-        if verbose: print("Optimization Reqested: Computing Duty Cycle")
+        log("Optimization Reqested: Computing Duty Cycle")
         m = {"maxexptime_per_int":compute_maxexptime_per_int(pandeia_input, sat_level) , 
-            "tframe":tframe,"nframe":nframe,"mingroups":mingroups,"nskip":nskip}
-        if verbose: print("Finished Duty Cycle Calc")
+            "tframe":tframe,"nframe":nframe,"mingroups":mingroups,"nskip":nskip,
+            "nsuperstripe":nsuperstripe}
+        m.update(exposure_time_inputs)
+        log("Finished Duty Cycle Calc")
 
     #calculate all timing info
     max_ngroup_instrument = max_ngroup[pandeia_input["configuration"]["instrument"]["instrument"]]
     timing, flags = compute_timing(m,transit_duration,expfact_out,noccultations,max_ngroup_instrument)
     
     #Simulate out trans and in transit
-    if verbose: print("Starting Out of Transit Simulation")
+    log("Starting Out of Transit Simulation")
     out = perform_out(pandeia_input, pandexo_input,timing, both_spec)
 
     #extract extraction area before dict conversion
     extraction_area = out.extraction_area
     out = out.as_dict()
     out.pop('3d')
-    if verbose: print("End out of Transit")
+    update_timing_measurement_time(timing, out['scalar']['measurement_time'])
+    log("End out of Transit")
 
     #Remove effects of Quantum Yield from shot noise 
     out = remove_QY(out, instrument)
 
     #this kind of redundant going to compute inn from out instead 
     #keep perform_in but change inputs to (out, timing, both_spec)
-    if verbose: print("Starting In Transit Simulation")
+    log("Starting In Transit Simulation")
     inn = perform_in(pandeia_input, pandexo_input,timing, both_spec, out, calculation)
-    if verbose: print("End In Transit")
+    log("End In Transit")
     
 
 
@@ -223,15 +392,18 @@ def compute_full_sim(dictinput,verbose=False):
         w = out['1d']['extracted_flux'][0]
         result = compNoise.run_2d_extract()
     
-    #this is the noise calculation that PandExo uses online. It derives 
+    #this is the historical noise calculation used for legacy readouts. It derives
     #its own calculation of readnoise and does not use MULTIACUMM 
     #noise formula  
     elif calculation == 'fml':
         w = out['1d']['extracted_flux'][0]
         result = compNoise.run_f_minus_l()
     
-    elif calculation == 'phase_spec':
-        result = compNoise.run_phase_spec()
+    elif calculation == 'phase_spec_fml':
+        result = compNoise.run_phase_spec_fml()
+        w = result['time']
+    elif calculation == 'phase_spec_slope':
+        result = compNoise.run_phase_spec_slope()
         w = result['time']
     else:
         result = None
@@ -241,6 +413,45 @@ def compute_full_sim(dictinput,verbose=False):
     varout = result['var_out_1d']
     extracted_flux_out = result['photon_out_1d']
     extracted_flux_inn = result['photon_in_1d']
+    pandeia_extracted_noise = None
+    pandeia_snr_int = None
+    if not is_phase_spec(calculation):
+        pandeia_extracted_noise = np.asarray(
+            out['1d']['extracted_noise'][1], dtype=float
+        )
+        pandeia_snr_int = [
+            np.asarray(out['1d']['sn'][0], dtype=float),
+            np.asarray(out['1d']['sn'][1], dtype=float),
+        ]
+
+    input_wave_order = np.argsort(w, kind='mergesort')
+    if not np.array_equal(input_wave_order, np.arange(len(w))):
+        w = w[input_wave_order]
+        varin = varin[input_wave_order]
+        varout = varout[input_wave_order]
+        extracted_flux_out = extracted_flux_out[input_wave_order]
+        extracted_flux_inn = extracted_flux_inn[input_wave_order]
+        result['rn[out,in]'] = sort_by_wave_order(result['rn[out,in]'], input_wave_order)
+        result['bkg[out,in]'] = sort_by_wave_order(result['bkg[out,in]'], input_wave_order)
+        if pandeia_extracted_noise is not None:
+            pandeia_extracted_noise = pandeia_extracted_noise[input_wave_order]
+        if pandeia_snr_int is not None:
+            pandeia_snr_int = sort_by_wave_order(pandeia_snr_int, input_wave_order)
+
+    validate_saturation_state(conf, out, pandeia_extracted_noise)
+
+    valid_channel = nirspec_valid_channel_mask(
+        conf, pandeia_extracted_noise
+    )
+    if valid_channel is not None:
+        w = w[valid_channel]
+        varin = varin[valid_channel]
+        varout = varout[valid_channel]
+        extracted_flux_out = extracted_flux_out[valid_channel]
+        extracted_flux_inn = extracted_flux_inn[valid_channel]
+        result['rn[out,in]'] = sort_by_wave_order(result['rn[out,in]'], valid_channel)
+        result['bkg[out,in]'] = sort_by_wave_order(result['bkg[out,in]'], valid_channel)
+        pandeia_snr_int = sort_by_wave_order(pandeia_snr_int, valid_channel)
 
         
     #bin the data according to user input 
@@ -270,11 +481,9 @@ def compute_full_sim(dictinput,verbose=False):
         photon_out_bin = photon_out_bin[photon_out_bin>0]
         
     
-    if calculation == 'phase_spec':
-        to = (timing["APT: Num Groups per Integration"]+
-            timing["Zero Frame Efficiency Loss"])*tframe
-        ti = (timing["APT: Num Groups per Integration"]+
-            timing["Zero Frame Efficiency Loss"])*tframe
+    if is_phase_spec(calculation):
+        to = timing["Measurement Time per Integration (sec)"]
+        ti = timing["Measurement Time per Integration (sec)"]
         nint_in = 1
         nint_out = 1
     else: 
@@ -304,6 +513,18 @@ def compute_full_sim(dictinput,verbose=False):
     if pandexo_input['planet']['f_unit'] == 'fp/f*':
         sim_spec = -1.0*sim_spec
         raw_spec = -1.0*raw_spec    
+
+    wave_order = np.argsort(wbin, kind='mergesort')
+    if not np.array_equal(wave_order, np.arange(len(wbin))):
+        wbin = wbin[wave_order]
+        photon_out_bin = photon_out_bin[wave_order]
+        photon_in_bin = photon_in_bin[wave_order]
+        var_in_bin = var_in_bin[wave_order]
+        var_out_bin = var_out_bin[wave_order]
+        error_spec = error_spec[wave_order]
+        error_spec_nfloor = error_spec_nfloor[wave_order]
+        raw_spec = raw_spec[wave_order]
+        sim_spec = sim_spec[wave_order]
    
     #package processed data
     finalspec = {'wave':wbin,
@@ -315,15 +536,19 @@ def compute_full_sim(dictinput,verbose=False):
                 'electrons_out':photon_out_bin*nocc, 
                 'electrons_in':photon_in_bin*nocc,
                 'electron_per_int':photon_out_bin/nint_out, 
-                'snr_int':[out['1d']['sn'][0],out['1d']['sn'][1]],
+                'snr_int': (
+                    pandeia_snr_int
+                    if pandeia_snr_int is not None
+                    else [out['1d']['sn'][0], out['1d']['sn'][1]]
+                ),
                 'var_in':var_in_bin*nocc, 
                 'var_out':var_out_bin*nocc,
                 'e_rate_out':photon_out_bin/to,
                 'e_rate_in':photon_in_bin/ti,
                 'wave':wbin,
                 'error_no_floor':error_spec, 
-                'rn[out,in]':result['rn[out,in]'],
-                'bkg[out,in]':result['bkg[out,in]']
+                'rn[out,in]':sort_by_wave_order(result['rn[out,in]'], wave_order),
+                'bkg[out,in]':sort_by_wave_order(result['bkg[out,in]'], wave_order)
                 }
  
     result_dict = as_dict(out,both_spec ,finalspec, 
@@ -367,7 +592,7 @@ def compute_maxexptime_per_int(pandeia_input, sat_level):
     pandeia_input['configuration']['detector']['nint'] = 1 
     pandeia_input['configuration']['detector']['nexp'] = 1
     
-    report = perform_calculation(pandeia_input, dict_report=False)
+    report = _perform_calculation(pandeia_input, dict_report=False)
     report_dict = report.as_dict() 
 
     # count rate on the detector in e-/second/pixel
@@ -390,7 +615,7 @@ def compute_maxexptime_per_int(pandeia_input, sat_level):
     
     return maxexptime_per_int
         
-def compute_timing(m,transit_duration,expfact_out,noccultations,max_ngroup_instrument): 
+def compute_timing(m,transit_duration,expfact_out,noccultations,max_ngroup_instrument=65536.0):
     """Computes all timing info for observation
     
     Computes all JWST specific timing info for observation including. Some pertinent 
@@ -432,6 +657,27 @@ def compute_timing(m,transit_duration,expfact_out,noccultations,max_ngroup_instr
     nframe = m['nframe']
     nskip = m['nskip']
     mingroups = m['mingroups']
+    nsuperstripe = int(m.get("nsuperstripe", 1) or 1)
+    if nsuperstripe < 1:
+        nsuperstripe = 1
+    def _clocktime_per_int(ngroups):
+        if nsuperstripe > 1:
+            if (m.get("exposure_time_per_int") is not None and
+                    ngroups == m.get("exposure_time_ngroup")):
+                return m["exposure_time_per_int"]/float(nsuperstripe)
+            if m.get("tfffr") is not None:
+                full_cycle = nsuperstripe * (
+                    m["tfffr"]
+                    + tframe * (
+                        m.get("nreset1", 1)
+                        + m.get("ndrop1", 0)
+                        + (ngroups - 1.0)*(nframe + nskip)
+                        + nframe
+                        + m.get("ndrop3", 0)
+                    )
+                )
+                return full_cycle/float(nsuperstripe)
+        return (ngroups+1.0)*tframe
     overhead_per_int = tframe #overhead time added per integration 
     try: 
         #are we starting with a exposure time ?
@@ -465,7 +711,7 @@ def compute_timing(m,transit_duration,expfact_out,noccultations,max_ngroup_instr
             flag_high = "Groups/int > max num of allowed groups"
  
         if (ngroups_per_int < mingroups) | np.isnan(ngroups_per_int):
-            ngroups_per_int = mingroups  
+            ngroups_per_int = mingroups
             nframes_per_int = mingroups
             flag_default = "NGROUPS<"+str(mingroups)+"SET TO NGROUPS="+str(mingroups)
 
@@ -486,19 +732,30 @@ def compute_timing(m,transit_duration,expfact_out,noccultations,max_ngroup_instr
     else: 
         frame_zero_dead = -1
 
+    # FML normally measures the last frame minus the first frame. NGROUP=1
+    # has no true first-last baseline; Pandeia treats it as a measurement
+    # from the superbias frame to the end of the first group. Keep that
+    # positive timing convention while warning users downstream.
+    science_time_per_int = (ngroups_per_int + frame_zero_dead)*tframe*(nframe+nskip)
+    measurement_time_per_int = science_time_per_int*nsuperstripe
+
     #the integration time is related to the number of groups and the time of each 
     #group 
     exptime_per_int = ngroups_per_int*tframe
     
-    #clock time includes the reset frame 
-    clocktime_per_int = (ngroups_per_int+1.0)*tframe
+    #clock time includes the reset frame. For SOSS multistripe Pandeia's
+    #exposure_time is a full superstripe cycle, while PandExo keeps the
+    #historical integration count on a single-superstripe scale and divides
+    #by nsuperstripe for per-wavelength noise scaling.
+    clocktime_per_int = _clocktime_per_int(ngroups_per_int)
     
     #observing efficiency (i.e. what percentage of total time is spent on soure)
     eff = (ngroups_per_int + frame_zero_dead)/(ngroups_per_int + 1.0)
     
-    #this says "per occultation" but this is just the in transit frames.. See below
-    # transit duration / ((ngroups + reset)*frame time)
-    nint_per_occultation =  transit_duration/((ngroups_per_int+1.0)*tframe)
+    # this says "per occultation" but this is just the in-transit integration
+    # slots. For SOSS multistripe the clock is one superstripe slice of the
+    # full Pandeia exposure cycle.
+    nint_per_occultation =  transit_duration/clocktime_per_int
     
     #figure out how many integrations are in transit and how many are out of transit 
     nint_in = np.ceil(nint_per_occultation)
@@ -510,22 +767,46 @@ def compute_timing(m,transit_duration,expfact_out,noccultations,max_ngroup_instr
     if nint_in < min_nint_trans:
         ngroups_per_int = np.floor(ngroups_per_int/min_nint_trans)
         exptime_per_int = (ngroups_per_int)*tframe
-        clocktime_per_int = ngroups_per_int*tframe
+        if ngroups_per_int == 1:
+            frame_zero_dead = 0
+        else:
+            frame_zero_dead = -1
+        science_time_per_int = (ngroups_per_int + frame_zero_dead)*tframe*(nframe+nskip)
+        measurement_time_per_int = science_time_per_int*nsuperstripe
+        clocktime_per_int = _clocktime_per_int(ngroups_per_int)
         eff = (ngroups_per_int + frame_zero_dead)/(ngroups_per_int + 1.0)
-        nint_per_occultation =  transit_duration/((ngroups_per_int+1.0)*tframe)
+        nint_per_occultation =  transit_duration/clocktime_per_int
         nint_in = np.ceil(nint_per_occultation)
         nint_out = np.ceil(nint_in/expfact_out)
         
     if nint_out < min_nint_trans:
         nint_out = min_nint_trans
+
+    effective_nint_in = nint_in / float(nsuperstripe)
+    effective_nint_out = nint_out / float(nsuperstripe)
+    # measurement_time_per_int is the Pandeia value for one nint=1
+    # calculation. In SOSS multistripe modes it includes all superstripes,
+    # so the per-wavelength on-source time must use effective_nint_*.
+    on_source_in = effective_nint_in * measurement_time_per_int
+    on_source_out = effective_nint_out * measurement_time_per_int
+    effective_on_source_in = effective_nint_in * measurement_time_per_int
+    effective_on_source_out = effective_nint_out * measurement_time_per_int
    
     timing = {
         "Transit Duration" : (transit_duration)/60.0/60.0,
         "Seconds per Frame" : tframe,
         "Time/Integration incl reset (sec)":clocktime_per_int,
+        "Measurement Time per Integration (sec)":measurement_time_per_int,
         "APT: Num Groups per Integration" :int(ngroups_per_int), 
         "Num Integrations Out of Transit":int(nint_out),
         "Num Integrations In Transit":int(nint_in),
+        "Num Superstripes":nsuperstripe,
+        "Effective Integrations Out of Transit":effective_nint_out,
+        "Effective Integrations In Transit":effective_nint_in,
+        "On Source Time Out of Transit":on_source_out,
+        "On Source Time In Transit":on_source_in,
+        "Effective On Source Time Out of Transit":effective_on_source_out,
+        "Effective On Source Time In Transit":effective_on_source_in,
         "APT: Num Integrations per Occultation":int(nint_out+nint_in),
         "Observing Efficiency (%)": eff*100.0,
         "Transit+Baseline, no overhead (hrs)": (nint_out+nint_in)*clocktime_per_int/60.0/60.0, 
@@ -534,6 +815,28 @@ def compute_timing(m,transit_duration,expfact_out,noccultations,max_ngroup_instr
         }      
 
     return timing, {'flag_default':flag_default,'flag_high':flag_high}
+
+def update_timing_measurement_time(timing, measurement_time_per_int):
+    """Sync timing metadata to the measurement_time reported by Pandeia.
+
+    PandExo runs Pandeia with nint=1 and scales integrations internally. For
+    SOSS multistripe modes, Pandeia's one-integration measurement_time includes
+    all superstripes, so per-wavelength time uses the effective integration
+    counts in the timing dictionary.
+    """
+    nsuperstripe = float(timing.get("Num Superstripes", 1) or 1)
+    nint_in = timing["Num Integrations In Transit"]
+    nint_out = timing["Num Integrations Out of Transit"]
+    effective_nint_in = nint_in / nsuperstripe
+    effective_nint_out = nint_out / nsuperstripe
+
+    timing["Measurement Time per Integration (sec)"] = measurement_time_per_int
+    timing["Effective Integrations In Transit"] = effective_nint_in
+    timing["Effective Integrations Out of Transit"] = effective_nint_out
+    timing["On Source Time In Transit"] = effective_nint_in * measurement_time_per_int
+    timing["On Source Time Out of Transit"] = effective_nint_out * measurement_time_per_int
+    timing["Effective On Source Time In Transit"] = effective_nint_in * measurement_time_per_int
+    timing["Effective On Source Time Out of Transit"] = effective_nint_out * measurement_time_per_int
 
 def remove_QY(pandeia_dict, instrument):
     """Removes Quantum Yield from Pandeia Fluxes. Place Holder. 
@@ -596,7 +899,7 @@ def perform_out(pandeia_input, pandexo_input,timing, both_spec):
     pandeia_input['configuration']['detector']['nint'] = 1#int(timing['Num Integrations Out of Transit'])
     pandeia_input['configuration']['detector']['nexp'] = 1 
 
-    report_out = perform_calculation(pandeia_input, dict_report=False)
+    report_out = _perform_calculation(pandeia_input, dict_report=False)
     
     return report_out
 
@@ -621,8 +924,8 @@ def perform_in(pandeia_input, pandexo_input,timing, both_spec, out, calculation)
         out of transit dictionary from **perform_in**
     calculation : str
         key which speficies the kind of noise calcualtion 
-        (2d extract, slope method, fml, phase_spec). 
-        Recommended for transit transmisstion spectra = fml
+        (2d extract, slope method, fml, phase_spec_fml, phase_spec_slope).
+        Selected automatically from the detector readout mode.
 
     Returns
     -------
@@ -631,7 +934,7 @@ def perform_in(pandeia_input, pandexo_input,timing, both_spec, out, calculation)
     """
     
     #function to run pandeia for in transit
-    if calculation == 'phase_spec':
+    if is_phase_spec(calculation):
         #return the phase curve since it's all we need 
         report_in = {'time': both_spec['time'],'planet_phase': both_spec['planet_phase']}
     elif calculation == 'fml':
@@ -653,7 +956,7 @@ def perform_in(pandeia_input, pandexo_input,timing, both_spec, out, calculation)
     
         pandeia_input['scene'][0]['spectrum']['sed']['spectrum'] = in_transit_spec
 
-        report_in = perform_calculation(pandeia_input, dict_report=True)
+        report_in = _perform_calculation(pandeia_input, dict_report=True)
         instrument = pandeia_input['configuration']['instrument']['instrument']
         #remove QY effects 
         report_in = remove_QY(report_in, instrument)
@@ -897,10 +1200,10 @@ def target_acq(instrument, both_spec, warning):
 
     #this automatically builds a default calculation 
     #I got reasonable answers for everything so all you should need to do here is swap out (instrument = 'niriss', 'nirspec','miri' or 'nircam')
-    c = build_default_calc(telescope='jwst', instrument=instrument, mode='target_acq', method='taphot')
+    c = _build_default_calc(telescope='jwst', instrument=instrument, mode='target_acq', method='taphot')
     c['scene'][0]['spectrum']['sed'] = {'sed_type':'input','spectrum':out_spectrum}
     c['scene'][0]['spectrum']['normalization']['type'] = 'none'
-    rphot = perform_calculation(c, dict_report=True)
+    rphot = _perform_calculation(c, dict_report=True)
 
     #check warnings (pandeia doesn't return values for these warnings, so try will fail if all good)
     try: 
@@ -1026,4 +1329,3 @@ def as_dict(out, both_spec ,binned, timing, mag, sat_level, warnings, punit, unb
     return final_dict
 
     
-

@@ -6,19 +6,22 @@ import astropy.units as u
 import astropy.constants as c
 import os 
 from astropy.modeling.models import BlackBody
-#import warnings
-#with warnings.catch_warnings():
-#    warnings.filterwarnings("ignore")
-#    import pysynphot as psyn
-
-from synphot.models import Empirical1D
-from synphot import SourceSpectrum
-from synphot import units
-import stsynphot as sts
-import synphot as syn
-import copy 
-from pandeia.engine import constants 
-VEGA_FILE=constants.VEGA_FILE
+try:
+    from .synphot_compat import (
+        load_bandpass_from_file,
+        load_phoenix_spectrum,
+        make_array_spectrum,
+        renormalize_to_vegamag,
+        sample_spectrum_micron_mjy,
+    )
+except ImportError:
+    from synphot_compat import (
+        load_bandpass_from_file,
+        load_phoenix_spectrum,
+        make_array_spectrum,
+        renormalize_to_vegamag,
+        sample_spectrum_micron_mjy,
+    )
     
 def outTrans(input) :
     """Compute out of transit spectra
@@ -58,56 +61,15 @@ def outTrans(input) :
         sort= sort[sort[:,0].argsort()]
         wave = sort[:,0]
         flux = sort[:,1] 
-        if input['w_unit'] == 'um':
-            PANDEIA_WAVEUNITS = 'um'
-            
-        elif input['w_unit'] == 'nm':
-            PANDEIA_WAVEUNITS = 'nm'
-      
-        elif input['w_unit'] == 'cm' :
-            PANDEIA_WAVEUNITS = 'cm'
-     
-        elif input['w_unit'] == 'Angs' :
-            PANDEIA_WAVEUNITS = 'angstrom'
-
-        elif input['w_unit'] == 'Hz' :
-            PANDEIA_WAVEUNITS = 'Hz'
-
-        else: 
-            raise Exception('Units are not correct. Pick um, nm, cm, hz, or Angs')        
-
-        #convert to photons/s/nm/m^2 for flux normalization based on 
-        #http://www.gemini.edu/sciops/instruments/integration-time-calculators/itc-help/source-definition
-        if input['f_unit'] == 'Jy':
-            PANDEIA_FLUXUNITS = 'Jy' 
-        elif input['f_unit'] == 'FLAM' :
-            PANDEIA_FLUXUNITS = 'FLAM'
-        elif input['f_unit'] == 'erg/cm2/s/Hz':
-            flux = flux*1e23
-            PANDEIA_FLUXUNITS = 'Jy' 
-        else: 
-            raise Exception('Units are not correct. Pick FLAM or Jy or erg/cm2/s/Hz')
-
-        ST_SS = SourceSpectrum(Empirical1D, points=wave*u.Unit(PANDEIA_WAVEUNITS), lookup_table=flux*u.Unit(PANDEIA_FLUXUNITS))
-        #sp = psyn.ArraySpectrum(wave, flux, waveunits=PANDEIA_WAVEUNITS, fluxunits=PANDEIA_FLUXUNITS)        #Convert evrything to nanometer for converstion based on gemini.edu  
-        #sp.convert("nm")
-        #sp.convert('jy')
-        #flux_star = ST_SS(ST_SS.waveset,flux_unit=u.Unit('erg*cm^(-3)*s^(-1)')).value
+        sp = make_array_spectrum(wave, flux, input['w_unit'], input['f_unit'])
 
     ############ PHOENIX ################################################
     elif input['type'] =='phoenix':
-        
-
         #make sure metal is not out of bounds
         if input['metal'] > 0.5: input['metal'] = 0.5
-        ST_SS = sts.grid_to_spec('phoenix', input['temp'], input['metal'], input['logg'])
-        #sp = psyn.Icat("phoenix", input['temp'], input['metal'], input['logg'])
-        #sp.convert("nm")
-        #sp.convert("jy")
-        #wave = sp.wave
-        #flux = sp.flux
-        #input['w_unit'] ='nm'
-        #input['f_unit'] = 'jy'
+        sp = load_phoenix_spectrum(input['temp'], input['metal'], input['logg'])
+        input['w_unit'] ='nm'
+        input['f_unit'] = 'jy'
         
     else: 
         raise Exception('Wrong input type for stellar spectra')
@@ -115,6 +77,8 @@ def outTrans(input) :
 
     ############ NORMALIZATION ################################################
     refdata = os.environ.get("PYSYN_CDBS")
+    if refdata is None:
+        raise Exception("PYSYN_CDBS must point to the trds directory containing the comp and grid folders")
 
     all_bps = {"H": 'bessell_h_004_syn.fits',
                  "J":'bessell_j_003_syn.fits' ,
@@ -133,25 +97,18 @@ def outTrans(input) :
     if not os.path.exists(bp_path): 
         raise Exception("Oops! PandExo 2.0 now requires users to download this file https://archive.stsci.edu/hlsps/reference-atlases/hlsp_reference-atlases_hst_multi_everything_multi_v11_sed.tar it will untar with the structure grp/redcat/trds. Please place the directories nonhst and comp into this folder: "+refdata)
 
-    default_refdata_directory = os.environ['pandeia_refdata']
-    VEGA = syn.spectrum.SourceSpectrum.from_file(f"{default_refdata_directory}/sed/hst_calspec/{VEGA_FILE}")
-    bp = syn.spectrum.SpectralElement.from_file(bp_path)#psyn.FileBandpass(bp_path)
+    bp = load_bandpass_from_file(bp_path)
+    rn_sp = renormalize_to_vegamag(sp, mag, bp)
 
-    #sp.convert('angstroms')
-    #bp.convert('angstroms')
-
-    #rn_sp = sp.renorm(mag, 'vegamag', bp)
-
-
-    #rn_sp.convert("microns")
-    #rn_sp.convert("mjy")
-    ST_return = copy.deepcopy(ST_SS)
-    ST_SS_norm = ST_SS.normalize(
-         mag * units.VEGAMAG, band=bp, vegaspec=VEGA)
-
-    flux_out_trans = ST_SS_norm(ST_SS_norm.waveset,flux_unit=u.Unit('mJy')).value#rn_sp.flux
-    wave = (ST_SS_norm.waveset).to(u.um).value #rn_sp.wave
-    return {'flux_out_trans': flux_out_trans, 'wave': wave,'phoenix':ST_return} 
+    wave, flux_out_trans = sample_spectrum_micron_mjy(rn_sp)
+    _, stellar_flux = sample_spectrum_micron_mjy(sp, wavelengths=wave*u.micron)
+    return {
+        'flux_out_trans': flux_out_trans,
+        'wave': wave,
+        'phoenix': sp,
+        'stellar_flux': stellar_flux,
+        'stellar_wave': wave,
+    }
 
 
 def bothTrans(out_trans, planet,star=None) :
@@ -210,10 +167,14 @@ def bothTrans(out_trans, planet,star=None) :
         #constant fp/f* (using out_trans from user)
         elif planet['f_unit'] == 'fp/f*':
             planet['w_unit'] = 'um'
-            wave_planet = out_trans['wave'][(out_trans['wave']>0.5) & (out_trans['wave']<15)]
-            flux_star = out_trans['phoenix'](out_trans['phoenix'].waveset,flux_unit=u.Unit('mJy')).value
-            flux_star = flux_star[(out_trans['wave']>0.5) & (out_trans['wave']<15)]
-            #flux_star = (out_trans['phoenix'].flux*(u.Jy)).to(u.mJy)[(out_trans['wave']>0.5) & (out_trans['wave']<15)]
+            mask = (out_trans['wave']>0.5) & (out_trans['wave']<15)
+            wave_planet = out_trans['wave'][mask]
+            if 'stellar_flux' in out_trans:
+                flux_star = np.asarray(out_trans['stellar_flux'])[mask] * u.mJy
+            elif hasattr(out_trans.get('phoenix'), 'flux'):
+                flux_star = (out_trans['phoenix'].flux*(u.Jy)).to(u.mJy)[mask]
+            else:
+                flux_star = np.asarray(out_trans['flux_out_trans'])[mask] * u.mJy
             #MAKING SURE TO ADD IN SUPID PI FOR PER STERADIAN!!!!
             bb = BlackBody(temperature=planet['temp']*u.K) 
             flux_planet = (bb(wave_planet*u.micron)*np.pi*u.sr).to(u.mJy)
@@ -268,11 +229,15 @@ def bothTrans(out_trans, planet,star=None) :
             planet['flat'] = 0 
             planet['ray'] = 0 
 
-        #we are only using gravity of 25 and scaling by mass from there 
-        fort_grav = 25.0*u.m/u.s/u.s
+        #we are only using gravity of 25 m/s2 and scaling by mass from there
+        fort_grav = 25.0
+        fort_grav_unit = fort_grav*u.m/u.s/u.s
         df = header.loc[(header.gravity==fort_grav) & (header.temp==planet['temp'])
                            & (header.noTiO==planet['noTiO']) & (header.ray==planet['ray']) &
                            (header.flat==planet['flat'])]
+        if len(df) == 0:
+            raise ValueError('No Fortney grid model found for temp={}, chem={}, cloud={}'.format(
+                planet['temp'], planet['chem'], planet['cloud']))
         wave_planet=np.array(pd.read_sql_table(df['name'].values[0],db)['wavelength'])[::-1]
 
         r_lambda=np.array(pd.read_sql_table(df['name'].values[0],db)['radius'])*u.km
@@ -284,11 +249,11 @@ def bothTrans(out_trans, planet,star=None) :
             gravity = c.G*(mass)/(rplan.to(u.m))**2.0 #convert radius to m for gravity units
             #scale lambbda (this technically ignores the fact that scaleheight is altitude dependent)
             #therefore, it will not be valide for very very low gravities
-            z_lambda = z_lambda*fort_grav/gravity
+            z_lambda = z_lambda*fort_grav_unit/gravity
         except: 
             #keep original z lambda 
             gravity=25.0
-            z_lambda = z_lambda*fort_grav/fort_grav
+            z_lambda = z_lambda*fort_grav_unit/fort_grav_unit
             print('Default Planet Gravity of 25 m/s2 given')  
         
         #create new wavelength dependent R based on scaled ravity
@@ -470,11 +435,15 @@ def hst_spec(planet,star) :
             planet['flat'] = 0 
             planet['ray'] = 0 
 
-        #we are only using gravity of 25 and scaling by mass from there 
-        fort_grav = 25.0*u.m/u.s/u.s
+        #we are only using gravity of 25 m/s2 and scaling by mass from there
+        fort_grav = 25.0
+        fort_grav_unit = fort_grav*u.m/u.s/u.s
         df = header.loc[(header.gravity==fort_grav) & (header.temp==planet['temp'])
                            & (header.noTiO==planet['noTiO']) & (header.ray==planet['ray']) &
                            (header.flat==planet['flat'])]
+        if len(df) == 0:
+            raise ValueError('No Fortney grid model found for temp={}, chem={}, cloud={}'.format(
+                planet['temp'], planet['chem'], planet['cloud']))
         wave_planet=np.array(pd.read_sql_table(df['name'].values[0],db)['wavelength'])[::-1]
 
         r_lambda=np.array(pd.read_sql_table(df['name'].values[0],db)['radius'])*u.km
@@ -486,11 +455,11 @@ def hst_spec(planet,star) :
             gravity = c.G*(mass)/(rplan.to(u.m))**2.0 #convert radius to m for gravity units
             #scale lambbda (this technically ignores the fact that scaleheight is altitude dependent)
             #therefore, it will not be valide for very very low gravities
-            z_lambda = z_lambda*fort_grav/gravity
+            z_lambda = z_lambda*fort_grav_unit/gravity
         except: 
             #keep original z lambda 
             gravity=25.0
-            z_lambda = z_lambda*fort_grav/fort_grav
+            z_lambda = z_lambda*fort_grav_unit/fort_grav_unit
             print('Default Planet Gravity of 25 m/s2 given')  
         
         #create new wavelength dependent R based on scaled ravity

@@ -1,20 +1,72 @@
-*.pyc
-*.html~
-*.p
-*.json~
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.python-version
 
-# Jupyter Notebooks
-.ipynb_checkpoints
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+conda-env/
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+!.env.sample
+
+# Editors and IDEs
+*.code-workspace
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Jupyter notebooks
+.ipynb_checkpoints/
 notebooks/*.html
 
-# Installation
+# Test and coverage output
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+.pytest_cache/
+.tox/
+.nox/
+
+# Type checking and lint caches
+.mypy_cache/
+.ruff_cache/
+.pyre/
+
+# Build and packaging output
 build/
 dist/
 *.egg-info/
+*.egg
+pip-wheel-metadata/
 
-# Mac files
-*.DS_Store
+# Generated PandExo/output artifacts
+*.p
+*.pkl
+*.pickle
+*.fits
+*.h5
+*.hdf5
+regression_outputs
 
+# Logs and temporary files
+*.log
+*.tmp
+*.bak
+*.orig
+*.html~
+*.json~
 
-# test files
-tests/
+# OS files
+.DS_Store
+Thumbs.db

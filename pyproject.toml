@@ -4,29 +4,35 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pandexo.engine"
-version = "5.0.0"
+version = "2026.2"
 authors = [
   { name="Natasha Batalha at NASA Ames", email="natasha.e.batalha@nasa.gov" },
 ]
 description = "pandexo transiting exoplanet simulator"
 readme = "README.rst"
 license = { text="GPL" }
-requires-python = ">=3.6"
+requires-python = ">=3.10"
 classifiers = [
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: BSD License",
     "Operating System :: OS Independent",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Topic :: Scientific/Engineering :: Astronomy",
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 dependencies = [
-    "pandeia.engine==2025.7",
+    "pandeia.engine==2026.2",
     "numpy>=1.21",
-    "bokeh==3.5.1",
+    "bokeh>=3.4,<4",
+    "ipython",
     "tornado",
     "pandas",
+    "joblib",
     "photutils",
     "astropy",
     "synphot>=1.0",
@@ -35,6 +41,50 @@ dependencies = [
     "astroquery",
     "scipy>=1.9.2",
     "batman-package",
+]
+
+[project.optional-dependencies]
+docs = [
+    "sphinx",
+    "sphinx-rtd-theme",
+    "nbconvert",
+    "nbformat",
+]
+notebooks = [
+    "jupyter",
+    "ipykernel",
+]
+test = [
+    "pytest",
+]
+build = [
+    "build",
+    "twine",
+    "wheel",
+]
+dev = [
+    "sphinx",
+    "sphinx-rtd-theme",
+    "nbconvert",
+    "nbformat",
+    "jupyter",
+    "ipykernel",
+    "pytest",
+    "build",
+    "twine",
+    "wheel",
+]
+all = [
+    "sphinx",
+    "sphinx-rtd-theme",
+    "nbconvert",
+    "nbformat",
+    "jupyter",
+    "ipykernel",
+    "pytest",
+    "build",
+    "twine",
+    "wheel",
 ]
 
 [project.urls]
