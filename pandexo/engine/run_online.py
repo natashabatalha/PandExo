@@ -1,10 +1,12 @@
+import asyncio
 import json
+import logging
 import os
 import copy
 import uuid
 from collections import namedtuple, OrderedDict
+from tornado.httpclient import AsyncHTTPClient
 import tornado.escape
-import tornado.httpserver
 import tornado.ioloop
 import tornado.options
 import tornado.web
@@ -17,15 +19,15 @@ from concurrent.futures import ProcessPoolExecutor
 import pickle
 import pandas as pd 
 import numpy as np
-import requests
 from astroquery.simbad import Simbad
 import astropy.units as u
-import pdb
 
 from .pandexo import wrapper
 from .utils.plotters import create_component_jwst, create_component_hst
 from .logs import jwst_log, hst_log
-from .exomast import get_target_data
+from .exomast import async_get_target_data
+
+logger = logging.getLogger(__name__)
 
 #grab all planets for folks 
 #all_planets =  pd.read_csv('https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=select+pl_name+from+PSCompPars&format=csv')
@@ -33,12 +35,17 @@ from .exomast import get_target_data
 
 # define location of temp files
 __TEMP__ = os.environ.get("PANDEXO_TEMP", os.path.join(os.path.dirname(__file__), "temp"))
+PLANET_LIST_URL = "https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=select+pl_name+from+PSCompPars&format=csv"
+PLANET_LIST_CACHE = os.environ.get(
+    "PANDEXO_PLANET_LIST_CACHE",
+    os.path.join(__TEMP__, "planets.csv"),
+)
 
 #define location of fort grids
 try:
     __FORT__ = os.environ.get('FORTGRID_DIR')
     db_fort = create_engine('sqlite:///'+__FORT__)
-except: 
+except:
     print('FORTNEY DATABASE NOT INSTALLED')
 
 #add Simbad query info 
@@ -52,6 +59,29 @@ define("workers", default=4, help="maximum number of simultaneous async tasks")
 # Define a simple named tuple to keep track for submitted calculations
 CalculationTask = namedtuple('CalculationTask', ['id', 'name', 'task',
                                                  'cookie', 'count', 'form_data'])
+
+
+async def retrieve_url_to_file(url, filename):
+    """Fetch a URL without blocking Tornado and atomically cache it on disk."""
+    os.makedirs(os.path.dirname(filename), exist_ok=True)
+    response = await AsyncHTTPClient().fetch(url)
+    tmp_filename = "{}.{}.tmp".format(filename, uuid.uuid4().hex)
+    try:
+        with open(tmp_filename, "wb") as write_file:
+            write_file.write(response.body)
+        os.replace(tmp_filename, filename)
+    finally:
+        if os.path.exists(tmp_filename):
+            os.remove(tmp_filename)
+
+
+async def get_cached_planet_names():
+    """Return the Exoplanet Archive planet-name list, caching it between users."""
+    if not os.path.exists(PLANET_LIST_CACHE):
+        await retrieve_url_to_file(PLANET_LIST_URL, PLANET_LIST_CACHE)
+    all_planets = pd.read_csv(PLANET_LIST_CACHE)
+    return sorted(all_planets["pl_name"].dropna().values)
+
 
 def getStarName(planet_name):
     """
@@ -75,6 +105,64 @@ def getStarName(planet_name):
             
     # Return trimmed string:
     return star_name.strip()
+
+
+def _float_or_none(value):
+    if np.ma.is_masked(value):
+        return None
+    if hasattr(value, "value"):
+        value = value.value
+    try:
+        value = float(value)
+    except (TypeError, ValueError):
+        return None
+    if not np.isfinite(value):
+        return None
+    return value
+
+
+def _simbad_magnitude(simbad_data, *column_names):
+    if simbad_data is None or len(simbad_data) == 0:
+        return None
+
+    for column_name in column_names:
+        if column_name in simbad_data.colnames:
+            magnitude = _float_or_none(simbad_data[column_name][0])
+            if magnitude is not None:
+                return magnitude
+    return None
+
+
+def get_simbad_magnitudes(star_name):
+    """
+    Query Simbad for stellar magnitudes used by the online target resolver.
+
+    ExoMAST often lacks near-infrared stellar magnitudes, so the historical
+    web interface intentionally used Simbad for these fields.
+    """
+    simbad_data = Simbad.query_object(star_name)
+    return {
+        "Jmag": _simbad_magnitude(simbad_data, "FLUX_J", "J"),
+        "Hmag": _simbad_magnitude(simbad_data, "FLUX_H", "H"),
+    }
+
+
+async def add_simbad_magnitudes(planet_data, target_name):
+    if planet_data is None:
+        return None
+
+    star_name = getStarName(planet_data.get("canonical_name") or target_name)
+    try:
+        magnitudes = await asyncio.to_thread(get_simbad_magnitudes, star_name)
+    except Exception:
+        logger.exception("Unable to resolve Simbad magnitudes for %s", star_name)
+        return planet_data
+
+    for key, value in magnitudes.items():
+        if value is not None:
+            planet_data[key] = value
+
+    return planet_data
 
 class Application(tornado.web.Application):
     """Gobal settings of the server
@@ -182,7 +270,7 @@ class BaseHandler(tornado.web.RequestHandler):
             self.render_string("calc_rowhst.html", response=response))
 
         return response
-        
+
     def write_error(self, status_code, **kwargs):
         """
         This renders a customized error page
@@ -289,7 +377,7 @@ class CalculationNewHandler(BaseHandler):
     This request handler deals with processing the form data and submitting
     a new calculation task to the parallelized workers.
     """
-    def get(self, id=None):
+    async def get(self, id=None):
         try: 
             header= pd.read_sql_table('header',db_fort)
         except:
@@ -306,8 +394,7 @@ class CalculationNewHandler(BaseHandler):
         if id is not None:
             form_data = self.buffer[id].form_data
 
-        all_planets =  pd.read_csv('https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=select+pl_name+from+PSCompPars&format=csv')
-        all_planets = sorted(all_planets['pl_name'].values)
+        all_planets = await get_cached_planet_names()
         unique_temps = sorted(header.temp.unique())
         self.render("new.html", id=id,
                                  temp=list(map(str, unique_temps)),
@@ -321,9 +408,9 @@ class CalculationNewHandler(BaseHandler):
         accessed by using `self.get_argument(...)` for specific arguments,
         or `self.request.body` to grab the entire returned object.
         """
-        
+
         #print(self.request.body)
-        
+
         form_data = {}
         for key in self.request.arguments:
             form_data[key] = self.get_argument(key)
@@ -376,9 +463,8 @@ class CalculationNewHandler(BaseHandler):
                 fname_star = fileinfo_star['filename']
                 extn_star = os.path.splitext(fname_star)[1]
                 cname_star = id+'star' + extn_star
-                fh_star = open(os.path.join(__TEMP__, cname_star), 'wb')
-                fh_star.write(fileinfo_star['body'])
-                fh_star.close()
+                with open(os.path.join(__TEMP__, cname_star), 'wb') as fh_star:
+                    fh_star.write(fileinfo_star['body'])
 
                 exodata["star"]["starpath"] = os.path.join(__TEMP__, cname_star)
                 exodata["star"]["f_unit"] = self.get_argument("starfunits")
@@ -393,9 +479,8 @@ class CalculationNewHandler(BaseHandler):
                 fname_plan = fileinfo_plan['filename']
                 extn_plan = os.path.splitext(fname_plan)[1]
                 cname_plan = id+'planet' + extn_plan
-                fh_plan = open(os.path.join(__TEMP__, cname_plan), 'wb')
-                fh_plan.write(fileinfo_plan['body'])
-                fh_plan.close()
+                with open(os.path.join(__TEMP__, cname_plan), 'wb') as fh_plan:
+                    fh_plan.write(fileinfo_plan['body'])
 
                 exodata["planet"]["exopath"] = os.path.join(__TEMP__, cname_plan)
                 exodata["planet"]["w_unit"] = self.get_argument("planwunits")
@@ -434,9 +519,8 @@ class CalculationNewHandler(BaseHandler):
                     fname_noise = fileinfo_noise['filename']
                     extn_noise = os.path.splitext(fname_noise)[1]
                     cname_noise = id + 'noise' + extn_noise
-                    fh_noise = open(os.path.join(__TEMP__, cname_noise), 'wb')
-                    fh_noise.write(fileinfo_noise['body'])
-                    fh_noise.close()
+                    with open(os.path.join(__TEMP__, cname_noise), 'wb') as fh_noise:
+                        fh_noise.write(fileinfo_noise['body'])
                     exodata["observation"]["noise_floor"] = os.path.join(__TEMP__, cname_noise)
                 else:
                     exodata["observation"]["noise_floor"] = float(self.get_argument("noisefloor"))
@@ -523,12 +607,14 @@ class ResolveHandler(tornado.web.RequestHandler):
     """
     Resolves a planet by name and returns data on its system
     """
-    def get(self):
+    async def get(self):
         name = self.get_argument("name")
 
         try:
-            planet_data = get_target_data(name)[0]
-        except:
+            planet_data = (await async_get_target_data(name))[0]
+            planet_data = await add_simbad_magnitudes(planet_data, name)
+        except Exception:
+            logger.exception("Unable to resolve target %s", name)
             planet_data = None
 
         self.write(json.dumps(planet_data))
@@ -541,7 +627,7 @@ class CalculationNewHSTHandler(BaseHandler):
     a new HST calculation task to the parallelized workers.
     """
 
-    def get(self, id=None):
+    async def get(self, id=None):
         try: 
             self.header= pd.read_sql_table('header',db_fort)
         except:
@@ -558,8 +644,7 @@ class CalculationNewHSTHandler(BaseHandler):
         if id is not None:
             form_data = self.buffer[id].form_data
 
-        all_planets =  pd.read_csv('https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=select+pl_name+from+PSCompPars&format=csv')
-        all_planets = sorted(all_planets['pl_name'].values)
+        all_planets = await get_cached_planet_names()
         unique_temps = sorted(self.header.temp.unique())
         self.render("newHST.html", id=id,
                     temp=list(map(str, unique_temps)),
@@ -627,9 +712,8 @@ class CalculationNewHSTHandler(BaseHandler):
                 fname_plan = fileinfo_plan['filename']
                 extn_plan = os.path.splitext(fname_plan)[1]
                 cname_plan = id+'planet' + extn_plan
-                fh_plan = open(os.path.join(__TEMP__, cname_plan), 'wb')
-                fh_plan.write(fileinfo_plan['body'])
-                fh_plan.close()
+                with open(os.path.join(__TEMP__, cname_plan), 'wb') as fh_plan:
+                    fh_plan.write(fileinfo_plan['body'])
 
                 exodata["planet"]["exopath"] = os.path.join(__TEMP__, cname_plan)
                 exodata["planet"]["w_unit"] = self.get_argument("planwunits")
@@ -878,12 +962,17 @@ class CalculationViewHSTHandler(BaseHandler):
         self.render("viewhst.html", script=script, div=div, id=id)
 
 
-def main():
+async def run_tornado():
     tornado.options.parse_command_line()
     BaseHandler.executor = ProcessPoolExecutor(max_workers=options.workers)
-    http_server = tornado.httpserver.HTTPServer(Application())
-    http_server.listen(options.port)
-    tornado.ioloop.IOLoop.current().start()
+    app = Application()
+    app.listen(options.port, xheaders=True, reuse_port=True)
+    shutdown_event = asyncio.Event()
+    await shutdown_event.wait()
+
+
+def main():
+    tornado.ioloop.IOLoop.current().run_sync(run_tornado)
 
 
 if __name__ == "__main__":
