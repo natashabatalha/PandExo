@@ -6,13 +6,10 @@ import numpy as np
 import pandas as pd
 from copy import deepcopy 
 from astropy.io import fits
-from pandeia.engine.instrument_factory import InstrumentFactory
-from pandeia.engine.perform_calculation import perform_calculation
 from . import create_input as create
 from .compute_noise import ExtractSpec
 import astropy.units as u
 import pickle
-from pandeia.engine.calc_utils import build_default_calc, build_default_source
 
 #constant parameters.. consider putting these into json file 
 #max groups in integration
@@ -25,6 +22,24 @@ min_nint_trans = 1
 
 #refdata directory
 default_refdata_directory = os.environ.get("pandeia_refdata")
+
+
+def _instrument_factory(config):
+    from pandeia.engine.instrument_factory import InstrumentFactory
+
+    return InstrumentFactory(config=config)
+
+
+def _perform_calculation(*args, **kwargs):
+    from pandeia.engine.perform_calculation import perform_calculation
+
+    return perform_calculation(*args, **kwargs)
+
+
+def _build_default_calc(*args, **kwargs):
+    from pandeia.engine.calc_utils import build_default_calc
+
+    return build_default_calc(*args, **kwargs)
 
 def sort_by_wave_order(value, wave_order):
     if isinstance(value, np.ndarray) and value.shape[:1] == (len(wave_order),):
@@ -231,7 +246,7 @@ def compute_full_sim(dictinput,verbose=False):
     else: 
         conf_temp = conf
 
-    i = InstrumentFactory(config=conf_temp)
+    i = _instrument_factory(config=conf_temp)
     
     #detector parameters
     det_pars = i.read_detector_pars()
@@ -577,7 +592,7 @@ def compute_maxexptime_per_int(pandeia_input, sat_level):
     pandeia_input['configuration']['detector']['nint'] = 1 
     pandeia_input['configuration']['detector']['nexp'] = 1
     
-    report = perform_calculation(pandeia_input, dict_report=False)
+    report = _perform_calculation(pandeia_input, dict_report=False)
     report_dict = report.as_dict() 
 
     # count rate on the detector in e-/second/pixel
@@ -884,7 +899,7 @@ def perform_out(pandeia_input, pandexo_input,timing, both_spec):
     pandeia_input['configuration']['detector']['nint'] = 1#int(timing['Num Integrations Out of Transit'])
     pandeia_input['configuration']['detector']['nexp'] = 1 
 
-    report_out = perform_calculation(pandeia_input, dict_report=False)
+    report_out = _perform_calculation(pandeia_input, dict_report=False)
     
     return report_out
 
@@ -941,7 +956,7 @@ def perform_in(pandeia_input, pandexo_input,timing, both_spec, out, calculation)
     
         pandeia_input['scene'][0]['spectrum']['sed']['spectrum'] = in_transit_spec
 
-        report_in = perform_calculation(pandeia_input, dict_report=True)
+        report_in = _perform_calculation(pandeia_input, dict_report=True)
         instrument = pandeia_input['configuration']['instrument']['instrument']
         #remove QY effects 
         report_in = remove_QY(report_in, instrument)
@@ -1185,10 +1200,10 @@ def target_acq(instrument, both_spec, warning):
 
     #this automatically builds a default calculation 
     #I got reasonable answers for everything so all you should need to do here is swap out (instrument = 'niriss', 'nirspec','miri' or 'nircam')
-    c = build_default_calc(telescope='jwst', instrument=instrument, mode='target_acq', method='taphot')
+    c = _build_default_calc(telescope='jwst', instrument=instrument, mode='target_acq', method='taphot')
     c['scene'][0]['spectrum']['sed'] = {'sed_type':'input','spectrum':out_spectrum}
     c['scene'][0]['spectrum']['normalization']['type'] = 'none'
-    rphot = perform_calculation(c, dict_report=True)
+    rphot = _perform_calculation(c, dict_report=True)
 
     #check warnings (pandeia doesn't return values for these warnings, so try will fail if all good)
     try: 
