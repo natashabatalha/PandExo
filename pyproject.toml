@@ -1,0 +1,111 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pandexo.engine"
+version = "2026.2"
+authors = [
+  { name="Natasha Batalha at NASA Ames", email="natasha.e.batalha@nasa.gov" },
+]
+description = "pandexo transiting exoplanet simulator"
+readme = "README.rst"
+license = { text="GPL" }
+requires-python = ">=3.10"
+classifiers = [
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Astronomy",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "pandeia.engine==2026.2",
+    "numpy>=1.21",
+    "bokeh>=3.4,<4",
+    "ipython",
+    "tornado",
+    "pandas",
+    "joblib",
+    "photutils",
+    "astropy",
+    "synphot>=1.0",
+    "stsynphot>=1.0",
+    "sqlalchemy",
+    "astroquery",
+    "scipy>=1.9.2",
+    "batman-package",
+]
+
+[project.optional-dependencies]
+docs = [
+    "sphinx",
+    "sphinx-rtd-theme",
+    "nbconvert",
+    "nbformat",
+]
+notebooks = [
+    "jupyter",
+    "ipykernel",
+]
+test = [
+    "pytest",
+]
+build = [
+    "build",
+    "twine",
+    "wheel",
+]
+dev = [
+    "sphinx",
+    "sphinx-rtd-theme",
+    "nbconvert",
+    "nbformat",
+    "jupyter",
+    "ipykernel",
+    "pytest",
+    "build",
+    "twine",
+    "wheel",
+]
+all = [
+    "sphinx",
+    "sphinx-rtd-theme",
+    "nbconvert",
+    "nbformat",
+    "jupyter",
+    "ipykernel",
+    "pytest",
+    "build",
+    "twine",
+    "wheel",
+]
+
+[project.urls]
+Homepage = "https://natashabatalha.github.io/PandExo"
+"Source Code" = "https://github.com/natashabatalha/PandExo"
+
+[project.scripts]
+start_pandexo = "pandexo.engine.run_online:main"
+
+[tool.setuptools]
+packages = [
+    "pandexo",
+    "pandexo.engine",
+    "pandexo.engine.reference",
+    "pandexo.engine.static",
+    "pandexo.engine.static.css",
+    "pandexo.engine.static.fonts",
+    "pandexo.engine.static.img",
+    "pandexo.engine.static.js",
+    "pandexo.engine.temp",
+    "pandexo.engine.templates",
+    "pandexo.engine.utils",
+]
+include-package-data = true

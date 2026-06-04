@@ -18,6 +18,7 @@ conda-env/
 !.env.sample
 
 # Editors and IDEs
+*.code-workspace
 .vscode/
 .idea/
 *.swp
@@ -56,6 +57,7 @@ pip-wheel-metadata/
 *.fits
 *.h5
 *.hdf5
+regression_outputs
 
 # Logs and temporary files
 *.log
@@ -68,6 +70,3 @@ pip-wheel-metadata/
 # OS files
 .DS_Store
 Thumbs.db
-
-# Test files
-tests/

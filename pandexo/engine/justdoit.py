@@ -45,7 +45,8 @@ ALL = {"WFC3 G141":False,
        "NIRSpec G395H":False,
        "NIRSpec Prism":False,
        "NIRCam F322W2":False,
-       "NIRCam F444W":False}
+       "NIRCam F444W":False,
+       "NIRCam DHS":False}
 
 
 def print_instruments(verbose=True):
@@ -235,12 +236,12 @@ def get_thruput(inst, niriss=1, nirspec='f100lp', wmin='default', wmax='default'
     nirspec : str
         (Optional) for NIRISS G140M/H there are two available filters (f100lp and f070lp)
         if you are selecting G140M or G140H, this allows you to pick which one
-    wmin : str / float 
+    wmin : str / float
         (Optional) minimum wavlength to compute PCE across, 'default' will use
         values from Pandeia.
-    wmax : str / float 
+    wmax : str / float
         (Optional) maximum wavlength to compute PCE across, 'default' will use
-        values from Pandeia. 
+        values from Pandeia.
     Returns
     -------
     dict
@@ -502,7 +503,12 @@ def subarrays(inst):
   print("Subarray field stored in inst_dict['configuration']['detector']['subarray']")
 
   if inst.lower() == 'niriss':
-    return {'substrip96':2.2129,'substrip256':5.4913}
+    return {'substrip96':2.2129,'substrip256':5.4913, 
+            "sub17stripe_soss":0.06164,
+            "sub60stripe_soss":0.17688,
+            "sub204stripe_soss":0.5628,
+            "sub680stripe_soss": 1.83848
+            }
   elif inst.lower() == 'nirspec':
     return {'sub1024a':0.451,'sub1024b':0.451,'sub2048':0.90156,'sub512':0.22572,'sub512s':0.14392}
   elif inst.lower() == 'miri':

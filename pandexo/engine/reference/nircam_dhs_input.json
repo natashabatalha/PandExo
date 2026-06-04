@@ -47,14 +47,14 @@
     "configuration":{
     "instrument": {
             "instrument": "nircam",
-            "mode": "lw_tsgrism",
-            "filter": "f444w",
-            "aperture": "lw",
-            "disperser": "grismr"
+            "mode": "sw_tsgrism",
+            "filter": "f150w2",
+            "aperture": "dhs0spec8",
+            "disperser": "dhs0"
         },
     "detector": {
             "readout_pattern":"rapid",
-            "subarray": "subgrism64",
+            "subarray": "sub260s4_8-spectra",
             "ngroup": "optimize",
             "nint": 1,
             "nexp": 10

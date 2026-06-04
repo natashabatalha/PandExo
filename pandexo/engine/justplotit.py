@@ -9,6 +9,8 @@ import numpy as np
 from bokeh.layouts import row
 import pandas as pd
 
+CIRCLE_SIZE = 6
+
 
 def _show_bokeh(plot_obj, output_file, output_notebook):
     if output_notebook:
@@ -195,7 +197,7 @@ def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', out
             if y_axis_label == 'fp/f*': p = -1.0
             else: y_axis_label = y_axis_label
 
-            if dictt['input']['Calculation Type'] =='phase_spec':
+            if dictt['input']['Calculation Type'].startswith('phase_spec'):
                 x_axis_label='Time (secs)'
                 x_range = [min(x), max(x)]
             else:
@@ -220,13 +222,12 @@ def jwst_1d_spec(result_dict, model=True, title='Model + Data + Error Bars', out
             model_line = pd.DataFrame({'x':x, 'my':my}).dropna()
             fig1d.line(model_line['x'],model_line['my'], color=colors[i],alpha=0.2, line_width = 4)
 
-
         if legend:
             fig1d.scatter(data['x'], data['y'], marker='circle', color=colors[i],
-                          size=6, legend_label=legend_keys[i])
+                          size=CIRCLE_SIZE, legend_label=legend_keys[i])
         else:
             fig1d.scatter(data['x'], data['y'], marker='circle', color=colors[i],
-                          size=6)
+                          size=CIRCLE_SIZE)
         outx += [data['x'].values]
         outy += [data['y'].values]
         oute += [data['err'].values]
@@ -396,7 +397,7 @@ def jwst_1d_flux(result_dict, plot=True, output_file= 'flux.html'):
     --------
     jwst_1d_spec, jwst_1d_bkg, jwst_noise, jwst_1d_snr, jwst_2d_det, jwst_2d_sat
     """
-    TOOLS = "pan,wheel_zoom,box_zoom,reset,save"
+    #TOOLS = "pan,wheel_zoom,box_zoom,reset,save"
     out = result_dict['PandeiaOutTrans']
 
     # Flux 1d
@@ -404,7 +405,7 @@ def jwst_1d_flux(result_dict, plot=True, output_file= 'flux.html'):
     x = x[~np.isnan(y)]
     y = y[~np.isnan(y)]
 
-    plot_flux_1d1 = Figure(tools=TOOLS,
+    plot_flux_1d1 = Figure(#tools=TOOLS,
                          x_axis_label='Wavelength [microns]',
                          y_axis_label='Flux (e/s)', title="Out of Transit Flux Rate",
                          width=800, height=300)
@@ -440,14 +441,14 @@ def jwst_1d_snr(result_dict, plot=True, output_file='snr.html'):
     --------
     jwst_1d_bkg, jwst_noise, jwst_1d_flux, jwst_1d_spec, jwst_2d_det, jwst_2d_sat
     """
-    TOOLS = "pan,wheel_zoom,box_zoom,reset,save"
+    #TOOLS = "pan,wheel_zoom,box_zoom,reset,save"
     # Flux 1d
     x= result_dict['RawData']['wave']
     electrons_out = result_dict['RawData']['electrons_out']
     y = electrons_out/np.sqrt(result_dict['RawData']['var_out'])
     x = x[~np.isnan(y)]
     y = y[~np.isnan(y)]
-    plot_snr_1d1 = Figure(tools=TOOLS,
+    plot_snr_1d1 = Figure(#tools=TOOLS,
                          x_axis_label='Wavelength (micron)',
                          y_axis_label='SNR', title="SNR Out of Trans",
                          width=800, height=300)
@@ -482,13 +483,13 @@ def jwst_1d_bkg(result_dict, plot=True, output_file='bkg.html'):
     --------
     jwst_1d_spec, jwst_noise, jwst_1d_flux, jwst_1d_snr, jwst_2d_det, jwst_2d_sat
     """
-    TOOLS = "pan,wheel_zoom,box_zoom,reset,save"
+    #TOOLS = "pan,wheel_zoom,box_zoom,reset,save"
     # BG 1d
     out = result_dict['PandeiaOutTrans']
     x, y = out['1d']['extracted_bg_only']
     y = y[~np.isnan(y)]
     x = x[~np.isnan(y)]
-    plot_bg_1d1 = Figure(tools=TOOLS,
+    plot_bg_1d1 = Figure(#tools=TOOLS,
                          x_axis_label='Wavelength [microns]',
                          y_axis_label='Flux (e/s)', title="Background",
                          width=800, height=300)
@@ -522,22 +523,22 @@ def jwst_noise(result_dict, plot=True, output_file= 'noise.html'):
     --------
     jwst_1d_spec, jwst_1d_bkg, jwst_1d_flux, jwst_1d_snr, jwst_2d_det, jwst_2d_sat
     """
-    TOOLS = "pan,wheel_zoom,box_zoom,reset,save"    #saturation
+    #TOOLS = "pan,wheel_zoom,box_zoom,reset,save"    #saturation
 
     x = result_dict['FinalSpectrum']['wave']
     y = result_dict['FinalSpectrum']['error_w_floor']*1e6
     x = x[~np.isnan(y)]
     y = y[~np.isnan(y)]
+
     ymed = np.median(y)
 
 
-    plot_noise_1d1 = Figure(tools=TOOLS,#responsive=True,
+    plot_noise_1d1 = Figure(#tools=TOOLS,#responsive=True,
                          x_axis_label='Wavelength (micron)',
                          y_axis_label='Error on Spectrum (PPM)', title="Error Curve",
                          width=800, height=300, y_range = [0,2.0*ymed])
     ymed = np.median(y)
-    plot_noise_1d1.scatter(x, y, marker='circle', size=6, line_width = 4,
-                           alpha = .7)
+    plot_noise_1d1.step(x, y, line_width = 4, alpha = .7)
     if plot:
         outputfile(output_file)
         show(plot_noise_1d1)
@@ -567,7 +568,7 @@ def jwst_2d_det(result_dict, plot=True, output_file='det2d.html'):
     jwst_1d_spec, jwst_1d_bkg, jwst_1d_flux, jwst_1d_snr, jwst_noise, jwst_2d_sat
 
     """
-    TOOLS = "pan,wheel_zoom,box_zoom,reset,save"
+    #TOOLS = "pan,wheel_zoom,box_zoom,reset,save"
     out = result_dict['PandeiaOutTrans']
     data = out['2d']['detector']
 
@@ -580,7 +581,7 @@ def jwst_2d_det(result_dict, plot=True, output_file='det2d.html'):
 
     xr, yr = data.shape
 
-    plot_detector_2d = Figure(tools="pan,wheel_zoom,box_zoom,reset,hover,save",
+    plot_detector_2d = Figure(#tools="pan,wheel_zoom,box_zoom,reset,hover,save",
                          x_range=[0, yr], y_range=[0, xr],
                          x_axis_label='Pixel', y_axis_label='Spatial',
                          title="2D Detector Image",
@@ -618,7 +619,7 @@ def jwst_2d_sat(result_dict, plot=True, output_file='sat2d.html'):
     --------
     jwst_1d_spec, jwst_1d_bkg, jwst_1d_flux, jwst_1d_snr, jwst_2d_det, jwst_noise
     """
-    TOOLS = "pan,wheel_zoom,box_zoom,reset,save"    #saturation
+    #TOOLS = "pan,wheel_zoom,box_zoom,reset,save"    #saturation
     out = result_dict['PandeiaOutTrans']
     data = out['2d']['saturation']
     xr, yr = data.shape
@@ -630,7 +631,7 @@ def jwst_2d_sat(result_dict, plot=True, output_file='sat2d.html'):
         width=800
         height=300
         
-    plot_sat_2d = Figure(tools=TOOLS,
+    plot_sat_2d = Figure(#tools=TOOLS,
                          x_range=[0, yr], y_range=[0, xr],
                          x_axis_label='Pixel', y_axis_label='Spatial',
                          title="Saturation",
@@ -676,7 +677,7 @@ def hst_spec(result_dict, plot=True, output_file ='hstspec.html', model = True, 
     --------
     hst_time
     """
-    TOOLS = "pan,wheel_zoom,box_zoom,reset,save"
+    #TOOLS = "pan,wheel_zoom,box_zoom,reset,save"
     #plot planet spectrum
     mwave = result_dict['planet_spec']['model_wave']
     mspec = result_dict['planet_spec']['model_spec']
@@ -690,7 +691,7 @@ def hst_spec(result_dict, plot=True, output_file ='hstspec.html', model = True, 
     ylims = [np.min(binspec)-2.0*error[0], np.max(binspec)+2.0*error[0]]
 
     plot_spectrum = Figure(width=800, height=300, x_range=xlims,
-                               y_range=ylims, tools=TOOLS,#responsive=True,
+                               y_range=ylims, #tools=TOOLS,#responsive=True,
                                  x_axis_label='Wavelength [microns]',
                                  y_axis_label='Ratio',
                                title="Original Model with Observation")
@@ -702,7 +703,7 @@ def hst_spec(result_dict, plot=True, output_file ='hstspec.html', model = True, 
         np.array(y_err.append((py - yerr, py + yerr)))
     if model:
         plot_spectrum.line(mwave,mspec, color= "black", alpha = 0.5, line_width = 4)
-    plot_spectrum.scatter(binwave,binspec, marker='circle', size=6,
+    plot_spectrum.scatter(binwave,binspec, marker='circle', size=CIRCLE_SIZE,
                           line_width=3, line_alpha=0.6)
     plot_spectrum.multi_line(x_err, y_err)
 
@@ -748,7 +749,7 @@ def hst_time(result_dict, plot=True, output_file ='hsttime.html', model = True, 
     --------
     hst_spec
     """
-    TOOLS = "pan,wheel_zoom,box_zoom,reset,save"
+    #TOOLS = "pan,wheel_zoom,box_zoom,reset,save"
     #earliest and latest start times
     obsphase1 = result_dict['calc_start_window']['obsphase1']
     obstr1 = result_dict['calc_start_window']['obstr1']
@@ -775,23 +776,23 @@ def hst_time(result_dict, plot=True, output_file ='hsttime.html', model = True, 
         np.array(y_err2.append((py - yerr, py + yerr)))
 
     early = Figure(width=400, height=300,
-                               tools=TOOLS,#responsive=True,
+                               #tools=TOOLS,#responsive=True,
                                  x_axis_label='Orbital Phase',
                                  y_axis_label='Flux',
                                title="Earliest Start Time")
 
     if model: early.line(phase1, trmodel1, color='black',alpha=0.5, line_width = 4)
-    early.scatter(obsphase1, obstr1, marker='circle', size=6, line_width=3,
+    early.scatter(obsphase1, obstr1, marker='circle', size=CIRCLE_SIZE, line_width=3,
                   line_alpha=0.6)
     early.multi_line(x_err1, y_err1)
 
     late = Figure(width=400, height=300,
-                                tools=TOOLS,#responsive=True,
+                                #tools=TOOLS,#responsive=True,
                                  x_axis_label='Orbital Phase',
                                  y_axis_label='Flux',
                                title="Latest Start Time")
     if model: late.line(phase2, trmodel2, color='black',alpha=0.5, line_width = 3)
-    late.scatter(obsphase2, obstr2, marker='circle', size=6, line_width=3,
+    late.scatter(obsphase2, obstr2, marker='circle', size=CIRCLE_SIZE, line_width=3,
                  line_alpha=0.6)
     late.multi_line(x_err2, y_err2)
 
@@ -841,7 +842,7 @@ def hst_simulated_lightcurve(result_dict, plot=True, output_file ='hsttime.html'
     --------
     hst_spec
     """
-    TOOLS = "pan,wheel_zoom,box_zoom,reset,save"
+    #TOOLS = "pan,wheel_zoom,box_zoom,reset,save"
     # earliest and latest start times
     obsphase1 = result_dict['light_curve']['obsphase1']
     rms = result_dict['light_curve']['light_curve_rms']
@@ -875,25 +876,25 @@ def hst_simulated_lightcurve(result_dict, plot=True, output_file ='hsttime.html'
         title_description =" (Ramp Removed)"
 
     early = Figure(width=400, height=300,
-                               tools=TOOLS,#responsive=True,
+                               #tools=TOOLS,#responsive=True,
                                  x_axis_label='Orbital Phase',
                                  y_axis_label='Flux [electrons/pixel]',
                                title="Earliest Start Time" + title_description)
 
     if model:
         early.line(phase1, model_counts1, color='black', alpha=0.5, line_width=4)
-    early.scatter(obsphase1, counts1, marker='circle', size=6, line_width=3,
+    early.scatter(obsphase1, counts1, marker='circle', size=CIRCLE_SIZE, line_width=3,
                   line_alpha=0.6)
     early.multi_line(x_err1, y_err1)
 
     late = Figure(width=400, height=300,
-                  tools=TOOLS,  # responsive=True,
+                  #tools=TOOLS,  # responsive=True,
                   x_axis_label='Orbital Phase',
                   y_axis_label='Flux [electrons/pixel]',
                   title="Latest Start Time" + title_description)
     if model:
         late.line(phase2, model_counts2, color='black', alpha=0.5, line_width=3)
-    late.scatter(obsphase2, counts2, marker='circle', size=6, line_width=3,
+    late.scatter(obsphase2, counts2, marker='circle', size=CIRCLE_SIZE, line_width=3,
                  line_alpha=0.6)
     late.multi_line(x_err2, y_err2)
 

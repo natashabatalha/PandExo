@@ -12,6 +12,7 @@
 <h1 class="page-header">New JWST Calculation</h1>
 
 <form enctype="multipart/form-data" class="form-horizontal" action="/calculation/new" method="post" id="calculation-form">
+    <input type="hidden" id="formDataJson" value="{{ data_json }}">
                 
     <div class="form-group">
         <label class="col-md-3 control-label" for="calcName">Name</label>
@@ -65,7 +66,7 @@
             <option value='kilometer'>Km</option>  
             <option value='m'>m</option>  
             <option value='R_earth'>R<sub>E</sub></option> 
-            <option value='R_jupiter'>R<sub>J</sub></option>  
+            <option value='R_jupiter'>R<sub>J</sub></option>
             </select>
         </div>
         <p class="help-block">Stellar Radius</p>
@@ -74,7 +75,7 @@
         <input type="number" step="any" class="form-control" id="refradc" name="refradc" style="width: 70%;" required>
         <div class="input-group-btn" style="width: 20%;left: -4px;display: inline-block;" >
             <select id="r_unitc" name="r_unitc" class="form-control" required>
-            <option value='R_jupiter'>R<sub>J</sub></option>   
+            <option value='R_jupiter'>R<sub>J</sub></option>
             <option value='kilometer'>Km</option>  
             <option value='m'>m</option>  
             <option value='R_earth'>R<sub>E</sub></option> 
@@ -101,7 +102,7 @@
     <hr class="col-md-11 col-md-offset-1">
 
     <div class="form-group">
-        <label class="col-md-3 control-label" for="" style="top: 35px;">Stellar Model</label>
+        <label class="col-md-3 control-label" style="top: 35px;">Stellar Model</label>
         <div class="col-md-9">
             <div class="radio-chooser">
                 <div class="radio-chooser-item">
@@ -149,7 +150,7 @@
     <hr class="col-md-11 col-md-offset-1">
 
     <div class="form-group">
-        <label class="col-md-3 control-label" for="" style="top: 35px;">Planet Model</label>
+        <label class="col-md-3 control-label" style="top: 35px;">Planet Model</label>
         <div class="col-md-9">
             <div class="radio-chooser">
                 <div class="radio-chooser-item">
@@ -309,7 +310,8 @@
                 <option value=""></option>
                 <option value="MIRI">MIRI Low Resolution Spectroscopy</option>
                 <option value="NIRSpec">NIRSpec Bright Object Time Series</option>
-                <option value="NIRCam">NIRCam Grism Time Series</option>
+                <option value="NIRCam">NIRCam Long Wave Only Grism Time Series</option>
+                <option value="NIRCamDHS">NIRCam Long Wave &amp; Short Wave Grism Time Series</option>
                 <option value="NIRISS">NIRISS Single Object Slitless Spectroscopy</option>
             </select>
         </div>
@@ -350,8 +352,9 @@
 
         <div class="col-md-6" id="NIRCam">
             <div class="col-md-6" style="padding-left: 0;">
-                <select id="nircammode" name="nircammode" class="form-control" data-placeholder="Select NIRCam Mode">
-                    <option value="f322w2" selected>F322W2, 2.7-4 um</option>
+                <select id="nircamfilter" name="nircamfilter" onchange="showForm()" class="form-control" data-placeholder="Select NIRCam Mode">
+                    <option value=""></option>
+                    <option value="f322w2">F322W2, 2.7-4 um</option>
                     <option value="f444w">F444W, 4-5 um</option>
                 </select>
             </div>
@@ -368,12 +371,77 @@
             </div>
         </div>
 
-        <div class="col-md-4" id="NIRISS">
-            <select id="nirissmode" name="nirissmode" class="form-control" data-placeholder="Select NIRISS Mode">
-                <option value="substrip96" >Substrip 96</option>
-                <option value="substrip256" selected>Substrip 256</option>
-            </select>
+        <div class="col-md-9" id="NIRCamDHS">
+            <div class="col-md-3" style="padding-left: 0;">
+                <select id="nircamsw" name="nircamsw" onchange="showForm()" class="form-control" data-placeholder="Select SW Filter">
+                    <option value=""></option>
+                    <option value="f070w">F070W, ~0.6-0.8 um</option>
+                    <option value="f090w">F090W, ~0.8-1 um</option>
+                    <option value="f115w">F115W, ~1-1.2 um</option>
+                    <option value="f150w2">F150W2, ~1-1.9 um</option>
+                    <option value="f200w">F200W, ~1.7-2 um</option>
+                </select>
+            </div>            
+            <div class="col-md-3" style="padding-left: 0;">
+                <select id="nircamlw" name="nircamlw" onchange="showForm()" class="form-control" data-placeholder="Select LW Filter">
+                    <option value=""></option>
+                    <option value="f322w2">F322W2, 2.7-4 um</option>
+                    <option value="f444w">F444W, 4-5 um</option>
+                </select>
+            </div>
+            <div class="col-md-3" style="padding-right: 0;">
+                <select id="nircamsubarraydhs" name="nircamsubarraydhs" onchange="showForm()" class="form-control" data-placeholder="Select NIRCam Subarray">
+                    <option value=""></option>
+                    <option value="sub41s1_2-spectra">SUB41S1_2-SPECTRA (tframe=0.21)</option>
+                    <option value="sub82s2_4-spectra">SUB82S2_4-SPECTRA (tframe=0.42)</option>
+                    <option value="sub164s4_8-spectra"> SUB164S4_8-SPECTRA (tframe=0.84)</option>
+                    <option value="sub260s4_8-spectra">SUB260S4_8-SPECTRA (tframe=1.3)</option>
+                </select>
+            </div>
+            <div class="col-md-3" style="padding-right: 0;">
+                <select id="nircammode" name="nircammode" onchange="showForm()" class="form-control" data-placeholder="Display Simulation For?">
+                    <option value=""></option>
+                    <option value="sw">Short wave</option>
+                    <option value="lw">Long wave</option>
+                </select>
+            </div>
+            <div class="col-md-9" style="padding-right: 0;">
+            <p class="help-block">1) There are separate calculations for the short and long wavelength channels even though these observations occur simultaneously. Take caution to use the same Instrument Setup and Detector Setup in both the SW Grism Time Series and LW Grism Time Series calculations for a given target to correctly evaluate expected SNR. </p>
+            <p class="help-block">2) SW Filter wavelength ranges cited in the dropdown menu are only for guidance. The exact numbers dependt on the choice of LW filter <a href="https://jwst-docs.stsci.edu/jwst-near-infrared-camera/nircam-observing-modes/nircam-time-series-observations/nircam-short-wavelength-grism-time-series#gsc.tab=0">(see JDOX Table 3)</a></p>
+            </div>
         </div>
+
+
+        <div class="col-md-4" id="NIRISS">
+            <select id="nirissmode" name="nirissmode" onchange="show_dropdown()" class="form-control" data-placeholder="Select NIRISS Mode">
+                <option value=""></option>
+                <option value="substrip256">Substrip 256 (bright limit=8.5)</option>
+                <option value="substrip96">Substrip 96 (bright limit=6.3)</option>
+                <option value="sub17stripe_soss">MULTISTRIPE SUB17</option>
+                <option value="sub60stripe_soss">MULTISTRIPE SUB60</option>
+                <option value="sub204stripe_soss">MULTISTRIPE SUB204</option>
+                <option value="sub680stripe_soss">MULTISTRIPE SUB680</option>
+            </select>
+            <p class="help-block">Are you dimmer than 8.5? Pick sub256, Between mag of 6.3-8.5, don't care about Order 2? Pick sub96. Otherwise, explore trade offs between worse SNR in multistripe and/or partial saturation in sub96/sub256. </p>
+            <div id="order2_dropdown" style="display:none">
+                <select id="nirissorders" name="nirissorders" class="form-control">
+                    <option value="1">Order 1</option>
+                    <option value="2">Order 2</option>
+                </select>
+                <p class="help-block">Order to run calculation on. If optimizing number of groups, we recommend optimizing for Order 1 first, and using that optimum for the Order 2 calculations.</p>
+            </div>
+        </div>
+
+        <script type="text/javascript">
+            function show_dropdown() {
+                if(document.getElementById('nirissmode').value == "substrip256") {
+                    document.getElementById('order2_dropdown').style.display = 'block';
+                } else {
+                    document.getElementById('order2_dropdown').style.display = 'none';
+                }
+            }
+        </script>
+
     </div>
     <!--
     <div class="form-group">
@@ -387,7 +455,7 @@
             </button>
         </div>
     </div>
-    </!-->
+    -->
     <div class="form-group">
         <label class="col-md-3 control-label" for="optimize">Number of Groups per Integration</label>
         <div class="col-md-4">
@@ -413,7 +481,7 @@
     </div>
 
     <div class="form-group">
-        <label class="col-md-3 control-label" for="" style="top: 35px;">Noise Floor</label>
+        <label class="col-md-3 control-label" style="top: 35px;">Noise Floor</label>
         <div class="col-md-9">
             <div class="radio-chooser">
                 <div class="radio-chooser-item">
@@ -464,7 +532,7 @@
 <script src="{{ static_url('js/starter.form.js') }}"></script>
 <script src="{{ static_url('js/select2.min.js') }}"></script>
 
-<script type="text/javascript"> 
+<script type="text/javascript">
   $(document).ready(function(){
       $("#resolve_target_btn").click(function() {
 	  $.get("../resolve?name=" + encodeURIComponent($("#planetname").val()), function(data) {
@@ -487,7 +555,7 @@
 				      alert("Resolve failed. Contact support and include this error: " + JSON.stringify(xhr));
 				  });
       });
-      
+
         $("select").select2({
             theme: "bootstrap",
             width: "100%",
@@ -498,7 +566,7 @@
         $(".radio-chooser-content").click(function () {
             $(".radio-chooser-item").removeClass("radio-chooser-selected");
             $(this).parent().addClass("radio-chooser-selected");
-            switch ( $(this).find("input").attr("id") ) {               
+            switch ( $(this).find("input").attr("id") ) {
                 case "stellarModelUser":
                     $(".upload-stellar-section").removeClass("hidden");
 		    $(".upload-stellar-section input").find("input, select").attr("required", true);
@@ -509,7 +577,7 @@
                     break;                
                 case "planetModelConstant":
                     $(".upload-planet-section").addClass("hidden");
-	    	    $(".upload-planet-section").find("input, select").attr("required", false);
+		    $(".upload-planet-section").find("input, select").attr("required", false);
                     $(".constant-transit-section").removeClass("hidden");
 		    $(".constant-transit-section").find("input, select").attr("required", true);
                     $(".select-from-grid").addClass("hidden");
@@ -517,7 +585,7 @@
                     break;
                 case "planetModelUser":
                     $(".constant-transit-section").addClass("hidden");
-	 	    $(".constant-transit-section").find("input, select").attr("required", false);
+		    $(".constant-transit-section").find("input, select").attr("required", false);
                     $(".upload-planet-section").removeClass("hidden");
 		    $(".upload-planet-section").find("input, select").attr("required", true);
                     $(".select-from-grid").addClass("hidden");
@@ -553,11 +621,11 @@
 	  else
 	      $("#ptempc").attr("required", false);
       });
-      
+
         /* Instrument Selection */
         $("#instrument").change(function () {
             $("#instrument-mode-section").removeClass("hidden");
-            $("#MIRI, #NIRSpec, #NIRISS, #NIRCam").addClass("hidden");
+            $("#MIRI, #NIRSpec, #NIRISS, #NIRCam, #NIRCamDHS").addClass("hidden");
             var selopt = $("#instrument").val();
             switch (selopt) {
                 case "MIRI":
@@ -572,19 +640,22 @@
                 case "NIRCam":
                     $("#NIRCam").removeClass("hidden");
                     break;
+                case "NIRCamDHS":
+                    $("#NIRCamDHS").removeClass("hidden");
+                    break;
             }
         });
 
       //if we're editing, set the form values to what it was before
-      var obj = JSON.parse({% raw json_encode(data_json) %});
+      var obj = JSON.parse($("#formDataJson").val());
       if (!jQuery.isEmptyObject(obj)) {
-	  var radioNames = $('form :radio').map((_, radio) => radio.name).get();	  
+	  var radioNames = $('form :radio').map((_, radio) => radio.name).get();
 	  var dropdownNames = $('form select').map((_, radio) => radio.name).get();
 	  $.each(obj, function(name, value) {
 	      if (radioNames.includes(name)) {
 		  $(`input[name='${name}'][value='${value}']`).trigger("click");
 	      }
-	      else if (dropdownNames.includes(name)) { 
+	      else if (dropdownNames.includes(name)) {
 		  $(`select[name='${name}']`).val(value).trigger("change");
 	      }
 	      else {
@@ -597,7 +668,7 @@
 	  $(`input[name='stellarModel'][value='phoenix']`).trigger("click");
 	  $(`input[name='planetModel'][value='constant']`).trigger("click");
 	  $(`input[name='noiseModel'][value='constant-noise']`).trigger("click");
-      }   
+      }
   });
 
     function pickStar() {

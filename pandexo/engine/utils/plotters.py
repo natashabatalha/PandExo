@@ -41,7 +41,7 @@ def create_component_jwst(result_dict):
     if punit == 'fp/f*': p = -1.0
     else: punit = punit
     
-    if result_dict['input']['Calculation Type'] =='phase_spec':
+    if result_dict['input']['Calculation Type'].startswith('phase_spec'):
         x_axis_label='Time (secs)'
         frac = 1.0
     else:
@@ -81,9 +81,8 @@ def create_component_jwst(result_dict):
                                title="Original Model with Observation")
     
     plot_spectrum.line(result_dict['OriginalInput']['model_wave'],result_dict['OriginalInput']['model_spec'], color= "black", alpha = 0.5, line_width = 4)
-        
-    plot_spectrum.scatter('x', 'y', source=source, marker='circle', size=6,
-                          line_width=3, line_alpha=0.6)
+    radius_size = np.diff(ylims)[0]/20
+    plot_spectrum.circle('x', 'y', source=source, line_width=3, line_alpha=0.6,radius=radius_size)
     plot_spectrum.multi_line('x_err', 'y_err', source=source)
 
     callback = CustomJS(args=dict(source=source, original=original), code="""
@@ -216,9 +215,10 @@ def create_component_jwst(result_dict):
     raw = result_dict['RawData']
     
     # Flux 1d
-    x, y = raw['wave'], raw['e_rate_out']*result_dict['timing']['Seconds per Frame']*(timing["APT: Num Groups per Integration"]-1)
-    x = x[~np.isnan(y)]
-    y = y[~np.isnan(y)]
+    #x, y = raw['wave'], raw['e_rate_out']*result_dict['timing']['Seconds per Frame']*(timing["APT: Num Groups per Integration"]+timing["Zero Frame Efficiency Loss"])
+    #x = x[~np.isnan(y)]
+    #y = y[~np.isnan(y)]
+    x,y = raw['wave'],raw['electron_per_int']
 
     plot_flux_1d1 = Figure(tools=TOOLS,
                          x_axis_label='Wavelength [microns]',
@@ -239,7 +239,7 @@ def create_component_jwst(result_dict):
     #tab2 = Panel(child=plot_bg_1d1, title="Background Flux")
 
     # SNR 
-    y = np.sqrt(y) #this is computing the SNR (sqrt of photons in a single integration)
+    x,y = raw['snr_int'][0],raw['snr_int'][1] #this is computing the SNR (sqrt of photons in a single integration)
 
 
     plot_snr_1d1 = Figure(tools=TOOLS,
@@ -265,8 +265,7 @@ def create_component_jwst(result_dict):
                          y_axis_label='Spectral Precision (ppm)', title="Spectral Precision",
                          width=800, height=300, y_range = [0,2.0*ymed])
     ymed = np.median(y)
-    plot_noise_1d1.scatter('x', 'y', marker='circle', size=6,
-                           line_width = 4, alpha = .7, source=source2)
+    plot_noise_1d1.step('x', 'y', line_width = 4, alpha = .7, source=source2)
 
     callback2 = CustomJS(args=dict(source=source2, original=original2), code="""
             // Grab some references to the data
@@ -375,7 +374,7 @@ def create_component_jwst(result_dict):
                         result_dict['PandeiaOutTrans']['1d']['n_full_saturated'][1],
                         line_width = 4,alpha = .7)
     tab7 = Panel(child=plot_full_sat, title="Full saturation")
-    
+
     #create set of five tabs 
     tabs1d = Tabs(tabs=[ tab1,tab3, tab4, tab5, tab6, tab7])
 
@@ -498,8 +497,9 @@ def create_component_hst(result_dict):
         np.array(y_err.append((py - yerr, py + yerr)))
 
     plot_spectrum.line(mwave,mspec, color= "black", alpha = 0.5, line_width = 4)
-    plot_spectrum.scatter(binwave,binspec, marker='circle', size=6,
-                          line_width=3, line_alpha=0.6)
+    radius_size = np.diff(ylims)[0]/20
+    plot_spectrum.circle(binwave,binspec, line_width=3, line_alpha=0.6,
+        radius=radius_size)
     plot_spectrum.multi_line(x_err, y_err)
     
     
@@ -533,10 +533,9 @@ def create_component_hst(result_dict):
                                  x_axis_label='Orbital Phase',
                                  y_axis_label='Flux', 
                                title="Earliest Start Time")
-    
+    radius = (np.max(trmodel1)-np.min(trmodel1))/20
     early.line(phase1, trmodel1, color='black',alpha=0.5, line_width = 4)
-    early.scatter(obsphase1, obstr1, marker='circle', size=6, line_width=3,
-                  line_alpha=0.6)
+    early.circle(obsphase1, obstr1, line_width=3, line_alpha=0.6,radius=radius)
     early.multi_line(x_err1, y_err1)
      
     late = Figure(width=400, height=300, 
@@ -545,8 +544,7 @@ def create_component_hst(result_dict):
                                  y_axis_label='Flux', 
                                title="Latest Start Time")
     late.line(phase2, trmodel2, color='black',alpha=0.5, line_width = 3)
-    late.scatter(obsphase2, obstr2, marker='circle', size=6, line_width=3,
-                 line_alpha=0.6)
+    late.circle(obsphase2, obstr2, line_width=3, line_alpha=0.6,radius=radius)
     late.multi_line(x_err2, y_err2)
         
     start_time = row(early, late)
@@ -590,10 +588,10 @@ def create_component_hst(result_dict):
                                  y_axis_label='Flux [electrons/pixel]',
                                title="Earliest Start Time" + title_description)
 
-
+    
     early.line(phase1, model_counts1, color='black', alpha=0.5, line_width=4)
-    early.scatter(obsphase1, counts1, marker='circle', size=6, line_width=3,
-                  line_alpha=0.6)
+    radius = (np.max(counts1)-np.min(counts1))/20
+    early.circle(obsphase1, counts1, line_width=3, line_alpha=0.6,radius=radius)
     early.multi_line(x_err1, y_err1)
 
     late = Figure(width=400, height=300,
@@ -603,8 +601,8 @@ def create_component_hst(result_dict):
                   title="Latest Start Time" + title_description)
 
     late.line(phase2, model_counts2, color='black', alpha=0.5, line_width=3)
-    late.scatter(obsphase2, counts2, marker='circle', size=6, line_width=3,
-                 line_alpha=0.6)
+    radius = (np.max(counts2)-np.min(counts2))/20
+    late.circle(obsphase2, counts2, line_width=3, line_alpha=0.6,radius=radius)
     late.multi_line(x_err2, y_err2)
 
     start_time = row(early, late)

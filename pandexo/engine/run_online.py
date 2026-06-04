@@ -283,7 +283,7 @@ class DashboardHSTHandler(BaseHandler):
         self.render("dashboardhst.html", calculations=task_responses[::-1])
 
 
-        
+
 class CalculationNewHandler(BaseHandler):
     """
     This request handler deals with processing the form data and submitting
@@ -303,7 +303,7 @@ class CalculationNewHandler(BaseHandler):
             exodata = json.load(data_file)
 
         form_data = None
-        if id is not None:            
+        if id is not None:
             form_data = self.buffer[id].form_data
 
         all_planets =  pd.read_csv('https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=select+pl_name+from+PSCompPars&format=csv')
@@ -314,7 +314,7 @@ class CalculationNewHandler(BaseHandler):
                                  planets=all_planets,
                                  data=exodata, data_json=json.dumps(form_data))
 
-    
+
     def post(self):
         """
         The post method contains the returned data from the form data (
@@ -335,13 +335,15 @@ class CalculationNewHandler(BaseHandler):
 
             exodata = json.load(data_file)
             exodata["telescope"] = 'jwst'
+            # Retain the public input field; jwst.compute_full_sim selects the
+            # actual transit noise method from the detector readout mode.
             exodata["calculation"] = 'fml'
 
             #star
 
             exodata["star"]["temp"] = float(self.get_argument("temp"))
             exodata["star"]["logg"] = float(self.get_argument("logg"))
-            exodata["star"]["metal"] = float(self.get_argument("metal"))  
+            exodata["star"]["metal"] = float(self.get_argument("metal"))
             exodata["star"]["mag"] = float(self.get_argument("mag"))
             exodata["star"]["ref_wave"] = float(self.get_argument("ref_wave"))
 
@@ -351,7 +353,7 @@ class CalculationNewHandler(BaseHandler):
 
             #optional planet radius
             exodata["planet"]["radius"] = float(self.get_argument("refradc"))
-            exodata["planet"]["r_unit"] = str(self.get_argument("r_unitc")) 
+            exodata["planet"]["r_unit"] = str(self.get_argument("r_unitc"))
 
             #transit duration
             # for phase curves user doesn't necessarily have to input a transit duration
@@ -362,7 +364,7 @@ class CalculationNewHandler(BaseHandler):
                 # but if they don't.. make sure that the planet units are in seconds...
                 if self.get_argument("planwunits") == 'sec':
                     exodata["planet"]["transit_duration"] = 0.0
-                else: 
+                else:
                     raise Exception("Need transit duraiton or input phase curve file")
 
             # stellar model
@@ -398,7 +400,7 @@ class CalculationNewHandler(BaseHandler):
                 exodata["planet"]["exopath"] = os.path.join(__TEMP__, cname_plan)
                 exodata["planet"]["w_unit"] = self.get_argument("planwunits")
                 exodata["planet"]["f_unit"] = self.get_argument("planfunits")
-            elif exodata["planet"]["type"] == "constant":                               
+            elif exodata["planet"]["type"] == "constant":
                 if self.get_argument("constant_unit") == 'fp/f*':
                     exodata["planet"]["temp"] = float(self.get_argument("ptempc"))
                     exodata["planet"]["f_unit"] = 'fp/f*'
@@ -407,10 +409,10 @@ class CalculationNewHandler(BaseHandler):
             elif exodata["planet"]["type"] == "grid":
                 exodata["planet"]["temp"] = float(self.get_argument("ptempg"))
                 exodata["planet"]["chem"] = str(self.get_argument("pchem"))
-                exodata["planet"]["cloud"] = self.get_argument("cloud") 
+                exodata["planet"]["cloud"] = self.get_argument("cloud")
                 exodata["planet"]["mass"] = float(self.get_argument("pmass"))
                 exodata["planet"]["m_unit"] = str(self.get_argument("m_unit"))
-            #baseline 
+            #baseline
             exodata["observation"]["baseline"] = float(self.get_argument("baseline"))
             exodata["observation"]["baseline_unit"] = self.get_argument("baseline_unit")
             try:
@@ -433,7 +435,7 @@ class CalculationNewHandler(BaseHandler):
                     extn_noise = os.path.splitext(fname_noise)[1]
                     cname_noise = id + 'noise' + extn_noise
                     fh_noise = open(os.path.join(__TEMP__, cname_noise), 'wb')
-                    fh_noise.write(fileinfo_star['body'])
+                    fh_noise.write(fileinfo_noise['body'])
                     fh_noise.close()
                     exodata["observation"]["noise_floor"] = os.path.join(__TEMP__, cname_noise)
                 else:
@@ -444,7 +446,7 @@ class CalculationNewHandler(BaseHandler):
         instrument = self.get_argument("instrument").lower()
         if instrument == "miri":
             with open(os.path.join(os.path.dirname(__file__), "reference", "miri_input.json")) as data_file:
-                pandata = json.load(data_file)       
+                pandata = json.load(data_file)
                 mirimode = self.get_argument("mirimode")
                 if (mirimode == "lrsslit"):
                     pandata["configuration"]["instrument"]["mode"] = mirimode
@@ -453,7 +455,7 @@ class CalculationNewHandler(BaseHandler):
 
         if instrument == "nirspec":
             with open(os.path.join(os.path.dirname(__file__), "reference", "nirspec_input.json")) as data_file:
-                pandata = json.load(data_file)  
+                pandata = json.load(data_file)
                 nirspecmode = self.get_argument("nirspecmode")
                 pandata["configuration"]["instrument"]["disperser"] = nirspecmode[0:5]
                 pandata["configuration"]["instrument"]["filter"] = nirspecmode[5:11]
@@ -461,30 +463,46 @@ class CalculationNewHandler(BaseHandler):
 
         if instrument == "nircam":
             with open(os.path.join(os.path.dirname(__file__), "reference", "nircam_input.json")) as data_file:
-                pandata = json.load(data_file) 
-                pandata["configuration"]["instrument"]["filter"] = self.get_argument("nircammode")
+                pandata = json.load(data_file)
+                pandata["configuration"]["instrument"]["filter"] = self.get_argument("nircamfilter")
                 pandata["configuration"]["detector"]["subarray"] = self.get_argument("nircamsubarray")
+
+        if instrument == "nircamdhs":
+            with open(os.path.join(os.path.dirname(__file__), "reference", "nircam_dhs_input.json")) as data_file:
+                pandata = json.load(data_file)
+                # SW and LW are observed together, but PandExo displays one at a time.
+                sw_or_lw = self.get_argument("nircammode")
+                filter_to_sim = "nircam{}".format(sw_or_lw)
+                if "sw" in filter_to_sim:
+                    pair_filter = "nircamlw"
+                else:
+                    pair_filter = "nircamsw"
+                pandata["configuration"]["instrument"]["filter"] = self.get_argument(filter_to_sim)
+                pandata["configuration"]["instrument"]["pandexofilterpair"] = self.get_argument(pair_filter)
+                pandata["configuration"]["detector"]["subarray"] = self.get_argument("nircamsubarraydhs")
 
         if instrument == "niriss":
             with open(os.path.join(os.path.dirname(__file__), "reference", "niriss_input.json")) as data_file:
                 pandata = json.load(data_file)
                 nirissmode = self.get_argument("nirissmode")
                 pandata["configuration"]["detector"]["subarray"] = nirissmode
+                if nirissmode == "substrip256":
+                    pandata["strategy"]["order"] = int(self.get_argument("nirissorders"))
 
-        pandata['configuration']['instrument']['instrument'] = instrument
+        pandata['configuration']['instrument']['instrument'] = instrument.replace('dhs', '')
 
         # write in optimal groups or set a number
         try:
             pandata["configuration"]["detector"]["ngroup"] = int(self.get_argument("optimize"))
-        except: 
+        except:
             pandata["configuration"]["detector"]["ngroup"] = self.get_argument("optimize")
 
         finaldata = {"pandeia_input": pandata, "pandexo_input": exodata}
 
         #PandExo stats
-        try: 
+        try:
             jwst_log(finaldata)
-        except: 
+        except:
             pass
 
         task = self.executor.submit(wrapper, finaldata)
@@ -512,11 +530,11 @@ class ResolveHandler(tornado.web.RequestHandler):
             planet_data = get_target_data(name)[0]
         except:
             planet_data = None
-        
+
         self.write(json.dumps(planet_data))
 
 
-            
+
 class CalculationNewHSTHandler(BaseHandler):
     """
     This request handler deals with processing the form data and submitting
@@ -537,11 +555,11 @@ class CalculationNewHSTHandler(BaseHandler):
 
 
         form_data = None
-        if id is not None:            
+        if id is not None:
             form_data = self.buffer[id].form_data
-            
+
         all_planets =  pd.read_csv('https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=select+pl_name+from+PSCompPars&format=csv')
-        all_planets = sorted(all_planets['pl_name'].values)        
+        all_planets = sorted(all_planets['pl_name'].values)
         unique_temps = sorted(self.header.temp.unique())
         self.render("newHST.html", id=id,
                     temp=list(map(str, unique_temps)),
@@ -560,7 +578,7 @@ class CalculationNewHSTHandler(BaseHandler):
             form_data[key] = self.get_argument(key)
 
         id = str(uuid.uuid4())+'h'
-      
+
         with open(os.path.join(os.path.dirname(__file__), "reference",
                         "exo_input.json")) as data_file:
             exodata = json.load(data_file)
@@ -617,7 +635,7 @@ class CalculationNewHSTHandler(BaseHandler):
                 exodata["planet"]["w_unit"] = self.get_argument("planwunits")
                 exodata["planet"]["f_unit"] = self.get_argument("planfunits")
 
-            elif exodata["planet"]["type"] == "constant":                               
+            elif exodata["planet"]["type"] == "constant":
                 if self.get_argument("constant_unit") == 'fp/f*':
                     exodata["planet"]["temp"] = float(self.get_argument("ptempc"))
                     exodata["planet"]["f_unit"] = 'fp/f*'
@@ -629,25 +647,25 @@ class CalculationNewHSTHandler(BaseHandler):
                 exodata["planet"]["m_unit"] = str(self.get_argument("m_unit"))
                 exodata["planet"]["temp"] = float(self.get_argument("ptempg"))
                 exodata["planet"]["chem"] = str(self.get_argument("pchem"))
-                exodata["planet"]["cloud"] = self.get_argument("cloud") 
+                exodata["planet"]["cloud"] = self.get_argument("cloud")
 
             exodata["observation"]["noise_floor"]           = 0.0
             exodata["calculation"]                          = 'scale'
 
-        if (self.get_argument("instrument")=="STIS"): 
+        if (self.get_argument("instrument")=="STIS"):
             with open(os.path.join(os.path.dirname(__file__), "reference",
-                               "stis_input.json")) as data_file:   
-                pandata = json.load(data_file)       
+                               "stis_input.json")) as data_file:
+                pandata = json.load(data_file)
                 stismode = self.get_argument("stismode")
-        if (self.get_argument("instrument")=="WFC3"): 
+        if (self.get_argument("instrument")=="WFC3"):
             with open(os.path.join(os.path.dirname(__file__), "reference",
                                "wfc3_input.json")) as data_file:
-                pandata = json.load(data_file)  
+                pandata = json.load(data_file)
                 pandata["configuration"]['detector']['subarray']    = self.get_argument("subarray")
                 pandata["configuration"]['detector']['nsamp']       = int(self.get_argument("nsamp"))
                 pandata["configuration"]['detector']['samp_seq']    = self.get_argument("samp_seq")
                 pandata["configuration"]['instrument']['disperser'] = self.get_argument("wfc3mode")
-            try: 
+            try:
                 pandata["strategy"]["norbits"]           = int(self.get_argument("norbits"))
             except:
                 pandata["strategy"]["norbits"]           = None
@@ -664,23 +682,23 @@ class CalculationNewHSTHandler(BaseHandler):
             calc_ramp = self.get_argument("ramp")
 
             calc_ramp = True
-        except: 
+        except:
             calc_ramp = False
 
 
         pandata['strategy']['calculateRamp'] = calc_ramp
         pandata['strategy']['targetFluence'] = float(self.get_argument("targetFluence"))
 
-        #import pickle as pk 
+        #import pickle as pk
         #a = pk.load(open('/Users/natashabatalha/Desktop/JWST/testing/ui.pk','rb'))
         #pandata = a['pandeia_input']
         #exodata  = a['pandexo_input']
 
         finaldata = {"pandeia_input": pandata , "pandexo_input":exodata}
         #PandExo stats
-        try: 
+        try:
             hst_log(finaldata)
-        except: 
+        except:
             pass
 
         task = self.executor.submit(wrapper, finaldata)
@@ -723,7 +741,7 @@ class CalculationStatusHSTHandler(BaseHandler):
 class CalculationDownloadTextHandler(BaseHandler):
     def get(self, id):
         result = self._get_task_result(id)
-  
+
         if self.request.connection.stream.closed():
             return
 
@@ -744,12 +762,12 @@ class CalculationDownloadTextHandler(BaseHandler):
             for i in range(len(spec["binwave"])):
                 output += "{} {} {}\n".format(round(spec["binwave"][i], 5), spec["binspec"][i], spec["error"])
         else:
-            return None    
-                
+            return None
+
         self.write(output)
         self.finish()
 
-        
+
 class CalculationDownloadHandler(BaseHandler):
     """
     Handlers returning the downloaded data of a particular calculation task.
@@ -757,7 +775,7 @@ class CalculationDownloadHandler(BaseHandler):
     """
     def get(self, id):
         result = self._get_task_result(id)
-  
+
         if self.request.connection.stream.closed():
             return
         file_name = "ETC-calculation" +id+".p"
@@ -784,7 +802,7 @@ class CalculationDownloadHandler(BaseHandler):
         self.finish()
 
 
-      
+
 
 class CalculationDownloadPandInHandler(BaseHandler):
     """

@@ -46,24 +46,38 @@ class ExtractSpec():
         computes noise using multiaccum formulation
     run_f_minus_l
         computs noise using first minus last
-    run_phase_spec
-        computs noise for phase curve observations     
+    run_phase_spec_fml
+        computes first-minus-last noise for legacy phase curve observations
+    run_phase_spec_slope
+        computes Pandeia slope noise for multistripe phase curve observations
     """
     def __init__(self, inn, out, rn, extraction_area, timing):
         self.inn = inn
         self.out = out 
         self.ngroups_per_int = timing["APT: Num Groups per Integration"]
-        self.nint_out = timing["Num Integrations Out of Transit"]
-        self.nint_in = timing["Num Integrations In Transit"]
+        self.real_nint_out = timing["Num Integrations Out of Transit"]
+        self.real_nint_in = timing["Num Integrations In Transit"]
+        self.nsuperstripe = timing.get("Num Superstripes", 1)
+        self.nint_out = timing.get("Effective Integrations Out of Transit",
+                                   self.real_nint_out)
+        self.nint_in = timing.get("Effective Integrations In Transit",
+                                  self.real_nint_in)
         self.tframe = timing["Seconds per Frame"]
+        self.frame_zero_dead = timing["Zero Frame Efficiency Loss"]
         self.rn = rn 
         self.extraction_area = extraction_area
 
-        #on source out versus in 
-        self.exptime_per_int = self.tframe * (self.ngroups_per_int-1.0)
-
-        self.on_source_in = self.tframe * (self.ngroups_per_int-1.0) * self.nint_in
-        self.on_source_out = self.tframe * (self.ngroups_per_int-1.0) * self.nint_out
+        # Pandeia is run with nint=1. Its scalar measurement_time is the
+        # per-integration science time PandExo scales below. For SOSS
+        # multistripe modes that Pandeia value includes all superstripes, so
+        # timing supplies effective per-wavelength integration counts.
+        self.exptime_per_int = timing.get(
+            "Measurement Time per Integration (sec)",
+            self.tframe * (self.ngroups_per_int+self.frame_zero_dead) * self.nsuperstripe
+        )
+        measurement_time_in = self.inn.get('scalar', self.out['scalar'])['measurement_time']
+        self.on_source_in = measurement_time_in * self.nint_in
+        self.on_source_out = self.out['scalar']['measurement_time'] * self.nint_out #self.tframe * (self.ngroups_per_int+self.frame_zero_dead) 
 
     def loopingL(self, cen, signal_col, noise_col, bkg_col):
         """Finds bottom of the optimal extraction region.
@@ -206,7 +220,10 @@ class ExtractSpec():
                 'var_in_1d':var_in_1d, 'var_out_1d':var_out_1d,
                 'rn[out,in]':[rn_out_1d,rn_in_1d],'bkg[out,in]': [sky_in_1d,sky_out_1d], 
                 'extract_info':extract_info,'on_source_in':self.on_source_in, 
-                'on_source_out':self.on_source_out}
+                'on_source_out':self.on_source_out,
+                'nint_in':self.nint_in, 'nint_out':self.nint_out,
+                'real_nint_in':self.real_nint_in,
+                'real_nint_out':self.real_nint_out}
 
     def extract_region(self): #second to last 
         """Determine extraction Region
@@ -341,7 +358,7 @@ class ExtractSpec():
         bkg_flux_out = curves_out['extracted_bg_only'][1] * on_source_out
 
         #calculate rn 
-        rn_var = 2.0*self.rn**2.0
+        rn_var = self.rn**2.0
                 
         #1d rn     = rn/pix * # of integrations * #extraction area 
         #not used for noise calcualtions here 
@@ -351,27 +368,40 @@ class ExtractSpec():
 
         #In the following the SN is changed to incorporate number of occultations 
         #i.e. multiply by sqrt(n) 
-        sn_in = curves_inn['sn'][1]
-        sn_out = curves_out['sn'][1]
+        #sn_in = curves_inn['sn'][1]*np.sqrt(self.nint_in)
+        #sn_out = curves_out['sn'][1]*np.sqrt(self.nint_out)
 
-        extracted_flux_inn = curves_inn['extracted_flux'][1]*on_source_in
+        #extracted_flux_inn = curves_inn['extracted_flux'][1]*on_source_in
         
-        extracted_noise_inn = curves_inn['extracted_flux'][1]/(sn_in)
+        #extracted_noise_inn = curves_inn['extracted_flux'][1]/(sn_in)
 
-        extracted_flux_out = curves_out['extracted_flux'][1]*on_source_out
+        #extracted_flux_out = curves_out['extracted_flux'][1]*on_source_out
         
-        extracted_noise_out = curves_out['extracted_flux'][1]/(sn_out)
+        #extracted_noise_out = curves_out['extracted_flux'][1]/(sn_out)
+
+        extracted_flux_inn = curves_inn['extracted_flux'][1] * self.nint_in
+
+        extracted_flux_out = curves_out['extracted_flux'][1] * self.nint_out
+
+        extracted_noise_inn = curves_inn['extracted_noise'][1] * np.sqrt(self.nint_in)
+
+        extracted_noise_out = curves_out['extracted_noise'][1] * np.sqrt(self.nint_out)
 
         #units of this unconventional.. sigma/s
         #because snr = extracted flux / extracted noise and 
         #extracted flux in units of electrons /s
-        varin = (extracted_noise_inn*on_source_in)**2.0
-        varout = (extracted_noise_out*on_source_out)**2.0
+        #varin = (extracted_noise_inn*on_source_in)**2.0
+        #varout = (extracted_noise_out*on_source_out)**2.0
+        varin = extracted_noise_inn**2
+        varout = extracted_noise_out**2
 
         return {'photon_out_1d':extracted_flux_out, 'photon_in_1d':extracted_flux_inn, 
                     'var_in_1d':varin, 'var_out_1d': varout,'on_source_in':self.on_source_in, 
                 'on_source_out':self.on_source_out,'bkg[out,in]':[bkg_flux_out,bkg_flux_inn],
-                'rn[out,in]':[rn_var_out,rn_var_inn]}
+                'rn[out,in]':[rn_var_out,rn_var_inn], 
+                'nint_in':self.nint_in, 'nint_out':self.nint_out,
+                'real_nint_in':self.real_nint_in,
+                'real_nint_out':self.real_nint_out}
     
     
     def run_f_minus_l(self):
@@ -418,28 +448,35 @@ class ExtractSpec():
         return {'photon_out_1d':extracted_flux_out, 'photon_in_1d':extracted_flux_inn, 
                     'var_in_1d':varin, 'var_out_1d': varout,'on_source_in':self.on_source_in, 
                 'on_source_out':self.on_source_out, 'rn[out,in]':[rn_var_out,rn_var_inn], 
-                'bkg[out,in]':[bkg_flux_out,bkg_flux_inn]}
+                'bkg[out,in]':[bkg_flux_out,bkg_flux_inn], 
+                'nint_in':self.nint_in, 'nint_out':self.nint_out,
+                'real_nint_in':self.real_nint_in,
+                'real_nint_out':self.real_nint_out}
     
 
     
-    def run_phase_spec(self):
-        """Computes time dependent noise for phase curves.
+    def _phase_spec_inputs(self):
+        """Return the resampled phase curve and one-integration cadence."""
+        time = self.inn['time']
+        tint = self.exptime_per_int
+        new_t = np.arange(min(time), max(time), tint)
+        planet_phase = np.interp(new_t, time, self.inn['planet_phase'])
+        return tint, new_t, planet_phase
+
+
+    def run_phase_spec_fml(self):
+        """Compute time dependent first-minus-last noise for phase curves.
         
-        Computes noise for phase curve analysis instead of spectroscopy. 
-        Using MULTIACCUM formula here but this could be changed in the future.  Does not 
-        return a spectra for each time element... On your own for that. 
+        Computes white-light noise for a legacy readout instead of returning a
+        spectrum for each time element.
         
         Return
         ------
         dict 
             all optimally extracted 1d products        
         """
-        time = self.inn['time']
-        tint = self.exptime_per_int 
+        tint, new_t, planet_phase = self._phase_spec_inputs()
         curves_out = self.out['1d']
-        #don't input a ridiculously low res phase curve
-        new_t = np.arange(min(time), max(time), tint) 
-        planet_phase = np.interp(new_t, time, self.inn['planet_phase'])
 
         rn_var = 2.0*self.rn**2.0
 
@@ -459,9 +496,41 @@ class ExtractSpec():
         varin = flux_time_in + bkg_flux_out + rn_var_out
  
         
-        return {'photon_out_1d':flux_time_out, 'photon_in_1d':flux_time_in, 
-                    'var_in_1d':varin, 'var_out_1d': varout, 'time':new_t,'on_source_in':'N/A', 
-                'on_source_out':'N/A','rn[out,in]':[rn_var_out,rn_var_out], 
+        return {'photon_out_1d':flux_time_out, 'photon_in_1d':flux_time_in,
+                    'var_in_1d':varin, 'var_out_1d': varout, 'time':new_t,
+                'on_source_in':tint, 'on_source_out':tint,
+                'rn[out,in]':[rn_var_out,rn_var_out],
                 'bkg[out,in]':[bkg_flux_out,bkg_flux_out]}
-        
 
+
+    def run_phase_spec(self):
+        """Retain the historical phase-curve method for direct callers."""
+        return self.run_phase_spec_fml()
+
+
+    def run_phase_spec_slope(self):
+        """Compute time dependent Pandeia slope noise for phase curves.
+
+        Pandeia is evaluated for one out-of-event integration. The extracted
+        MULTIACCUM noise from that integration is used at every phase sample;
+        the supplied phase curve changes the white-light signal only.
+        """
+        tint, new_t, planet_phase = self._phase_spec_inputs()
+        curves_out = self.out['1d']
+
+        extracted_flux_out = np.sum(curves_out['extracted_flux'][1]) * tint
+        flux_time_out = extracted_flux_out + np.zeros(len(new_t))
+        flux_time_in = flux_time_out * (1.0 + planet_phase)
+
+        extracted_noise_out = curves_out['extracted_noise'][1] * tint
+        varout = np.sum(extracted_noise_out**2.0) + np.zeros(len(new_t))
+        varin = varout.copy()
+
+        bkg_flux_out = np.sum(curves_out['extracted_bg_only'][1]) * tint
+        rn_var_out = self.rn**2.0 * self.extraction_area
+
+        return {'photon_out_1d':flux_time_out, 'photon_in_1d':flux_time_in,
+                    'var_in_1d':varin, 'var_out_1d':varout, 'time':new_t,
+                'on_source_in':tint, 'on_source_out':tint,
+                'rn[out,in]':[rn_var_out,rn_var_out],
+                'bkg[out,in]':[bkg_flux_out,bkg_flux_out]}
