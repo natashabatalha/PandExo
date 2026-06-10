@@ -209,13 +209,22 @@ class BaseHandler(tornado.web.RequestHandler):
     executor = ProcessPoolExecutor(max_workers=16)
     buffer = OrderedDict()
 
-    def get_template_namespace(self):
-        namespace = super(BaseHandler, self).get_template_namespace()
-        namespace.update({
+    @staticmethod
+    def _bokeh_resources():
+        return {
             'bokeh_css': CDN.render_css(),
             'bokeh_js': CDN.render_js(),
-        })
+        }
+
+    def get_template_namespace(self):
+        namespace = super(BaseHandler, self).get_template_namespace()
+        namespace.update(self._bokeh_resources())
         return namespace
+
+    def render(self, template_name, **kwargs):
+        for key, value in self._bokeh_resources().items():
+            kwargs.setdefault(key, value)
+        return super(BaseHandler, self).render(template_name, **kwargs)
 
     def _get_task_response(self, id):
         """
