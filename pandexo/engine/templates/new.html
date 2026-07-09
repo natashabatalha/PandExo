@@ -562,6 +562,13 @@
             minimumResultsForSearch: 7
         });
 
+        $("#instrument-mode-section").on("select2:select", "select", function () {
+            var select = $(this);
+            window.setTimeout(function () {
+                select.select2("close");
+            }, 0);
+        });
+
         /* Nice block level radio selection */
         $(".radio-chooser-content").click(function () {
             $(".radio-chooser-item").removeClass("radio-chooser-selected");
