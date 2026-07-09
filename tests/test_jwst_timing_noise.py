@@ -189,7 +189,7 @@ def test_compute_timing_keeps_single_group_on_source_time_positive():
         * timing["Num Integrations In Transit"]
         > 0
     )
-    assert flags["flag_default"] == "NGROUPS<1SET TO NGROUPS=1"
+    assert flags["flag_default"] == "Optimized NGROUPS below minimum (1). SET TO NGROUPS=1"
 
 
 def test_multigroup_measurement_time_preserves_first_minus_last_interval():
