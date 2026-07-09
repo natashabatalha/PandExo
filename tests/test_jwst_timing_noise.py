@@ -254,18 +254,67 @@ def test_pandeia_measurement_time_update_controls_on_source_metadata():
     )
 
 
-def test_multistripe_timing_uses_pandeia_full_cycle_clock_without_double_counting():
+def test_multistripe_timing_uses_pandeia_full_cycle_clock_for_real_integrations():
     timing = _timing_with_pandeia_cycle(
         nsuperstripe=4,
         exposure_time_per_int=40.0,
         ngroup=3,
     )
 
-    assert timing["Time/Integration incl reset (sec)"] == pytest.approx(10.0)
-    assert timing["Num Integrations In Transit"] == 5
-    assert timing["Effective Integrations In Transit"] == pytest.approx(1.25)
+    assert timing["Time/Integration incl reset (sec)"] == pytest.approx(40.0)
+    assert timing["Num Integrations In Transit"] == 2
+    assert timing["Effective Integrations In Transit"] == pytest.approx(0.5)
     assert timing["Measurement Time per Integration (sec)"] == pytest.approx(16.0)
-    assert timing["On Source Time In Transit"] == pytest.approx(20.0)
+    assert timing["On Source Time In Transit"] == pytest.approx(8.0)
+
+
+def test_dhs_clock_time_includes_pandeia_fixed_overhead():
+    timing, _ = compute_timing(
+        {
+            "ngroup": 30,
+            "tframe": 1.36765,
+            "nframe": 1,
+            "mingroups": 2,
+            "nskip": 0,
+            "nsuperstripe": 1,
+            "exposure_time_per_int": 42.41763,
+            "exposure_time_ngroup": 30,
+        },
+        transit_duration=2.8032 * 3600.0,
+        expfact_out=1.0,
+        noccultations=1,
+        max_ngroup_instrument=101,
+    )
+
+    assert timing["Time/Integration incl reset (sec)"] == pytest.approx(42.41763)
+    assert timing["Measurement Time per Integration (sec)"] == pytest.approx(39.66185)
+
+
+def test_soss_sub17stripe_clock_time_matches_pandeia_full_cycle():
+    timing, _ = compute_timing(
+        {
+            "ngroup": 8,
+            "tframe": 0.06164,
+            "nframe": 1,
+            "mingroups": 2,
+            "nskip": 0,
+            "nsuperstripe": 120,
+            "exposure_time_per_int": 69.0288,
+            "exposure_time_ngroup": 8,
+        },
+        transit_duration=2.8032 * 3600.0,
+        expfact_out=1.0,
+        noccultations=1,
+        max_ngroup_instrument=65536,
+    )
+
+    assert timing["Time/Integration incl reset (sec)"] == pytest.approx(69.0288)
+    assert timing["Measurement Time per Integration (sec)"] == pytest.approx(51.7776)
+    assert timing["Measurement Time per Integration (sec)"] / timing[
+        "Num Superstripes"
+    ] == pytest.approx(0.43148)
+    assert timing["Num Integrations In Transit"] == 147
+    assert timing["Effective Integrations In Transit"] == pytest.approx(147 / 120.0)
 
 
 def test_multistripe_timing_display_uses_apt_and_calculation_tables():

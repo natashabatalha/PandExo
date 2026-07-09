@@ -805,22 +805,21 @@ def compute_timing(m,transit_duration,expfact_out,noccultations,max_ngroup_instr
     if nsuperstripe < 1:
         nsuperstripe = 1
     def _clocktime_per_int(ngroups):
-        if nsuperstripe > 1:
-            if (m.get("exposure_time_per_int") is not None and
-                    ngroups == m.get("exposure_time_ngroup")):
-                return m["exposure_time_per_int"]/float(nsuperstripe)
-            if m.get("tfffr") is not None:
-                full_cycle = nsuperstripe * (
-                    m["tfffr"]
-                    + tframe * (
-                        m.get("nreset1", 1)
-                        + m.get("ndrop1", 0)
-                        + (ngroups - 1.0)*(nframe + nskip)
-                        + nframe
-                        + m.get("ndrop3", 0)
-                    )
+        if (m.get("exposure_time_per_int") is not None and
+                ngroups == m.get("exposure_time_ngroup")):
+            return m["exposure_time_per_int"]
+        if nsuperstripe > 1 and m.get("tfffr") is not None:
+            full_cycle = nsuperstripe * (
+                m["tfffr"]
+                + tframe * (
+                    m.get("nreset1", 1)
+                    + m.get("ndrop1", 0)
+                    + (ngroups - 1.0)*(nframe + nskip)
+                    + nframe
+                    + m.get("ndrop3", 0)
                 )
-                return full_cycle/float(nsuperstripe)
+            )
+            return full_cycle
         return (ngroups+1.0)*tframe
     overhead_per_int = tframe #overhead time added per integration 
     try: 
@@ -887,18 +886,17 @@ def compute_timing(m,transit_duration,expfact_out,noccultations,max_ngroup_instr
     #group 
     exptime_per_int = ngroups_per_int*tframe
     
-    #clock time includes the reset frame. For SOSS multistripe Pandeia's
-    #exposure_time is a full superstripe cycle, while PandExo keeps the
-    #historical integration count on a single-superstripe scale and divides
-    #by nsuperstripe for per-wavelength noise scaling.
+    # Clock time includes reset/readout overheads. For multistripe readouts,
+    # Pandeia's exposure_time is the full APT integration cycle across all
+    # stripes; per-wavelength noise scaling is handled by the effective
+    # integration counts below.
     clocktime_per_int = _clocktime_per_int(ngroups_per_int)
     
     #observing efficiency (i.e. what percentage of total time is spent on soure)
     eff = (ngroups_per_int + frame_zero_dead)/(ngroups_per_int + 1.0)
     
-    # this says "per occultation" but this is just the in-transit integration
-    # slots. For SOSS multistripe the clock is one superstripe slice of the
-    # full Pandeia exposure cycle.
+    # This says "per occultation" but this is just the in-transit integration
+    # count. For multistripe modes the clock is the full APT integration cycle.
     nint_per_occultation =  transit_duration/clocktime_per_int
     
     #figure out how many integrations are in transit and how many are out of transit 
