@@ -13,10 +13,10 @@ import pickle
 
 #constant parameters.. consider putting these into json file 
 #max groups in integration
-max_ngroup = {'nirspec':65536.0 ,
-              'miri':65536.0 ,
-              'niriss':65536.0 ,
-              'nircam':30}
+max_ngroup = {'nirspec':65535,
+              'miri':65535,
+              'niriss':65535,
+              'nircam':100}
 #minimum number of integrations
 min_nint_trans = 1
 
