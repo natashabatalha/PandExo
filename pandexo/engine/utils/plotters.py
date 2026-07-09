@@ -10,6 +10,7 @@ from bokeh.models import  ColumnDataSource, Slider,Select
 from bokeh.models.callbacks import CustomJS
 from bokeh.io import curdoc
 from bokeh.layouts import row
+from .plot_helpers import add_wavelength_gap_breaks
 
 def create_component_jwst(result_dict):
     """Generate front end plots JWST
@@ -219,6 +220,8 @@ def create_component_jwst(result_dict):
     #x = x[~np.isnan(y)]
     #y = y[~np.isnan(y)]
     x,y = raw['wave'],raw['electron_per_int']
+    if x_axis_label.startswith('Wavelength'):
+        x, y = add_wavelength_gap_breaks(x, y)
 
     plot_flux_1d1 = Figure(tools=TOOLS,
                          x_axis_label='Wavelength [microns]',
@@ -240,6 +243,8 @@ def create_component_jwst(result_dict):
 
     # SNR 
     x,y = raw['snr_int'][0],raw['snr_int'][1] #this is computing the SNR (sqrt of photons in a single integration)
+    if x_axis_label.startswith('Wavelength'):
+        x, y = add_wavelength_gap_breaks(x, y)
 
 
     plot_snr_1d1 = Figure(tools=TOOLS,
@@ -256,8 +261,14 @@ def create_component_jwst(result_dict):
     x = x[~np.isnan(y)]
     y = y[~np.isnan(y)]    
     ymed = np.median(y)
+    x_plot, y_plot = (
+        add_wavelength_gap_breaks(x, y)
+        if x_axis_label.startswith('Wavelength')
+        else (x, y)
+    )
+    nocc_plot = x_plot*0+noccultations
 
-    source2 = ColumnDataSource(data=dict(x=x, y=y,nocc=x*0+noccultations))
+    source2 = ColumnDataSource(data=dict(x=x_plot, y=y_plot,nocc=nocc_plot))
     original2 = ColumnDataSource(data=dict(x=x, y=y,nocc=x*0+noccultations))
 
     plot_noise_1d1 = Figure(tools=TOOLS,#responsive=True,
@@ -314,6 +325,61 @@ def create_component_jwst(result_dict):
             function add(a, b) {
                 return a+b;
             }
+            function addGaps(xin, yin) {
+                if (xin.length < 3) {
+                    return [xin.slice(0), yin.slice(0)];
+                }
+
+                var steps = [];
+                for (var j = 0; j < xin.length-1; j++) {
+                    steps.push(xin[j+1] - xin[j]);
+                }
+                function median(values) {
+                    values.sort(function(a, b) { return a-b; });
+                    var middle = Math.floor(values.length/2);
+                    if (values.length % 2 == 1) {
+                        return values[middle];
+                    }
+                    return 0.5*(values[middle-1] + values[middle]);
+                }
+                function localTypicalStep(index) {
+                    var radius = 3;
+                    var start = Math.max(0, index-radius);
+                    var stop = Math.min(steps.length, index+radius+1);
+                    var local = [];
+                    for (var k = start; k < stop; k++) {
+                        if (k != index && isFinite(steps[k]) && steps[k] > 0) {
+                            local.push(steps[k]);
+                        }
+                    }
+                    if (local.length == 0) {
+                        return NaN;
+                    }
+                    return median(local);
+                }
+
+                var xgap = [];
+                var ygap = [];
+                for (var j = 0; j < xin.length; j++) {
+                    xgap.push(xin[j]);
+                    ygap.push(yin[j]);
+                    if (j < xin.length-1) {
+                        var step = steps[j];
+                        var typical = localTypicalStep(j);
+                        if (
+                            isFinite(step)
+                            && step > 0
+                            && isFinite(typical)
+                            && typical > 0
+                            && step > 5.0*typical
+                        ) {
+                            xgap.push(0.5*(xin[j] + xin[j+1]));
+                            ygap.push(NaN);
+                        }
+                    }
+                }
+                return [xgap, ygap];
+            }
             for (i = 0; i < ind.length-1; i++) {
 
                 xslice = x.slice(ind[i],ind[i+1]);
@@ -327,11 +393,15 @@ def create_component_jwst(result_dict):
             }
             
             var new_err = 1.0;
-            for (i = 0; i < x.length; i++) {
+            var yscaled = [];
+            for (i = 0; i < yout.length; i++) {
                 new_err = yout[i]*Math.sqrt(og_ntran[i]/ntran);
-                x[i] = xout[i];
-                y[i] = new_err       
+                yscaled.push(new_err);
             }
+            var gapped = addGaps(xout, yscaled);
+            sdata['x'] = gapped[0];
+            sdata['y'] = gapped[1];
+            sdata['nocc'] = new Array(gapped[0].length).fill(ntran);
 
             source.change.emit();
         """)    

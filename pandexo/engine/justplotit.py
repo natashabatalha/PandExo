@@ -8,6 +8,7 @@ import pickle as pk
 import numpy as np
 from bokeh.layouts import row
 import pandas as pd
+from .utils.plot_helpers import add_wavelength_gap_breaks
 
 CIRCLE_SIZE = 6
 
@@ -404,12 +405,13 @@ def jwst_1d_flux(result_dict, plot=True, output_file= 'flux.html'):
     x, y = out['1d']['extracted_flux']
     x = x[~np.isnan(y)]
     y = y[~np.isnan(y)]
+    x_plot, y_plot = add_wavelength_gap_breaks(x, y)
 
     plot_flux_1d1 = Figure(#tools=TOOLS,
                          x_axis_label='Wavelength [microns]',
                          y_axis_label='Flux (e/s)', title="Out of Transit Flux Rate",
                          width=800, height=300)
-    plot_flux_1d1.line(x, y, line_width = 4, alpha = .7)
+    plot_flux_1d1.line(x_plot, y_plot, line_width = 4, alpha = .7)
 
     if plot:
         outputfile(output_file)
@@ -448,11 +450,12 @@ def jwst_1d_snr(result_dict, plot=True, output_file='snr.html'):
     y = electrons_out/np.sqrt(result_dict['RawData']['var_out'])
     x = x[~np.isnan(y)]
     y = y[~np.isnan(y)]
+    x_plot, y_plot = add_wavelength_gap_breaks(x, y)
     plot_snr_1d1 = Figure(#tools=TOOLS,
                          x_axis_label='Wavelength (micron)',
                          y_axis_label='SNR', title="SNR Out of Trans",
                          width=800, height=300)
-    plot_snr_1d1.line(x, y, line_width = 4, alpha = .7)
+    plot_snr_1d1.line(x_plot, y_plot, line_width = 4, alpha = .7)
     if plot:
         outputfile(output_file)
         show(plot_snr_1d1)
@@ -529,6 +532,7 @@ def jwst_noise(result_dict, plot=True, output_file= 'noise.html'):
     y = result_dict['FinalSpectrum']['error_w_floor']*1e6
     x = x[~np.isnan(y)]
     y = y[~np.isnan(y)]
+    x_plot, y_plot = add_wavelength_gap_breaks(x, y)
 
     ymed = np.median(y)
 
@@ -538,7 +542,7 @@ def jwst_noise(result_dict, plot=True, output_file= 'noise.html'):
                          y_axis_label='Error on Spectrum (PPM)', title="Error Curve",
                          width=800, height=300, y_range = [0,2.0*ymed])
     ymed = np.median(y)
-    plot_noise_1d1.step(x, y, line_width = 4, alpha = .7)
+    plot_noise_1d1.step(x_plot, y_plot, line_width = 4, alpha = .7)
     if plot:
         outputfile(output_file)
         show(plot_noise_1d1)
