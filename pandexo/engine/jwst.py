@@ -19,6 +19,7 @@ max_ngroup = {'nirspec':65535,
               'nircam':100}
 #minimum number of integrations
 min_nint_trans = 1
+DHS_F150W_MIN_WAVELENGTH = 0.96
 
 #refdata directory
 default_refdata_directory = os.environ.get("pandeia_refdata")
@@ -132,6 +133,46 @@ def nirspec_valid_channel_mask(conf, extracted_noise, full_saturation=None):
         & (full_saturation > 0.0)
     )
     return valid_noise | fully_saturated
+
+
+def dhs_f150w_wavelength_mask(conf, wave):
+    """Build a wavelength mask for the low-throughput edge of DHS F150W.
+
+    NIRCam DHS calculations can include F150W/F150W2 wavelength samples below
+    the useful bandpass where the throughput is effectively zero. Those samples
+    make the raw and binned diagnostic plots difficult to read, so PandExo
+    trims them before downstream binning and plot packaging.
+
+    Parameters
+    ----------
+    conf : dict
+        Pandeia ``configuration`` dictionary for the calculation. The helper
+        inspects ``conf["instrument"]`` to determine whether the setup is a
+        NIRCam DHS calculation with a filter name starting with ``"f150w"``.
+    wave : array-like
+        Wavelength samples in microns.
+
+    Returns
+    -------
+    numpy.ndarray or None
+        Boolean mask selecting wavelengths greater than or equal to
+        ``DHS_F150W_MIN_WAVELENGTH``. Returns ``None`` when the calculation is
+        not a NIRCam DHS F150W/F150W2 setup, so callers can leave other modes
+        unchanged.
+    """
+    instrument = conf.get('instrument', {})
+    if str(instrument.get('instrument', '')).lower() != 'nircam':
+        return None
+
+    aperture = str(instrument.get('aperture', '')).lower()
+    mode = str(instrument.get('mode', '')).lower()
+    filter_name = str(instrument.get('filter', '')).lower()
+    if 'dhs' not in aperture and mode != 'dhs':
+        return None
+    if not filter_name.startswith('f150w'):
+        return None
+
+    return np.asarray(wave, dtype=float) >= DHS_F150W_MIN_WAVELENGTH
 
 
 def _no_valid_spectral_channels_message(conf, scalar):
@@ -519,6 +560,23 @@ def compute_full_sim(dictinput,verbose=False):
         result['rn[out,in]'] = sort_by_wave_order(result['rn[out,in]'], valid_channel)
         result['bkg[out,in]'] = sort_by_wave_order(result['bkg[out,in]'], valid_channel)
         pandeia_snr_int = sort_by_wave_order(pandeia_snr_int, valid_channel)
+
+    dhs_wavelength_channel = None
+    if not is_phase_spec(calculation):
+        dhs_wavelength_channel = dhs_f150w_wavelength_mask(conf, w)
+    if dhs_wavelength_channel is not None:
+        w = w[dhs_wavelength_channel]
+        varin = varin[dhs_wavelength_channel]
+        varout = varout[dhs_wavelength_channel]
+        extracted_flux_out = extracted_flux_out[dhs_wavelength_channel]
+        extracted_flux_inn = extracted_flux_inn[dhs_wavelength_channel]
+        if pandeia_extracted_noise is not None:
+            pandeia_extracted_noise = pandeia_extracted_noise[dhs_wavelength_channel]
+        if pandeia_full_saturation is not None:
+            pandeia_full_saturation = pandeia_full_saturation[dhs_wavelength_channel]
+        result['rn[out,in]'] = sort_by_wave_order(result['rn[out,in]'], dhs_wavelength_channel)
+        result['bkg[out,in]'] = sort_by_wave_order(result['bkg[out,in]'], dhs_wavelength_channel)
+        pandeia_snr_int = sort_by_wave_order(pandeia_snr_int, dhs_wavelength_channel)
 
         
     #bin the data according to user input 
