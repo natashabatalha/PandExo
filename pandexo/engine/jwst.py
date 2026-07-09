@@ -854,12 +854,12 @@ def compute_timing(m,transit_duration,expfact_out,noccultations,max_ngroup_instr
 
         if ngroups_per_int > max_ngroup_instrument:
             ngroups_per_int = max_ngroup_instrument
-            flag_high = "Groups/int > max num of allowed groups"
+            flag_high = f"Optimized NGROUPS above maximum ({max_ngroup_instrument}). SET TO NGROUPS={max_ngroup_instrument}"
  
         if (ngroups_per_int < mingroups) | np.isnan(ngroups_per_int):
             ngroups_per_int = mingroups
             nframes_per_int = mingroups
-            flag_default = "NGROUPS<"+str(mingroups)+"SET TO NGROUPS="+str(mingroups)
+            flag_default = f"Optimized NGROUPS below minimum ({mingroups}). SET TO NGROUPS={mingroups}"
 
     elif 'ngroups_per_int' in locals(): 
         #if it maxexptime_per_int been defined then set nframes per int 
@@ -871,7 +871,7 @@ def compute_timing(m,transit_duration,expfact_out,noccultations,max_ngroup_instr
         #for the sake of not returning error
         ngroups_per_int = mingroups
         nframes_per_int = mingroups
-        flag_default = "Something went wrong. SET TO NGROUPS="+str(mingroups)
+        flag_default = f"Something went wrong. SET TO NGROUPS={mingroups}"
 
     if ngroups_per_int == 1: 
         frame_zero_dead = 0 
