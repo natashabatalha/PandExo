@@ -195,7 +195,7 @@ def _no_valid_spectral_channels_message(conf, scalar):
         ('sat_ngroups', scalar.get('sat_ngroups')),
     ]:
         if value is not None:
-            details.append('{0}={1}'.format(key, value))
+            details.append(f'{key}={value}')
     return ' '.join(details)
 
 
@@ -204,9 +204,7 @@ def _saturation_warning_message(conf, scalar, pandeia_warning, saturation_kind):
     instrument = conf.get('instrument', {})
     detector = conf.get('detector', {})
     details = [
-        'Pandeia reports {0} saturation for this observation.'.format(
-            saturation_kind
-        ),
+        f'Pandeia reports {saturation_kind} saturation for this observation.',
         str(pandeia_warning),
     ]
     for key, value in [
@@ -220,7 +218,7 @@ def _saturation_warning_message(conf, scalar, pandeia_warning, saturation_kind):
         ('sat_ngroups', scalar.get('sat_ngroups')),
     ]:
         if value is not None:
-            details.append('{0}={1}'.format(key, value))
+            details.append(f'{key}={value}')
     return ' '.join(details)
 
 
@@ -315,7 +313,7 @@ def compute_full_sim(dictinput,verbose=False):
 
     def log(message):
         if isinstance(verbose, str):
-            print("[{}] {}".format(verbose, message), flush=True)
+            print(f"[{verbose}] {message}", flush=True)
         elif verbose:
             print(message, flush=True)
 	
@@ -1367,6 +1365,213 @@ def target_acq(instrument, both_spec, warning):
             'ngroup': rphot['input']['configuration']['detector']['ngroup'], 
             'saturation':rphot['2d']['saturation']}
 
+
+def _table_html(rows):
+    table = pd.DataFrame(rows, columns=['Parameter', 'Value'])
+    table = table.set_index('Parameter')
+    table.index.name = None
+    table = table.to_html()
+    return '<table class="table table-striped"> \n' + table[36:len(table)]
+
+
+def _jwst_instrument_name(instrument):
+    names = {
+        'miri': 'MIRI',
+        'nircam': 'NIRCam',
+        'niriss': 'NIRISS',
+        'nirspec': 'NIRSpec',
+    }
+    return names.get(str(instrument).lower(), instrument)
+
+
+def _jwst_template_name(instrument, mode, aperture, filter_name, paired_filter):
+    instrument = str(instrument).lower()
+    mode = str(mode).lower()
+    aperture = str(aperture).lower()
+    if instrument == 'miri':
+        return 'MIRI Low Resolution Spectroscopy'
+    if instrument == 'nirspec':
+        return 'NIRSpec Bright Object Time Series'
+    if instrument == 'niriss':
+        return 'NIRISS Single Object Slitless Spectroscopy'
+    if instrument == 'nircam':
+        return 'NIRCam Grism Time Series'
+    return mode
+
+
+def _is_nircam_short_wave_filter(filter_name):
+    return str(filter_name).lower().startswith(
+        ('f070w', 'f090w', 'f115w', 'f150w', 'f150w2', 'f200w')
+    )
+
+
+def _nircam_channel_mode(mode, aperture, paired_filter):
+    mode = str(mode).lower()
+    aperture = str(aperture).lower()
+    if mode == 'sw_tsgrism' or 'dhs' in aperture:
+        return 'GRISM'
+    if paired_filter is not None:
+        return 'GRISM'
+    return 'IMAGING'
+
+
+def _display_subarray(subarray):
+    if subarray is None:
+        return None
+    return str(subarray).split(' (')[0].upper()
+
+
+def _nircam_output_channels(subarray):
+    subarray = str(subarray).lower()
+    if 'noutputs=1' in subarray:
+        return 1
+    if subarray.startswith('subgrism'):
+        return 4
+    prefix = subarray.split('_', 1)[0]
+    stripe_marker = prefix.rfind('s')
+    if stripe_marker >= 0:
+        try:
+            return int(prefix[stripe_marker + 1:])
+        except ValueError:
+            pass
+    return None
+
+
+def _upper_or_none(value):
+    if value is None:
+        return 'None'
+    return str(value).upper()
+
+
+def _nircam_pupil_rows(filter_name, paired_filter):
+    short_filter = None
+    long_filter = None
+    if filter_name is not None:
+        if _is_nircam_short_wave_filter(filter_name):
+            short_filter = filter_name
+        else:
+            long_filter = filter_name
+    if paired_filter is not None:
+        if _is_nircam_short_wave_filter(paired_filter):
+            short_filter = paired_filter
+        else:
+            long_filter = paired_filter
+    short_pupil_filter = 'None'
+    long_pupil_filter = 'None'
+    if short_filter is not None:
+        short_pupil_filter = f'GDHS0+{_upper_or_none(short_filter)}'
+    if long_filter is not None:
+        long_pupil_filter = f'GRISMR+{_upper_or_none(long_filter)}'
+    if short_filter is None and long_filter is not None:
+        short_pupil_filter = 'CHOOSE THIS USING ETC'
+    return [
+        ('Short Pupil+Filter', short_pupil_filter),
+        ('Long Pupil+Filter', long_pupil_filter),
+    ]
+
+
+def build_timing_display_div(out, timing):
+    """Build the browser-facing JWST timing tables."""
+    configuration = out['input']['configuration']
+    instrument_config = configuration['instrument']
+    detector_config = configuration['detector']
+
+    instrument = instrument_config.get('instrument')
+    mode = instrument_config.get('mode')
+    aperture = instrument_config.get('aperture')
+    filter_name = instrument_config.get('filter')
+    paired_filter = instrument_config.get('pandexofilterpair')
+    readout_pattern = detector_config.get(
+        'readout_pattern',
+        detector_config.get('readmode')
+    )
+    nstripes = int(timing.get('Num Superstripes', 1) or 1)
+
+    apt_rows = [
+        ('Instrument', _jwst_instrument_name(instrument)),
+        (
+            'Template',
+            _jwst_template_name(
+                instrument, mode, aperture, filter_name, paired_filter
+            )
+        ),
+    ]
+    if str(instrument).lower() == 'nircam':
+        apt_rows.append(
+            ('SW Channel Mode', _nircam_channel_mode(mode, aperture, paired_filter))
+        )
+    apt_rows.append(('Subarray', _display_subarray(detector_config.get('subarray'))))
+    if str(instrument).lower() == 'nircam':
+        apt_rows.append(
+            ('No. of Output Channels', _nircam_output_channels(detector_config.get('subarray')))
+        )
+    apt_rows.append(('Exposures/Dith', 1))
+    if str(instrument).lower() == 'nircam':
+        apt_rows.extend(_nircam_pupil_rows(filter_name, paired_filter))
+    else:
+        apt_rows.append(('Filter', filter_name))
+    apt_rows.extend([
+        ('Readout Pattern', readout_pattern),
+        (
+            'Groups per Integration',
+            timing['APT: Num Groups per Integration']
+        ),
+        (
+            'Integrations per Occultation',
+            timing['APT: Num Integrations per Occultation']
+        ),
+    ])
+
+    calculation_rows = [
+        ('Transit Duration (hr)', timing['Transit Duration']),
+        ('Number of Transits', timing['Number of Transits']),
+        (
+            'Transit + Baseline, No Overhead (hr)',
+            timing['Transit+Baseline, no overhead (hrs)']
+        ),
+        ('Observing Efficiency (%)', timing['Observing Efficiency (%)']),
+        ('Frame Time (sec)', timing['Seconds per Frame']),
+        ('Integrations In Transit', timing['Num Integrations In Transit']),
+        ('Integrations Out of Transit', timing['Num Integrations Out of Transit']),
+    ]
+
+    if nstripes > 1:
+        calculation_rows.extend([
+            ('Number of Stripes', nstripes),
+            (
+                'Elapsed Time per APT Integration incl. Reset (sec)',
+                timing['Time/Integration incl reset (sec)']
+            ),
+            (
+                'Science Time per Full Multistripe Cycle excl. Reset (sec)',
+                timing['Measurement Time per Integration (sec)']
+            ),
+            (
+                'Science Time per Stripe excl. Reset (sec)',
+                timing['Measurement Time per Integration (sec)'] / float(nstripes)
+            ),
+        ])
+    else:
+        calculation_rows.extend([
+            (
+                'Elapsed Time per Integration incl. Reset (sec)',
+                timing['Time/Integration incl reset (sec)']
+            ),
+            (
+                'Science Time per Integration excl. Reset (sec)',
+                timing['Measurement Time per Integration (sec)']
+            ),
+        ])
+
+    timing_div = (
+        '<h3>APT Inputs</h3>\n'
+        + _table_html(apt_rows)
+        + '\n<h3>Calculation Details</h3>\n'
+        + _table_html(calculation_rows)
+    )
+    return timing_div.encode()
+
+
 def as_dict(out, both_spec ,binned, timing, mag, sat_level, warnings, punit, unbinned,calculation): 
     """Format dictionary for output data 
     
@@ -1404,15 +1609,7 @@ def as_dict(out, both_spec ,binned, timing, mag, sat_level, warnings, punit, unb
 
     p=1.0
     if punit == 'fp/f*': p = -1.0
-    frame_loss = timing['Zero Frame Efficiency Loss']
-    timing.pop("Zero Frame Efficiency Loss")
-    timing_div = pd.DataFrame.from_dict(timing, orient='index')
-    #add back in so its not in html, but in timing dict 
-    timing["Zero Frame Efficiency Loss"]=frame_loss
-    timing_div.columns = ['Value']
-    timing_div = timing_div.to_html()
-    timing_div = '<table class="table table-striped"> \n' + timing_div[36:len(timing_div)] 
-    timing_div = timing_div.encode()
+    timing_div = build_timing_display_div(out, timing)
 
     warnings_div = pd.DataFrame.from_dict(warnings, orient='index')
     warnings_div.columns = ['Value']

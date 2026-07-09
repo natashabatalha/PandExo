@@ -10,6 +10,7 @@ import pytest
 
 from pandexo.engine.compute_noise import ExtractSpec
 from pandexo.engine.jwst import (
+    build_timing_display_div,
     compute_timing,
     select_calculation,
     update_timing_measurement_time,
@@ -52,6 +53,26 @@ def _timing_with_pandeia_cycle(nsuperstripe, exposure_time_per_int, ngroup=3):
         max_ngroup_instrument=65536,
     )
     return timing
+
+
+def _pandeia_out(instrument=None, detector=None):
+    return {
+        "input": {
+            "configuration": {
+                "instrument": instrument or {
+                    "instrument": "niriss",
+                    "mode": "soss",
+                    "filter": "clear",
+                    "aperture": "soss",
+                    "disperser": "gr700xd",
+                },
+                "detector": detector or {
+                    "subarray": "substrip96",
+                    "readout_pattern": "nisrapid",
+                },
+            }
+        }
+    }
 
 
 def _fml_result(timing):
@@ -245,6 +266,99 @@ def test_multistripe_timing_uses_pandeia_full_cycle_clock_without_double_countin
     assert timing["Effective Integrations In Transit"] == pytest.approx(1.25)
     assert timing["Measurement Time per Integration (sec)"] == pytest.approx(16.0)
     assert timing["On Source Time In Transit"] == pytest.approx(20.0)
+
+
+def test_multistripe_timing_display_uses_apt_and_calculation_tables():
+    timing = _timing_with_pandeia_cycle(
+        nsuperstripe=4,
+        exposure_time_per_int=40.0,
+        ngroup=3,
+    )
+    html = build_timing_display_div(_pandeia_out(), timing).decode()
+
+    assert "APT Inputs" in html
+    assert "Calculation Details" in html
+    assert "Groups per Integration" in html
+    assert "Integrations per Occultation" in html
+    assert "Number of Stripes" in html
+    assert "Elapsed Time per APT Integration incl. Reset (sec)" in html
+    assert "Science Time per Full Multistripe Cycle excl. Reset (sec)" in html
+    assert "Science Time per Stripe excl. Reset (sec)" in html
+    assert "Effective Per-Wavelength" not in html
+    assert "Time/Integration incl reset" not in html
+    assert "Measurement Time per Integration" not in html
+
+
+def test_non_multistripe_timing_display_omits_stripe_rows():
+    timing = _timing(nsuperstripe=1)
+    html = build_timing_display_div(_pandeia_out(), timing).decode()
+
+    assert "Elapsed Time per Integration incl. Reset (sec)" in html
+    assert "Science Time per Integration excl. Reset (sec)" in html
+    assert "Number of Stripes" not in html
+    assert "Full Multistripe Cycle" not in html
+    assert "Science Time per Stripe" not in html
+
+
+def test_nircam_timing_display_shows_channel_and_pupil_rows():
+    timing = _timing(nsuperstripe=1)
+    html = build_timing_display_div(
+        _pandeia_out(
+            instrument={
+                "instrument": "nircam",
+                "mode": "sw_tsgrism",
+                "filter": "f150w2",
+                "pandexofilterpair": "f322w2",
+                "aperture": "dhs0spec8",
+                "disperser": "dhs0",
+            },
+            detector={
+                "subarray": "sub260s4_8-spectra",
+                "readout_pattern": "rapid",
+            },
+        ),
+        timing,
+    ).decode()
+
+    assert "SW Channel Mode" in html
+    assert "GRISM" in html
+    assert "SUB260S4_8-SPECTRA" in html
+    assert "No. of Output Channels" in html
+    assert "<td>4</td>" in html
+    assert "Short Pupil+Filter" in html
+    assert "GDHS0+F150W2" in html
+    assert "Long Pupil+Filter" in html
+    assert "GRISMR+F322W2" in html
+
+
+def test_nircam_lw_only_timing_display_shows_imaging_sw_channel():
+    timing = _timing(nsuperstripe=1)
+    html = build_timing_display_div(
+        _pandeia_out(
+            instrument={
+                "instrument": "nircam",
+                "mode": "lw_tsgrism",
+                "filter": "f322w2",
+                "aperture": "lw",
+                "disperser": "grismr",
+            },
+            detector={
+                "subarray": "subgrism64",
+                "readout_pattern": "rapid",
+            },
+        ),
+        timing,
+    ).decode()
+
+    assert "SW Channel Mode" in html
+    assert "IMAGING" in html
+    assert "SUBGRISM64" in html
+    assert "No. of Output Channels" in html
+    assert "<td>4</td>" in html
+    assert "Short Pupil+Filter" in html
+    assert "CHOOSE THIS USING ETC" in html
+    assert "Long Pupil+Filter" in html
+    assert "GRISMR+F322W2" in html
 
 
 def test_slope_uncertainty_increases_by_sqrt_nsuperstripe():
