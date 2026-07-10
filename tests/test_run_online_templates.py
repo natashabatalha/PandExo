@@ -76,6 +76,15 @@ def test_new_calculation_template_lists_nirspec_prism_multistripe_subarrays():
     assert 'value="s32m16_prm"' in template
 
 
+def test_new_calculation_template_uses_subgrism256_label():
+    template = Path("pandexo/engine/templates/new.html").read_text()
+    bad_label = "SUBGRISM25" + "8"
+
+    assert 'value="subgrism256">SUBGRISM256' in template
+    assert 'value="subgrism256 (noutputs=1)">SUBGRISM256' in template
+    assert bad_label not in template
+
+
 def test_miri_reference_uses_supported_fastr1_readout():
     reference = Path("pandexo/engine/reference/miri_input.json").read_text()
 
