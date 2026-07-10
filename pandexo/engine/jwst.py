@@ -512,6 +512,7 @@ def compute_full_sim(dictinput,verbose=False):
     varout = result['var_out_1d']
     extracted_flux_out = result['photon_out_1d']
     extracted_flux_inn = result['photon_in_1d']
+    extracted_flux_per_int_out = result.get('photon_out_1d_per_int')
     pandeia_extracted_noise = None
     pandeia_snr_int = None
     pandeia_full_saturation = None
@@ -534,6 +535,8 @@ def compute_full_sim(dictinput,verbose=False):
         varout = varout[input_wave_order]
         extracted_flux_out = extracted_flux_out[input_wave_order]
         extracted_flux_inn = extracted_flux_inn[input_wave_order]
+        if extracted_flux_per_int_out is not None:
+            extracted_flux_per_int_out = extracted_flux_per_int_out[input_wave_order]
         result['rn[out,in]'] = sort_by_wave_order(result['rn[out,in]'], input_wave_order)
         result['bkg[out,in]'] = sort_by_wave_order(result['bkg[out,in]'], input_wave_order)
         if pandeia_extracted_noise is not None:
@@ -554,6 +557,8 @@ def compute_full_sim(dictinput,verbose=False):
         varout = varout[valid_channel]
         extracted_flux_out = extracted_flux_out[valid_channel]
         extracted_flux_inn = extracted_flux_inn[valid_channel]
+        if extracted_flux_per_int_out is not None:
+            extracted_flux_per_int_out = extracted_flux_per_int_out[valid_channel]
         pandeia_full_saturation = pandeia_full_saturation[valid_channel]
         result['rn[out,in]'] = sort_by_wave_order(result['rn[out,in]'], valid_channel)
         result['bkg[out,in]'] = sort_by_wave_order(result['bkg[out,in]'], valid_channel)
@@ -568,6 +573,8 @@ def compute_full_sim(dictinput,verbose=False):
         varout = varout[dhs_wavelength_channel]
         extracted_flux_out = extracted_flux_out[dhs_wavelength_channel]
         extracted_flux_inn = extracted_flux_inn[dhs_wavelength_channel]
+        if extracted_flux_per_int_out is not None:
+            extracted_flux_per_int_out = extracted_flux_per_int_out[dhs_wavelength_channel]
         if pandeia_extracted_noise is not None:
             pandeia_extracted_noise = pandeia_extracted_noise[dhs_wavelength_channel]
         if pandeia_full_saturation is not None:
@@ -588,6 +595,14 @@ def compute_full_sim(dictinput,verbose=False):
 
         photon_out_bin = uniform_tophat_sum(wbin, w,extracted_flux_out)
         photon_in_bin = uniform_tophat_sum(wbin,w, extracted_flux_inn)
+        if extracted_flux_per_int_out is None:
+            electron_per_int_bin = photon_out_bin / result.get(
+                'real_nint_out', result.get('nint_out', 1)
+            )
+        else:
+            electron_per_int_bin = uniform_tophat_sum(
+                wbin, w, extracted_flux_per_int_out
+            )
         var_in_bin = uniform_tophat_sum(wbin, w,varin)
         var_out_bin = uniform_tophat_sum(wbin,w, varout)
         full_saturation_bin = (
@@ -597,6 +612,7 @@ def compute_full_sim(dictinput,verbose=False):
         valid_photon = photon_out_bin > 0
         wbin = wbin[valid_photon]
         photon_in_bin = photon_in_bin[valid_photon]
+        electron_per_int_bin = electron_per_int_bin[valid_photon]
         var_in_bin = var_in_bin[valid_photon]
         var_out_bin = var_out_bin[valid_photon]
         full_saturation_bin = full_saturation_bin[valid_photon]
@@ -604,6 +620,12 @@ def compute_full_sim(dictinput,verbose=False):
     else: 
         wbin = w
         photon_out_bin = extracted_flux_out
+        if extracted_flux_per_int_out is None:
+            electron_per_int_bin = photon_out_bin / result.get(
+                'real_nint_out', result.get('nint_out', 1)
+            )
+        else:
+            electron_per_int_bin = extracted_flux_per_int_out
         full_saturation_bin = (
             np.zeros(len(wbin), dtype=bool)
             if pandeia_full_saturation is None
@@ -613,6 +635,7 @@ def compute_full_sim(dictinput,verbose=False):
         wbin = wbin[valid_photon]
         photon_in_bin = extracted_flux_inn
         photon_in_bin = photon_in_bin[valid_photon]
+        electron_per_int_bin = electron_per_int_bin[valid_photon]
         var_in_bin = varin
         var_in_bin = var_in_bin[valid_photon]
         var_out_bin = varout
@@ -659,6 +682,7 @@ def compute_full_sim(dictinput,verbose=False):
         wbin = wbin[wave_order]
         photon_out_bin = photon_out_bin[wave_order]
         photon_in_bin = photon_in_bin[wave_order]
+        electron_per_int_bin = electron_per_int_bin[wave_order]
         var_in_bin = var_in_bin[wave_order]
         var_out_bin = var_out_bin[wave_order]
         error_spec = error_spec[wave_order]
@@ -679,7 +703,7 @@ def compute_full_sim(dictinput,verbose=False):
     rawstuff = {
                 'electrons_out':photon_out_bin*nocc, 
                 'electrons_in':photon_in_bin*nocc,
-                'electron_per_int':photon_out_bin/nint_out, 
+                'electron_per_int':electron_per_int_bin,
                 'snr_int': (
                     pandeia_snr_int
                     if pandeia_snr_int is not None

@@ -382,6 +382,16 @@ class ExtractSpec():
         extracted_flux_inn = curves_inn['extracted_flux'][1] * self.nint_in
 
         extracted_flux_out = curves_out['extracted_flux'][1] * self.nint_out
+        extracted_flux_per_int_inn = (
+            curves_inn['extracted_flux'][1]
+            * self.inn.get('scalar', self.out['scalar'])['measurement_time']
+            / float(self.nsuperstripe)
+        )
+        extracted_flux_per_int_out = (
+            curves_out['extracted_flux'][1]
+            * self.out['scalar']['measurement_time']
+            / float(self.nsuperstripe)
+        )
 
         extracted_noise_inn = curves_inn['extracted_noise'][1] * np.sqrt(self.nint_in)
 
@@ -395,7 +405,9 @@ class ExtractSpec():
         varin = extracted_noise_inn**2
         varout = extracted_noise_out**2
 
-        return {'photon_out_1d':extracted_flux_out, 'photon_in_1d':extracted_flux_inn, 
+        return {'photon_out_1d':extracted_flux_out, 'photon_in_1d':extracted_flux_inn,
+                    'photon_out_1d_per_int':extracted_flux_per_int_out,
+                    'photon_in_1d_per_int':extracted_flux_per_int_inn,
                     'var_in_1d':varin, 'var_out_1d': varout,'on_source_in':self.on_source_in, 
                 'on_source_out':self.on_source_out,'bkg[out,in]':[bkg_flux_out,bkg_flux_inn],
                 'rn[out,in]':[rn_var_out,rn_var_inn], 
@@ -436,6 +448,16 @@ class ExtractSpec():
         #extract fluxs
         extracted_flux_inn = curves_inn['extracted_flux'][1] * on_source_in 
         extracted_flux_out = curves_out['extracted_flux'][1] * on_source_out 
+        extracted_flux_per_int_inn = (
+            curves_inn['extracted_flux'][1]
+            * self.inn.get('scalar', self.out['scalar'])['measurement_time']
+            / float(self.nsuperstripe)
+        )
+        extracted_flux_per_int_out = (
+            curves_out['extracted_flux'][1]
+            * self.out['scalar']['measurement_time']
+            / float(self.nsuperstripe)
+        )
                 
         #background + contamination extracted 
         bkg_flux_inn = curves_inn['extracted_bg_only'][1] * on_source_in 
@@ -445,7 +467,9 @@ class ExtractSpec():
         varin = (extracted_flux_inn + bkg_flux_inn + rn_var_inn)
         varout = (extracted_flux_out + bkg_flux_out + rn_var_out)
         
-        return {'photon_out_1d':extracted_flux_out, 'photon_in_1d':extracted_flux_inn, 
+        return {'photon_out_1d':extracted_flux_out, 'photon_in_1d':extracted_flux_inn,
+                    'photon_out_1d_per_int':extracted_flux_per_int_out,
+                    'photon_in_1d_per_int':extracted_flux_per_int_inn,
                     'var_in_1d':varin, 'var_out_1d': varout,'on_source_in':self.on_source_in, 
                 'on_source_out':self.on_source_out, 'rn[out,in]':[rn_var_out,rn_var_inn], 
                 'bkg[out,in]':[bkg_flux_out,bkg_flux_inn], 

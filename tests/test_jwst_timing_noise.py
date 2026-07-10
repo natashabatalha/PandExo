@@ -242,6 +242,18 @@ def test_multistripe_effective_time_is_divided_by_nsuperstripe():
     )
 
 
+def test_slope_method_reports_per_stripe_electrons_per_real_integration():
+    result = _slope_result(_timing(nsuperstripe=4))
+
+    assert result["photon_out_1d_per_int"] == pytest.approx([250.0, 250.0])
+
+
+def test_fml_method_reports_electrons_per_real_integration():
+    result = _fml_result(_timing(nsuperstripe=1))
+
+    assert result["photon_out_1d_per_int"] == pytest.approx([1000.0, 1000.0])
+
+
 def test_pandeia_measurement_time_update_controls_on_source_metadata():
     timing = _timing(nsuperstripe=4)
     update_timing_measurement_time(timing, measurement_time_per_int=32.0)
