@@ -18,7 +18,7 @@ max_ngroup = {'nirspec':65535,
               'niriss':65535,
               'nircam':100}
 #minimum number of integrations
-min_nint_trans = 1
+min_nint_trans = 3
 DHS_F150W_MIN_WAVELENGTH = 0.96
 
 #refdata directory
@@ -821,17 +821,44 @@ def compute_timing(m,transit_duration,expfact_out,noccultations,max_ngroup_instr
             )
             return full_cycle
         return (ngroups+1.0)*tframe
-    overhead_per_int = tframe #overhead time added per integration 
-    try: 
+    def _timing_values(ngroups):
+        if ngroups == 1:
+            frame_zero_dead = 0
+        else:
+            frame_zero_dead = -1
+
+        science_time_per_int = (ngroups + frame_zero_dead)*tframe*(nframe+nskip)
+        measurement_time_per_int = science_time_per_int*nsuperstripe
+        clocktime_per_int = _clocktime_per_int(ngroups)
+        eff = measurement_time_per_int/float(nsuperstripe)/clocktime_per_int
+        nint_per_occultation = transit_duration/clocktime_per_int
+        nint_in = np.ceil(nint_per_occultation)
+        nint_out = np.ceil(nint_in/expfact_out)
+
+        return {
+            "frame_zero_dead": frame_zero_dead,
+            "science_time_per_int": science_time_per_int,
+            "measurement_time_per_int": measurement_time_per_int,
+            "clocktime_per_int": clocktime_per_int,
+            "eff": eff,
+            "nint_per_occultation": nint_per_occultation,
+            "nint_in": nint_in,
+            "nint_out": nint_out,
+            "exptime_per_int": ngroups*tframe,
+        }
+
+    optimized_ngroups = "maxexptime_per_int" in m
+    if optimized_ngroups:
         #are we starting with a exposure time ?
         maxexptime_per_int = m['maxexptime_per_int']
-    except:
+    else:
         #or a pre defined number of groups specified by user
         ngroups_per_int = m['ngroup']
         
     flag_default = "All good"
     flag_high = "All good"
-    if 'maxexptime_per_int' in locals():
+    flag_min_nint = "All good"
+    if optimized_ngroups:
         #Frist, if maxexptime_per_int has been defined (from above), compute ngroups_per_int
         
         #number of frames in one integration is the maximum time beofre exposure 
@@ -870,56 +897,64 @@ def compute_timing(m,transit_duration,expfact_out,noccultations,max_ngroup_instr
         nframes_per_int = mingroups
         flag_default = f"Something went wrong. SET TO NGROUPS={mingroups}"
 
-    if ngroups_per_int == 1: 
-        frame_zero_dead = 0 
-    else: 
-        frame_zero_dead = -1
-
-    # FML normally measures the last frame minus the first frame. NGROUP=1
-    # has no true first-last baseline; Pandeia treats it as a measurement
-    # from the superbias frame to the end of the first group. Keep that
-    # positive timing convention while warning users downstream.
-    science_time_per_int = (ngroups_per_int + frame_zero_dead)*tframe*(nframe+nskip)
-    measurement_time_per_int = science_time_per_int*nsuperstripe
-
-    #the integration time is related to the number of groups and the time of each 
-    #group 
-    exptime_per_int = ngroups_per_int*tframe
-    
-    # Clock time includes reset/readout overheads. For multistripe readouts,
-    # Pandeia's exposure_time is the full APT integration cycle across all
-    # stripes; per-wavelength noise scaling is handled by the effective
-    # integration counts below.
-    clocktime_per_int = _clocktime_per_int(ngroups_per_int)
-    
-    #observing efficiency (i.e. what percentage of total time is spent on soure)
-    eff = (ngroups_per_int + frame_zero_dead)/(ngroups_per_int + 1.0)
-    
-    # This says "per occultation" but this is just the in-transit integration
-    # count. For multistripe modes the clock is the full APT integration cycle.
-    nint_per_occultation =  transit_duration/clocktime_per_int
-    
-    #figure out how many integrations are in transit and how many are out of transit 
-    nint_in = np.ceil(nint_per_occultation)
-    nint_out = np.ceil(nint_in/expfact_out)
+    timing_values = _timing_values(ngroups_per_int)
+    frame_zero_dead = timing_values["frame_zero_dead"]
+    science_time_per_int = timing_values["science_time_per_int"]
+    measurement_time_per_int = timing_values["measurement_time_per_int"]
+    exptime_per_int = timing_values["exptime_per_int"]
+    clocktime_per_int = timing_values["clocktime_per_int"]
+    eff = timing_values["eff"]
+    nint_per_occultation = timing_values["nint_per_occultation"]
+    nint_in = timing_values["nint_in"]
+    nint_out = timing_values["nint_out"]
     
     #you would never want a single integration in transit. 
     #here we assume that for very dim things, you would want at least 
     #3 integrations in transit 
     if nint_in < min_nint_trans:
-        ngroups_per_int = np.floor(ngroups_per_int/min_nint_trans)
-        exptime_per_int = (ngroups_per_int)*tframe
-        if ngroups_per_int == 1:
-            frame_zero_dead = 0
+        original_ngroups_per_int = ngroups_per_int
+        original_nint_in = nint_in
+
+        if optimized_ngroups:
+            ngroups_per_int = np.max(
+                [mingroups, np.floor(ngroups_per_int/min_nint_trans)]
+            )
+            timing_values = _timing_values(ngroups_per_int)
+            while (
+                    timing_values["nint_in"] < min_nint_trans and
+                    ngroups_per_int > mingroups):
+                ngroups_per_int -= 1
+                timing_values = _timing_values(ngroups_per_int)
+
+            frame_zero_dead = timing_values["frame_zero_dead"]
+            science_time_per_int = timing_values["science_time_per_int"]
+            measurement_time_per_int = timing_values["measurement_time_per_int"]
+            exptime_per_int = timing_values["exptime_per_int"]
+            clocktime_per_int = timing_values["clocktime_per_int"]
+            eff = timing_values["eff"]
+            nint_per_occultation = timing_values["nint_per_occultation"]
+            nint_in = timing_values["nint_in"]
+            nint_out = timing_values["nint_out"]
+            flag_min_nint = (
+                f"Optimized NGROUPS would produce {int(original_nint_in)} "
+                f"in-transit integrations. Reduced NGROUPS from "
+                f"{int(original_ngroups_per_int)} to {int(ngroups_per_int)} "
+                f"to require at least {min_nint_trans} in-transit integrations."
+            )
+            if nint_in < min_nint_trans:
+                flag_min_nint = (
+                    f"Optimized NGROUPS would produce {int(original_nint_in)} "
+                    f"in-transit integrations. Reduced NGROUPS from "
+                    f"{int(original_ngroups_per_int)} to the minimum allowed "
+                    f"value of {int(ngroups_per_int)}, but this still produces "
+                    f"fewer than {min_nint_trans} in-transit integrations."
+                )
         else:
-            frame_zero_dead = -1
-        science_time_per_int = (ngroups_per_int + frame_zero_dead)*tframe*(nframe+nskip)
-        measurement_time_per_int = science_time_per_int*nsuperstripe
-        clocktime_per_int = _clocktime_per_int(ngroups_per_int)
-        eff = (ngroups_per_int + frame_zero_dead)/(ngroups_per_int + 1.0)
-        nint_per_occultation =  transit_duration/clocktime_per_int
-        nint_in = np.ceil(nint_per_occultation)
-        nint_out = np.ceil(nint_in/expfact_out)
+            flag_min_nint = (
+                f"User-specified NGROUPS produces {int(nint_in)} in-transit "
+                f"integrations, below the recommended minimum of "
+                f"{min_nint_trans}. NGROUPS was not changed."
+            )
         
     if nint_out < min_nint_trans:
         nint_out = min_nint_trans
@@ -956,7 +991,11 @@ def compute_timing(m,transit_duration,expfact_out,noccultations,max_ngroup_instr
         "Zero Frame Efficiency Loss":frame_zero_dead
         }      
 
-    return timing, {'flag_default':flag_default,'flag_high':flag_high}
+    return timing, {
+        'flag_default':flag_default,
+        'flag_high':flag_high,
+        'flag_min_nint':flag_min_nint,
+    }
 
 def update_timing_measurement_time(timing, measurement_time_per_int):
     """Sync timing metadata to the measurement_time reported by Pandeia.
@@ -1168,7 +1207,8 @@ def add_warnings(pand_dict, timing, sat_level, flags,instrument):
             "Non linear?" : flag_nonl,
             "Saturated?" : flag_sat,
             "% full well high?": flag_perc, 
-            "Num Groups Reset?": flags["flag_default"]
+            "Num Groups Reset?": flags["flag_default"],
+            "Minimum Integrations?": flags.get("flag_min_nint", "All good")
     }
 
     return warnings     

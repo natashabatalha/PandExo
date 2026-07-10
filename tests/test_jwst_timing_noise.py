@@ -10,6 +10,7 @@ import pytest
 
 from pandexo.engine.compute_noise import ExtractSpec
 from pandexo.engine.jwst import (
+    add_warnings,
     build_timing_display_div,
     compute_timing,
     select_calculation,
@@ -315,6 +316,84 @@ def test_soss_sub17stripe_clock_time_matches_pandeia_full_cycle():
     ] == pytest.approx(0.43148)
     assert timing["Num Integrations In Transit"] == 147
     assert timing["Effective Integrations In Transit"] == pytest.approx(147 / 120.0)
+
+
+def test_soss_multistripe_efficiency_uses_per_stripe_science_time():
+    timing, _ = compute_timing(
+        {
+            "ngroup": 1111,
+            "tframe": 0.06164,
+            "nframe": 1,
+            "mingroups": 2,
+            "nskip": 0,
+            "nsuperstripe": 120,
+            "exposure_time_per_int": 8227.6992,
+            "exposure_time_ngroup": 1111,
+        },
+        transit_duration=2.8032 * 3600.0,
+        expfact_out=1.0,
+        noccultations=1,
+        max_ngroup_instrument=65536,
+    )
+
+    assert timing["Observing Efficiency (%)"] == pytest.approx(0.8315860648)
+
+
+def test_optimized_multistripe_timing_reduces_ngroups_for_minimum_integrations():
+    timing, flags = compute_timing(
+        {
+            "maxexptime_per_int": 1109 * 0.06164,
+            "tframe": 0.06164,
+            "nframe": 1,
+            "mingroups": 2,
+            "nskip": 0,
+            "nsuperstripe": 120,
+            "tfffr": 0.02048,
+            "nreset1": 1,
+            "ndrop1": 0,
+            "ndrop3": 0,
+        },
+        transit_duration=2.8032 * 3600.0,
+        expfact_out=1.0,
+        noccultations=1,
+        max_ngroup_instrument=65536,
+    )
+
+    assert timing["APT: Num Groups per Integration"] == 369
+    assert timing["Num Integrations In Transit"] >= 3
+    assert "Reduced NGROUPS from 1109 to 369" in flags["flag_min_nint"]
+
+
+def test_user_multistripe_timing_warns_without_changing_ngroups_below_minimum():
+    timing, flags = compute_timing(
+        {
+            "ngroup": 1111,
+            "tframe": 0.06164,
+            "nframe": 1,
+            "mingroups": 2,
+            "nskip": 0,
+            "nsuperstripe": 120,
+            "exposure_time_per_int": 8227.6992,
+            "exposure_time_ngroup": 1111,
+        },
+        transit_duration=2.8032 * 3600.0,
+        expfact_out=1.0,
+        noccultations=1,
+        max_ngroup_instrument=65536,
+    )
+
+    warnings = add_warnings(
+        {"warnings": {}},
+        timing,
+        sat_level=0.8,
+        flags=flags,
+        instrument="niriss",
+    )
+
+    assert timing["APT: Num Groups per Integration"] == 1111
+    assert timing["Num Integrations In Transit"] == 2
+    assert "User-specified NGROUPS produces 2" in flags["flag_min_nint"]
+    assert warnings["Minimum Integrations?"] == flags["flag_min_nint"]
 
 
 def test_multistripe_timing_display_uses_apt_and_calculation_tables():
