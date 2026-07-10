@@ -10,6 +10,8 @@ import pytest
 
 from pandexo.engine.compute_noise import ExtractSpec
 from pandexo.engine.jwst import (
+    add_warnings,
+    build_timing_display_div,
     compute_timing,
     select_calculation,
     update_timing_measurement_time,
@@ -52,6 +54,26 @@ def _timing_with_pandeia_cycle(nsuperstripe, exposure_time_per_int, ngroup=3):
         max_ngroup_instrument=65536,
     )
     return timing
+
+
+def _pandeia_out(instrument=None, detector=None):
+    return {
+        "input": {
+            "configuration": {
+                "instrument": instrument or {
+                    "instrument": "niriss",
+                    "mode": "soss",
+                    "filter": "clear",
+                    "aperture": "soss",
+                    "disperser": "gr700xd",
+                },
+                "detector": detector or {
+                    "subarray": "substrip96",
+                    "readout_pattern": "nisrapid",
+                },
+            }
+        }
+    }
 
 
 def _fml_result(timing):
@@ -189,7 +211,7 @@ def test_compute_timing_keeps_single_group_on_source_time_positive():
         * timing["Num Integrations In Transit"]
         > 0
     )
-    assert flags["flag_default"] == "NGROUPS<1SET TO NGROUPS=1"
+    assert flags["flag_default"] == "Optimized NGROUPS below minimum (1). SET TO NGROUPS=1"
 
 
 def test_multigroup_measurement_time_preserves_first_minus_last_interval():
@@ -220,6 +242,18 @@ def test_multistripe_effective_time_is_divided_by_nsuperstripe():
     )
 
 
+def test_slope_method_reports_per_stripe_electrons_per_real_integration():
+    result = _slope_result(_timing(nsuperstripe=4))
+
+    assert result["photon_out_1d_per_int"] == pytest.approx([250.0, 250.0])
+
+
+def test_fml_method_reports_electrons_per_real_integration():
+    result = _fml_result(_timing(nsuperstripe=1))
+
+    assert result["photon_out_1d_per_int"] == pytest.approx([1000.0, 1000.0])
+
+
 def test_pandeia_measurement_time_update_controls_on_source_metadata():
     timing = _timing(nsuperstripe=4)
     update_timing_measurement_time(timing, measurement_time_per_int=32.0)
@@ -233,18 +267,238 @@ def test_pandeia_measurement_time_update_controls_on_source_metadata():
     )
 
 
-def test_multistripe_timing_uses_pandeia_full_cycle_clock_without_double_counting():
+def test_multistripe_timing_uses_pandeia_full_cycle_clock_for_real_integrations():
     timing = _timing_with_pandeia_cycle(
         nsuperstripe=4,
         exposure_time_per_int=40.0,
         ngroup=3,
     )
 
-    assert timing["Time/Integration incl reset (sec)"] == pytest.approx(10.0)
-    assert timing["Num Integrations In Transit"] == 5
-    assert timing["Effective Integrations In Transit"] == pytest.approx(1.25)
+    assert timing["Time/Integration incl reset (sec)"] == pytest.approx(40.0)
+    assert timing["Num Integrations In Transit"] == 2
+    assert timing["Effective Integrations In Transit"] == pytest.approx(0.5)
     assert timing["Measurement Time per Integration (sec)"] == pytest.approx(16.0)
-    assert timing["On Source Time In Transit"] == pytest.approx(20.0)
+    assert timing["On Source Time In Transit"] == pytest.approx(8.0)
+
+
+def test_dhs_clock_time_includes_pandeia_fixed_overhead():
+    timing, _ = compute_timing(
+        {
+            "ngroup": 30,
+            "tframe": 1.36765,
+            "nframe": 1,
+            "mingroups": 2,
+            "nskip": 0,
+            "nsuperstripe": 1,
+            "exposure_time_per_int": 42.41763,
+            "exposure_time_ngroup": 30,
+        },
+        transit_duration=2.8032 * 3600.0,
+        expfact_out=1.0,
+        noccultations=1,
+        max_ngroup_instrument=101,
+    )
+
+    assert timing["Time/Integration incl reset (sec)"] == pytest.approx(42.41763)
+    assert timing["Measurement Time per Integration (sec)"] == pytest.approx(39.66185)
+
+
+def test_soss_sub17stripe_clock_time_matches_pandeia_full_cycle():
+    timing, _ = compute_timing(
+        {
+            "ngroup": 8,
+            "tframe": 0.06164,
+            "nframe": 1,
+            "mingroups": 2,
+            "nskip": 0,
+            "nsuperstripe": 120,
+            "exposure_time_per_int": 69.0288,
+            "exposure_time_ngroup": 8,
+        },
+        transit_duration=2.8032 * 3600.0,
+        expfact_out=1.0,
+        noccultations=1,
+        max_ngroup_instrument=65536,
+    )
+
+    assert timing["Time/Integration incl reset (sec)"] == pytest.approx(69.0288)
+    assert timing["Measurement Time per Integration (sec)"] == pytest.approx(51.7776)
+    assert timing["Measurement Time per Integration (sec)"] / timing[
+        "Num Superstripes"
+    ] == pytest.approx(0.43148)
+    assert timing["Num Integrations In Transit"] == 147
+    assert timing["Effective Integrations In Transit"] == pytest.approx(147 / 120.0)
+
+
+def test_soss_multistripe_efficiency_uses_per_stripe_science_time():
+    timing, _ = compute_timing(
+        {
+            "ngroup": 1111,
+            "tframe": 0.06164,
+            "nframe": 1,
+            "mingroups": 2,
+            "nskip": 0,
+            "nsuperstripe": 120,
+            "exposure_time_per_int": 8227.6992,
+            "exposure_time_ngroup": 1111,
+        },
+        transit_duration=2.8032 * 3600.0,
+        expfact_out=1.0,
+        noccultations=1,
+        max_ngroup_instrument=65536,
+    )
+
+    assert timing["Observing Efficiency (%)"] == pytest.approx(0.8315860648)
+
+
+def test_optimized_multistripe_timing_reduces_ngroups_for_minimum_integrations():
+    timing, flags = compute_timing(
+        {
+            "maxexptime_per_int": 1109 * 0.06164,
+            "tframe": 0.06164,
+            "nframe": 1,
+            "mingroups": 2,
+            "nskip": 0,
+            "nsuperstripe": 120,
+            "tfffr": 0.02048,
+            "nreset1": 1,
+            "ndrop1": 0,
+            "ndrop3": 0,
+        },
+        transit_duration=2.8032 * 3600.0,
+        expfact_out=1.0,
+        noccultations=1,
+        max_ngroup_instrument=65536,
+    )
+
+    assert timing["APT: Num Groups per Integration"] == 369
+    assert timing["Num Integrations In Transit"] >= 3
+    assert "Reduced NGROUPS from 1109 to 369" in flags["flag_min_nint"]
+
+
+def test_user_multistripe_timing_warns_without_changing_ngroups_below_minimum():
+    timing, flags = compute_timing(
+        {
+            "ngroup": 1111,
+            "tframe": 0.06164,
+            "nframe": 1,
+            "mingroups": 2,
+            "nskip": 0,
+            "nsuperstripe": 120,
+            "exposure_time_per_int": 8227.6992,
+            "exposure_time_ngroup": 1111,
+        },
+        transit_duration=2.8032 * 3600.0,
+        expfact_out=1.0,
+        noccultations=1,
+        max_ngroup_instrument=65536,
+    )
+
+    warnings = add_warnings(
+        {"warnings": {}},
+        timing,
+        sat_level=0.8,
+        flags=flags,
+        instrument="niriss",
+    )
+
+    assert timing["APT: Num Groups per Integration"] == 1111
+    assert timing["Num Integrations In Transit"] == 2
+    assert "User-specified NGROUPS produces 2" in flags["flag_min_nint"]
+    assert warnings["Minimum Integrations?"] == flags["flag_min_nint"]
+
+
+def test_multistripe_timing_display_uses_apt_and_calculation_tables():
+    timing = _timing_with_pandeia_cycle(
+        nsuperstripe=4,
+        exposure_time_per_int=40.0,
+        ngroup=3,
+    )
+    html = build_timing_display_div(_pandeia_out(), timing).decode()
+
+    assert "APT Inputs" in html
+    assert "Calculation Details" in html
+    assert "Groups per Integration" in html
+    assert "Integrations per Occultation" in html
+    assert "Number of Stripes" in html
+    assert "Elapsed Time per APT Integration incl. Reset (sec)" in html
+    assert "Science Time per Full Multistripe Cycle excl. Reset (sec)" in html
+    assert "Science Time per Stripe excl. Reset (sec)" in html
+    assert "Effective Per-Wavelength" not in html
+    assert "Time/Integration incl reset" not in html
+    assert "Measurement Time per Integration" not in html
+
+
+def test_non_multistripe_timing_display_omits_stripe_rows():
+    timing = _timing(nsuperstripe=1)
+    html = build_timing_display_div(_pandeia_out(), timing).decode()
+
+    assert "Elapsed Time per Integration incl. Reset (sec)" in html
+    assert "Science Time per Integration excl. Reset (sec)" in html
+    assert "Number of Stripes" not in html
+    assert "Full Multistripe Cycle" not in html
+    assert "Science Time per Stripe" not in html
+
+
+def test_nircam_timing_display_shows_channel_and_pupil_rows():
+    timing = _timing(nsuperstripe=1)
+    html = build_timing_display_div(
+        _pandeia_out(
+            instrument={
+                "instrument": "nircam",
+                "mode": "sw_tsgrism",
+                "filter": "f150w2",
+                "pandexofilterpair": "f322w2",
+                "aperture": "dhs0spec8",
+                "disperser": "dhs0",
+            },
+            detector={
+                "subarray": "sub260s4_8-spectra",
+                "readout_pattern": "rapid",
+            },
+        ),
+        timing,
+    ).decode()
+
+    assert "SW Channel Mode" in html
+    assert "GRISM" in html
+    assert "SUB260S4_8-SPECTRA" in html
+    assert "No. of Output Channels" in html
+    assert "<td>4</td>" in html
+    assert "Short Pupil+Filter" in html
+    assert "GDHS0+F150W2" in html
+    assert "Long Pupil+Filter" in html
+    assert "GRISMR+F322W2" in html
+
+
+def test_nircam_lw_only_timing_display_shows_imaging_sw_channel():
+    timing = _timing(nsuperstripe=1)
+    html = build_timing_display_div(
+        _pandeia_out(
+            instrument={
+                "instrument": "nircam",
+                "mode": "lw_tsgrism",
+                "filter": "f322w2",
+                "aperture": "lw",
+                "disperser": "grismr",
+            },
+            detector={
+                "subarray": "subgrism64",
+                "readout_pattern": "rapid",
+            },
+        ),
+        timing,
+    ).decode()
+
+    assert "SW Channel Mode" in html
+    assert "IMAGING" in html
+    assert "SUBGRISM64" in html
+    assert "No. of Output Channels" in html
+    assert "<td>4</td>" in html
+    assert "Short Pupil+Filter" in html
+    assert "CHOOSE THIS USING ETC" in html
+    assert "Long Pupil+Filter" in html
+    assert "GRISMR+F322W2" in html
 
 
 def test_slope_uncertainty_increases_by_sqrt_nsuperstripe():

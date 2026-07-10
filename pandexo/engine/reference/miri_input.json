@@ -66,7 +66,7 @@
             "method": "specapphot",
             "background_subtraction":true,
             "aperture_size": 0.6,
-            "sky_annulus": [2.3,3.0],
+            "sky_annulus": [1.0,2.8],
             "target_xy": [0.0, 0.0],
             "reference_wavelength": null,
             "units":"arcsec"

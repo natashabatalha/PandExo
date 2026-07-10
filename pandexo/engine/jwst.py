@@ -13,12 +13,13 @@ import pickle
 
 #constant parameters.. consider putting these into json file 
 #max groups in integration
-max_ngroup = {'nirspec':65536.0 ,
-              'miri':65536.0 ,
-              'niriss':65536.0 ,
-              'nircam':30}
+max_ngroup = {'nirspec':65535,
+              'miri':65535,
+              'niriss':65535,
+              'nircam':100}
 #minimum number of integrations
-min_nint_trans = 1
+min_nint_trans = 3
+DHS_F150W_MIN_WAVELENGTH = 0.96
 
 #refdata directory
 default_refdata_directory = os.environ.get("pandeia_refdata")
@@ -134,6 +135,46 @@ def nirspec_valid_channel_mask(conf, extracted_noise, full_saturation=None):
     return valid_noise | fully_saturated
 
 
+def dhs_f150w_wavelength_mask(conf, wave):
+    """Build a wavelength mask for the low-throughput edge of DHS F150W.
+
+    NIRCam DHS calculations can include F150W/F150W2 wavelength samples below
+    the useful bandpass where the throughput is effectively zero. Those samples
+    make the raw and binned diagnostic plots difficult to read, so PandExo
+    trims them before downstream binning and plot packaging.
+
+    Parameters
+    ----------
+    conf : dict
+        Pandeia ``configuration`` dictionary for the calculation. The helper
+        inspects ``conf["instrument"]`` to determine whether the setup is a
+        NIRCam DHS calculation with a filter name starting with ``"f150w"``.
+    wave : array-like
+        Wavelength samples in microns.
+
+    Returns
+    -------
+    numpy.ndarray or None
+        Boolean mask selecting wavelengths greater than or equal to
+        ``DHS_F150W_MIN_WAVELENGTH``. Returns ``None`` when the calculation is
+        not a NIRCam DHS F150W/F150W2 setup, so callers can leave other modes
+        unchanged.
+    """
+    instrument = conf.get('instrument', {})
+    if str(instrument.get('instrument', '')).lower() != 'nircam':
+        return None
+
+    aperture = str(instrument.get('aperture', '')).lower()
+    mode = str(instrument.get('mode', '')).lower()
+    filter_name = str(instrument.get('filter', '')).lower()
+    if 'dhs' not in aperture and mode != 'dhs':
+        return None
+    if not filter_name.startswith('f150w'):
+        return None
+
+    return np.asarray(wave, dtype=float) >= DHS_F150W_MIN_WAVELENGTH
+
+
 def _no_valid_spectral_channels_message(conf, scalar):
     """Describe an all-invalid spectral extraction without requiring Pandeia."""
     instrument = conf.get('instrument', {})
@@ -154,7 +195,7 @@ def _no_valid_spectral_channels_message(conf, scalar):
         ('sat_ngroups', scalar.get('sat_ngroups')),
     ]:
         if value is not None:
-            details.append('{0}={1}'.format(key, value))
+            details.append(f'{key}={value}')
     return ' '.join(details)
 
 
@@ -163,9 +204,7 @@ def _saturation_warning_message(conf, scalar, pandeia_warning, saturation_kind):
     instrument = conf.get('instrument', {})
     detector = conf.get('detector', {})
     details = [
-        'Pandeia reports {0} saturation for this observation.'.format(
-            saturation_kind
-        ),
+        f'Pandeia reports {saturation_kind} saturation for this observation.',
         str(pandeia_warning),
     ]
     for key, value in [
@@ -179,7 +218,7 @@ def _saturation_warning_message(conf, scalar, pandeia_warning, saturation_kind):
         ('sat_ngroups', scalar.get('sat_ngroups')),
     ]:
         if value is not None:
-            details.append('{0}={1}'.format(key, value))
+            details.append(f'{key}={value}')
     return ' '.join(details)
 
 
@@ -274,7 +313,7 @@ def compute_full_sim(dictinput,verbose=False):
 
     def log(message):
         if isinstance(verbose, str):
-            print("[{}] {}".format(verbose, message), flush=True)
+            print(f"[{verbose}] {message}", flush=True)
         elif verbose:
             print(message, flush=True)
 	
@@ -473,6 +512,7 @@ def compute_full_sim(dictinput,verbose=False):
     varout = result['var_out_1d']
     extracted_flux_out = result['photon_out_1d']
     extracted_flux_inn = result['photon_in_1d']
+    extracted_flux_per_int_out = result.get('photon_out_1d_per_int')
     pandeia_extracted_noise = None
     pandeia_snr_int = None
     pandeia_full_saturation = None
@@ -495,6 +535,8 @@ def compute_full_sim(dictinput,verbose=False):
         varout = varout[input_wave_order]
         extracted_flux_out = extracted_flux_out[input_wave_order]
         extracted_flux_inn = extracted_flux_inn[input_wave_order]
+        if extracted_flux_per_int_out is not None:
+            extracted_flux_per_int_out = extracted_flux_per_int_out[input_wave_order]
         result['rn[out,in]'] = sort_by_wave_order(result['rn[out,in]'], input_wave_order)
         result['bkg[out,in]'] = sort_by_wave_order(result['bkg[out,in]'], input_wave_order)
         if pandeia_extracted_noise is not None:
@@ -515,10 +557,31 @@ def compute_full_sim(dictinput,verbose=False):
         varout = varout[valid_channel]
         extracted_flux_out = extracted_flux_out[valid_channel]
         extracted_flux_inn = extracted_flux_inn[valid_channel]
+        if extracted_flux_per_int_out is not None:
+            extracted_flux_per_int_out = extracted_flux_per_int_out[valid_channel]
         pandeia_full_saturation = pandeia_full_saturation[valid_channel]
         result['rn[out,in]'] = sort_by_wave_order(result['rn[out,in]'], valid_channel)
         result['bkg[out,in]'] = sort_by_wave_order(result['bkg[out,in]'], valid_channel)
         pandeia_snr_int = sort_by_wave_order(pandeia_snr_int, valid_channel)
+
+    dhs_wavelength_channel = None
+    if not is_phase_spec(calculation):
+        dhs_wavelength_channel = dhs_f150w_wavelength_mask(conf, w)
+    if dhs_wavelength_channel is not None:
+        w = w[dhs_wavelength_channel]
+        varin = varin[dhs_wavelength_channel]
+        varout = varout[dhs_wavelength_channel]
+        extracted_flux_out = extracted_flux_out[dhs_wavelength_channel]
+        extracted_flux_inn = extracted_flux_inn[dhs_wavelength_channel]
+        if extracted_flux_per_int_out is not None:
+            extracted_flux_per_int_out = extracted_flux_per_int_out[dhs_wavelength_channel]
+        if pandeia_extracted_noise is not None:
+            pandeia_extracted_noise = pandeia_extracted_noise[dhs_wavelength_channel]
+        if pandeia_full_saturation is not None:
+            pandeia_full_saturation = pandeia_full_saturation[dhs_wavelength_channel]
+        result['rn[out,in]'] = sort_by_wave_order(result['rn[out,in]'], dhs_wavelength_channel)
+        result['bkg[out,in]'] = sort_by_wave_order(result['bkg[out,in]'], dhs_wavelength_channel)
+        pandeia_snr_int = sort_by_wave_order(pandeia_snr_int, dhs_wavelength_channel)
 
         
     #bin the data according to user input 
@@ -532,6 +595,14 @@ def compute_full_sim(dictinput,verbose=False):
 
         photon_out_bin = uniform_tophat_sum(wbin, w,extracted_flux_out)
         photon_in_bin = uniform_tophat_sum(wbin,w, extracted_flux_inn)
+        if extracted_flux_per_int_out is None:
+            electron_per_int_bin = photon_out_bin / result.get(
+                'real_nint_out', result.get('nint_out', 1)
+            )
+        else:
+            electron_per_int_bin = uniform_tophat_sum(
+                wbin, w, extracted_flux_per_int_out
+            )
         var_in_bin = uniform_tophat_sum(wbin, w,varin)
         var_out_bin = uniform_tophat_sum(wbin,w, varout)
         full_saturation_bin = (
@@ -541,6 +612,7 @@ def compute_full_sim(dictinput,verbose=False):
         valid_photon = photon_out_bin > 0
         wbin = wbin[valid_photon]
         photon_in_bin = photon_in_bin[valid_photon]
+        electron_per_int_bin = electron_per_int_bin[valid_photon]
         var_in_bin = var_in_bin[valid_photon]
         var_out_bin = var_out_bin[valid_photon]
         full_saturation_bin = full_saturation_bin[valid_photon]
@@ -548,6 +620,12 @@ def compute_full_sim(dictinput,verbose=False):
     else: 
         wbin = w
         photon_out_bin = extracted_flux_out
+        if extracted_flux_per_int_out is None:
+            electron_per_int_bin = photon_out_bin / result.get(
+                'real_nint_out', result.get('nint_out', 1)
+            )
+        else:
+            electron_per_int_bin = extracted_flux_per_int_out
         full_saturation_bin = (
             np.zeros(len(wbin), dtype=bool)
             if pandeia_full_saturation is None
@@ -557,6 +635,7 @@ def compute_full_sim(dictinput,verbose=False):
         wbin = wbin[valid_photon]
         photon_in_bin = extracted_flux_inn
         photon_in_bin = photon_in_bin[valid_photon]
+        electron_per_int_bin = electron_per_int_bin[valid_photon]
         var_in_bin = varin
         var_in_bin = var_in_bin[valid_photon]
         var_out_bin = varout
@@ -603,6 +682,7 @@ def compute_full_sim(dictinput,verbose=False):
         wbin = wbin[wave_order]
         photon_out_bin = photon_out_bin[wave_order]
         photon_in_bin = photon_in_bin[wave_order]
+        electron_per_int_bin = electron_per_int_bin[wave_order]
         var_in_bin = var_in_bin[wave_order]
         var_out_bin = var_out_bin[wave_order]
         error_spec = error_spec[wave_order]
@@ -623,7 +703,7 @@ def compute_full_sim(dictinput,verbose=False):
     rawstuff = {
                 'electrons_out':photon_out_bin*nocc, 
                 'electrons_in':photon_in_bin*nocc,
-                'electron_per_int':photon_out_bin/nint_out, 
+                'electron_per_int':electron_per_int_bin,
                 'snr_int': (
                     pandeia_snr_int
                     if pandeia_snr_int is not None
@@ -749,34 +829,60 @@ def compute_timing(m,transit_duration,expfact_out,noccultations,max_ngroup_instr
     if nsuperstripe < 1:
         nsuperstripe = 1
     def _clocktime_per_int(ngroups):
-        if nsuperstripe > 1:
-            if (m.get("exposure_time_per_int") is not None and
-                    ngroups == m.get("exposure_time_ngroup")):
-                return m["exposure_time_per_int"]/float(nsuperstripe)
-            if m.get("tfffr") is not None:
-                full_cycle = nsuperstripe * (
-                    m["tfffr"]
-                    + tframe * (
-                        m.get("nreset1", 1)
-                        + m.get("ndrop1", 0)
-                        + (ngroups - 1.0)*(nframe + nskip)
-                        + nframe
-                        + m.get("ndrop3", 0)
-                    )
+        if (m.get("exposure_time_per_int") is not None and
+                ngroups == m.get("exposure_time_ngroup")):
+            return m["exposure_time_per_int"]
+        if nsuperstripe > 1 and m.get("tfffr") is not None:
+            full_cycle = nsuperstripe * (
+                m["tfffr"]
+                + tframe * (
+                    m.get("nreset1", 1)
+                    + m.get("ndrop1", 0)
+                    + (ngroups - 1.0)*(nframe + nskip)
+                    + nframe
+                    + m.get("ndrop3", 0)
                 )
-                return full_cycle/float(nsuperstripe)
+            )
+            return full_cycle
         return (ngroups+1.0)*tframe
-    overhead_per_int = tframe #overhead time added per integration 
-    try: 
+    def _timing_values(ngroups):
+        if ngroups == 1:
+            frame_zero_dead = 0
+        else:
+            frame_zero_dead = -1
+
+        science_time_per_int = (ngroups + frame_zero_dead)*tframe*(nframe+nskip)
+        measurement_time_per_int = science_time_per_int*nsuperstripe
+        clocktime_per_int = _clocktime_per_int(ngroups)
+        eff = measurement_time_per_int/float(nsuperstripe)/clocktime_per_int
+        nint_per_occultation = transit_duration/clocktime_per_int
+        nint_in = np.ceil(nint_per_occultation)
+        nint_out = np.ceil(nint_in/expfact_out)
+
+        return {
+            "frame_zero_dead": frame_zero_dead,
+            "science_time_per_int": science_time_per_int,
+            "measurement_time_per_int": measurement_time_per_int,
+            "clocktime_per_int": clocktime_per_int,
+            "eff": eff,
+            "nint_per_occultation": nint_per_occultation,
+            "nint_in": nint_in,
+            "nint_out": nint_out,
+            "exptime_per_int": ngroups*tframe,
+        }
+
+    optimized_ngroups = "maxexptime_per_int" in m
+    if optimized_ngroups:
         #are we starting with a exposure time ?
         maxexptime_per_int = m['maxexptime_per_int']
-    except:
+    else:
         #or a pre defined number of groups specified by user
         ngroups_per_int = m['ngroup']
         
     flag_default = "All good"
     flag_high = "All good"
-    if 'maxexptime_per_int' in locals():
+    flag_min_nint = "All good"
+    if optimized_ngroups:
         #Frist, if maxexptime_per_int has been defined (from above), compute ngroups_per_int
         
         #number of frames in one integration is the maximum time beofre exposure 
@@ -796,12 +902,12 @@ def compute_timing(m,transit_duration,expfact_out,noccultations,max_ngroup_instr
 
         if ngroups_per_int > max_ngroup_instrument:
             ngroups_per_int = max_ngroup_instrument
-            flag_high = "Groups/int > max num of allowed groups"
+            flag_high = f"Optimized NGROUPS above maximum ({max_ngroup_instrument}). SET TO NGROUPS={max_ngroup_instrument}"
  
         if (ngroups_per_int < mingroups) | np.isnan(ngroups_per_int):
             ngroups_per_int = mingroups
             nframes_per_int = mingroups
-            flag_default = "NGROUPS<"+str(mingroups)+"SET TO NGROUPS="+str(mingroups)
+            flag_default = f"Optimized NGROUPS below minimum ({mingroups}). SET TO NGROUPS={mingroups}"
 
     elif 'ngroups_per_int' in locals(): 
         #if it maxexptime_per_int been defined then set nframes per int 
@@ -813,59 +919,66 @@ def compute_timing(m,transit_duration,expfact_out,noccultations,max_ngroup_instr
         #for the sake of not returning error
         ngroups_per_int = mingroups
         nframes_per_int = mingroups
-        flag_default = "Something went wrong. SET TO NGROUPS="+str(mingroups)
+        flag_default = f"Something went wrong. SET TO NGROUPS={mingroups}"
 
-    if ngroups_per_int == 1: 
-        frame_zero_dead = 0 
-    else: 
-        frame_zero_dead = -1
-
-    # FML normally measures the last frame minus the first frame. NGROUP=1
-    # has no true first-last baseline; Pandeia treats it as a measurement
-    # from the superbias frame to the end of the first group. Keep that
-    # positive timing convention while warning users downstream.
-    science_time_per_int = (ngroups_per_int + frame_zero_dead)*tframe*(nframe+nskip)
-    measurement_time_per_int = science_time_per_int*nsuperstripe
-
-    #the integration time is related to the number of groups and the time of each 
-    #group 
-    exptime_per_int = ngroups_per_int*tframe
-    
-    #clock time includes the reset frame. For SOSS multistripe Pandeia's
-    #exposure_time is a full superstripe cycle, while PandExo keeps the
-    #historical integration count on a single-superstripe scale and divides
-    #by nsuperstripe for per-wavelength noise scaling.
-    clocktime_per_int = _clocktime_per_int(ngroups_per_int)
-    
-    #observing efficiency (i.e. what percentage of total time is spent on soure)
-    eff = (ngroups_per_int + frame_zero_dead)/(ngroups_per_int + 1.0)
-    
-    # this says "per occultation" but this is just the in-transit integration
-    # slots. For SOSS multistripe the clock is one superstripe slice of the
-    # full Pandeia exposure cycle.
-    nint_per_occultation =  transit_duration/clocktime_per_int
-    
-    #figure out how many integrations are in transit and how many are out of transit 
-    nint_in = np.ceil(nint_per_occultation)
-    nint_out = np.ceil(nint_in/expfact_out)
+    timing_values = _timing_values(ngroups_per_int)
+    frame_zero_dead = timing_values["frame_zero_dead"]
+    science_time_per_int = timing_values["science_time_per_int"]
+    measurement_time_per_int = timing_values["measurement_time_per_int"]
+    exptime_per_int = timing_values["exptime_per_int"]
+    clocktime_per_int = timing_values["clocktime_per_int"]
+    eff = timing_values["eff"]
+    nint_per_occultation = timing_values["nint_per_occultation"]
+    nint_in = timing_values["nint_in"]
+    nint_out = timing_values["nint_out"]
     
     #you would never want a single integration in transit. 
     #here we assume that for very dim things, you would want at least 
     #3 integrations in transit 
     if nint_in < min_nint_trans:
-        ngroups_per_int = np.floor(ngroups_per_int/min_nint_trans)
-        exptime_per_int = (ngroups_per_int)*tframe
-        if ngroups_per_int == 1:
-            frame_zero_dead = 0
+        original_ngroups_per_int = ngroups_per_int
+        original_nint_in = nint_in
+
+        if optimized_ngroups:
+            ngroups_per_int = np.max(
+                [mingroups, np.floor(ngroups_per_int/min_nint_trans)]
+            )
+            timing_values = _timing_values(ngroups_per_int)
+            while (
+                    timing_values["nint_in"] < min_nint_trans and
+                    ngroups_per_int > mingroups):
+                ngroups_per_int -= 1
+                timing_values = _timing_values(ngroups_per_int)
+
+            frame_zero_dead = timing_values["frame_zero_dead"]
+            science_time_per_int = timing_values["science_time_per_int"]
+            measurement_time_per_int = timing_values["measurement_time_per_int"]
+            exptime_per_int = timing_values["exptime_per_int"]
+            clocktime_per_int = timing_values["clocktime_per_int"]
+            eff = timing_values["eff"]
+            nint_per_occultation = timing_values["nint_per_occultation"]
+            nint_in = timing_values["nint_in"]
+            nint_out = timing_values["nint_out"]
+            flag_min_nint = (
+                f"Optimized NGROUPS would produce {int(original_nint_in)} "
+                f"in-transit integrations. Reduced NGROUPS from "
+                f"{int(original_ngroups_per_int)} to {int(ngroups_per_int)} "
+                f"to require at least {min_nint_trans} in-transit integrations."
+            )
+            if nint_in < min_nint_trans:
+                flag_min_nint = (
+                    f"Optimized NGROUPS would produce {int(original_nint_in)} "
+                    f"in-transit integrations. Reduced NGROUPS from "
+                    f"{int(original_ngroups_per_int)} to the minimum allowed "
+                    f"value of {int(ngroups_per_int)}, but this still produces "
+                    f"fewer than {min_nint_trans} in-transit integrations."
+                )
         else:
-            frame_zero_dead = -1
-        science_time_per_int = (ngroups_per_int + frame_zero_dead)*tframe*(nframe+nskip)
-        measurement_time_per_int = science_time_per_int*nsuperstripe
-        clocktime_per_int = _clocktime_per_int(ngroups_per_int)
-        eff = (ngroups_per_int + frame_zero_dead)/(ngroups_per_int + 1.0)
-        nint_per_occultation =  transit_duration/clocktime_per_int
-        nint_in = np.ceil(nint_per_occultation)
-        nint_out = np.ceil(nint_in/expfact_out)
+            flag_min_nint = (
+                f"User-specified NGROUPS produces {int(nint_in)} in-transit "
+                f"integrations, below the recommended minimum of "
+                f"{min_nint_trans}. NGROUPS was not changed."
+            )
         
     if nint_out < min_nint_trans:
         nint_out = min_nint_trans
@@ -902,7 +1015,11 @@ def compute_timing(m,transit_duration,expfact_out,noccultations,max_ngroup_instr
         "Zero Frame Efficiency Loss":frame_zero_dead
         }      
 
-    return timing, {'flag_default':flag_default,'flag_high':flag_high}
+    return timing, {
+        'flag_default':flag_default,
+        'flag_high':flag_high,
+        'flag_min_nint':flag_min_nint,
+    }
 
 def update_timing_measurement_time(timing, measurement_time_per_int):
     """Sync timing metadata to the measurement_time reported by Pandeia.
@@ -1114,7 +1231,8 @@ def add_warnings(pand_dict, timing, sat_level, flags,instrument):
             "Non linear?" : flag_nonl,
             "Saturated?" : flag_sat,
             "% full well high?": flag_perc, 
-            "Num Groups Reset?": flags["flag_default"]
+            "Num Groups Reset?": flags["flag_default"],
+            "Minimum Integrations?": flags.get("flag_min_nint", "All good")
     }
 
     return warnings     
@@ -1309,6 +1427,213 @@ def target_acq(instrument, both_spec, warning):
             'ngroup': rphot['input']['configuration']['detector']['ngroup'], 
             'saturation':rphot['2d']['saturation']}
 
+
+def _table_html(rows):
+    table = pd.DataFrame(rows, columns=['Parameter', 'Value'])
+    table = table.set_index('Parameter')
+    table.index.name = None
+    table = table.to_html()
+    return '<table class="table table-striped"> \n' + table[36:len(table)]
+
+
+def _jwst_instrument_name(instrument):
+    names = {
+        'miri': 'MIRI',
+        'nircam': 'NIRCam',
+        'niriss': 'NIRISS',
+        'nirspec': 'NIRSpec',
+    }
+    return names.get(str(instrument).lower(), instrument)
+
+
+def _jwst_template_name(instrument, mode, aperture, filter_name, paired_filter):
+    instrument = str(instrument).lower()
+    mode = str(mode).lower()
+    aperture = str(aperture).lower()
+    if instrument == 'miri':
+        return 'MIRI Low Resolution Spectroscopy'
+    if instrument == 'nirspec':
+        return 'NIRSpec Bright Object Time Series'
+    if instrument == 'niriss':
+        return 'NIRISS Single Object Slitless Spectroscopy'
+    if instrument == 'nircam':
+        return 'NIRCam Grism Time Series'
+    return mode
+
+
+def _is_nircam_short_wave_filter(filter_name):
+    return str(filter_name).lower().startswith(
+        ('f070w', 'f090w', 'f115w', 'f150w', 'f150w2', 'f200w')
+    )
+
+
+def _nircam_channel_mode(mode, aperture, paired_filter):
+    mode = str(mode).lower()
+    aperture = str(aperture).lower()
+    if mode == 'sw_tsgrism' or 'dhs' in aperture:
+        return 'GRISM'
+    if paired_filter is not None:
+        return 'GRISM'
+    return 'IMAGING'
+
+
+def _display_subarray(subarray):
+    if subarray is None:
+        return None
+    return str(subarray).split(' (')[0].upper()
+
+
+def _nircam_output_channels(subarray):
+    subarray = str(subarray).lower()
+    if 'noutputs=1' in subarray:
+        return 1
+    if subarray.startswith('subgrism'):
+        return 4
+    prefix = subarray.split('_', 1)[0]
+    stripe_marker = prefix.rfind('s')
+    if stripe_marker >= 0:
+        try:
+            return int(prefix[stripe_marker + 1:])
+        except ValueError:
+            pass
+    return None
+
+
+def _upper_or_none(value):
+    if value is None:
+        return 'None'
+    return str(value).upper()
+
+
+def _nircam_pupil_rows(filter_name, paired_filter):
+    short_filter = None
+    long_filter = None
+    if filter_name is not None:
+        if _is_nircam_short_wave_filter(filter_name):
+            short_filter = filter_name
+        else:
+            long_filter = filter_name
+    if paired_filter is not None:
+        if _is_nircam_short_wave_filter(paired_filter):
+            short_filter = paired_filter
+        else:
+            long_filter = paired_filter
+    short_pupil_filter = 'None'
+    long_pupil_filter = 'None'
+    if short_filter is not None:
+        short_pupil_filter = f'GDHS0+{_upper_or_none(short_filter)}'
+    if long_filter is not None:
+        long_pupil_filter = f'GRISMR+{_upper_or_none(long_filter)}'
+    if short_filter is None and long_filter is not None:
+        short_pupil_filter = 'CHOOSE THIS USING ETC'
+    return [
+        ('Short Pupil+Filter', short_pupil_filter),
+        ('Long Pupil+Filter', long_pupil_filter),
+    ]
+
+
+def build_timing_display_div(out, timing):
+    """Build the browser-facing JWST timing tables."""
+    configuration = out['input']['configuration']
+    instrument_config = configuration['instrument']
+    detector_config = configuration['detector']
+
+    instrument = instrument_config.get('instrument')
+    mode = instrument_config.get('mode')
+    aperture = instrument_config.get('aperture')
+    filter_name = instrument_config.get('filter')
+    paired_filter = instrument_config.get('pandexofilterpair')
+    readout_pattern = detector_config.get(
+        'readout_pattern',
+        detector_config.get('readmode')
+    )
+    nstripes = int(timing.get('Num Superstripes', 1) or 1)
+
+    apt_rows = [
+        ('Instrument', _jwst_instrument_name(instrument)),
+        (
+            'Template',
+            _jwst_template_name(
+                instrument, mode, aperture, filter_name, paired_filter
+            )
+        ),
+    ]
+    if str(instrument).lower() == 'nircam':
+        apt_rows.append(
+            ('SW Channel Mode', _nircam_channel_mode(mode, aperture, paired_filter))
+        )
+    apt_rows.append(('Subarray', _display_subarray(detector_config.get('subarray'))))
+    if str(instrument).lower() == 'nircam':
+        apt_rows.append(
+            ('No. of Output Channels', _nircam_output_channels(detector_config.get('subarray')))
+        )
+    apt_rows.append(('Exposures/Dith', 1))
+    if str(instrument).lower() == 'nircam':
+        apt_rows.extend(_nircam_pupil_rows(filter_name, paired_filter))
+    else:
+        apt_rows.append(('Filter', filter_name))
+    apt_rows.extend([
+        ('Readout Pattern', readout_pattern),
+        (
+            'Groups per Integration',
+            timing['APT: Num Groups per Integration']
+        ),
+        (
+            'Integrations per Occultation',
+            timing['APT: Num Integrations per Occultation']
+        ),
+    ])
+
+    calculation_rows = [
+        ('Transit Duration (hr)', timing['Transit Duration']),
+        ('Number of Transits', timing['Number of Transits']),
+        (
+            'Transit + Baseline, No Overhead (hr)',
+            timing['Transit+Baseline, no overhead (hrs)']
+        ),
+        ('Observing Efficiency (%)', timing['Observing Efficiency (%)']),
+        ('Frame Time (sec)', timing['Seconds per Frame']),
+        ('Integrations In Transit', timing['Num Integrations In Transit']),
+        ('Integrations Out of Transit', timing['Num Integrations Out of Transit']),
+    ]
+
+    if nstripes > 1:
+        calculation_rows.extend([
+            ('Number of Stripes', nstripes),
+            (
+                'Elapsed Time per APT Integration incl. Reset (sec)',
+                timing['Time/Integration incl reset (sec)']
+            ),
+            (
+                'Science Time per Full Multistripe Cycle excl. Reset (sec)',
+                timing['Measurement Time per Integration (sec)']
+            ),
+            (
+                'Science Time per Stripe excl. Reset (sec)',
+                timing['Measurement Time per Integration (sec)'] / float(nstripes)
+            ),
+        ])
+    else:
+        calculation_rows.extend([
+            (
+                'Elapsed Time per Integration incl. Reset (sec)',
+                timing['Time/Integration incl reset (sec)']
+            ),
+            (
+                'Science Time per Integration excl. Reset (sec)',
+                timing['Measurement Time per Integration (sec)']
+            ),
+        ])
+
+    timing_div = (
+        '<h3>APT Inputs</h3>\n'
+        + _table_html(apt_rows)
+        + '\n<h3>Calculation Details</h3>\n'
+        + _table_html(calculation_rows)
+    )
+    return timing_div.encode()
+
+
 def as_dict(out, both_spec ,binned, timing, mag, sat_level, warnings, punit, unbinned,calculation): 
     """Format dictionary for output data 
     
@@ -1346,15 +1671,7 @@ def as_dict(out, both_spec ,binned, timing, mag, sat_level, warnings, punit, unb
 
     p=1.0
     if punit == 'fp/f*': p = -1.0
-    frame_loss = timing['Zero Frame Efficiency Loss']
-    timing.pop("Zero Frame Efficiency Loss")
-    timing_div = pd.DataFrame.from_dict(timing, orient='index')
-    #add back in so its not in html, but in timing dict 
-    timing["Zero Frame Efficiency Loss"]=frame_loss
-    timing_div.columns = ['Value']
-    timing_div = timing_div.to_html()
-    timing_div = '<table class="table table-striped"> \n' + timing_div[36:len(timing_div)] 
-    timing_div = timing_div.encode()
+    timing_div = build_timing_display_div(out, timing)
 
     warnings_div = pd.DataFrame.from_dict(warnings, orient='index')
     warnings_div.columns = ['Value']

@@ -562,6 +562,13 @@
             minimumResultsForSearch: 7
         });
 
+        $("#instrument-mode-section").on("select2:select", "select", function () {
+            var select = $(this);
+            window.setTimeout(function () {
+                select.select2("close");
+            }, 0);
+        });
+
         /* Nice block level radio selection */
         $(".radio-chooser-content").click(function () {
             $(".radio-chooser-item").removeClass("radio-chooser-selected");
@@ -622,8 +629,7 @@
 	      $("#ptempc").attr("required", false);
       });
 
-        /* Instrument Selection */
-        $("#instrument").change(function () {
+        function showSelectedInstrumentMode() {
             $("#instrument-mode-section").removeClass("hidden");
             $("#MIRI, #NIRSpec, #NIRISS, #NIRCam, #NIRCamDHS").addClass("hidden");
             var selopt = $("#instrument").val();
@@ -644,7 +650,10 @@
                     $("#NIRCamDHS").removeClass("hidden");
                     break;
             }
-        });
+        }
+
+        /* Instrument Selection */
+        $("#instrument").change(showSelectedInstrumentMode);
 
       //if we're editing, set the form values to what it was before
       var obj = JSON.parse($("#formDataJson").val());
@@ -655,13 +664,23 @@
 	      if (radioNames.includes(name)) {
 		  $(`input[name='${name}'][value='${value}']`).trigger("click");
 	      }
-	      else if (dropdownNames.includes(name)) {
-		  $(`select[name='${name}']`).val(value).trigger("change");
-	      }
 	      else {
 		  $("#" + name).val(value);
 	      }
 	  });
+
+          if (obj.instrument) {
+              $("#instrument").val(obj.instrument).trigger("change.select2");
+              showSelectedInstrumentMode();
+          }
+
+	  $.each(obj, function(name, value) {
+	      if (dropdownNames.includes(name) && name != "instrument") {
+		  $(`select[name='${name}']`).val(value).trigger("change.select2");
+	      }
+	  });
+
+          show_dropdown();
       }
       else {
 	  //default radio options
@@ -682,6 +701,9 @@
                 $("#phoenix").removeClass("hidden");
                 break;
         }
+    }
+
+    function showForm() {
     }
 
 
