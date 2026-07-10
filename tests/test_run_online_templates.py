@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pytest
 import tornado.web
 
@@ -50,3 +52,34 @@ def test_base_handler_render_preserves_explicit_bokeh_resources(monkeypatch):
 
     assert captured["kwargs"]["bokeh_css"] == "custom-css"
     assert captured["kwargs"]["bokeh_js"] == "custom-js"
+
+
+def test_new_calculation_template_lists_new_miri_lrs_subarrays():
+    template = Path("pandexo/engine/templates/new.html").read_text()
+
+    assert 'value="slitlessprism_ip"' in template
+    assert 'value="slitlessprism_ips"' in template
+    assert 'SLITLESSPRISM (Not Recommended' in template
+    assert 'value="full"' in template
+    assert "FULL (tframe=2.775)" in template
+    assert 'value="subslit"' in template
+    assert "miriSubarraysByMode" in template
+    assert 'lrsslit: ["full", "subslit"]' in template
+
+
+def test_new_calculation_template_lists_nirspec_prism_multistripe_subarrays():
+    template = Path("pandexo/engine/templates/new.html").read_text()
+
+    assert 'value="s256m2_prm"' in template
+    assert 'value="s128m4_prm"' in template
+    assert 'value="s64m8_prm"' in template
+    assert 'value="s32m16_prm"' in template
+
+
+def test_miri_reference_uses_supported_fastr1_readout():
+    reference = Path("pandexo/engine/reference/miri_input.json").read_text()
+
+    assert '"readout_pattern":"fastr1"' in reference
+    assert '"readmode": "fastr1"' in reference
+    assert '"readout_pattern":"fast"' not in reference
+    assert '"readmode": "fast"' not in reference

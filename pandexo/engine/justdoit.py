@@ -219,6 +219,8 @@ def load_mode_dict(inst):
     -------
     >>> inst_dict = load_mode_dict('MIRI LRS')
     >>> inst_dict['configuration']['instrument']['aperture'] = 'lrsslit'
+    >>> inst_dict['configuration']['instrument']['mode'] = 'lrsslit'
+    >>> inst_dict['configuration']['detector']['subarray'] = 'subslit'
     """
     return SetDefaultModes(inst).pick()
 
@@ -510,9 +512,11 @@ def subarrays(inst):
             "sub680stripe_soss": 1.83848
             }
   elif inst.lower() == 'nirspec':
-    return {'sub1024a':0.451,'sub1024b':0.451,'sub2048':0.90156,'sub512':0.22572,'sub512s':0.14392}
+    return {'sub1024a':0.451,'sub1024b':0.451,'sub2048':0.90156,'sub512':0.22572,'sub512s':0.14392,
+            's256m2_prm':0.11352,'s128m4_prm':0.0572,'s64m8_prm':0.02904,'s32m16_prm':0.01496}
   elif inst.lower() == 'miri':
-    return {'slitlessprism':0.159}
+    return {'slitlessprism_ip':0.15616,'slitlessprism_ips':0.11776,
+            'slitlessprism':0.15904,'full':2.77504,'subslit':0.27904}
   elif inst.lower()  == 'nircam':
     return {"subgrism64":0.34, "subgrism128":0.67, "subgrism256":1.34,
       "subgrism64 (noutputs=1)":1.3, "subgrism128 (noutputs=1)":2.6, "subgrism256 (noutputs=1)":5.2}

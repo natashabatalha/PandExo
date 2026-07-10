@@ -15,6 +15,7 @@ from pandexo.engine.jwst import (
     compute_timing,
     select_calculation,
     update_timing_measurement_time,
+    validate_miri_lrs_subarray,
 )
 
 
@@ -561,6 +562,69 @@ def _niriss_config(subarray):
     return conf
 
 
+def _nirspec_prism_config(subarray):
+    with open("pandexo/engine/reference/nirspec_input.json") as handle:
+        conf = json.load(handle)["configuration"]
+    conf = deepcopy(conf)
+    conf["instrument"]["disperser"] = "prism"
+    conf["instrument"]["filter"] = "clear"
+    conf["detector"]["subarray"] = subarray
+    conf["detector"]["ngroup"] = 2
+    return conf
+
+
+def _miri_lrs_slit_config(subarray):
+    with open("pandexo/engine/reference/miri_input.json") as handle:
+        conf = json.load(handle)["configuration"]
+    conf = deepcopy(conf)
+    conf["instrument"]["mode"] = "lrsslit"
+    conf["instrument"]["aperture"] = "lrsslit"
+    conf["detector"]["subarray"] = subarray
+    conf["detector"]["ngroup"] = 2
+    return conf
+
+
+@pytest.mark.parametrize(
+    ("mode", "subarray"),
+    [
+        ("lrsslitless", "slitlessprism"),
+        ("lrsslitless", "slitlessprism_ip"),
+        ("lrsslitless", "slitlessprism_ips"),
+        ("lrsslit", "full"),
+        ("lrsslit", "subslit"),
+    ],
+)
+def test_validate_miri_lrs_subarray_accepts_supported_pairs(mode, subarray):
+    with open("pandexo/engine/reference/miri_input.json") as handle:
+        conf = json.load(handle)["configuration"]
+    conf = deepcopy(conf)
+    conf["instrument"]["mode"] = mode
+    conf["detector"]["subarray"] = subarray
+
+    validate_miri_lrs_subarray(conf)
+
+
+@pytest.mark.parametrize(
+    ("mode", "subarray"),
+    [
+        ("lrsslitless", "full"),
+        ("lrsslitless", "subslit"),
+        ("lrsslit", "slitlessprism"),
+        ("lrsslit", "slitlessprism_ip"),
+        ("lrsslit", "slitlessprism_ips"),
+    ],
+)
+def test_validate_miri_lrs_subarray_rejects_unsupported_pairs(mode, subarray):
+    with open("pandexo/engine/reference/miri_input.json") as handle:
+        conf = json.load(handle)["configuration"]
+    conf = deepcopy(conf)
+    conf["instrument"]["mode"] = mode
+    conf["detector"]["subarray"] = subarray
+
+    with pytest.raises(ValueError, match="MIRI LRS"):
+        validate_miri_lrs_subarray(conf)
+
+
 @pytest.mark.parametrize(
     ("subarray", "expected_nsuperstripe"),
     [
@@ -584,6 +648,51 @@ def test_pandeia_soss_multistripe_exposes_superstripes(subarray, expected_nsuper
     assert "Effective Integrations In Transit" in timing
     assert "On Source Time In Transit" in timing
     assert "Effective On Source Time In Transit" in timing
+
+
+@pytest.mark.parametrize(
+    ("subarray", "expected_nsuperstripe"),
+    [
+        ("s256m2_prm", 2),
+        ("s128m4_prm", 4),
+        ("s64m8_prm", 8),
+        ("s32m16_prm", 16),
+    ],
+)
+def test_pandeia_nirspec_prism_multistripe_exposes_superstripes(
+    subarray, expected_nsuperstripe
+):
+    _skip_if_pandeia_refdata_invalid()
+    from pandeia.engine.instrument_factory import InstrumentFactory
+
+    try:
+        exp_pars = InstrumentFactory(
+            config=_nirspec_prism_config(subarray)
+        ).the_detector.exposure_spec
+    except Exception as exc:
+        pytest.skip(f"NIRSpec PRISM multistripe subarray is unavailable: {exc}")
+
+    timing = _timing(nsuperstripe=int(getattr(exp_pars, "nsuperstripe", 1) or 1))
+
+    assert exp_pars.nsuperstripe == expected_nsuperstripe
+    assert select_calculation("um", exp_pars.nsuperstripe) == "slope method"
+    assert timing["Num Superstripes"] == expected_nsuperstripe
+    assert timing["Observing Efficiency (%)"] < 100.0
+
+
+def test_pandeia_miri_lrs_slit_supports_subslit():
+    _skip_if_pandeia_refdata_invalid()
+    from pandeia.engine.instrument_factory import InstrumentFactory
+
+    try:
+        exp_pars = InstrumentFactory(
+            config=_miri_lrs_slit_config("subslit")
+        ).the_detector.exposure_spec
+    except Exception as exc:
+        pytest.skip(f"MIRI LRS SUBSLIT subarray is unavailable: {exc}")
+
+    assert exp_pars.tframe == pytest.approx(0.27904)
+    assert exp_pars.nsuperstripe == 1
 
 
 @pytest.mark.parametrize("subarray", ["substrip96", "substrip256"])

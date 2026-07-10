@@ -40,6 +40,10 @@ PLANET_LIST_CACHE = os.environ.get(
     "PANDEXO_PLANET_LIST_CACHE",
     os.path.join(__TEMP__, "planets.csv"),
 )
+MIRI_LRS_ALLOWED_SUBARRAYS = {
+    "lrsslitless": ("slitlessprism", "slitlessprism_ip", "slitlessprism_ips"),
+    "lrsslit": ("full", "subslit"),
+}
 
 #define location of fort grids
 try:
@@ -541,10 +545,22 @@ class CalculationNewHandler(BaseHandler):
             with open(os.path.join(os.path.dirname(__file__), "reference", "miri_input.json")) as data_file:
                 pandata = json.load(data_file)
                 mirimode = self.get_argument("mirimode")
+                mirisubarray = self.get_argument("mirisubarray", "slitlessprism_ip")
+                if mirisubarray not in MIRI_LRS_ALLOWED_SUBARRAYS[mirimode]:
+                    allowed = ", ".join(
+                        item.upper() for item in MIRI_LRS_ALLOWED_SUBARRAYS[mirimode]
+                    )
+                    raise tornado.web.HTTPError(
+                        400,
+                        reason=(
+                            f"MIRI LRS {mirimode.upper()} supports only these "
+                            f"subarrays: {allowed}."
+                        ),
+                    )
                 if (mirimode == "lrsslit"):
                     pandata["configuration"]["instrument"]["mode"] = mirimode
                     pandata["configuration"]["instrument"]["aperture"] = "lrsslit"
-                    pandata["configuration"]["detector"]["subarray"] = "full"
+                pandata["configuration"]["detector"]["subarray"] = mirisubarray
 
         if instrument == "nirspec":
             with open(os.path.join(os.path.dirname(__file__), "reference", "nirspec_input.json")) as data_file:

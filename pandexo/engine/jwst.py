@@ -20,6 +20,10 @@ max_ngroup = {'nirspec':65535,
 #minimum number of integrations
 min_nint_trans = 3
 DHS_F150W_MIN_WAVELENGTH = 0.96
+MIRI_LRS_ALLOWED_SUBARRAYS = {
+    "lrsslitless": ("slitlessprism", "slitlessprism_ip", "slitlessprism_ips"),
+    "lrsslit": ("full", "subslit"),
+}
 
 #refdata directory
 default_refdata_directory = os.environ.get("pandeia_refdata")
@@ -60,6 +64,27 @@ def select_calculation(planet_wave_unit, nsuperstripe, is_dhs=False):
     if use_slope:
         return 'slope method'
     return 'fml'
+
+
+def validate_miri_lrs_subarray(conf):
+    """Validate MIRI LRS mode/subarray combinations supported by Pandeia."""
+    instrument = conf.get("instrument", {})
+    detector = conf.get("detector", {})
+    if str(instrument.get("instrument", "")).lower() != "miri":
+        return
+
+    mode = str(instrument.get("mode", "")).lower()
+    if mode not in MIRI_LRS_ALLOWED_SUBARRAYS:
+        return
+
+    subarray = str(detector.get("subarray", "")).lower()
+    allowed = MIRI_LRS_ALLOWED_SUBARRAYS[mode]
+    if subarray not in allowed:
+        allowed_display = ", ".join(item.upper() for item in allowed)
+        raise ValueError(
+            f"MIRI LRS {mode.upper()} supports only these subarrays: "
+            f"{allowed_display}. Got {subarray.upper()}."
+        )
 
 
 def _pandeia_1d_values_at_wave(pand_dict, key, wave):
@@ -320,6 +345,7 @@ def compute_full_sim(dictinput,verbose=False):
     #which instrument 
     instrument = pandeia_input['configuration']['instrument']['instrument']
     conf = pandeia_input['configuration']
+    validate_miri_lrs_subarray(conf)
 
     #now fix DHS #of spectra depending on the subarray
     is_dhs = 'dhs' in conf['instrument']['aperture']
@@ -349,8 +375,17 @@ def compute_full_sim(dictinput,verbose=False):
     
     #detector parameters
     det_pars = i.read_detector_pars()
-    fullwell = det_pars['fullwell']
-    rn = det_pars['rn']
+    fullwell = det_pars.get('fullwell', det_pars.get('saturation_fullwell'))
+    if fullwell is None:
+        raise KeyError(
+            "Detector parameters do not include 'fullwell' or "
+            "'saturation_fullwell'."
+        )
+    rn = det_pars.get('rn', det_pars.get('readnoise'))
+    if rn is None:
+        raise KeyError(
+            "Detector parameters do not include 'rn' or 'readnoise'."
+        )
     mingroups = det_pars['mingroups']
         
     #exposure parameters 
