@@ -4,17 +4,20 @@ import contextlib
 import io
 import json
 from copy import deepcopy
+from pathlib import Path
 
 import numpy as np
 import pytest
 
 from pandexo.engine.compute_noise import ExtractSpec
 from pandexo.engine.jwst import (
+    _table_html,
     add_warnings,
     build_timing_display_div,
     compute_timing,
     select_calculation,
     update_timing_measurement_time,
+    validate_miri_lrs_subarray,
 )
 
 
@@ -414,10 +417,12 @@ def test_multistripe_timing_display_uses_apt_and_calculation_tables():
         exposure_time_per_int=40.0,
         ngroup=3,
     )
-    html = build_timing_display_div(_pandeia_out(), timing).decode()
+    apt_div, calculation_div = build_timing_display_div(_pandeia_out(), timing)
+    html = (apt_div + calculation_div).decode()
 
-    assert "APT Inputs" in html
-    assert "Calculation Details" in html
+    assert "APT Inputs" not in html
+    assert "Calculation Details" not in html
+    assert html.count("<table") == 2
     assert "Groups per Integration" in html
     assert "Integrations per Occultation" in html
     assert "Number of Stripes" in html
@@ -429,9 +434,30 @@ def test_multistripe_timing_display_uses_apt_and_calculation_tables():
     assert "Measurement Time per Integration" not in html
 
 
+def test_view_template_owns_timing_table_headings():
+    template = Path("pandexo/engine/templates/view.html").read_text()
+
+    assert "<h3>APT Inputs</h3>" in template
+    assert "<h3>Calculation Details</h3>" in template
+    assert "{% raw div['apt_div']  %}" in template
+    assert "{% raw div['calculation_div']  %}" in template
+    assert "{% raw div['timing_div']  %}" in template
+
+
+def test_summary_tables_use_shared_fixed_column_layout():
+    template = Path("pandexo/engine/templates/view.html").read_text()
+    html = _table_html([('Parameter', 'Value')])
+
+    assert 'pandexo-summary-table' in html
+    assert '.pandexo-summary-table {' in template
+    assert 'table-layout: fixed;' in template
+    assert 'width: 50%;' in template
+
+
 def test_non_multistripe_timing_display_omits_stripe_rows():
     timing = _timing(nsuperstripe=1)
-    html = build_timing_display_div(_pandeia_out(), timing).decode()
+    apt_div, calculation_div = build_timing_display_div(_pandeia_out(), timing)
+    html = (apt_div + calculation_div).decode()
 
     assert "Elapsed Time per Integration incl. Reset (sec)" in html
     assert "Science Time per Integration excl. Reset (sec)" in html
@@ -440,9 +466,26 @@ def test_non_multistripe_timing_display_omits_stripe_rows():
     assert "Science Time per Stripe" not in html
 
 
+def test_timing_display_formats_transit_and_integration_counts_as_integers():
+    timing = _timing(nsuperstripe=1)
+    timing['Number of Transits'] = 1.0
+    timing['Num Integrations In Transit'] = 12.0
+    timing['Num Integrations Out of Transit'] = 15.0
+
+    apt_div, calculation_div = build_timing_display_div(_pandeia_out(), timing)
+    html = (apt_div + calculation_div).decode()
+
+    assert "<td>1</td>" in html
+    assert "<td>12</td>" in html
+    assert "<td>15</td>" in html
+    assert "<td>1.0</td>" not in html
+    assert "<td>12.0</td>" not in html
+    assert "<td>15.0</td>" not in html
+
+
 def test_nircam_timing_display_shows_channel_and_pupil_rows():
     timing = _timing(nsuperstripe=1)
-    html = build_timing_display_div(
+    apt_div, calculation_div = build_timing_display_div(
         _pandeia_out(
             instrument={
                 "instrument": "nircam",
@@ -458,7 +501,8 @@ def test_nircam_timing_display_shows_channel_and_pupil_rows():
             },
         ),
         timing,
-    ).decode()
+    )
+    html = (apt_div + calculation_div).decode()
 
     assert "SW Channel Mode" in html
     assert "GRISM" in html
@@ -473,7 +517,7 @@ def test_nircam_timing_display_shows_channel_and_pupil_rows():
 
 def test_nircam_lw_only_timing_display_shows_imaging_sw_channel():
     timing = _timing(nsuperstripe=1)
-    html = build_timing_display_div(
+    apt_div, calculation_div = build_timing_display_div(
         _pandeia_out(
             instrument={
                 "instrument": "nircam",
@@ -488,7 +532,8 @@ def test_nircam_lw_only_timing_display_shows_imaging_sw_channel():
             },
         ),
         timing,
-    ).decode()
+    )
+    html = (apt_div + calculation_div).decode()
 
     assert "SW Channel Mode" in html
     assert "IMAGING" in html
@@ -499,6 +544,98 @@ def test_nircam_lw_only_timing_display_shows_imaging_sw_channel():
     assert "CHOOSE THIS USING ETC" in html
     assert "Long Pupil+Filter" in html
     assert "GRISMR+F322W2" in html
+
+
+@pytest.mark.parametrize(
+    ('disperser', 'filter_name', 'expected'),
+    [
+        ('prism', 'clear', 'PRISM/CLEAR'),
+        ('g140h', 'f070lp', 'G140H/F070LP'),
+    ],
+)
+def test_nirspec_timing_display_combines_grating_and_filter(
+    disperser, filter_name, expected
+):
+    timing = _timing(nsuperstripe=1)
+    apt_div, calculation_div = build_timing_display_div(
+        _pandeia_out(
+            instrument={
+                'instrument': 'nirspec',
+                'mode': 'bots',
+                'filter': filter_name,
+                'aperture': 's1600a1',
+                'disperser': disperser,
+            }
+        ),
+        timing,
+    )
+    html = (apt_div + calculation_div).decode()
+
+    assert '<th>Grating/Filter</th>' in html
+    assert expected in html
+    assert '<th>Filter</th>' not in html
+
+
+@pytest.mark.parametrize(
+    ('subarray', 'expected'),
+    [
+        ('s256m2_prm', 'S256M2_PRISM'),
+        ('s128m4_prm', 'S128M4_PRISM'),
+        ('s64m8_prm', 'S64M8_PRISM'),
+        ('s32m16_prm', 'S32M16_PRISM'),
+    ],
+)
+def test_nirspec_multistripe_subarray_display_uses_prism_suffix(
+    subarray, expected
+):
+    timing = _timing(nsuperstripe=1)
+    apt_div, _ = build_timing_display_div(
+        _pandeia_out(
+            instrument={
+                'instrument': 'nirspec',
+                'mode': 'bots',
+                'filter': 'clear',
+                'aperture': 's1600a1',
+                'disperser': 'prism',
+            },
+            detector={
+                'subarray': subarray,
+                'readout_pattern': 'nrsrapid',
+            },
+        ),
+        timing,
+    )
+    html = apt_div.decode()
+
+    assert expected in html
+    assert '_PRM' not in html
+
+
+def test_miri_lrs_timing_display_uses_dither_not_filter_and_uppercase_readout():
+    timing = _timing(nsuperstripe=1)
+    apt_div, calculation_div = build_timing_display_div(
+        _pandeia_out(
+            instrument={
+                "instrument": "miri",
+                "mode": "lrsslitless",
+                "filter": None,
+                "aperture": "imager",
+                "disperser": "p750l",
+            },
+            detector={
+                "subarray": "slitlessprism_ip",
+                "readout_pattern": "fastr1",
+            },
+        ),
+        timing,
+    )
+    html = (apt_div + calculation_div).decode()
+
+    assert "<th>Filter</th>" not in html
+    assert "<th>Dither</th>" in html
+    assert "<td>None</td>" in html
+    assert "<td>FASTR1</td>" in html
+    assert "<td>fastr1</td>" not in html
 
 
 def test_slope_uncertainty_increases_by_sqrt_nsuperstripe():
@@ -561,6 +698,69 @@ def _niriss_config(subarray):
     return conf
 
 
+def _nirspec_prism_config(subarray):
+    with open("pandexo/engine/reference/nirspec_input.json") as handle:
+        conf = json.load(handle)["configuration"]
+    conf = deepcopy(conf)
+    conf["instrument"]["disperser"] = "prism"
+    conf["instrument"]["filter"] = "clear"
+    conf["detector"]["subarray"] = subarray
+    conf["detector"]["ngroup"] = 2
+    return conf
+
+
+def _miri_lrs_slit_config(subarray):
+    with open("pandexo/engine/reference/miri_input.json") as handle:
+        conf = json.load(handle)["configuration"]
+    conf = deepcopy(conf)
+    conf["instrument"]["mode"] = "lrsslit"
+    conf["instrument"]["aperture"] = "lrsslit"
+    conf["detector"]["subarray"] = subarray
+    conf["detector"]["ngroup"] = 2
+    return conf
+
+
+@pytest.mark.parametrize(
+    ("mode", "subarray"),
+    [
+        ("lrsslitless", "slitlessprism"),
+        ("lrsslitless", "slitlessprism_ip"),
+        ("lrsslitless", "slitlessprism_ips"),
+        ("lrsslit", "full"),
+        ("lrsslit", "subslit"),
+    ],
+)
+def test_validate_miri_lrs_subarray_accepts_supported_pairs(mode, subarray):
+    with open("pandexo/engine/reference/miri_input.json") as handle:
+        conf = json.load(handle)["configuration"]
+    conf = deepcopy(conf)
+    conf["instrument"]["mode"] = mode
+    conf["detector"]["subarray"] = subarray
+
+    validate_miri_lrs_subarray(conf)
+
+
+@pytest.mark.parametrize(
+    ("mode", "subarray"),
+    [
+        ("lrsslitless", "full"),
+        ("lrsslitless", "subslit"),
+        ("lrsslit", "slitlessprism"),
+        ("lrsslit", "slitlessprism_ip"),
+        ("lrsslit", "slitlessprism_ips"),
+    ],
+)
+def test_validate_miri_lrs_subarray_rejects_unsupported_pairs(mode, subarray):
+    with open("pandexo/engine/reference/miri_input.json") as handle:
+        conf = json.load(handle)["configuration"]
+    conf = deepcopy(conf)
+    conf["instrument"]["mode"] = mode
+    conf["detector"]["subarray"] = subarray
+
+    with pytest.raises(ValueError, match="MIRI LRS"):
+        validate_miri_lrs_subarray(conf)
+
+
 @pytest.mark.parametrize(
     ("subarray", "expected_nsuperstripe"),
     [
@@ -584,6 +784,51 @@ def test_pandeia_soss_multistripe_exposes_superstripes(subarray, expected_nsuper
     assert "Effective Integrations In Transit" in timing
     assert "On Source Time In Transit" in timing
     assert "Effective On Source Time In Transit" in timing
+
+
+@pytest.mark.parametrize(
+    ("subarray", "expected_nsuperstripe"),
+    [
+        ("s256m2_prm", 2),
+        ("s128m4_prm", 4),
+        ("s64m8_prm", 8),
+        ("s32m16_prm", 16),
+    ],
+)
+def test_pandeia_nirspec_prism_multistripe_exposes_superstripes(
+    subarray, expected_nsuperstripe
+):
+    _skip_if_pandeia_refdata_invalid()
+    from pandeia.engine.instrument_factory import InstrumentFactory
+
+    try:
+        exp_pars = InstrumentFactory(
+            config=_nirspec_prism_config(subarray)
+        ).the_detector.exposure_spec
+    except Exception as exc:
+        pytest.skip(f"NIRSpec PRISM multistripe subarray is unavailable: {exc}")
+
+    timing = _timing(nsuperstripe=int(getattr(exp_pars, "nsuperstripe", 1) or 1))
+
+    assert exp_pars.nsuperstripe == expected_nsuperstripe
+    assert select_calculation("um", exp_pars.nsuperstripe) == "slope method"
+    assert timing["Num Superstripes"] == expected_nsuperstripe
+    assert timing["Observing Efficiency (%)"] < 100.0
+
+
+def test_pandeia_miri_lrs_slit_supports_subslit():
+    _skip_if_pandeia_refdata_invalid()
+    from pandeia.engine.instrument_factory import InstrumentFactory
+
+    try:
+        exp_pars = InstrumentFactory(
+            config=_miri_lrs_slit_config("subslit")
+        ).the_detector.exposure_spec
+    except Exception as exc:
+        pytest.skip(f"MIRI LRS SUBSLIT subarray is unavailable: {exc}")
+
+    assert exp_pars.tframe == pytest.approx(0.27904)
+    assert exp_pars.nsuperstripe == 1
 
 
 @pytest.mark.parametrize("subarray", ["substrip96", "substrip256"])

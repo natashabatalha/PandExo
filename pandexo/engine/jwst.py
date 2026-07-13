@@ -20,6 +20,10 @@ max_ngroup = {'nirspec':65535,
 #minimum number of integrations
 min_nint_trans = 3
 DHS_F150W_MIN_WAVELENGTH = 0.96
+MIRI_LRS_ALLOWED_SUBARRAYS = {
+    "lrsslitless": ("slitlessprism", "slitlessprism_ip", "slitlessprism_ips"),
+    "lrsslit": ("subslit", "full"),
+}
 
 #refdata directory
 default_refdata_directory = os.environ.get("pandeia_refdata")
@@ -60,6 +64,27 @@ def select_calculation(planet_wave_unit, nsuperstripe, is_dhs=False):
     if use_slope:
         return 'slope method'
     return 'fml'
+
+
+def validate_miri_lrs_subarray(conf):
+    """Validate MIRI LRS mode/subarray combinations supported by Pandeia."""
+    instrument = conf.get("instrument", {})
+    detector = conf.get("detector", {})
+    if str(instrument.get("instrument", "")).lower() != "miri":
+        return
+
+    mode = str(instrument.get("mode", "")).lower()
+    if mode not in MIRI_LRS_ALLOWED_SUBARRAYS:
+        return
+
+    subarray = str(detector.get("subarray", "")).lower()
+    allowed = MIRI_LRS_ALLOWED_SUBARRAYS[mode]
+    if subarray not in allowed:
+        allowed_display = ", ".join(item.upper() for item in allowed)
+        raise ValueError(
+            f"MIRI LRS {mode.upper()} supports only these subarrays: "
+            f"{allowed_display}. Got {subarray.upper()}."
+        )
 
 
 def _pandeia_1d_values_at_wave(pand_dict, key, wave):
@@ -320,6 +345,7 @@ def compute_full_sim(dictinput,verbose=False):
     #which instrument 
     instrument = pandeia_input['configuration']['instrument']['instrument']
     conf = pandeia_input['configuration']
+    validate_miri_lrs_subarray(conf)
 
     #now fix DHS #of spectra depending on the subarray
     is_dhs = 'dhs' in conf['instrument']['aperture']
@@ -349,8 +375,17 @@ def compute_full_sim(dictinput,verbose=False):
     
     #detector parameters
     det_pars = i.read_detector_pars()
-    fullwell = det_pars['fullwell']
-    rn = det_pars['rn']
+    fullwell = det_pars.get('fullwell', det_pars.get('saturation_fullwell'))
+    if fullwell is None:
+        raise KeyError(
+            "Detector parameters do not include 'fullwell' or "
+            "'saturation_fullwell'."
+        )
+    rn = det_pars.get('rn', det_pars.get('readnoise'))
+    if rn is None:
+        raise KeyError(
+            "Detector parameters do not include 'rn' or 'readnoise'."
+        )
     mingroups = det_pars['mingroups']
         
     #exposure parameters 
@@ -1429,11 +1464,18 @@ def target_acq(instrument, both_spec, warning):
 
 
 def _table_html(rows):
+    def format_value(value):
+        if isinstance(value, (float, np.floating)):
+            if np.isfinite(value) and float(value).is_integer():
+                return str(int(value))
+            return f'{value:.6f}'
+        return str(value)
+
     table = pd.DataFrame(rows, columns=['Parameter', 'Value'])
     table = table.set_index('Parameter')
     table.index.name = None
-    table = table.to_html()
-    return '<table class="table table-striped"> \n' + table[36:len(table)]
+    table = table.to_html(formatters={'Value': format_value})
+    return '<table class="table table-striped pandexo-summary-table"> \n' + table[36:len(table)]
 
 
 def _jwst_instrument_name(instrument):
@@ -1480,7 +1522,10 @@ def _nircam_channel_mode(mode, aperture, paired_filter):
 def _display_subarray(subarray):
     if subarray is None:
         return None
-    return str(subarray).split(' (')[0].upper()
+    display_subarray = str(subarray).split(' (')[0].upper()
+    if display_subarray.endswith('_PRM'):
+        return f'{display_subarray[:-4]}_PRISM'
+    return display_subarray
 
 
 def _nircam_output_channels(subarray):
@@ -1503,6 +1548,15 @@ def _upper_or_none(value):
     if value is None:
         return 'None'
     return str(value).upper()
+
+
+def _integer_display(value):
+    """Return whole-number values as integers for display."""
+    try:
+        integer_value = int(value)
+    except (TypeError, ValueError):
+        return value
+    return integer_value if integer_value == value else value
 
 
 def _nircam_pupil_rows(filter_name, paired_filter):
@@ -1533,7 +1587,14 @@ def _nircam_pupil_rows(filter_name, paired_filter):
 
 
 def build_timing_display_div(out, timing):
-    """Build the browser-facing JWST timing tables."""
+    """Build browser-facing JWST APT-input and calculation-detail tables.
+
+    Returns
+    -------
+    tuple of bytes
+        HTML for the APT-input table followed by HTML for the calculation-detail
+        table. The surrounding section headings are owned by ``view.html``.
+    """
     configuration = out['input']['configuration']
     instrument_config = configuration['instrument']
     detector_config = configuration['detector']
@@ -1541,6 +1602,7 @@ def build_timing_display_div(out, timing):
     instrument = instrument_config.get('instrument')
     mode = instrument_config.get('mode')
     aperture = instrument_config.get('aperture')
+    disperser = instrument_config.get('disperser')
     filter_name = instrument_config.get('filter')
     paired_filter = instrument_config.get('pandexofilterpair')
     readout_pattern = detector_config.get(
@@ -1567,13 +1629,27 @@ def build_timing_display_div(out, timing):
         apt_rows.append(
             ('No. of Output Channels', _nircam_output_channels(detector_config.get('subarray')))
         )
-    apt_rows.append(('Exposures/Dith', 1))
     if str(instrument).lower() == 'nircam':
         apt_rows.extend(_nircam_pupil_rows(filter_name, paired_filter))
-    else:
+    elif str(instrument).lower() == 'nirspec':
+        apt_rows.append(
+            (
+                'Grating/Filter',
+                f'{_upper_or_none(disperser)}/{_upper_or_none(filter_name)}'
+            )
+        )
+    elif not (
+        str(instrument).lower() == 'miri'
+        and str(mode).lower() in ('lrsslitless', 'lrsslit')
+    ):
         apt_rows.append(('Filter', filter_name))
+    if (
+        str(instrument).lower() == 'miri'
+        and str(mode).lower() in ('lrsslitless', 'lrsslit')
+    ):
+        apt_rows.append(('Dither', 'None'))
     apt_rows.extend([
-        ('Readout Pattern', readout_pattern),
+        ('Readout Pattern', _upper_or_none(readout_pattern)),
         (
             'Groups per Integration',
             timing['APT: Num Groups per Integration']
@@ -1586,15 +1662,21 @@ def build_timing_display_div(out, timing):
 
     calculation_rows = [
         ('Transit Duration (hr)', timing['Transit Duration']),
-        ('Number of Transits', timing['Number of Transits']),
+        ('Number of Transits', _integer_display(timing['Number of Transits'])),
         (
             'Transit + Baseline, No Overhead (hr)',
             timing['Transit+Baseline, no overhead (hrs)']
         ),
         ('Observing Efficiency (%)', timing['Observing Efficiency (%)']),
         ('Frame Time (sec)', timing['Seconds per Frame']),
-        ('Integrations In Transit', timing['Num Integrations In Transit']),
-        ('Integrations Out of Transit', timing['Num Integrations Out of Transit']),
+        (
+            'Integrations In Transit',
+            _integer_display(timing['Num Integrations In Transit'])
+        ),
+        (
+            'Integrations Out of Transit',
+            _integer_display(timing['Num Integrations Out of Transit'])
+        ),
     ]
 
     if nstripes > 1:
@@ -1625,13 +1707,7 @@ def build_timing_display_div(out, timing):
             ),
         ])
 
-    timing_div = (
-        '<h3>APT Inputs</h3>\n'
-        + _table_html(apt_rows)
-        + '\n<h3>Calculation Details</h3>\n'
-        + _table_html(calculation_rows)
-    )
-    return timing_div.encode()
+    return _table_html(apt_rows).encode(), _table_html(calculation_rows).encode()
 
 
 def as_dict(out, both_spec ,binned, timing, mag, sat_level, warnings, punit, unbinned,calculation): 
@@ -1671,12 +1747,15 @@ def as_dict(out, both_spec ,binned, timing, mag, sat_level, warnings, punit, unb
 
     p=1.0
     if punit == 'fp/f*': p = -1.0
-    timing_div = build_timing_display_div(out, timing)
+    apt_div, calculation_div = build_timing_display_div(out, timing)
 
     warnings_div = pd.DataFrame.from_dict(warnings, orient='index')
     warnings_div.columns = ['Value']
     warnings_div = warnings_div.to_html()
-    warnings_div = '<table class="table table-striped"> \n' + warnings_div[36:len(warnings_div)]
+    warnings_div = (
+        '<table class="table table-striped pandexo-summary-table"> \n'
+        + warnings_div[36:len(warnings_div)]
+    )
     warnings_div = warnings_div.encode()
     
     map_dhs_names = {'sub40stripe1_dhs':'SUB40S1_2-SPECTRA',
@@ -1705,7 +1784,10 @@ def as_dict(out, both_spec ,binned, timing, mag, sat_level, warnings, punit, unb
     input_div = pd.DataFrame.from_dict(input_dict, orient='index')
     input_div.columns = ['Value']
     input_div = input_div.to_html()
-    input_div = '<table class="table table-striped"> \n' + input_div[36:len(input_div)]
+    input_div = (
+        '<table class="table table-striped pandexo-summary-table"> \n'
+        + input_div[36:len(input_div)]
+    )
     input_div = input_div.encode()
     
     #add calc type to input dict (doing it here so it doesn't output on webpage
@@ -1727,7 +1809,9 @@ def as_dict(out, both_spec ,binned, timing, mag, sat_level, warnings, punit, unb
     'input':input_dict,
     
     #divs for html rendering    
-    'timing_div':timing_div, 
+    'timing_div': apt_div + b'\n' + calculation_div,
+    'apt_div': apt_div,
+    'calculation_div': calculation_div,
     'input_div':input_div,
     'warnings_div':warnings_div,
     }

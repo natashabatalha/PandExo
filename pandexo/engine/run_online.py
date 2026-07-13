@@ -40,6 +40,16 @@ PLANET_LIST_CACHE = os.environ.get(
     "PANDEXO_PLANET_LIST_CACHE",
     os.path.join(__TEMP__, "planets.csv"),
 )
+MIRI_LRS_ALLOWED_SUBARRAYS = {
+    "lrsslitless": ("slitlessprism", "slitlessprism_ip", "slitlessprism_ips"),
+    "lrsslit": ("subslit", "full"),
+}
+NIRSPEC_PRISM_MULTISTRIPE_SUBARRAYS = (
+    "s256m2_prm",
+    "s128m4_prm",
+    "s64m8_prm",
+    "s32m16_prm",
+)
 
 #define location of fort grids
 try:
@@ -541,18 +551,44 @@ class CalculationNewHandler(BaseHandler):
             with open(os.path.join(os.path.dirname(__file__), "reference", "miri_input.json")) as data_file:
                 pandata = json.load(data_file)
                 mirimode = self.get_argument("mirimode")
+                mirisubarray = self.get_argument(
+                    "mirisubarray", MIRI_LRS_ALLOWED_SUBARRAYS[mirimode][0]
+                )
+                if mirisubarray not in MIRI_LRS_ALLOWED_SUBARRAYS[mirimode]:
+                    allowed = ", ".join(
+                        item.upper() for item in MIRI_LRS_ALLOWED_SUBARRAYS[mirimode]
+                    )
+                    raise tornado.web.HTTPError(
+                        400,
+                        reason=(
+                            f"MIRI LRS {mirimode.upper()} supports only these "
+                            f"subarrays: {allowed}."
+                        ),
+                    )
                 if (mirimode == "lrsslit"):
                     pandata["configuration"]["instrument"]["mode"] = mirimode
                     pandata["configuration"]["instrument"]["aperture"] = "lrsslit"
-                    pandata["configuration"]["detector"]["subarray"] = "full"
+                pandata["configuration"]["detector"]["subarray"] = mirisubarray
 
         if instrument == "nirspec":
             with open(os.path.join(os.path.dirname(__file__), "reference", "nirspec_input.json")) as data_file:
                 pandata = json.load(data_file)
                 nirspecmode = self.get_argument("nirspecmode")
+                nirspecsubarray = self.get_argument("nirspecsubarray")
+                if (
+                    nirspecmode != "prismclear"
+                    and nirspecsubarray in NIRSPEC_PRISM_MULTISTRIPE_SUBARRAYS
+                ):
+                    raise tornado.web.HTTPError(
+                        400,
+                        reason=(
+                            "NIRSpec PRISM multistripe subarrays are only "
+                            "available with Prism R=100 No filter."
+                        ),
+                    )
                 pandata["configuration"]["instrument"]["disperser"] = nirspecmode[0:5]
                 pandata["configuration"]["instrument"]["filter"] = nirspecmode[5:11]
-                pandata["configuration"]["detector"]["subarray"] = self.get_argument("nirspecsubarray")
+                pandata["configuration"]["detector"]["subarray"] = nirspecsubarray
 
         if instrument == "nircam":
             with open(os.path.join(os.path.dirname(__file__), "reference", "nircam_input.json")) as data_file:
@@ -945,7 +981,11 @@ class CalculationViewHandler(BaseHandler):
         result = self._get_task_result(id)
         
         script, div = create_component_jwst(result)
-        div['timing_div'] = result['timing_div']
+        if 'apt_div' in result:
+            div['apt_div'] = result['apt_div']
+            div['calculation_div'] = result['calculation_div']
+        else:
+            div['timing_div'] = result['timing_div']
         div['input_div'] = result['input_div'] 
         div['warnings_div'] = result['warnings_div']
 

@@ -2,6 +2,24 @@
 
 {% block css %}
 {% raw bokeh_css %}
+<style>
+    .pandexo-summary-table {
+        table-layout: fixed;
+        width: 100%;
+    }
+
+    .pandexo-summary-table thead th:first-child,
+    .pandexo-summary-table tbody th {
+        text-align: left;
+        width: 50%;
+    }
+
+    .pandexo-summary-table thead th:nth-child(2),
+    .pandexo-summary-table tbody td {
+        text-align: left;
+        width: 50%;
+    }
+</style>
 {% end %}
 
 {% block body %}
@@ -62,7 +80,14 @@
 <div class="container">
    <h2 id="timing">Timing Info</h2>
        <p> All the timing info needed for your observation. Overhead calculation assumes 30 minute target acquisition time.  </p>
+           {% if 'apt_div' in div %}
+           <h3>APT Inputs</h3>
+           {% raw div['apt_div']  %}
+           <h3>Calculation Details</h3>
+           {% raw div['calculation_div']  %}
+           {% else %}
            {% raw div['timing_div']  %}
+           {% end %}
 </div>
 
 

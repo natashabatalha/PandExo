@@ -54,9 +54,9 @@
            "disperser": "p750l"
            },
     "detector": {
-              "readout_pattern":"fast",
-              "subarray": "slitlessprism",
-              "readmode": "fast",
+              "readout_pattern":"fastr1",
+              "subarray": "slitlessprism_ip",
+              "readmode": "fastr1",
               "ngroup": "optimize",
               "nint": 1,
               "nexp": 10

@@ -319,11 +319,22 @@
 
     <div class="form-group hidden" id="instrument-mode-section">
         <label class="col-md-3 control-label" for="mirimode">Mode</label>
-        <div class="col-md-4" id="MIRI">
-            <select id="mirimode" name="mirimode" class="form-control" data-placeholder="Select MIRI Mode">
-                <option value="lrsslitless" selected>Slitless LRS</option>
-                <option value="lrsslit">Slit LRS</option>
-            </select>
+        <div class="col-md-6" id="MIRI">
+            <div class="col-md-6" style="padding-left: 0;">
+                <select id="mirimode" name="mirimode" class="form-control" data-placeholder="Select MIRI Mode">
+                    <option value="lrsslitless" selected>Slitless LRS</option>
+                    <option value="lrsslit">Slit LRS</option>
+                </select>
+            </div>
+            <div class="col-md-6" style="padding-right: 0;">
+                <select id="mirisubarray" name="mirisubarray" class="form-control" data-placeholder="Select MIRI Subarray">
+                    <option value="slitlessprism_ip" selected>SLITLESSPRISM_IP (tframe=0.156)</option>
+                    <option value="slitlessprism_ips">SLITLESSPRISM_IPS (tframe=0.118)</option>
+                    <option value="slitlessprism">SLITLESSPRISM (Not Recommended, tframe=0.159)</option>
+                    <option value="full">FULL (tframe=2.775)</option>
+                    <option value="subslit">SUBSLIT (tframe=0.279)</option>
+                </select>
+            </div>
         </div>
 
         <div class="col-md-6" id="NIRSpec">
@@ -346,13 +357,17 @@
                     <option value="sub1024a">S1600A1 SUB1024A</option>
                     <option value="sub1024b">S1600A1 SUB1024B</option>
                     <option value="sub512">S1600A1 SUB512</option>
+                    <option value="s256m2_prm">Multistripe SUB256M2_PRISM</option>
+                    <option value="s128m4_prm">Multistripe SUB128M4_PRISM</option>
+                    <option value="s64m8_prm">Multistripe SUB64M8_PRISM</option>
+                    <option value="s32m16_prm">Multistripe SUB32M16_PRISM</option>
                 </select>
             </div>
         </div>
 
         <div class="col-md-6" id="NIRCam">
             <div class="col-md-6" style="padding-left: 0;">
-                <select id="nircamfilter" name="nircamfilter" onchange="showForm()" class="form-control" data-placeholder="Select NIRCam Mode">
+                <select id="nircamfilter" name="nircamfilter" class="form-control" data-placeholder="Select NIRCam Mode">
                     <option value=""></option>
                     <option value="f322w2">F322W2, 2.7-4 um</option>
                     <option value="f444w">F444W, 4-5 um</option>
@@ -361,19 +376,19 @@
             <div class="col-md-6" style="padding-right: 0;">
                 <select id="nircamsubarray" name="nircamsubarray" class="form-control" data-placeholder="Select NIRCam Subarray">
                     <option value=""></option>
-                    <option value="subgrism64" selected>SUBGRISM64, 4 outs(tframe=0.34)</option>
-                    <option value="subgrism128">SUBGRISM128, 4 outs(tframe=0.67)</option>
-                    <option value="subgrism256">SUBGRISM258, 4 outs(tframe=1.34)</option>
-                    <option value="subgrism64 (noutputs=1)">SUBGRISM64, 1 out(tframe=1.3)</option>
-                    <option value="subgrism128 (noutputs=1)">SUBGRISM128, 1 out(tframe=2.6)</option>
-                    <option value="subgrism256 (noutputs=1)">SUBGRISM258, 1 out(tframe=5.2)</option>
+                    <option value="subgrism64" selected>SUBGRISM64, 4 outs (tframe=0.34)</option>
+                    <option value="subgrism128">SUBGRISM128, 4 outs (tframe=0.67)</option>
+                    <option value="subgrism256">SUBGRISM256, 4 outs (tframe=1.34)</option>
+                    <option value="subgrism64 (noutputs=1)">SUBGRISM64, 1 out (tframe=1.3)</option>
+                    <option value="subgrism128 (noutputs=1)">SUBGRISM128, 1 out (tframe=2.6)</option>
+                    <option value="subgrism256 (noutputs=1)">SUBGRISM256, 1 out (tframe=5.2)</option>
                 </select>
             </div>
         </div>
 
         <div class="col-md-9" id="NIRCamDHS">
             <div class="col-md-3" style="padding-left: 0;">
-                <select id="nircamsw" name="nircamsw" onchange="showForm()" class="form-control" data-placeholder="Select SW Filter">
+                <select id="nircamsw" name="nircamsw" class="form-control" data-placeholder="Select SW Filter">
                     <option value=""></option>
                     <option value="f070w">F070W, ~0.6-0.8 um</option>
                     <option value="f090w">F090W, ~0.8-1 um</option>
@@ -383,14 +398,14 @@
                 </select>
             </div>            
             <div class="col-md-3" style="padding-left: 0;">
-                <select id="nircamlw" name="nircamlw" onchange="showForm()" class="form-control" data-placeholder="Select LW Filter">
+                <select id="nircamlw" name="nircamlw" class="form-control" data-placeholder="Select LW Filter">
                     <option value=""></option>
                     <option value="f322w2">F322W2, 2.7-4 um</option>
                     <option value="f444w">F444W, 4-5 um</option>
                 </select>
             </div>
             <div class="col-md-3" style="padding-right: 0;">
-                <select id="nircamsubarraydhs" name="nircamsubarraydhs" onchange="showForm()" class="form-control" data-placeholder="Select NIRCam Subarray">
+                <select id="nircamsubarraydhs" name="nircamsubarraydhs" class="form-control" data-placeholder="Select NIRCam Subarray">
                     <option value=""></option>
                     <option value="sub41s1_2-spectra">SUB41S1_2-SPECTRA (tframe=0.21)</option>
                     <option value="sub82s2_4-spectra">SUB82S2_4-SPECTRA (tframe=0.42)</option>
@@ -399,7 +414,7 @@
                 </select>
             </div>
             <div class="col-md-3" style="padding-right: 0;">
-                <select id="nircammode" name="nircammode" onchange="showForm()" class="form-control" data-placeholder="Display Simulation For?">
+                <select id="nircammode" name="nircammode" class="form-control" data-placeholder="Display Simulation For?">
                     <option value=""></option>
                     <option value="sw">Short wave</option>
                     <option value="lw">Long wave</option>
@@ -569,6 +584,76 @@
             }, 0);
         });
 
+        var miriSubarrayOptionsByMode = {
+            lrsslitless: [
+                {value: "slitlessprism_ip", label: "SLITLESSPRISM_IP (tframe=0.156)"},
+                {value: "slitlessprism_ips", label: "SLITLESSPRISM_IPS (tframe=0.118)"},
+                {value: "slitlessprism", label: "SLITLESSPRISM (Not Recommended, tframe=0.159)"}
+            ],
+            lrsslit: [
+                {value: "subslit", label: "SUBSLIT (tframe=0.279)"},
+                {value: "full", label: "FULL (tframe=2.775)"}
+            ]
+        };
+
+        function updateMiriSubarrayOptions() {
+            var mode = $("#mirimode").val();
+            var options = miriSubarrayOptionsByMode[mode] || miriSubarrayOptionsByMode.lrsslitless;
+            var current = $("#mirisubarray").val();
+            var selected = options.some(function (option) {
+                return option.value === current;
+            }) ? current : options[0].value;
+
+            $("#mirisubarray").empty();
+            $.each(options, function (_, option) {
+                $("<option></option>")
+                    .val(option.value)
+                    .text(option.label)
+                    .prop("selected", option.value === selected)
+                    .appendTo("#mirisubarray");
+            });
+            $("#mirisubarray").trigger("change.select2");
+        }
+
+        $("#mirimode").change(updateMiriSubarrayOptions);
+
+        var nirspecStandardSubarrayOptions = [
+            {value: "sub2048", label: "S1600A1 SUB2048"},
+            {value: "sub1024a", label: "S1600A1 SUB1024A"},
+            {value: "sub1024b", label: "S1600A1 SUB1024B"},
+            {value: "sub512", label: "S1600A1 SUB512"}
+        ];
+        var nirspecPrismMultistripeSubarrayOptions = [
+            {value: "s256m2_prm", label: "Multistripe SUB256M2_PRISM"},
+            {value: "s128m4_prm", label: "Multistripe SUB128M4_PRISM"},
+            {value: "s64m8_prm", label: "Multistripe SUB64M8_PRISM"},
+            {value: "s32m16_prm", label: "Multistripe SUB32M16_PRISM"}
+        ];
+
+        function updateNirspecSubarrayOptions() {
+            var mode = $("#nirspecmode").val();
+            var options = nirspecStandardSubarrayOptions.slice();
+            if (mode === "prismclear") {
+                options = options.concat(nirspecPrismMultistripeSubarrayOptions);
+            }
+            var current = $("#nirspecsubarray").val();
+            var selected = options.some(function (option) {
+                return option.value === current;
+            }) ? current : options[0].value;
+
+            $("#nirspecsubarray").empty();
+            $.each(options, function (_, option) {
+                $("<option></option>")
+                    .val(option.value)
+                    .text(option.label)
+                    .prop("selected", option.value === selected)
+                    .appendTo("#nirspecsubarray");
+            });
+            $("#nirspecsubarray").trigger("change.select2");
+        }
+
+        $("#nirspecmode").change(updateNirspecSubarrayOptions);
+
         /* Nice block level radio selection */
         $(".radio-chooser-content").click(function () {
             $(".radio-chooser-item").removeClass("radio-chooser-selected");
@@ -653,7 +738,11 @@
         }
 
         /* Instrument Selection */
-        $("#instrument").change(showSelectedInstrumentMode);
+        $("#instrument").change(function () {
+            showSelectedInstrumentMode();
+            updateMiriSubarrayOptions();
+            updateNirspecSubarrayOptions();
+        });
 
       //if we're editing, set the form values to what it was before
       var obj = JSON.parse($("#formDataJson").val());
@@ -680,6 +769,8 @@
 	      }
 	  });
 
+          updateMiriSubarrayOptions();
+          updateNirspecSubarrayOptions();
           show_dropdown();
       }
       else {
@@ -687,6 +778,8 @@
 	  $(`input[name='stellarModel'][value='phoenix']`).trigger("click");
 	  $(`input[name='planetModel'][value='constant']`).trigger("click");
 	  $(`input[name='noiseModel'][value='constant-noise']`).trigger("click");
+          updateMiriSubarrayOptions();
+          updateNirspecSubarrayOptions();
       }
   });
 
@@ -702,10 +795,6 @@
                 break;
         }
     }
-
-    function showForm() {
-    }
-
 
 $(function () {
   $('[data-toggle="tooltip"]').tooltip()
