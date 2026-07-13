@@ -53,7 +53,7 @@
             "disperser": "dhs0"
         },
     "detector": {
-            "readout_pattern":"rapid",
+            "readout_pattern":"optimize",
             "subarray": "sub260s4_8-spectra",
             "ngroup": "optimize",
             "nint": 1,

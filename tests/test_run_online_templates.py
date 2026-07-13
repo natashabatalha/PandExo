@@ -125,6 +125,21 @@ def test_new_calculation_template_uses_subgrism256_label():
     assert bad_label not in template
 
 
+def test_new_calculation_template_lists_dhs_readout_patterns():
+    template = Path("pandexo/engine/templates/new.html").read_text()
+
+    assert 'name="nircamdhsreadout"' in template
+    assert '<option value="optimize" selected>Optimize readout pattern</option>' in template
+    for readout in ("rapid", "bright1", "dhs3", "dhs4", "dhs5", "dhs6", "dhs7"):
+        assert f'<option value="{readout}">' in template
+
+
+def test_nircam_dhs_reference_defaults_to_readout_optimization():
+    reference = Path("pandexo/engine/reference/nircam_dhs_input.json").read_text()
+
+    assert '"readout_pattern":"optimize"' in reference
+
+
 def test_miri_reference_uses_supported_fastr1_readout():
     reference = Path("pandexo/engine/reference/miri_input.json").read_text()
 

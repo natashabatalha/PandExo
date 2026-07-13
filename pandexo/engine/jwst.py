@@ -485,6 +485,20 @@ def compute_full_sim(dictinput,verbose=False):
 
     #now fix DHS #of spectra depending on the subarray
     is_dhs = 'dhs' in conf['instrument']['aperture']
+    requested_dhs_readout = str(
+        conf['detector'].get('readout_pattern', '')
+    ).lower()
+    optimize_dhs_readout = is_dhs and requested_dhs_readout == 'optimize'
+    if is_dhs:
+        if optimize_dhs_readout:
+            # Pandeia does not recognize PandExo's optimization sentinel.
+            conf['detector']['readout_pattern'] = DHS_READOUT_PATTERNS[0]
+        elif requested_dhs_readout not in DHS_READOUT_PATTERNS:
+            allowed = ', '.join(pattern.upper() for pattern in DHS_READOUT_PATTERNS)
+            raise ValueError(
+                f"Unsupported NIRCam DHS readout pattern: "
+                f"{requested_dhs_readout}. Choose optimize or one of {allowed}."
+            )
     if is_dhs:
         subarray = pandeia_input['configuration']['detector']['subarray']
         nspectra = int(subarray.split('-spectra')[0][-1])#2*int(substripe[substripe.find('stripe')+6])
@@ -618,20 +632,19 @@ def compute_full_sim(dictinput,verbose=False):
     max_ngroup_instrument = max_ngroup[pandeia_input["configuration"]["instrument"]["instrument"]]
     timing, flags = compute_timing(m,transit_duration,expfact_out,noccultations,max_ngroup_instrument)
 
-    if is_dhs and "maxexptime_per_int" in m:
-        maxexptime_per_int = m["maxexptime_per_int"]
+    if optimize_dhs_readout:
         selected = None
         rejected_readouts = []
         for readout_pattern in DHS_READOUT_PATTERNS:
             conf['detector']['readout_pattern'] = readout_pattern
             candidate_conf = deepcopy(conf)
-            candidate_conf['instrument']['aperture'] = 'dhs0bright'
+            if 'dhs' in candidate_conf['instrument']['aperture']:
+                candidate_conf['instrument']['aperture'] = 'dhs0bright'
             candidate_conf['detector']['ngroup'] = 2
             candidate_instrument = _instrument_factory(config=candidate_conf)
             candidate_detector = candidate_instrument.read_detector_pars()
             candidate_exposure = candidate_instrument.the_detector.exposure_spec
             candidate_m = {
-                "maxexptime_per_int": maxexptime_per_int,
                 "tframe": candidate_exposure.tframe,
                 "nframe": candidate_exposure.nframe,
                 "mingroups": candidate_detector['mingroups'],
@@ -644,6 +657,10 @@ def compute_full_sim(dictinput,verbose=False):
                 "ndrop1": getattr(candidate_exposure, "ndrop1", 0),
                 "ndrop3": getattr(candidate_exposure, "ndrop3", 0),
             }
+            if "maxexptime_per_int" in m:
+                candidate_m["maxexptime_per_int"] = m["maxexptime_per_int"]
+            else:
+                candidate_m["ngroup"] = m["ngroup"]
             candidate_timing, candidate_flags = compute_timing(
                 candidate_m,
                 transit_duration,
@@ -699,6 +716,23 @@ def compute_full_sim(dictinput,verbose=False):
             )
             + " Estimate assumes no target acquisition and a standard "
             "2,100-second initial slew."
+        )
+    elif is_dhs:
+        allocation_overhead = nircam_dhs_no_ta_overhead(tframe)
+        excess_rate, data_excess = estimate_dhs_data_excess(
+            conf['detector']['subarray'],
+            requested_dhs_readout,
+            timing['APT: Num Groups per Integration'],
+            timing['Transit+Baseline, no overhead (hrs)'],
+            allocation_overhead_seconds=allocation_overhead,
+        )
+        timing['Estimated DHS Data Excess Rate (GB/hr)'] = excess_rate
+        timing['Estimated DHS Data Excess (GB)'] = data_excess
+        timing['Assumed DHS Allocation Overhead (sec)'] = allocation_overhead
+        flags['flag_dhs_readout'] = (
+            f"User selected {requested_dhs_readout.upper()}; readout pattern "
+            "optimization was not performed. Estimate assumes no target "
+            "acquisition and a standard 2,100-second initial slew."
         )
     
     #Simulate out trans and in transit

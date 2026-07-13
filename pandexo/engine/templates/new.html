@@ -420,6 +420,18 @@
                     <option value="lw">Long wave</option>
                 </select>
             </div>
+            <div class="col-md-3" style="padding-left: 0;">
+                <select id="nircamdhsreadout" name="nircamdhsreadout" class="form-control" data-placeholder="Select DHS Readout Pattern">
+                    <option value="optimize" selected>Optimize readout pattern</option>
+                    <option value="rapid">RAPID</option>
+                    <option value="bright1">BRIGHT1</option>
+                    <option value="dhs3">DHS3</option>
+                    <option value="dhs4">DHS4</option>
+                    <option value="dhs5">DHS5</option>
+                    <option value="dhs6">DHS6</option>
+                    <option value="dhs7">DHS7</option>
+                </select>
+            </div>
             <div class="col-md-9" style="padding-right: 0;">
             <p class="help-block">1) There are separate calculations for the short and long wavelength channels even though these observations occur simultaneously. Take caution to use the same Instrument Setup and Detector Setup in both the SW Grism Time Series and LW Grism Time Series calculations for a given target to correctly evaluate expected SNR. </p>
             <p class="help-block">2) SW Filter wavelength ranges cited in the dropdown menu are only for guidance. The exact numbers dependt on the choice of LW filter <a href="https://jwst-docs.stsci.edu/jwst-near-infrared-camera/nircam-observing-modes/nircam-time-series-observations/nircam-short-wavelength-grism-time-series#gsc.tab=0">(see JDOX Table 3)</a></p>

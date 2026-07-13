@@ -962,8 +962,32 @@ def test_pandeia_dhs_readout_uses_slope_without_superstripes():
 
     with open("pandexo/engine/reference/nircam_dhs_input.json") as handle:
         conf = json.load(handle)["configuration"]
+    assert conf["detector"]["readout_pattern"] == "optimize"
+    conf["detector"]["readout_pattern"] = "rapid"
     conf["detector"]["ngroup"] = 2
     exp_pars = InstrumentFactory(config=conf).the_detector.exposure_spec
 
     assert exp_pars.nsuperstripe == 1
     assert select_calculation("um", exp_pars.nsuperstripe, is_dhs=True) == "slope method"
+
+
+def test_dhs_throughput_resolves_optimized_readout_before_pandeia(monkeypatch):
+    from pandexo.engine import justdoit
+
+    captured = {}
+
+    class FakeInstrument:
+        def __init__(self, config):
+            captured.update(config)
+
+        def get_wave_range(self):
+            return {"wmin": 1.0, "wmax": 2.0}
+
+        def get_total_eff(self, wave):
+            return np.ones_like(wave)
+
+    monkeypatch.setattr(justdoit, "InstrumentFactory", FakeInstrument)
+
+    justdoit.get_thruput("NIRCam DHS")
+
+    assert captured["detector"]["readout_pattern"] == "rapid"
