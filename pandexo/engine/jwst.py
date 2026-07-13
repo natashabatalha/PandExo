@@ -1914,7 +1914,7 @@ def build_timing_display_div(out, timing):
                 f'{_upper_or_none(disperser)}/{_upper_or_none(filter_name)}'
             )
         )
-    elif not (
+    elif str(instrument).lower() != 'niriss' and not (
         str(instrument).lower() == 'miri'
         and str(mode).lower() in ('lrsslitless', 'lrsslit')
     ):

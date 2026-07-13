@@ -594,6 +594,15 @@ def test_timing_display_formats_transit_and_integration_counts_as_integers():
     assert "<td>15.0</td>" not in html
 
 
+def test_niriss_timing_display_omits_filter_row():
+    timing = _timing(nsuperstripe=1)
+    apt_div, _ = build_timing_display_div(_pandeia_out(), timing)
+    html = apt_div.decode()
+
+    assert "<th>Filter</th>" not in html
+    assert "<td>clear</td>" not in html
+
+
 def test_nircam_timing_display_shows_channel_and_pupil_rows():
     timing = _timing(nsuperstripe=1)
     apt_div, calculation_div = build_timing_display_div(
