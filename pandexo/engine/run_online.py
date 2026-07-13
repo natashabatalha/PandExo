@@ -42,7 +42,7 @@ PLANET_LIST_CACHE = os.environ.get(
 )
 MIRI_LRS_ALLOWED_SUBARRAYS = {
     "lrsslitless": ("slitlessprism", "slitlessprism_ip", "slitlessprism_ips"),
-    "lrsslit": ("full", "subslit"),
+    "lrsslit": ("subslit", "full"),
 }
 
 #define location of fort grids
@@ -545,7 +545,9 @@ class CalculationNewHandler(BaseHandler):
             with open(os.path.join(os.path.dirname(__file__), "reference", "miri_input.json")) as data_file:
                 pandata = json.load(data_file)
                 mirimode = self.get_argument("mirimode")
-                mirisubarray = self.get_argument("mirisubarray", "slitlessprism_ip")
+                mirisubarray = self.get_argument(
+                    "mirisubarray", MIRI_LRS_ALLOWED_SUBARRAYS[mirimode][0]
+                )
                 if mirisubarray not in MIRI_LRS_ALLOWED_SUBARRAYS[mirimode]:
                     allowed = ", ".join(
                         item.upper() for item in MIRI_LRS_ALLOWED_SUBARRAYS[mirimode]

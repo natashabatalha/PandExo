@@ -22,7 +22,7 @@ min_nint_trans = 3
 DHS_F150W_MIN_WAVELENGTH = 0.96
 MIRI_LRS_ALLOWED_SUBARRAYS = {
     "lrsslitless": ("slitlessprism", "slitlessprism_ip", "slitlessprism_ips"),
-    "lrsslit": ("full", "subslit"),
+    "lrsslit": ("subslit", "full"),
 }
 
 #refdata directory

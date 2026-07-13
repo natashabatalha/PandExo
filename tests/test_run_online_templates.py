@@ -56,6 +56,8 @@ def test_base_handler_render_preserves_explicit_bokeh_resources(monkeypatch):
 
 def test_new_calculation_template_lists_new_miri_lrs_subarrays():
     template = Path("pandexo/engine/templates/new.html").read_text()
+    slit_subslit_option = 'value: "subslit", label: "SUBSLIT (tframe=0.279)"'
+    slit_full_option = 'value: "full", label: "FULL (tframe=2.775)"'
 
     assert 'value="slitlessprism_ip"' in template
     assert 'value="slitlessprism_ips"' in template
@@ -65,10 +67,17 @@ def test_new_calculation_template_lists_new_miri_lrs_subarrays():
     assert 'value="subslit"' in template
     assert "miriSubarrayOptionsByMode" in template
     assert 'lrsslit: [' in template
-    assert 'value: "full", label: "FULL (tframe=2.775)"' in template
-    assert 'value: "subslit", label: "SUBSLIT (tframe=0.279)"' in template
+    assert slit_full_option in template
+    assert slit_subslit_option in template
+    assert template.index(slit_subslit_option) < template.index(slit_full_option)
     assert ".empty()" in template
     assert ".prop(\"disabled\"" not in template
+
+
+def test_miri_lrs_slit_defaults_to_subslit():
+    from pandexo.engine.run_online import MIRI_LRS_ALLOWED_SUBARRAYS
+
+    assert MIRI_LRS_ALLOWED_SUBARRAYS["lrsslit"][0] == "subslit"
 
 
 def test_new_calculation_template_lists_nirspec_prism_multistripe_subarrays():
