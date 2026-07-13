@@ -4,6 +4,7 @@ import contextlib
 import io
 import json
 from copy import deepcopy
+from pathlib import Path
 
 import numpy as np
 import pytest
@@ -415,10 +416,12 @@ def test_multistripe_timing_display_uses_apt_and_calculation_tables():
         exposure_time_per_int=40.0,
         ngroup=3,
     )
-    html = build_timing_display_div(_pandeia_out(), timing).decode()
+    apt_div, calculation_div = build_timing_display_div(_pandeia_out(), timing)
+    html = (apt_div + calculation_div).decode()
 
-    assert "APT Inputs" in html
-    assert "Calculation Details" in html
+    assert "APT Inputs" not in html
+    assert "Calculation Details" not in html
+    assert html.count("<table") == 2
     assert "Groups per Integration" in html
     assert "Integrations per Occultation" in html
     assert "Number of Stripes" in html
@@ -430,9 +433,20 @@ def test_multistripe_timing_display_uses_apt_and_calculation_tables():
     assert "Measurement Time per Integration" not in html
 
 
+def test_view_template_owns_timing_table_headings():
+    template = Path("pandexo/engine/templates/view.html").read_text()
+
+    assert "<h3>APT Inputs</h3>" in template
+    assert "<h3>Calculation Details</h3>" in template
+    assert "{% raw div['apt_div']  %}" in template
+    assert "{% raw div['calculation_div']  %}" in template
+    assert "{% raw div['timing_div']  %}" in template
+
+
 def test_non_multistripe_timing_display_omits_stripe_rows():
     timing = _timing(nsuperstripe=1)
-    html = build_timing_display_div(_pandeia_out(), timing).decode()
+    apt_div, calculation_div = build_timing_display_div(_pandeia_out(), timing)
+    html = (apt_div + calculation_div).decode()
 
     assert "Elapsed Time per Integration incl. Reset (sec)" in html
     assert "Science Time per Integration excl. Reset (sec)" in html
@@ -443,7 +457,7 @@ def test_non_multistripe_timing_display_omits_stripe_rows():
 
 def test_nircam_timing_display_shows_channel_and_pupil_rows():
     timing = _timing(nsuperstripe=1)
-    html = build_timing_display_div(
+    apt_div, calculation_div = build_timing_display_div(
         _pandeia_out(
             instrument={
                 "instrument": "nircam",
@@ -459,7 +473,8 @@ def test_nircam_timing_display_shows_channel_and_pupil_rows():
             },
         ),
         timing,
-    ).decode()
+    )
+    html = (apt_div + calculation_div).decode()
 
     assert "SW Channel Mode" in html
     assert "GRISM" in html
@@ -474,7 +489,7 @@ def test_nircam_timing_display_shows_channel_and_pupil_rows():
 
 def test_nircam_lw_only_timing_display_shows_imaging_sw_channel():
     timing = _timing(nsuperstripe=1)
-    html = build_timing_display_div(
+    apt_div, calculation_div = build_timing_display_div(
         _pandeia_out(
             instrument={
                 "instrument": "nircam",
@@ -489,7 +504,8 @@ def test_nircam_lw_only_timing_display_shows_imaging_sw_channel():
             },
         ),
         timing,
-    ).decode()
+    )
+    html = (apt_div + calculation_div).decode()
 
     assert "SW Channel Mode" in html
     assert "IMAGING" in html
@@ -504,7 +520,7 @@ def test_nircam_lw_only_timing_display_shows_imaging_sw_channel():
 
 def test_miri_lrs_timing_display_uses_dither_not_filter_and_uppercase_readout():
     timing = _timing(nsuperstripe=1)
-    html = build_timing_display_div(
+    apt_div, calculation_div = build_timing_display_div(
         _pandeia_out(
             instrument={
                 "instrument": "miri",
@@ -519,7 +535,8 @@ def test_miri_lrs_timing_display_uses_dither_not_filter_and_uppercase_readout():
             },
         ),
         timing,
-    ).decode()
+    )
+    html = (apt_div + calculation_div).decode()
 
     assert "<th>Filter</th>" not in html
     assert "<th>Dither</th>" in html

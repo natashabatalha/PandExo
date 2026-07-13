@@ -981,7 +981,11 @@ class CalculationViewHandler(BaseHandler):
         result = self._get_task_result(id)
         
         script, div = create_component_jwst(result)
-        div['timing_div'] = result['timing_div']
+        if 'apt_div' in result:
+            div['apt_div'] = result['apt_div']
+            div['calculation_div'] = result['calculation_div']
+        else:
+            div['timing_div'] = result['timing_div']
         div['input_div'] = result['input_div'] 
         div['warnings_div'] = result['warnings_div']
 

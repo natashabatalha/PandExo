@@ -1568,7 +1568,14 @@ def _nircam_pupil_rows(filter_name, paired_filter):
 
 
 def build_timing_display_div(out, timing):
-    """Build the browser-facing JWST timing tables."""
+    """Build browser-facing JWST APT-input and calculation-detail tables.
+
+    Returns
+    -------
+    tuple of bytes
+        HTML for the APT-input table followed by HTML for the calculation-detail
+        table. The surrounding section headings are owned by ``view.html``.
+    """
     configuration = out['input']['configuration']
     instrument_config = configuration['instrument']
     detector_config = configuration['detector']
@@ -1668,13 +1675,7 @@ def build_timing_display_div(out, timing):
             ),
         ])
 
-    timing_div = (
-        '<h3>APT Inputs</h3>\n'
-        + _table_html(apt_rows)
-        + '\n<h3>Calculation Details</h3>\n'
-        + _table_html(calculation_rows)
-    )
-    return timing_div.encode()
+    return _table_html(apt_rows).encode(), _table_html(calculation_rows).encode()
 
 
 def as_dict(out, both_spec ,binned, timing, mag, sat_level, warnings, punit, unbinned,calculation): 
@@ -1714,7 +1715,7 @@ def as_dict(out, both_spec ,binned, timing, mag, sat_level, warnings, punit, unb
 
     p=1.0
     if punit == 'fp/f*': p = -1.0
-    timing_div = build_timing_display_div(out, timing)
+    apt_div, calculation_div = build_timing_display_div(out, timing)
 
     warnings_div = pd.DataFrame.from_dict(warnings, orient='index')
     warnings_div.columns = ['Value']
@@ -1770,7 +1771,9 @@ def as_dict(out, both_spec ,binned, timing, mag, sat_level, warnings, punit, unb
     'input':input_dict,
     
     #divs for html rendering    
-    'timing_div':timing_div, 
+    'timing_div': apt_div + b'\n' + calculation_div,
+    'apt_div': apt_div,
+    'calculation_div': calculation_div,
     'input_div':input_div,
     'warnings_div':warnings_div,
     }
