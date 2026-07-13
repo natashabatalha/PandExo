@@ -11,6 +11,7 @@ import pytest
 
 from pandexo.engine.compute_noise import ExtractSpec
 from pandexo.engine.jwst import (
+    _table_html,
     add_warnings,
     build_timing_display_div,
     compute_timing,
@@ -441,6 +442,16 @@ def test_view_template_owns_timing_table_headings():
     assert "{% raw div['apt_div']  %}" in template
     assert "{% raw div['calculation_div']  %}" in template
     assert "{% raw div['timing_div']  %}" in template
+
+
+def test_summary_tables_use_shared_fixed_column_layout():
+    template = Path("pandexo/engine/templates/view.html").read_text()
+    html = _table_html([('Parameter', 'Value')])
+
+    assert 'pandexo-summary-table' in html
+    assert '.pandexo-summary-table {' in template
+    assert 'table-layout: fixed;' in template
+    assert 'width: 50%;' in template
 
 
 def test_non_multistripe_timing_display_omits_stripe_rows():

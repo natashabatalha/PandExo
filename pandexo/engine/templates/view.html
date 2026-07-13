@@ -2,6 +2,24 @@
 
 {% block css %}
 {% raw bokeh_css %}
+<style>
+    .pandexo-summary-table {
+        table-layout: fixed;
+        width: 100%;
+    }
+
+    .pandexo-summary-table thead th:first-child,
+    .pandexo-summary-table tbody th {
+        text-align: left;
+        width: 50%;
+    }
+
+    .pandexo-summary-table thead th:nth-child(2),
+    .pandexo-summary-table tbody td {
+        text-align: left;
+        width: 50%;
+    }
+</style>
 {% end %}
 
 {% block body %}

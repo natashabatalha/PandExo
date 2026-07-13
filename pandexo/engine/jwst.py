@@ -1475,7 +1475,7 @@ def _table_html(rows):
     table = table.set_index('Parameter')
     table.index.name = None
     table = table.to_html(formatters={'Value': format_value})
-    return '<table class="table table-striped"> \n' + table[36:len(table)]
+    return '<table class="table table-striped pandexo-summary-table"> \n' + table[36:len(table)]
 
 
 def _jwst_instrument_name(instrument):
@@ -1741,7 +1741,10 @@ def as_dict(out, both_spec ,binned, timing, mag, sat_level, warnings, punit, unb
     warnings_div = pd.DataFrame.from_dict(warnings, orient='index')
     warnings_div.columns = ['Value']
     warnings_div = warnings_div.to_html()
-    warnings_div = '<table class="table table-striped"> \n' + warnings_div[36:len(warnings_div)]
+    warnings_div = (
+        '<table class="table table-striped pandexo-summary-table"> \n'
+        + warnings_div[36:len(warnings_div)]
+    )
     warnings_div = warnings_div.encode()
     
     map_dhs_names = {'sub40stripe1_dhs':'SUB40S1_2-SPECTRA',
@@ -1770,7 +1773,10 @@ def as_dict(out, both_spec ,binned, timing, mag, sat_level, warnings, punit, unb
     input_div = pd.DataFrame.from_dict(input_dict, orient='index')
     input_div.columns = ['Value']
     input_div = input_div.to_html()
-    input_div = '<table class="table table-striped"> \n' + input_div[36:len(input_div)]
+    input_div = (
+        '<table class="table table-striped pandexo-summary-table"> \n'
+        + input_div[36:len(input_div)]
+    )
     input_div = input_div.encode()
     
     #add calc type to input dict (doing it here so it doesn't output on webpage
