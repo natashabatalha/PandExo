@@ -24,6 +24,31 @@ MIRI_LRS_ALLOWED_SUBARRAYS = {
     "lrsslitless": ("slitlessprism", "slitlessprism_ip", "slitlessprism_ips"),
     "lrsslit": ("subslit", "full"),
 }
+DHS_READOUT_PATTERNS = (
+    "rapid", "bright1", "dhs3", "dhs4", "dhs5", "dhs6", "dhs7"
+)
+DHS_READOUT_CADENCE_FRAMES = {
+    "rapid": 1,
+    "bright1": 2,
+    "dhs3": 3,
+    "dhs4": 4,
+    "dhs5": 5,
+    "dhs6": 6,
+    "dhs7": 7,
+}
+DHS_DATA_EXCESS_RECOMMENDED_LIMIT_GB = 15.0
+DHS_DATA_EXCESS_LOWER_THRESHOLD_GB = 5.0
+DHS_SUSTAINABLE_DATA_RATE_GB_PER_HOUR = 3.132
+DHS_NO_TA_FIXED_OVERHEAD_SECONDS = 694.0
+DHS_INITIAL_SLEW_SECONDS = 2100.0
+# Peak raw group rates calibrated from STScI's published RAPID, NGROUPS=2
+# DHS data-excess rates. These account for each supported DHS subarray size.
+DHS_RAW_GROUP_RATE_GB_PER_HOUR = {
+    "sub41s1_2-spectra": 13.728,
+    "sub82s2_4-spectra": 13.893,
+    "sub164s4_8-spectra": 13.983,
+    "sub260s4_8-spectra": 14.013,
+}
 
 #refdata directory
 default_refdata_directory = os.environ.get("pandeia_refdata")
@@ -64,6 +89,117 @@ def select_calculation(planet_wave_unit, nsuperstripe, is_dhs=False):
     if use_slope:
         return 'slope method'
     return 'fml'
+
+
+def nircam_dhs_no_ta_overhead(tframe):
+    """Return the assumed no-TA scheduling and initial-slew overhead.
+
+    The fixed 694-second scheduling component follows the documented NIRCam
+    overhead model for one grism time-series exposure without target
+    acquisition: visit scripts, guide-star acquisition, subarray and wheel
+    configuration, OSS compilation, exposure setup/cleanup, fine-guide
+    shutdown, and end-of-visit activities. Frame synchronization contributes
+    another half frame. The standard 2,100-second initial slew is then added
+    because it contributes to the nominal data allocation used by APT.
+
+    https://jwst-docs.stsci.edu/jppom/visit-overheads-timing-model/instrument-specific-overheads/nircam-overheads#gsc.tab=0
+
+    Parameters
+    ----------
+    tframe : float
+        Detector frame time in seconds.
+
+    Returns
+    -------
+    float
+        Scheduling overhead plus initial slew in seconds.
+    """
+    if not np.isfinite(tframe) or tframe <= 0:
+        raise ValueError("tframe must be a positive finite value")
+    return (
+        DHS_NO_TA_FIXED_OVERHEAD_SECONDS
+        + 0.5 * tframe
+        + DHS_INITIAL_SLEW_SECONDS
+    )
+
+
+def estimate_dhs_data_excess(
+        subarray, readout_pattern, ngroup, exposure_hours,
+        allocation_overhead_seconds=0.0):
+    """Estimate NIRCam DHS data excess for one APT exposure.
+
+    The estimate follows the data-rate relation underlying Table 2 of the
+    STScI NIRCam short-wavelength grism time-series recommendations. It
+    subtracts JWST's sustainable 3.132 GB/hour allocation from the generated
+    data rate, then scales the excess rate by the full exposure duration.
+
+    Parameters
+    ----------
+    subarray : str
+        PandExo/Pandeia DHS subarray name, such as
+        ``"sub260s4_8-spectra"``.
+    readout_pattern : str
+        One of ``RAPID``, ``BRIGHT1``, or ``DHS3`` through ``DHS7``. Matching
+        is case-insensitive.
+    ngroup : int
+        Number of groups per integration.
+    exposure_hours : float
+        Elapsed duration of the APT exposure, including integration resets,
+        in hours.
+    allocation_overhead_seconds : float, optional
+        Additional scheduling and slew duration over which APT accrues nominal
+        data allocation. The default of zero reproduces the approximate rates
+        in the STScI DHS recommendations.
+
+    Returns
+    -------
+    tuple of float
+        Estimated data-excess rate in GB/hour and total data excess in GB.
+        A negative rate means the generated rate is below the sustainable
+        allocation; the corresponding total data excess is reported as zero.
+
+    Raises
+    ------
+    ValueError
+        If the subarray, readout pattern, number of groups, or duration is not
+        supported by the estimate.
+
+    Notes
+    -----
+    This is an estimate for choosing a viable readout pattern. Users should
+    still verify final data-volume constraints in APT.
+    """
+    subarray = str(subarray).lower()
+    readout_pattern = str(readout_pattern).lower()
+    if subarray not in DHS_RAW_GROUP_RATE_GB_PER_HOUR:
+        raise ValueError(f"Unsupported NIRCam DHS subarray: {subarray}")
+    if readout_pattern not in DHS_READOUT_CADENCE_FRAMES:
+        raise ValueError(
+            f"Unsupported NIRCam DHS readout pattern: {readout_pattern}"
+        )
+    if int(ngroup) != ngroup or ngroup < 1:
+        raise ValueError("ngroup must be a positive integer")
+    if exposure_hours < 0:
+        raise ValueError("exposure_hours must be non-negative")
+    if allocation_overhead_seconds < 0:
+        raise ValueError("allocation_overhead_seconds must be non-negative")
+
+    ngroup = int(ngroup)
+    cadence_frames = DHS_READOUT_CADENCE_FRAMES[readout_pattern]
+    clock_frames = 2 + (ngroup - 1) * cadence_frames
+    generated_rate = (
+        DHS_RAW_GROUP_RATE_GB_PER_HOUR[subarray]
+        * ngroup
+        / clock_frames
+    )
+    excess_rate = generated_rate - DHS_SUSTAINABLE_DATA_RATE_GB_PER_HOUR
+    overhead_allocation = (
+        DHS_SUSTAINABLE_DATA_RATE_GB_PER_HOUR
+        * allocation_overhead_seconds
+        / 3600.0
+    )
+    total_data_excess = excess_rate * exposure_hours - overhead_allocation
+    return excess_rate, max(0.0, total_data_excess)
 
 
 def validate_miri_lrs_subarray(conf):
@@ -481,6 +617,89 @@ def compute_full_sim(dictinput,verbose=False):
     #calculate all timing info
     max_ngroup_instrument = max_ngroup[pandeia_input["configuration"]["instrument"]["instrument"]]
     timing, flags = compute_timing(m,transit_duration,expfact_out,noccultations,max_ngroup_instrument)
+
+    if is_dhs and "maxexptime_per_int" in m:
+        maxexptime_per_int = m["maxexptime_per_int"]
+        selected = None
+        rejected_readouts = []
+        for readout_pattern in DHS_READOUT_PATTERNS:
+            conf['detector']['readout_pattern'] = readout_pattern
+            candidate_conf = deepcopy(conf)
+            candidate_conf['instrument']['aperture'] = 'dhs0bright'
+            candidate_conf['detector']['ngroup'] = 2
+            candidate_instrument = _instrument_factory(config=candidate_conf)
+            candidate_detector = candidate_instrument.read_detector_pars()
+            candidate_exposure = candidate_instrument.the_detector.exposure_spec
+            candidate_m = {
+                "maxexptime_per_int": maxexptime_per_int,
+                "tframe": candidate_exposure.tframe,
+                "nframe": candidate_exposure.nframe,
+                "mingroups": candidate_detector['mingroups'],
+                "nskip": candidate_exposure.ndrop2,
+                "nsuperstripe": int(
+                    getattr(candidate_exposure, "nsuperstripe", 1) or 1
+                ),
+                "tfffr": getattr(candidate_exposure, "tfffr", None),
+                "nreset1": getattr(candidate_exposure, "nreset1", 1),
+                "ndrop1": getattr(candidate_exposure, "ndrop1", 0),
+                "ndrop3": getattr(candidate_exposure, "ndrop3", 0),
+            }
+            candidate_timing, candidate_flags = compute_timing(
+                candidate_m,
+                transit_duration,
+                expfact_out,
+                noccultations,
+                max_ngroup_instrument,
+            )
+            allocation_overhead = nircam_dhs_no_ta_overhead(
+                candidate_exposure.tframe
+            )
+            excess_rate, data_excess = estimate_dhs_data_excess(
+                conf['detector']['subarray'],
+                readout_pattern,
+                candidate_timing['APT: Num Groups per Integration'],
+                candidate_timing['Transit+Baseline, no overhead (hrs)'],
+                allocation_overhead_seconds=allocation_overhead,
+            )
+            candidate_timing[
+                'Estimated DHS Data Excess Rate (GB/hr)'
+            ] = excess_rate
+            candidate_timing['Estimated DHS Data Excess (GB)'] = data_excess
+            candidate_timing[
+                'Assumed DHS Allocation Overhead (sec)'
+            ] = allocation_overhead
+            selected = (
+                readout_pattern, candidate_instrument, candidate_timing,
+                candidate_flags
+            )
+
+            saturation_limited = (
+                candidate_flags['flag_default'].startswith(
+                    'Optimized NGROUPS below minimum'
+                )
+            )
+            if saturation_limited or (
+                    data_excess <= DHS_DATA_EXCESS_RECOMMENDED_LIMIT_GB):
+                break
+            rejected_readouts.append(readout_pattern.upper())
+
+        readout_pattern, i, timing, flags = selected
+        conf['detector']['readout_pattern'] = readout_pattern
+        exp_pars = i.the_detector.exposure_spec
+        tframe = exp_pars.tframe
+        nframe = exp_pars.nframe
+        nskip = exp_pars.ndrop2
+        nsuperstripe = int(getattr(exp_pars, "nsuperstripe", 1) or 1)
+        flags['flag_dhs_readout'] = (
+            f"Selected {readout_pattern.upper()}"
+            + (
+                f" after {', '.join(rejected_readouts)} exceeded the "
+                f"{DHS_DATA_EXCESS_RECOMMENDED_LIMIT_GB:g} GB recommendation."
+                if rejected_readouts else "."
+            )
+            + " Estimate assumes no target acquisition and a standard "
+            "2,100-second initial slew."
+        )
     
     #Simulate out trans and in transit
     log("Starting Out of Transit Simulation")
@@ -879,7 +1098,9 @@ def compute_timing(m,transit_duration,expfact_out,noccultations,max_ngroup_instr
                 )
             )
             return full_cycle
-        return (ngroups+1.0)*tframe
+        return (
+            1.0 + nframe + (ngroups - 1.0) * (nframe + nskip)
+        ) * tframe
     def _timing_values(ngroups):
         if ngroups == 1:
             frame_zero_dead = 0
@@ -1269,6 +1490,27 @@ def add_warnings(pand_dict, timing, sat_level, flags,instrument):
             "Num Groups Reset?": flags["flag_default"],
             "Minimum Integrations?": flags.get("flag_min_nint", "All good")
     }
+
+    if 'Estimated DHS Data Excess (GB)' in timing:
+        data_excess = timing['Estimated DHS Data Excess (GB)']
+        if data_excess <= DHS_DATA_EXCESS_LOWER_THRESHOLD_GB:
+            data_excess_warning = "All good"
+        elif data_excess <= DHS_DATA_EXCESS_RECOMMENDED_LIMIT_GB:
+            data_excess_warning = (
+                f"Estimated data excess is {data_excess:.2f} GB, above the "
+                f"{DHS_DATA_EXCESS_LOWER_THRESHOLD_GB:g} GB lower threshold. "
+                "This is acceptable for DHS, but verify the setup in APT."
+            )
+        else:
+            data_excess_warning = (
+                f"Estimated data excess is {data_excess:.2f} GB, above the "
+                f"{DHS_DATA_EXCESS_RECOMMENDED_LIMIT_GB:g} GB recommended "
+                "limit. Verify and revise the setup in APT."
+            )
+        warnings['DHS Readout Optimization'] = flags.get(
+            'flag_dhs_readout', 'User-specified readout pattern was not changed.'
+        )
+        warnings['DHS Data Excess?'] = data_excess_warning
 
     return warnings     
     
@@ -1678,6 +1920,18 @@ def build_timing_display_div(out, timing):
             _integer_display(timing['Num Integrations Out of Transit'])
         ),
     ]
+
+    if 'Estimated DHS Data Excess (GB)' in timing:
+        calculation_rows.extend([
+            (
+                'Estimated DHS Data Excess (GB)',
+                timing['Estimated DHS Data Excess (GB)']
+            ),
+            (
+                'Assumed No-TA Scheduling + Slew Overhead (sec)',
+                timing['Assumed DHS Allocation Overhead (sec)']
+            ),
+        ])
 
     if nstripes > 1:
         calculation_rows.extend([

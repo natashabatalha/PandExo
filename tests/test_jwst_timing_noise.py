@@ -11,14 +11,74 @@ import pytest
 
 from pandexo.engine.compute_noise import ExtractSpec
 from pandexo.engine.jwst import (
+    DHS_DATA_EXCESS_RECOMMENDED_LIMIT_GB,
+    DHS_READOUT_PATTERNS,
     _table_html,
     add_warnings,
     build_timing_display_div,
     compute_timing,
+    estimate_dhs_data_excess,
+    nircam_dhs_no_ta_overhead,
     select_calculation,
     update_timing_measurement_time,
     validate_miri_lrs_subarray,
 )
+
+
+@pytest.mark.parametrize(
+    ("subarray", "readout", "ngroup", "expected_rate"),
+    [
+        ("sub41s1_2-spectra", "rapid", 2, 6.02),
+        ("sub260s4_8-spectra", "rapid", 2, 6.21),
+        ("sub260s4_8-spectra", "bright1", 3, 3.88),
+        ("sub260s4_8-spectra", "dhs4", 3, 1.07),
+        ("sub260s4_8-spectra", "dhs6", 3, -0.13),
+    ],
+)
+def test_dhs_data_excess_estimate_matches_stsci_table(
+    subarray, readout, ngroup, expected_rate
+):
+    rate, total = estimate_dhs_data_excess(
+        subarray, readout, ngroup, exposure_hours=2.0
+    )
+
+    assert rate == pytest.approx(expected_rate, abs=0.01)
+    assert total == pytest.approx(max(0.0, 2.0 * expected_rate), abs=0.02)
+
+
+def test_dhs_readout_order_reaches_first_recommended_six_hour_setup():
+    selected = None
+    for readout in DHS_READOUT_PATTERNS:
+        _, total = estimate_dhs_data_excess(
+            "sub260s4_8-spectra", readout, ngroup=2, exposure_hours=6.0
+        )
+        if total <= DHS_DATA_EXCESS_RECOMMENDED_LIMIT_GB:
+            selected = readout
+            break
+
+    assert selected == "dhs3"
+
+
+def test_dhs_no_ta_overhead_includes_standard_initial_slew():
+    overhead = nircam_dhs_no_ta_overhead(tframe=1.36765)
+
+    assert overhead == pytest.approx(2794.683825)
+
+
+def test_dhs_data_excess_uses_no_ta_allocation_overhead():
+    _, without_overhead = estimate_dhs_data_excess(
+        "sub260s4_8-spectra", "dhs3", 100, exposure_hours=5.7931374583
+    )
+    _, with_overhead = estimate_dhs_data_excess(
+        "sub260s4_8-spectra",
+        "dhs3",
+        100,
+        exposure_hours=5.7931374583,
+        allocation_overhead_seconds=nircam_dhs_no_ta_overhead(1.36765),
+    )
+
+    assert without_overhead == pytest.approx(9.006139368, abs=1e-6)
+    assert with_overhead == pytest.approx(6.574764707, abs=1e-6)
 
 
 def _timing(nsuperstripe, ngroup=3, mingroups=2):
@@ -224,6 +284,25 @@ def test_multigroup_measurement_time_preserves_first_minus_last_interval():
     assert timing["Measurement Time per Integration (sec)"] == pytest.approx(4.0)
 
 
+def test_skipped_frames_contribute_to_elapsed_integration_time():
+    timing, _ = compute_timing(
+        {
+            "ngroup": 3,
+            "tframe": 2.0,
+            "nframe": 1,
+            "mingroups": 2,
+            "nskip": 2,
+            "nsuperstripe": 1,
+        },
+        transit_duration=24.0,
+        expfact_out=1.0,
+        noccultations=1,
+    )
+
+    assert timing["Time/Integration incl reset (sec)"] == pytest.approx(16.0)
+    assert timing["Measurement Time per Integration (sec)"] == pytest.approx(12.0)
+
+
 def test_multistripe_effective_time_is_divided_by_nsuperstripe():
     timing = _timing(nsuperstripe=4)
 
@@ -411,6 +490,27 @@ def test_user_multistripe_timing_warns_without_changing_ngroups_below_minimum():
     assert warnings["Minimum Integrations?"] == flags["flag_min_nint"]
 
 
+def test_dhs_lower_threshold_warning_is_exposed():
+    timing = _timing(nsuperstripe=1)
+    timing["Estimated DHS Data Excess (GB)"] = 10.0
+    warnings = add_warnings(
+        {"warnings": {}},
+        timing,
+        sat_level=0.8,
+        flags={
+            "flag_default": "All good",
+            "flag_high": "All good",
+            "flag_min_nint": "All good",
+            "flag_dhs_readout": "Selected DHS3 after RAPID, BRIGHT1 exceeded the limit.",
+        },
+        instrument="nircam",
+    )
+
+    assert warnings["DHS Readout Optimization"].startswith("Selected DHS3")
+    assert "above the 5 GB lower threshold" in warnings["DHS Data Excess?"]
+    assert "acceptable for DHS" in warnings["DHS Data Excess?"]
+
+
 def test_multistripe_timing_display_uses_apt_and_calculation_tables():
     timing = _timing_with_pandeia_cycle(
         nsuperstripe=4,
@@ -432,6 +532,17 @@ def test_multistripe_timing_display_uses_apt_and_calculation_tables():
     assert "Effective Per-Wavelength" not in html
     assert "Time/Integration incl reset" not in html
     assert "Measurement Time per Integration" not in html
+
+
+def test_timing_display_includes_estimated_dhs_data_excess():
+    timing = _timing(nsuperstripe=1)
+    timing["Estimated DHS Data Excess (GB)"] = 4.25
+    timing["Assumed DHS Allocation Overhead (sec)"] = 2794.68
+    _, calculation_div = build_timing_display_div(_pandeia_out(), timing)
+
+    assert "Estimated DHS Data Excess (GB)" in calculation_div.decode()
+    assert "4.25" in calculation_div.decode()
+    assert "Assumed No-TA Scheduling + Slew Overhead (sec)" in calculation_div.decode()
 
 
 def test_view_template_owns_timing_table_headings():
