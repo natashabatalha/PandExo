@@ -140,6 +140,23 @@ def test_nircam_dhs_reference_defaults_to_readout_optimization():
     assert '"readout_pattern":"optimize"' in reference
 
 
+def test_new_calculation_template_lists_standard_nircam_readout_patterns():
+    template = Path("pandexo/engine/templates/new.html").read_text()
+
+    assert 'name="nircamreadout"' in template
+    for readout in (
+        "rapid", "bright1", "bright2", "shallow2", "shallow4", "medium2",
+        "medium8", "mediumdeep2", "mediumdeep8", "deep2", "deep8",
+    ):
+        assert f'<option value="{readout}">' in template
+
+
+def test_standard_nircam_reference_defaults_to_readout_optimization():
+    reference = Path("pandexo/engine/reference/nircam_input.json").read_text()
+
+    assert '"readout_pattern":"optimize"' in reference
+
+
 def test_miri_reference_uses_supported_fastr1_readout():
     reference = Path("pandexo/engine/reference/miri_input.json").read_text()
 

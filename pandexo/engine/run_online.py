@@ -595,6 +595,9 @@ class CalculationNewHandler(BaseHandler):
                 pandata = json.load(data_file)
                 pandata["configuration"]["instrument"]["filter"] = self.get_argument("nircamfilter")
                 pandata["configuration"]["detector"]["subarray"] = self.get_argument("nircamsubarray")
+                pandata["configuration"]["detector"]["readout_pattern"] = (
+                    self.get_argument("nircamreadout", "optimize")
+                )
 
         if instrument == "nircamdhs":
             with open(os.path.join(os.path.dirname(__file__), "reference", "nircam_dhs_input.json")) as data_file:

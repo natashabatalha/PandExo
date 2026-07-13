@@ -365,15 +365,15 @@
             </div>
         </div>
 
-        <div class="col-md-6" id="NIRCam">
-            <div class="col-md-6" style="padding-left: 0;">
+        <div class="col-md-9" id="NIRCam">
+            <div class="col-md-4" style="padding-left: 0;">
                 <select id="nircamfilter" name="nircamfilter" class="form-control" data-placeholder="Select NIRCam Mode">
                     <option value=""></option>
                     <option value="f322w2">F322W2, 2.7-4 um</option>
                     <option value="f444w">F444W, 4-5 um</option>
                 </select>
             </div>
-            <div class="col-md-6" style="padding-right: 0;">
+            <div class="col-md-4">
                 <select id="nircamsubarray" name="nircamsubarray" class="form-control" data-placeholder="Select NIRCam Subarray">
                     <option value=""></option>
                     <option value="subgrism64" selected>SUBGRISM64, 4 outs (tframe=0.34)</option>
@@ -382,6 +382,22 @@
                     <option value="subgrism64 (noutputs=1)">SUBGRISM64, 1 out (tframe=1.3)</option>
                     <option value="subgrism128 (noutputs=1)">SUBGRISM128, 1 out (tframe=2.6)</option>
                     <option value="subgrism256 (noutputs=1)">SUBGRISM256, 1 out (tframe=5.2)</option>
+                </select>
+            </div>
+            <div class="col-md-4" style="padding-right: 0;">
+                <select id="nircamreadout" name="nircamreadout" class="form-control" data-placeholder="Select NIRCam Readout Pattern">
+                    <option value="optimize" selected>Optimize readout pattern</option>
+                    <option value="rapid">RAPID</option>
+                    <option value="bright1">BRIGHT1</option>
+                    <option value="bright2">BRIGHT2</option>
+                    <option value="shallow2">SHALLOW2</option>
+                    <option value="shallow4">SHALLOW4</option>
+                    <option value="medium2">MEDIUM2</option>
+                    <option value="medium8">MEDIUM8</option>
+                    <option value="mediumdeep2">MEDIUMDEEP2</option>
+                    <option value="mediumdeep8">MEDIUMDEEP8</option>
+                    <option value="deep2">DEEP2</option>
+                    <option value="deep8">DEEP8</option>
                 </select>
             </div>
         </div>

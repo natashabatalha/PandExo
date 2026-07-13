@@ -260,7 +260,7 @@ def get_thruput(inst, niriss=1, nirspec='f100lp', wmin='default', wmax='default'
     conf['detector']['ngroup'] = 2
     if conf['detector'].get('readout_pattern') == 'optimize':
         # Readout cadence does not affect throughput, and Pandeia does not
-        # recognize PandExo's DHS optimization sentinel.
+        # recognize PandExo's NIRCam optimization sentinel.
         conf['detector']['readout_pattern'] = 'rapid'
 
     if conf['instrument']['instrument'].lower() =='niriss':

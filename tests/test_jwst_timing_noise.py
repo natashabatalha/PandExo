@@ -13,12 +13,15 @@ from pandexo.engine.compute_noise import ExtractSpec
 from pandexo.engine.jwst import (
     DHS_DATA_EXCESS_RECOMMENDED_LIMIT_GB,
     DHS_READOUT_PATTERNS,
+    NIRCAM_READOUT_PATTERNS,
     _table_html,
     add_warnings,
     build_timing_display_div,
     compute_timing,
     estimate_dhs_data_excess,
+    estimate_nircam_data_excess,
     nircam_dhs_no_ta_overhead,
+    nircam_no_ta_overhead,
     select_calculation,
     update_timing_measurement_time,
     validate_miri_lrs_subarray,
@@ -63,6 +66,7 @@ def test_dhs_no_ta_overhead_includes_standard_initial_slew():
     overhead = nircam_dhs_no_ta_overhead(tframe=1.36765)
 
     assert overhead == pytest.approx(2794.683825)
+    assert overhead == nircam_no_ta_overhead(tframe=1.36765)
 
 
 def test_dhs_data_excess_uses_no_ta_allocation_overhead():
@@ -79,6 +83,76 @@ def test_dhs_data_excess_uses_no_ta_allocation_overhead():
 
     assert without_overhead == pytest.approx(9.006139368, abs=1e-6)
     assert with_overhead == pytest.approx(6.574764707, abs=1e-6)
+
+
+def test_standard_nircam_optimizer_reaches_first_recommended_readout():
+    selected = None
+    for readout in NIRCAM_READOUT_PATTERNS:
+        _, total = estimate_nircam_data_excess(
+            "subgrism64", readout, ngroup=100, exposure_hours=6.0
+        )
+        if total <= DHS_DATA_EXCESS_RECOMMENDED_LIMIT_GB:
+            selected = readout
+            break
+
+    assert selected == "bright1"
+
+
+def test_standard_nircam_one_output_subarray_can_retain_rapid():
+    rate, total = estimate_nircam_data_excess(
+        "subgrism64 (noutputs=1)", "rapid", ngroup=100,
+        exposure_hours=6.0,
+    )
+
+    assert rate < 0
+    assert total == 0
+
+
+def test_standard_nircam_multiframe_readout_includes_frame_zero():
+    bright1_rate, _ = estimate_nircam_data_excess(
+        "subgrism64", "bright1", ngroup=2, exposure_hours=1.0
+    )
+    bright2_rate, _ = estimate_nircam_data_excess(
+        "subgrism64", "bright2", ngroup=2, exposure_hours=1.0
+    )
+
+    assert bright2_rate > bright1_rate
+
+
+def test_standard_nircam_data_excess_matches_apt_bright1_setup():
+    _, total = estimate_nircam_data_excess(
+        "subgrism64",
+        "bright1",
+        ngroup=14,
+        exposure_hours=21622.625 / 3600.0,
+        allocation_overhead_seconds=nircam_no_ta_overhead(0.34061),
+    )
+
+    assert total == pytest.approx(4.5875, abs=0.002)
+
+
+def test_standard_nircam_data_excess_warning_is_exposed():
+    timing = _timing(nsuperstripe=1)
+    timing["Estimated NIRCam Data Excess (GB)"] = 10.0
+    warnings = add_warnings(
+        {"warnings": {}},
+        timing,
+        sat_level=0.8,
+        flags={
+            "flag_default": "All good",
+            "flag_high": "All good",
+            "flag_min_nint": "All good",
+            "flag_nircam_readout": "Selected BRIGHT1 after RAPID.",
+        },
+        instrument="nircam",
+    )
+
+    assert warnings["NIRCam Readout Optimization"].startswith(
+        "Selected BRIGHT1"
+    )
+    assert "above the 5 GB lower threshold" in warnings[
+        "NIRCam Data Excess?"
+    ]
 
 
 def _timing(nsuperstripe, ngroup=3, mingroups=2):
