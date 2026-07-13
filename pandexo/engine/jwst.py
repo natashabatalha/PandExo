@@ -1522,7 +1522,10 @@ def _nircam_channel_mode(mode, aperture, paired_filter):
 def _display_subarray(subarray):
     if subarray is None:
         return None
-    return str(subarray).split(' (')[0].upper()
+    display_subarray = str(subarray).split(' (')[0].upper()
+    if display_subarray.endswith('_PRM'):
+        return f'{display_subarray[:-4]}_PRISM'
+    return display_subarray
 
 
 def _nircam_output_channels(subarray):
@@ -1599,6 +1602,7 @@ def build_timing_display_div(out, timing):
     instrument = instrument_config.get('instrument')
     mode = instrument_config.get('mode')
     aperture = instrument_config.get('aperture')
+    disperser = instrument_config.get('disperser')
     filter_name = instrument_config.get('filter')
     paired_filter = instrument_config.get('pandexofilterpair')
     readout_pattern = detector_config.get(
@@ -1627,6 +1631,13 @@ def build_timing_display_div(out, timing):
         )
     if str(instrument).lower() == 'nircam':
         apt_rows.extend(_nircam_pupil_rows(filter_name, paired_filter))
+    elif str(instrument).lower() == 'nirspec':
+        apt_rows.append(
+            (
+                'Grating/Filter',
+                f'{_upper_or_none(disperser)}/{_upper_or_none(filter_name)}'
+            )
+        )
     elif not (
         str(instrument).lower() == 'miri'
         and str(mode).lower() in ('lrsslitless', 'lrsslit')

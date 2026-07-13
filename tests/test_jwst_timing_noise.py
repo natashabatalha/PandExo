@@ -546,6 +546,71 @@ def test_nircam_lw_only_timing_display_shows_imaging_sw_channel():
     assert "GRISMR+F322W2" in html
 
 
+@pytest.mark.parametrize(
+    ('disperser', 'filter_name', 'expected'),
+    [
+        ('prism', 'clear', 'PRISM/CLEAR'),
+        ('g140h', 'f070lp', 'G140H/F070LP'),
+    ],
+)
+def test_nirspec_timing_display_combines_grating_and_filter(
+    disperser, filter_name, expected
+):
+    timing = _timing(nsuperstripe=1)
+    apt_div, calculation_div = build_timing_display_div(
+        _pandeia_out(
+            instrument={
+                'instrument': 'nirspec',
+                'mode': 'bots',
+                'filter': filter_name,
+                'aperture': 's1600a1',
+                'disperser': disperser,
+            }
+        ),
+        timing,
+    )
+    html = (apt_div + calculation_div).decode()
+
+    assert '<th>Grating/Filter</th>' in html
+    assert expected in html
+    assert '<th>Filter</th>' not in html
+
+
+@pytest.mark.parametrize(
+    ('subarray', 'expected'),
+    [
+        ('s256m2_prm', 'S256M2_PRISM'),
+        ('s128m4_prm', 'S128M4_PRISM'),
+        ('s64m8_prm', 'S64M8_PRISM'),
+        ('s32m16_prm', 'S32M16_PRISM'),
+    ],
+)
+def test_nirspec_multistripe_subarray_display_uses_prism_suffix(
+    subarray, expected
+):
+    timing = _timing(nsuperstripe=1)
+    apt_div, _ = build_timing_display_div(
+        _pandeia_out(
+            instrument={
+                'instrument': 'nirspec',
+                'mode': 'bots',
+                'filter': 'clear',
+                'aperture': 's1600a1',
+                'disperser': 'prism',
+            },
+            detector={
+                'subarray': subarray,
+                'readout_pattern': 'nrsrapid',
+            },
+        ),
+        timing,
+    )
+    html = apt_div.decode()
+
+    assert expected in html
+    assert '_PRM' not in html
+
+
 def test_miri_lrs_timing_display_uses_dither_not_filter_and_uppercase_readout():
     timing = _timing(nsuperstripe=1)
     apt_div, calculation_div = build_timing_display_div(
