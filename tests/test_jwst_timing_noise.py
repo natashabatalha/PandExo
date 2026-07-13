@@ -153,6 +153,8 @@ def test_standard_nircam_data_excess_warning_is_exposed():
     assert "above the 5 GB lower threshold" in warnings[
         "NIRCam Data Excess?"
     ]
+    assert "10.0 GB" in warnings["NIRCam Data Excess?"]
+    assert "10.00 GB" not in warnings["NIRCam Data Excess?"]
 
 
 def _timing(nsuperstripe, ngroup=3, mingroups=2):
@@ -583,6 +585,8 @@ def test_dhs_lower_threshold_warning_is_exposed():
     assert warnings["DHS Readout Optimization"].startswith("Selected DHS3")
     assert "above the 5 GB lower threshold" in warnings["DHS Data Excess?"]
     assert "acceptable for DHS" in warnings["DHS Data Excess?"]
+    assert "10.0 GB" in warnings["DHS Data Excess?"]
+    assert "10.00 GB" not in warnings["DHS Data Excess?"]
 
 
 def test_multistripe_timing_display_uses_apt_and_calculation_tables():

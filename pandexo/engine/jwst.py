@@ -1679,14 +1679,14 @@ def add_warnings(pand_dict, timing, sat_level, flags,instrument):
         elif data_excess <= DHS_DATA_EXCESS_RECOMMENDED_LIMIT_GB:
             if data_excess_mode == 'DHS':
                 data_excess_warning = (
-                    f"Estimated data excess is {data_excess:.2f} GB, above "
+                    f"Estimated data excess is {data_excess:.1f} GB, above "
                     f"the {DHS_DATA_EXCESS_LOWER_THRESHOLD_GB:g} GB lower "
                     "threshold. This is acceptable for DHS, but verify the "
                     "setup in APT."
                 )
             else:
                 data_excess_warning = (
-                    f"Estimated data excess is {data_excess:.2f} GB, above "
+                    f"Estimated data excess is {data_excess:.1f} GB, above "
                     f"the {DHS_DATA_EXCESS_LOWER_THRESHOLD_GB:g} GB lower "
                     f"threshold. It remains within the "
                     f"{DHS_DATA_EXCESS_RECOMMENDED_LIMIT_GB:g} GB "
@@ -1694,7 +1694,7 @@ def add_warnings(pand_dict, timing, sat_level, flags,instrument):
                 )
         else:
             data_excess_warning = (
-                f"Estimated data excess is {data_excess:.2f} GB, above the "
+                f"Estimated data excess is {data_excess:.1f} GB, above the "
                 f"{DHS_DATA_EXCESS_RECOMMENDED_LIMIT_GB:g} GB recommended "
                 "limit. Verify and revise the setup in APT."
             )
