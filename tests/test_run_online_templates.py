@@ -63,8 +63,12 @@ def test_new_calculation_template_lists_new_miri_lrs_subarrays():
     assert 'value="full"' in template
     assert "FULL (tframe=2.775)" in template
     assert 'value="subslit"' in template
-    assert "miriSubarraysByMode" in template
-    assert 'lrsslit: ["full", "subslit"]' in template
+    assert "miriSubarrayOptionsByMode" in template
+    assert 'lrsslit: [' in template
+    assert 'value: "full", label: "FULL (tframe=2.775)"' in template
+    assert 'value: "subslit", label: "SUBSLIT (tframe=0.279)"' in template
+    assert ".empty()" in template
+    assert ".prop(\"disabled\"" not in template
 
 
 def test_new_calculation_template_lists_nirspec_prism_multistripe_subarrays():

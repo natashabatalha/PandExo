@@ -584,20 +584,34 @@
             }, 0);
         });
 
-        var miriSubarraysByMode = {
-            lrsslitless: ["slitlessprism_ip", "slitlessprism_ips", "slitlessprism"],
-            lrsslit: ["full", "subslit"]
+        var miriSubarrayOptionsByMode = {
+            lrsslitless: [
+                {value: "slitlessprism_ip", label: "SLITLESSPRISM_IP (tframe=0.156)"},
+                {value: "slitlessprism_ips", label: "SLITLESSPRISM_IPS (tframe=0.118)"},
+                {value: "slitlessprism", label: "SLITLESSPRISM (Not Recommended, tframe=0.159)"}
+            ],
+            lrsslit: [
+                {value: "full", label: "FULL (tframe=2.775)"},
+                {value: "subslit", label: "SUBSLIT (tframe=0.279)"}
+            ]
         };
 
         function updateMiriSubarrayOptions() {
             var mode = $("#mirimode").val();
-            var allowed = miriSubarraysByMode[mode] || miriSubarraysByMode.lrsslitless;
-            $("#mirisubarray option").each(function () {
-                $(this).prop("disabled", allowed.indexOf($(this).val()) === -1);
+            var options = miriSubarrayOptionsByMode[mode] || miriSubarrayOptionsByMode.lrsslitless;
+            var current = $("#mirisubarray").val();
+            var selected = options.some(function (option) {
+                return option.value === current;
+            }) ? current : options[0].value;
+
+            $("#mirisubarray").empty();
+            $.each(options, function (_, option) {
+                $("<option></option>")
+                    .val(option.value)
+                    .text(option.label)
+                    .prop("selected", option.value === selected)
+                    .appendTo("#mirisubarray");
             });
-            if (allowed.indexOf($("#mirisubarray").val()) === -1) {
-                $("#mirisubarray").val(allowed[0]);
-            }
             $("#mirisubarray").trigger("change.select2");
         }
 
