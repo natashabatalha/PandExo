@@ -502,6 +502,32 @@ def test_nircam_lw_only_timing_display_shows_imaging_sw_channel():
     assert "GRISMR+F322W2" in html
 
 
+def test_miri_lrs_timing_display_uses_dither_not_filter_and_uppercase_readout():
+    timing = _timing(nsuperstripe=1)
+    html = build_timing_display_div(
+        _pandeia_out(
+            instrument={
+                "instrument": "miri",
+                "mode": "lrsslitless",
+                "filter": None,
+                "aperture": "imager",
+                "disperser": "p750l",
+            },
+            detector={
+                "subarray": "slitlessprism_ip",
+                "readout_pattern": "fastr1",
+            },
+        ),
+        timing,
+    ).decode()
+
+    assert "<th>Filter</th>" not in html
+    assert "<th>Dither</th>" in html
+    assert "<td>None</td>" in html
+    assert "<td>FASTR1</td>" in html
+    assert "<td>fastr1</td>" not in html
+
+
 def test_slope_uncertainty_increases_by_sqrt_nsuperstripe():
     nsuperstripe = 9
     normal = _slope_result(_timing(nsuperstripe=1))

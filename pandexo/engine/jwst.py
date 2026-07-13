@@ -1605,10 +1605,18 @@ def build_timing_display_div(out, timing):
     apt_rows.append(('Exposures/Dith', 1))
     if str(instrument).lower() == 'nircam':
         apt_rows.extend(_nircam_pupil_rows(filter_name, paired_filter))
-    else:
+    elif not (
+        str(instrument).lower() == 'miri'
+        and str(mode).lower() in ('lrsslitless', 'lrsslit')
+    ):
         apt_rows.append(('Filter', filter_name))
+    if (
+        str(instrument).lower() == 'miri'
+        and str(mode).lower() in ('lrsslitless', 'lrsslit')
+    ):
+        apt_rows.append(('Dither', 'None'))
     apt_rows.extend([
-        ('Readout Pattern', readout_pattern),
+        ('Readout Pattern', _upper_or_none(readout_pattern)),
         (
             'Groups per Integration',
             timing['APT: Num Groups per Integration']
