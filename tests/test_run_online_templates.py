@@ -129,7 +129,11 @@ def test_new_calculation_template_lists_dhs_readout_patterns():
     template = Path("pandexo/engine/templates/new.html").read_text()
 
     assert 'name="nircamdhsreadout"' in template
-    assert '<option value="optimize" selected>Optimize readout pattern</option>' in template
+    assert template.count('class="row dhs-control-row"') == 2
+    assert 'class="col-md-12 dhs-notes"' in template
+    assert template.count(
+        '<option value="optimize" selected>Optimize readout</option>'
+    ) == 2
     for readout in ("rapid", "bright1", "dhs3", "dhs4", "dhs5", "dhs6", "dhs7"):
         assert f'<option value="{readout}">' in template
 

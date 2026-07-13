@@ -740,6 +740,34 @@ def test_nircam_lw_only_timing_display_shows_imaging_sw_channel():
     assert "GRISMR+F322W2" in html
 
 
+def test_nircam_timing_display_formats_estimated_data_excess():
+    timing = _timing(nsuperstripe=1)
+    timing['Estimated NIRCam Data Excess (GB)'] = 4.5875
+    timing['Assumed NIRCam Allocation Overhead (sec)'] = 2794.0
+    _, calculation_div = build_timing_display_div(
+        _pandeia_out(
+            instrument={
+                "instrument": "nircam",
+                "mode": "lw_tsgrism",
+                "filter": "f322w2",
+                "aperture": "lw",
+                "disperser": "grismr",
+            },
+            detector={
+                "subarray": "subgrism64",
+                "readout_pattern": "bright1",
+            },
+        ),
+        timing,
+    )
+    html = calculation_div.decode()
+
+    assert "Estimated NIRCam Data Excess (GB)" in html
+    assert "4.6 (Verify using APT)" in html
+    assert "4.6 GB" not in html
+    assert "4.5875" not in html
+
+
 @pytest.mark.parametrize(
     ('disperser', 'filter_name', 'expected'),
     [

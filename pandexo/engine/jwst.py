@@ -2124,10 +2124,16 @@ def build_timing_display_div(out, timing):
         None,
     )
     if data_excess_mode is not None:
+        data_excess_label = f'Estimated {data_excess_mode} Data Excess (GB)'
+        data_excess_value = timing[data_excess_label]
+        if data_excess_mode == 'NIRCam':
+            data_excess_value = (
+                f'{data_excess_value:.1f} (Verify using APT)'
+            )
         calculation_rows.extend([
             (
-                f'Estimated {data_excess_mode} Data Excess (GB)',
-                timing[f'Estimated {data_excess_mode} Data Excess (GB)']
+                data_excess_label,
+                data_excess_value,
             ),
             (
                 'Assumed No-TA Scheduling + Slew Overhead (sec)',
