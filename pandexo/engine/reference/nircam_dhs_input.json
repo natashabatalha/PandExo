@@ -49,6 +49,7 @@
             "instrument": "nircam",
             "mode": "sw_tsgrism",
             "filter": "f150w2",
+            "pandexofilterpair": "f322w2",
             "aperture": "dhs0spec8",
             "disperser": "dhs0"
         },

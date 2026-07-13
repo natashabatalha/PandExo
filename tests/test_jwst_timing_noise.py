@@ -14,6 +14,7 @@ from pandexo.engine.jwst import (
     DHS_DATA_EXCESS_RECOMMENDED_LIMIT_GB,
     DHS_READOUT_PATTERNS,
     NIRCAM_READOUT_PATTERNS,
+    _nircam_dhs_optimization_configs,
     _table_html,
     add_warnings,
     build_timing_display_div,
@@ -155,6 +156,50 @@ def test_standard_nircam_data_excess_warning_is_exposed():
     ]
     assert "10.0 GB" in warnings["NIRCam Data Excess?"]
     assert "10.00 GB" not in warnings["NIRCam Data Excess?"]
+
+
+def test_dhs_optimization_configs_are_independent_of_displayed_channel():
+    base_conf = {
+        'instrument': {
+            'instrument': 'nircam',
+            'mode': 'sw_tsgrism',
+            'filter': 'f150w2',
+            'pandexofilterpair': 'f322w2',
+            'aperture': 'dhs0spec8',
+            'disperser': 'dhs0',
+        },
+        'detector': {
+            'readout_pattern': 'rapid',
+            'subarray': 'sub260s4_8-spectra',
+            'ngroup': 'optimize',
+        },
+    }
+    long_wave_conf = deepcopy(base_conf)
+    long_wave_conf['instrument'].update(
+        mode='lw_tsgrism',
+        filter='f322w2',
+        pandexofilterpair='f150w2',
+        aperture='lw',
+        disperser='grismr',
+    )
+
+    short_display_configs = _nircam_dhs_optimization_configs(base_conf)
+    long_display_configs = _nircam_dhs_optimization_configs(long_wave_conf)
+
+    for short_display, long_display in zip(
+        short_display_configs, long_display_configs
+    ):
+        for key in (
+            'filter', 'pandexofilterpair', 'mode', 'aperture', 'disperser'
+        ):
+            assert short_display['instrument'][key] == (
+                long_display['instrument'][key]
+            )
+        assert short_display['detector'] == long_display['detector']
+    assert short_display_configs[0]['instrument']['filter'] == 'f150w2'
+    assert short_display_configs[1]['instrument']['filter'] == 'f322w2'
+    assert base_conf['instrument']['aperture'] == 'dhs0spec8'
+    assert long_wave_conf['instrument']['aperture'] == 'lw'
 
 
 def _timing(nsuperstripe, ngroup=3, mingroups=2):

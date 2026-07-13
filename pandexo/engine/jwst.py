@@ -609,6 +609,9 @@ def compute_full_sim(dictinput,verbose=False):
                 f"{requested_nircam_readout}. Choose optimize or one of "
                 f"{allowed}."
             )
+    dhs_optimization_confs = (
+        _nircam_dhs_optimization_configs(conf) if is_dhs else None
+    )
     if is_dhs:
         subarray = pandeia_input['configuration']['detector']['subarray']
         nspectra = int(subarray.split('-spectra')[0][-1])#2*int(substripe[substripe.find('stripe')+6])
@@ -633,23 +636,39 @@ def compute_full_sim(dictinput,verbose=False):
 
     i = _instrument_factory(config=conf_temp)
     
-    #detector parameters
+    # Detector parameters for the channel being simulated.
     det_pars = i.read_detector_pars()
-    fullwell = det_pars.get('fullwell', det_pars.get('saturation_fullwell'))
-    if fullwell is None:
-        raise KeyError(
-            "Detector parameters do not include 'fullwell' or "
-            "'saturation_fullwell'."
-        )
     rn = det_pars.get('rn', det_pars.get('readnoise'))
     if rn is None:
         raise KeyError(
             "Detector parameters do not include 'rn' or 'readnoise'."
         )
-    mingroups = det_pars['mingroups']
+
+    # DHS timing and saturation optimization describe one simultaneous APT
+    # exposure and must not depend on which channel PandExo later displays.
+    timing_instrument = i
+    timing_det_pars = det_pars
+    if is_dhs:
+        timing_conf = deepcopy(dhs_optimization_confs[0])
+        timing_conf['detector']['ngroup'] = (
+            2 if 'optimize' in str(conf['detector']['ngroup'])
+            else conf['detector']['ngroup']
+        )
+        timing_instrument = _instrument_factory(config=timing_conf)
+        timing_det_pars = timing_instrument.read_detector_pars()
+
+    fullwell = timing_det_pars.get(
+        'fullwell', timing_det_pars.get('saturation_fullwell')
+    )
+    if fullwell is None:
+        raise KeyError(
+            "Detector parameters do not include 'fullwell' or "
+            "'saturation_fullwell'."
+        )
+    mingroups = timing_det_pars['mingroups']
         
     #exposure parameters 
-    exp_pars = i.the_detector.exposure_spec
+    exp_pars = timing_instrument.the_detector.exposure_spec
     tframe = exp_pars.tframe
     nframe = exp_pars.nframe
     nskip = exp_pars.ndrop2
@@ -732,7 +751,40 @@ def compute_full_sim(dictinput,verbose=False):
     else:
         #run pandeia once to determine max exposure time per int and get exposure params
         log("Optimization Reqested: Computing Duty Cycle")
-        m = {"maxexptime_per_int":compute_maxexptime_per_int(pandeia_input, sat_level) , 
+        if is_dhs:
+            max_exposure_times = []
+            for optimization_conf in dhs_optimization_confs:
+                optimization_input = deepcopy(pandeia_input)
+                optimization_input['configuration'] = deepcopy(
+                    optimization_conf
+                )
+                optimization_detector_conf = deepcopy(optimization_conf)
+                optimization_detector_conf['detector']['ngroup'] = 2
+                optimization_detector = _instrument_factory(
+                    config=optimization_detector_conf
+                ).read_detector_pars()
+                optimization_fullwell = optimization_detector.get(
+                    'fullwell',
+                    optimization_detector.get('saturation_fullwell'),
+                )
+                optimization_sat_level = sat_level
+                if sat_unit == '%':
+                    optimization_sat_level = (
+                        pandexo_input['observation']['sat_level']
+                        / 100.0
+                        * optimization_fullwell
+                    )
+                max_exposure_times.append(
+                    compute_maxexptime_per_int(
+                        optimization_input, optimization_sat_level
+                    )
+                )
+            maxexptime_per_int = np.nanmin(max_exposure_times)
+        else:
+            maxexptime_per_int = compute_maxexptime_per_int(
+                pandeia_input, sat_level
+            )
+        m = {"maxexptime_per_int":maxexptime_per_int,
             "tframe":tframe,"nframe":nframe,"mingroups":mingroups,"nskip":nskip,
             "nsuperstripe":nsuperstripe}
         m.update(exposure_time_inputs)
@@ -747,7 +799,10 @@ def compute_full_sim(dictinput,verbose=False):
         rejected_readouts = []
         for readout_pattern in readout_patterns:
             conf['detector']['readout_pattern'] = readout_pattern
-            candidate_conf = deepcopy(conf)
+            candidate_conf = deepcopy(
+                dhs_optimization_confs[0] if is_dhs else conf
+            )
+            candidate_conf['detector']['readout_pattern'] = readout_pattern
             if 'dhs' in candidate_conf['instrument']['aperture']:
                 candidate_conf['instrument']['aperture'] = 'dhs0bright'
             candidate_conf['detector']['ngroup'] = 2
@@ -1944,6 +1999,81 @@ def _is_nircam_short_wave_filter(filter_name):
     return str(filter_name).lower().startswith(
         ('f070w', 'f090w', 'f115w', 'f150w', 'f150w2', 'f200w')
     )
+
+
+def _nircam_dhs_optimization_configs(conf):
+    """Return both channel configurations for shared DHS optimization.
+
+    NIRCam DHS and long-wave grism data are acquired simultaneously. PandExo
+    runs the two channels separately for display, but their recommended
+    readout pattern, groups, and integrations must be derived from one common
+    APT exposure configuration. PandExo therefore evaluates saturation using
+    both the short-wave DHS bright aperture and the simultaneous long-wave
+    grism, then applies the more restrictive exposure-time limit.
+
+    Parameters
+    ----------
+    conf : dict
+        Pandeia configuration for either displayed channel. The simultaneous
+        filter for the other channel must be stored in ``pandexofilterpair``.
+
+    Returns
+    -------
+    tuple of dict
+        Deep-copied short- and long-wave Pandeia configurations. The former
+        uses the ``dhs0bright`` aperture and the latter uses the LW grism.
+
+    Raises
+    ------
+    ValueError
+        If the displayed and paired filters do not provide one short-wave and
+        one long-wave filter.
+    """
+    instrument_conf = conf['instrument']
+    filters = (
+        instrument_conf.get('filter'),
+        instrument_conf.get('pandexofilterpair'),
+    )
+    short_filter = next(
+        (
+            filter_name
+            for filter_name in filters
+            if _is_nircam_short_wave_filter(filter_name)
+        ),
+        None,
+    )
+    long_filter = next(
+        (
+            filter_name
+            for filter_name in filters
+            if filter_name is not None
+            and not _is_nircam_short_wave_filter(filter_name)
+        ),
+        None,
+    )
+    if short_filter is None or long_filter is None:
+        raise ValueError(
+            "NIRCam DHS optimization requires one short-wave and one "
+            "long-wave filter across 'filter' and 'pandexofilterpair'."
+        )
+
+    short_conf = deepcopy(conf)
+    short_conf['instrument'].update(
+        filter=short_filter,
+        pandexofilterpair=long_filter,
+        mode='sw_tsgrism',
+        aperture='dhs0bright',
+        disperser='dhs0',
+    )
+    long_conf = deepcopy(conf)
+    long_conf['instrument'].update(
+        filter=long_filter,
+        pandexofilterpair=short_filter,
+        mode='lw_tsgrism',
+        aperture='lw',
+        disperser='grismr',
+    )
+    return short_conf, long_conf
 
 
 def _nircam_channel_mode(mode, aperture, paired_filter):
