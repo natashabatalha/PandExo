@@ -24,6 +24,57 @@ MIRI_LRS_ALLOWED_SUBARRAYS = {
     "lrsslitless": ("slitlessprism", "slitlessprism_ip", "slitlessprism_ips"),
     "lrsslit": ("subslit", "full"),
 }
+DHS_READOUT_PATTERNS = (
+    "rapid", "bright1", "dhs3", "dhs4", "dhs5", "dhs6", "dhs7"
+)
+DHS_READOUT_CADENCE_FRAMES = {
+    "rapid": 1,
+    "bright1": 2,
+    "dhs3": 3,
+    "dhs4": 4,
+    "dhs5": 5,
+    "dhs6": 6,
+    "dhs7": 7,
+}
+NIRCAM_READOUT_PATTERNS = (
+    "rapid", "bright1", "bright2", "shallow2", "shallow4", "medium2",
+    "medium8", "mediumdeep2", "mediumdeep8", "deep2", "deep8",
+)
+NIRCAM_READOUT_PARAMETERS = {
+    "rapid": (1, 1),
+    "bright1": (2, 1),
+    "bright2": (2, 2),
+    "shallow2": (5, 2),
+    "shallow4": (5, 4),
+    "medium2": (10, 2),
+    "medium8": (10, 8),
+    "mediumdeep2": (15, 2),
+    "mediumdeep8": (15, 8),
+    "deep2": (20, 2),
+    "deep8": (20, 8),
+}
+NIRCAM_DATA_EXCESS_RECOMMENDED_LIMIT_GB = 15.0
+NIRCAM_DATA_EXCESS_LOWER_THRESHOLD_GB = 5.0
+NIRCAM_SUSTAINABLE_DATA_RATE_GB_PER_HOUR = 3.132
+# Backward-compatible names retained for downstream imports.
+DHS_DATA_EXCESS_RECOMMENDED_LIMIT_GB = NIRCAM_DATA_EXCESS_RECOMMENDED_LIMIT_GB
+DHS_DATA_EXCESS_LOWER_THRESHOLD_GB = NIRCAM_DATA_EXCESS_LOWER_THRESHOLD_GB
+DHS_SUSTAINABLE_DATA_RATE_GB_PER_HOUR = NIRCAM_SUSTAINABLE_DATA_RATE_GB_PER_HOUR
+DHS_NO_TA_FIXED_OVERHEAD_SECONDS = 694.0
+DHS_INITIAL_SLEW_SECONDS = 2100.0
+# Peak raw group rates calibrated from STScI's published RAPID, NGROUPS=2
+# DHS data-excess rates. These account for each supported DHS subarray size.
+DHS_RAW_GROUP_RATE_GB_PER_HOUR = {
+    "sub41s1_2-spectra": 13.728,
+    "sub82s2_4-spectra": 13.893,
+    "sub164s4_8-spectra": 13.983,
+    "sub260s4_8-spectra": 14.013,
+}
+# RAPID data generation for the three detectors used by a standard NIRCam
+# grism time series, calibrated against APT's reported data excess. One-output
+# subarrays take four times longer to read and generate groups at one quarter
+# of the four-output rate.
+NIRCAM_RAW_GROUP_RATE_GB_PER_HOUR = {4: 8.60103, 1: 2.1502575}
 
 #refdata directory
 default_refdata_directory = os.environ.get("pandeia_refdata")
@@ -64,6 +115,193 @@ def select_calculation(planet_wave_unit, nsuperstripe, is_dhs=False):
     if use_slope:
         return 'slope method'
     return 'fml'
+
+
+def nircam_no_ta_overhead(tframe):
+    """Return the assumed no-TA scheduling and initial-slew overhead.
+
+    The fixed 694-second scheduling component follows the documented NIRCam
+    overhead model for one grism time-series exposure without target
+    acquisition: visit scripts, guide-star acquisition, subarray and wheel
+    configuration, OSS compilation, exposure setup/cleanup, fine-guide
+    shutdown, and end-of-visit activities. Frame synchronization contributes
+    another half frame. The standard 2,100-second initial slew is then added
+    because it contributes to the nominal data allocation used by APT.
+
+    https://jwst-docs.stsci.edu/jppom/visit-overheads-timing-model/instrument-specific-overheads/nircam-overheads#gsc.tab=0
+
+    Parameters
+    ----------
+    tframe : float
+        Detector frame time in seconds.
+
+    Returns
+    -------
+    float
+        Scheduling overhead plus initial slew in seconds.
+    """
+    if not np.isfinite(tframe) or tframe <= 0:
+        raise ValueError("tframe must be a positive finite value")
+    return (
+        DHS_NO_TA_FIXED_OVERHEAD_SECONDS
+        + 0.5 * tframe
+        + DHS_INITIAL_SLEW_SECONDS
+    )
+
+
+def nircam_dhs_no_ta_overhead(tframe):
+    """Return the NIRCam no-TA overhead using the legacy DHS helper name."""
+    return nircam_no_ta_overhead(tframe)
+
+
+def estimate_dhs_data_excess(
+        subarray, readout_pattern, ngroup, exposure_hours,
+        allocation_overhead_seconds=0.0):
+    """Estimate NIRCam DHS data excess for one APT exposure.
+
+    The estimate follows the data-rate relation underlying Table 2 of the
+    STScI NIRCam short-wavelength grism time-series recommendations. It
+    subtracts JWST's sustainable 3.132 GB/hour allocation from the generated
+    data rate, then scales the excess rate by the full exposure duration.
+
+    Parameters
+    ----------
+    subarray : str
+        PandExo/Pandeia DHS subarray name, such as
+        ``"sub260s4_8-spectra"``.
+    readout_pattern : str
+        One of ``RAPID``, ``BRIGHT1``, or ``DHS3`` through ``DHS7``. Matching
+        is case-insensitive.
+    ngroup : int
+        Number of groups per integration.
+    exposure_hours : float
+        Elapsed duration of the APT exposure, including integration resets,
+        in hours.
+    allocation_overhead_seconds : float, optional
+        Additional scheduling and slew duration over which APT accrues nominal
+        data allocation. The default of zero reproduces the approximate rates
+        in the STScI DHS recommendations.
+
+    Returns
+    -------
+    tuple of float
+        Estimated data-excess rate in GB/hour and total data excess in GB.
+        A negative rate means the generated rate is below the sustainable
+        allocation; the corresponding total data excess is reported as zero.
+
+    Raises
+    ------
+    ValueError
+        If the subarray, readout pattern, number of groups, or duration is not
+        supported by the estimate.
+
+    Notes
+    -----
+    This is an estimate for choosing a viable readout pattern. Users should
+    still verify final data-volume constraints in APT.
+    """
+    subarray = str(subarray).lower()
+    readout_pattern = str(readout_pattern).lower()
+    if subarray not in DHS_RAW_GROUP_RATE_GB_PER_HOUR:
+        raise ValueError(f"Unsupported NIRCam DHS subarray: {subarray}")
+    if readout_pattern not in DHS_READOUT_CADENCE_FRAMES:
+        raise ValueError(
+            f"Unsupported NIRCam DHS readout pattern: {readout_pattern}"
+        )
+    if int(ngroup) != ngroup or ngroup < 1:
+        raise ValueError("ngroup must be a positive integer")
+    if exposure_hours < 0:
+        raise ValueError("exposure_hours must be non-negative")
+    if allocation_overhead_seconds < 0:
+        raise ValueError("allocation_overhead_seconds must be non-negative")
+
+    ngroup = int(ngroup)
+    cadence_frames = DHS_READOUT_CADENCE_FRAMES[readout_pattern]
+    clock_frames = 2 + (ngroup - 1) * cadence_frames
+    generated_rate = (
+        DHS_RAW_GROUP_RATE_GB_PER_HOUR[subarray]
+        * ngroup
+        / clock_frames
+    )
+    excess_rate = generated_rate - NIRCAM_SUSTAINABLE_DATA_RATE_GB_PER_HOUR
+    overhead_allocation = (
+        NIRCAM_SUSTAINABLE_DATA_RATE_GB_PER_HOUR
+        * allocation_overhead_seconds
+        / 3600.0
+    )
+    total_data_excess = excess_rate * exposure_hours - overhead_allocation
+    return excess_rate, max(0.0, total_data_excess)
+
+
+def estimate_nircam_data_excess(
+        subarray, readout_pattern, ngroup, exposure_hours,
+        allocation_overhead_seconds=0.0):
+    """Estimate data excess for a standard NIRCam grism time series.
+
+    The standard grism template records two short-wave detectors and one
+    long-wave detector. The estimate scales their RAPID data-generation rate
+    by the selected readout cadence and accounts for the additional Frame 0
+    product saved by patterns that average multiple frames into each group.
+
+    Parameters
+    ----------
+    subarray : str
+        A standard NIRCam grism subarray, optionally including the PandExo
+        ``"(noutputs=1)"`` qualifier.
+    readout_pattern : str
+        One of the standard NIRCam readout patterns from ``RAPID`` through
+        ``DEEP8``. Matching is case-insensitive.
+    ngroup : int
+        Number of groups per integration.
+    exposure_hours : float
+        Elapsed duration of the APT exposure in hours.
+    allocation_overhead_seconds : float, optional
+        Scheduling and slew duration over which APT accrues nominal data
+        allocation.
+
+    Returns
+    -------
+    tuple of float
+        Estimated data-excess rate in GB/hour and total data excess in GB.
+
+    Notes
+    -----
+    This estimate is intended to select a practical readout pattern. Final
+    data-volume constraints should still be checked in APT.
+    """
+    subarray = str(subarray).lower()
+    readout_pattern = str(readout_pattern).lower()
+    if not subarray.startswith("subgrism"):
+        raise ValueError(f"Unsupported standard NIRCam subarray: {subarray}")
+    if readout_pattern not in NIRCAM_READOUT_PARAMETERS:
+        raise ValueError(
+            f"Unsupported standard NIRCam readout pattern: {readout_pattern}"
+        )
+    if int(ngroup) != ngroup or ngroup < 1:
+        raise ValueError("ngroup must be a positive integer")
+    if exposure_hours < 0:
+        raise ValueError("exposure_hours must be non-negative")
+    if allocation_overhead_seconds < 0:
+        raise ValueError("allocation_overhead_seconds must be non-negative")
+
+    ngroup = int(ngroup)
+    noutputs = 1 if "noutputs=1" in subarray else 4
+    cadence_frames, nframe = NIRCAM_READOUT_PARAMETERS[readout_pattern]
+    clock_frames = 1 + nframe + (ngroup - 1) * cadence_frames
+    saved_groups = ngroup + int(nframe > 1)
+    generated_rate = (
+        NIRCAM_RAW_GROUP_RATE_GB_PER_HOUR[noutputs]
+        * saved_groups
+        / clock_frames
+    )
+    excess_rate = generated_rate - NIRCAM_SUSTAINABLE_DATA_RATE_GB_PER_HOUR
+    overhead_allocation = (
+        NIRCAM_SUSTAINABLE_DATA_RATE_GB_PER_HOUR
+        * allocation_overhead_seconds
+        / 3600.0
+    )
+    total_data_excess = excess_rate * exposure_hours - overhead_allocation
+    return excess_rate, max(0.0, total_data_excess)
 
 
 def validate_miri_lrs_subarray(conf):
@@ -349,6 +587,31 @@ def compute_full_sim(dictinput,verbose=False):
 
     #now fix DHS #of spectra depending on the subarray
     is_dhs = 'dhs' in conf['instrument']['aperture']
+    is_nircam = str(instrument).lower() == 'nircam'
+    requested_nircam_readout = str(
+        conf['detector'].get('readout_pattern', '')
+    ).lower()
+    readout_patterns = (
+        DHS_READOUT_PATTERNS if is_dhs else NIRCAM_READOUT_PATTERNS
+    )
+    optimize_nircam_readout = (
+        is_nircam and requested_nircam_readout == 'optimize'
+    )
+    if is_nircam:
+        if optimize_nircam_readout:
+            # Pandeia does not recognize PandExo's optimization sentinel.
+            conf['detector']['readout_pattern'] = readout_patterns[0]
+        elif requested_nircam_readout not in readout_patterns:
+            allowed = ', '.join(pattern.upper() for pattern in readout_patterns)
+            mode_name = 'DHS' if is_dhs else 'standard grism'
+            raise ValueError(
+                f"Unsupported NIRCam {mode_name} readout pattern: "
+                f"{requested_nircam_readout}. Choose optimize or one of "
+                f"{allowed}."
+            )
+    dhs_optimization_confs = (
+        _nircam_dhs_optimization_configs(conf) if is_dhs else None
+    )
     if is_dhs:
         subarray = pandeia_input['configuration']['detector']['subarray']
         nspectra = int(subarray.split('-spectra')[0][-1])#2*int(substripe[substripe.find('stripe')+6])
@@ -373,23 +636,39 @@ def compute_full_sim(dictinput,verbose=False):
 
     i = _instrument_factory(config=conf_temp)
     
-    #detector parameters
+    # Detector parameters for the channel being simulated.
     det_pars = i.read_detector_pars()
-    fullwell = det_pars.get('fullwell', det_pars.get('saturation_fullwell'))
-    if fullwell is None:
-        raise KeyError(
-            "Detector parameters do not include 'fullwell' or "
-            "'saturation_fullwell'."
-        )
     rn = det_pars.get('rn', det_pars.get('readnoise'))
     if rn is None:
         raise KeyError(
             "Detector parameters do not include 'rn' or 'readnoise'."
         )
-    mingroups = det_pars['mingroups']
+
+    # DHS timing and saturation optimization describe one simultaneous APT
+    # exposure and must not depend on which channel PandExo later displays.
+    timing_instrument = i
+    timing_det_pars = det_pars
+    if is_dhs:
+        timing_conf = deepcopy(dhs_optimization_confs[0])
+        timing_conf['detector']['ngroup'] = (
+            2 if 'optimize' in str(conf['detector']['ngroup'])
+            else conf['detector']['ngroup']
+        )
+        timing_instrument = _instrument_factory(config=timing_conf)
+        timing_det_pars = timing_instrument.read_detector_pars()
+
+    fullwell = timing_det_pars.get(
+        'fullwell', timing_det_pars.get('saturation_fullwell')
+    )
+    if fullwell is None:
+        raise KeyError(
+            "Detector parameters do not include 'fullwell' or "
+            "'saturation_fullwell'."
+        )
+    mingroups = timing_det_pars['mingroups']
         
     #exposure parameters 
-    exp_pars = i.the_detector.exposure_spec
+    exp_pars = timing_instrument.the_detector.exposure_spec
     tframe = exp_pars.tframe
     nframe = exp_pars.nframe
     nskip = exp_pars.ndrop2
@@ -472,7 +751,40 @@ def compute_full_sim(dictinput,verbose=False):
     else:
         #run pandeia once to determine max exposure time per int and get exposure params
         log("Optimization Reqested: Computing Duty Cycle")
-        m = {"maxexptime_per_int":compute_maxexptime_per_int(pandeia_input, sat_level) , 
+        if is_dhs:
+            max_exposure_times = []
+            for optimization_conf in dhs_optimization_confs:
+                optimization_input = deepcopy(pandeia_input)
+                optimization_input['configuration'] = deepcopy(
+                    optimization_conf
+                )
+                optimization_detector_conf = deepcopy(optimization_conf)
+                optimization_detector_conf['detector']['ngroup'] = 2
+                optimization_detector = _instrument_factory(
+                    config=optimization_detector_conf
+                ).read_detector_pars()
+                optimization_fullwell = optimization_detector.get(
+                    'fullwell',
+                    optimization_detector.get('saturation_fullwell'),
+                )
+                optimization_sat_level = sat_level
+                if sat_unit == '%':
+                    optimization_sat_level = (
+                        pandexo_input['observation']['sat_level']
+                        / 100.0
+                        * optimization_fullwell
+                    )
+                max_exposure_times.append(
+                    compute_maxexptime_per_int(
+                        optimization_input, optimization_sat_level
+                    )
+                )
+            maxexptime_per_int = np.nanmin(max_exposure_times)
+        else:
+            maxexptime_per_int = compute_maxexptime_per_int(
+                pandeia_input, sat_level
+            )
+        m = {"maxexptime_per_int":maxexptime_per_int,
             "tframe":tframe,"nframe":nframe,"mingroups":mingroups,"nskip":nskip,
             "nsuperstripe":nsuperstripe}
         m.update(exposure_time_inputs)
@@ -481,6 +793,140 @@ def compute_full_sim(dictinput,verbose=False):
     #calculate all timing info
     max_ngroup_instrument = max_ngroup[pandeia_input["configuration"]["instrument"]["instrument"]]
     timing, flags = compute_timing(m,transit_duration,expfact_out,noccultations,max_ngroup_instrument)
+
+    if optimize_nircam_readout:
+        selected = None
+        rejected_readouts = []
+        for readout_pattern in readout_patterns:
+            conf['detector']['readout_pattern'] = readout_pattern
+            candidate_conf = deepcopy(
+                dhs_optimization_confs[0] if is_dhs else conf
+            )
+            candidate_conf['detector']['readout_pattern'] = readout_pattern
+            if 'dhs' in candidate_conf['instrument']['aperture']:
+                candidate_conf['instrument']['aperture'] = 'dhs0bright'
+            candidate_conf['detector']['ngroup'] = 2
+            candidate_instrument = _instrument_factory(config=candidate_conf)
+            candidate_detector = candidate_instrument.read_detector_pars()
+            candidate_exposure = candidate_instrument.the_detector.exposure_spec
+            candidate_m = {
+                "tframe": candidate_exposure.tframe,
+                "nframe": candidate_exposure.nframe,
+                "mingroups": candidate_detector['mingroups'],
+                "nskip": candidate_exposure.ndrop2,
+                "nsuperstripe": int(
+                    getattr(candidate_exposure, "nsuperstripe", 1) or 1
+                ),
+                "tfffr": getattr(candidate_exposure, "tfffr", None),
+                "nreset1": getattr(candidate_exposure, "nreset1", 1),
+                "ndrop1": getattr(candidate_exposure, "ndrop1", 0),
+                "ndrop3": getattr(candidate_exposure, "ndrop3", 0),
+            }
+            if "maxexptime_per_int" in m:
+                candidate_m["maxexptime_per_int"] = m["maxexptime_per_int"]
+            else:
+                candidate_m["ngroup"] = m["ngroup"]
+            candidate_timing, candidate_flags = compute_timing(
+                candidate_m,
+                transit_duration,
+                expfact_out,
+                noccultations,
+                max_ngroup_instrument,
+            )
+            allocation_overhead = nircam_no_ta_overhead(
+                candidate_exposure.tframe
+            )
+            estimate_data_excess = (
+                estimate_dhs_data_excess
+                if is_dhs else estimate_nircam_data_excess
+            )
+            excess_rate, data_excess = estimate_data_excess(
+                conf['detector']['subarray'], readout_pattern,
+                candidate_timing['APT: Num Groups per Integration'],
+                candidate_timing['Transit+Baseline, no overhead (hrs)'],
+                allocation_overhead_seconds=allocation_overhead,
+            )
+            data_label = 'DHS' if is_dhs else 'NIRCam'
+            candidate_timing[
+                f'Estimated {data_label} Data Excess Rate (GB/hr)'
+            ] = excess_rate
+            candidate_timing[
+                f'Estimated {data_label} Data Excess (GB)'
+            ] = data_excess
+            candidate_timing[
+                f'Assumed {data_label} Allocation Overhead (sec)'
+            ] = allocation_overhead
+            selected = (
+                readout_pattern, candidate_instrument, candidate_timing,
+                candidate_flags
+            )
+
+            saturation_limited = (
+                candidate_flags['flag_default'].startswith(
+                    'Optimized NGROUPS below minimum'
+                )
+            )
+            if saturation_limited or (
+                    data_excess <= NIRCAM_DATA_EXCESS_RECOMMENDED_LIMIT_GB):
+                break
+            if readout_pattern != readout_patterns[-1]:
+                rejected_readouts.append(readout_pattern.upper())
+
+        readout_pattern, i, timing, flags = selected
+        conf['detector']['readout_pattern'] = readout_pattern
+        exp_pars = i.the_detector.exposure_spec
+        tframe = exp_pars.tframe
+        nframe = exp_pars.nframe
+        nskip = exp_pars.ndrop2
+        nsuperstripe = int(getattr(exp_pars, "nsuperstripe", 1) or 1)
+        flags['flag_nircam_readout'] = (
+            f"Selected {readout_pattern.upper()}"
+            + (
+                f" after {', '.join(rejected_readouts)} exceeded the "
+                f"{NIRCAM_DATA_EXCESS_RECOMMENDED_LIMIT_GB:g} GB "
+                "recommendation."
+                if rejected_readouts else "."
+            )
+            + " Estimate assumes no target acquisition and a standard "
+            "2,100-second initial slew."
+        )
+        if is_dhs:
+            flags['flag_dhs_readout'] = flags['flag_nircam_readout']
+    elif is_dhs:
+        allocation_overhead = nircam_no_ta_overhead(tframe)
+        excess_rate, data_excess = estimate_dhs_data_excess(
+            conf['detector']['subarray'],
+            requested_nircam_readout,
+            timing['APT: Num Groups per Integration'],
+            timing['Transit+Baseline, no overhead (hrs)'],
+            allocation_overhead_seconds=allocation_overhead,
+        )
+        timing['Estimated DHS Data Excess Rate (GB/hr)'] = excess_rate
+        timing['Estimated DHS Data Excess (GB)'] = data_excess
+        timing['Assumed DHS Allocation Overhead (sec)'] = allocation_overhead
+        flags['flag_dhs_readout'] = (
+            f"User selected {requested_nircam_readout.upper()}; readout pattern "
+            "optimization was not performed. Estimate assumes no target "
+            "acquisition and a standard 2,100-second initial slew."
+        )
+        flags['flag_nircam_readout'] = flags['flag_dhs_readout']
+    elif is_nircam:
+        allocation_overhead = nircam_no_ta_overhead(tframe)
+        excess_rate, data_excess = estimate_nircam_data_excess(
+            conf['detector']['subarray'],
+            requested_nircam_readout,
+            timing['APT: Num Groups per Integration'],
+            timing['Transit+Baseline, no overhead (hrs)'],
+            allocation_overhead_seconds=allocation_overhead,
+        )
+        timing['Estimated NIRCam Data Excess Rate (GB/hr)'] = excess_rate
+        timing['Estimated NIRCam Data Excess (GB)'] = data_excess
+        timing['Assumed NIRCam Allocation Overhead (sec)'] = allocation_overhead
+        flags['flag_nircam_readout'] = (
+            f"User selected {requested_nircam_readout.upper()}; readout pattern "
+            "optimization was not performed. Estimate assumes no target "
+            "acquisition and a standard 2,100-second initial slew."
+        )
     
     #Simulate out trans and in transit
     log("Starting Out of Transit Simulation")
@@ -879,7 +1325,9 @@ def compute_timing(m,transit_duration,expfact_out,noccultations,max_ngroup_instr
                 )
             )
             return full_cycle
-        return (ngroups+1.0)*tframe
+        return (
+            1.0 + nframe + (ngroups - 1.0) * (nframe + nskip)
+        ) * tframe
     def _timing_values(ngroups):
         if ngroups == 1:
             frame_zero_dead = 0
@@ -1270,6 +1718,50 @@ def add_warnings(pand_dict, timing, sat_level, flags,instrument):
             "Minimum Integrations?": flags.get("flag_min_nint", "All good")
     }
 
+    data_excess_mode = next(
+        (
+            mode_name for mode_name in ('DHS', 'NIRCam')
+            if f'Estimated {mode_name} Data Excess (GB)' in timing
+        ),
+        None,
+    )
+    if data_excess_mode is not None:
+        data_excess = timing[
+            f'Estimated {data_excess_mode} Data Excess (GB)'
+        ]
+        if data_excess <= DHS_DATA_EXCESS_LOWER_THRESHOLD_GB:
+            data_excess_warning = "All good"
+        elif data_excess <= DHS_DATA_EXCESS_RECOMMENDED_LIMIT_GB:
+            if data_excess_mode == 'DHS':
+                data_excess_warning = (
+                    f"Estimated data excess is {data_excess:.1f} GB, above "
+                    f"the {DHS_DATA_EXCESS_LOWER_THRESHOLD_GB:g} GB lower "
+                    "threshold. This is acceptable for DHS, but verify the "
+                    "setup in APT."
+                )
+            else:
+                data_excess_warning = (
+                    f"Estimated data excess is {data_excess:.1f} GB, above "
+                    f"the {DHS_DATA_EXCESS_LOWER_THRESHOLD_GB:g} GB lower "
+                    f"threshold. It remains within the "
+                    f"{DHS_DATA_EXCESS_RECOMMENDED_LIMIT_GB:g} GB "
+                    "recommendation, but verify the setup in APT."
+                )
+        else:
+            data_excess_warning = (
+                f"Estimated data excess is {data_excess:.1f} GB, above the "
+                f"{DHS_DATA_EXCESS_RECOMMENDED_LIMIT_GB:g} GB recommended "
+                "limit. Verify and revise the setup in APT."
+            )
+        warnings[f'{data_excess_mode} Readout Optimization'] = flags.get(
+            'flag_nircam_readout',
+            flags.get(
+                'flag_dhs_readout',
+                'User-specified readout pattern was not changed.',
+            ),
+        )
+        warnings[f'{data_excess_mode} Data Excess?'] = data_excess_warning
+
     return warnings     
     
 def add_noise_floor(noise_floor, wave_bin, error_spec):
@@ -1509,6 +2001,81 @@ def _is_nircam_short_wave_filter(filter_name):
     )
 
 
+def _nircam_dhs_optimization_configs(conf):
+    """Return both channel configurations for shared DHS optimization.
+
+    NIRCam DHS and long-wave grism data are acquired simultaneously. PandExo
+    runs the two channels separately for display, but their recommended
+    readout pattern, groups, and integrations must be derived from one common
+    APT exposure configuration. PandExo therefore evaluates saturation using
+    both the short-wave DHS bright aperture and the simultaneous long-wave
+    grism, then applies the more restrictive exposure-time limit.
+
+    Parameters
+    ----------
+    conf : dict
+        Pandeia configuration for either displayed channel. The simultaneous
+        filter for the other channel must be stored in ``pandexofilterpair``.
+
+    Returns
+    -------
+    tuple of dict
+        Deep-copied short- and long-wave Pandeia configurations. The former
+        uses the ``dhs0bright`` aperture and the latter uses the LW grism.
+
+    Raises
+    ------
+    ValueError
+        If the displayed and paired filters do not provide one short-wave and
+        one long-wave filter.
+    """
+    instrument_conf = conf['instrument']
+    filters = (
+        instrument_conf.get('filter'),
+        instrument_conf.get('pandexofilterpair'),
+    )
+    short_filter = next(
+        (
+            filter_name
+            for filter_name in filters
+            if _is_nircam_short_wave_filter(filter_name)
+        ),
+        None,
+    )
+    long_filter = next(
+        (
+            filter_name
+            for filter_name in filters
+            if filter_name is not None
+            and not _is_nircam_short_wave_filter(filter_name)
+        ),
+        None,
+    )
+    if short_filter is None or long_filter is None:
+        raise ValueError(
+            "NIRCam DHS optimization requires one short-wave and one "
+            "long-wave filter across 'filter' and 'pandexofilterpair'."
+        )
+
+    short_conf = deepcopy(conf)
+    short_conf['instrument'].update(
+        filter=short_filter,
+        pandexofilterpair=long_filter,
+        mode='sw_tsgrism',
+        aperture='dhs0bright',
+        disperser='dhs0',
+    )
+    long_conf = deepcopy(conf)
+    long_conf['instrument'].update(
+        filter=long_filter,
+        pandexofilterpair=short_filter,
+        mode='lw_tsgrism',
+        aperture='lw',
+        disperser='grismr',
+    )
+    return short_conf, long_conf
+
+
 def _nircam_channel_mode(mode, aperture, paired_filter):
     mode = str(mode).lower()
     aperture = str(aperture).lower()
@@ -1638,7 +2205,7 @@ def build_timing_display_div(out, timing):
                 f'{_upper_or_none(disperser)}/{_upper_or_none(filter_name)}'
             )
         )
-    elif not (
+    elif str(instrument).lower() != 'niriss' and not (
         str(instrument).lower() == 'miri'
         and str(mode).lower() in ('lrsslitless', 'lrsslit')
     ):
@@ -1678,6 +2245,30 @@ def build_timing_display_div(out, timing):
             _integer_display(timing['Num Integrations Out of Transit'])
         ),
     ]
+
+    data_excess_mode = next(
+        (
+            mode_name for mode_name in ('DHS', 'NIRCam')
+            if f'Estimated {mode_name} Data Excess (GB)' in timing
+        ),
+        None,
+    )
+    if data_excess_mode is not None:
+        data_excess_label = f'Estimated {data_excess_mode} Data Excess (GB)'
+        data_excess_value = timing[data_excess_label]
+        data_excess_value = f'{data_excess_value:.1f} (Verify using APT)'
+        calculation_rows.extend([
+            (
+                data_excess_label,
+                data_excess_value,
+            ),
+            (
+                'Assumed No-TA Scheduling + Slew Overhead (sec)',
+                timing[
+                    f'Assumed {data_excess_mode} Allocation Overhead (sec)'
+                ]
+            ),
+        ])
 
     if nstripes > 1:
         calculation_rows.extend([

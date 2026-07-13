@@ -49,11 +49,12 @@
             "instrument": "nircam",
             "mode": "sw_tsgrism",
             "filter": "f150w2",
+            "pandexofilterpair": "f322w2",
             "aperture": "dhs0spec8",
             "disperser": "dhs0"
         },
     "detector": {
-            "readout_pattern":"rapid",
+            "readout_pattern":"optimize",
             "subarray": "sub260s4_8-spectra",
             "ngroup": "optimize",
             "nint": 1,

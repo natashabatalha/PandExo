@@ -125,6 +125,43 @@ def test_new_calculation_template_uses_subgrism256_label():
     assert bad_label not in template
 
 
+def test_new_calculation_template_lists_dhs_readout_patterns():
+    template = Path("pandexo/engine/templates/new.html").read_text()
+
+    assert 'name="nircamdhsreadout"' in template
+    assert template.count('class="row dhs-control-row"') == 2
+    assert template.count('class="col-md-3 dhs-selector-column"') == 5
+    assert 'class="col-md-12 dhs-notes"' in template
+    assert template.count(
+        '<option value="optimize" selected>Optimize readout</option>'
+    ) == 2
+    for readout in ("rapid", "bright1", "dhs3", "dhs4", "dhs5", "dhs6", "dhs7"):
+        assert f'<option value="{readout}">' in template
+
+
+def test_nircam_dhs_reference_defaults_to_readout_optimization():
+    reference = Path("pandexo/engine/reference/nircam_dhs_input.json").read_text()
+
+    assert '"readout_pattern":"optimize"' in reference
+
+
+def test_new_calculation_template_lists_standard_nircam_readout_patterns():
+    template = Path("pandexo/engine/templates/new.html").read_text()
+
+    assert 'name="nircamreadout"' in template
+    for readout in (
+        "rapid", "bright1", "bright2", "shallow2", "shallow4", "medium2",
+        "medium8", "mediumdeep2", "mediumdeep8", "deep2", "deep8",
+    ):
+        assert f'<option value="{readout}">' in template
+
+
+def test_standard_nircam_reference_defaults_to_readout_optimization():
+    reference = Path("pandexo/engine/reference/nircam_input.json").read_text()
+
+    assert '"readout_pattern":"optimize"' in reference
+
+
 def test_miri_reference_uses_supported_fastr1_readout():
     reference = Path("pandexo/engine/reference/miri_input.json").read_text()
 

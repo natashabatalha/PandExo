@@ -11,14 +11,195 @@ import pytest
 
 from pandexo.engine.compute_noise import ExtractSpec
 from pandexo.engine.jwst import (
+    DHS_DATA_EXCESS_RECOMMENDED_LIMIT_GB,
+    DHS_READOUT_PATTERNS,
+    NIRCAM_READOUT_PATTERNS,
+    _nircam_dhs_optimization_configs,
     _table_html,
     add_warnings,
     build_timing_display_div,
     compute_timing,
+    estimate_dhs_data_excess,
+    estimate_nircam_data_excess,
+    nircam_dhs_no_ta_overhead,
+    nircam_no_ta_overhead,
     select_calculation,
     update_timing_measurement_time,
     validate_miri_lrs_subarray,
 )
+
+
+@pytest.mark.parametrize(
+    ("subarray", "readout", "ngroup", "expected_rate"),
+    [
+        ("sub41s1_2-spectra", "rapid", 2, 6.02),
+        ("sub260s4_8-spectra", "rapid", 2, 6.21),
+        ("sub260s4_8-spectra", "bright1", 3, 3.88),
+        ("sub260s4_8-spectra", "dhs4", 3, 1.07),
+        ("sub260s4_8-spectra", "dhs6", 3, -0.13),
+    ],
+)
+def test_dhs_data_excess_estimate_matches_stsci_table(
+    subarray, readout, ngroup, expected_rate
+):
+    rate, total = estimate_dhs_data_excess(
+        subarray, readout, ngroup, exposure_hours=2.0
+    )
+
+    assert rate == pytest.approx(expected_rate, abs=0.01)
+    assert total == pytest.approx(max(0.0, 2.0 * expected_rate), abs=0.02)
+
+
+def test_dhs_readout_order_reaches_first_recommended_six_hour_setup():
+    selected = None
+    for readout in DHS_READOUT_PATTERNS:
+        _, total = estimate_dhs_data_excess(
+            "sub260s4_8-spectra", readout, ngroup=2, exposure_hours=6.0
+        )
+        if total <= DHS_DATA_EXCESS_RECOMMENDED_LIMIT_GB:
+            selected = readout
+            break
+
+    assert selected == "dhs3"
+
+
+def test_dhs_no_ta_overhead_includes_standard_initial_slew():
+    overhead = nircam_dhs_no_ta_overhead(tframe=1.36765)
+
+    assert overhead == pytest.approx(2794.683825)
+    assert overhead == nircam_no_ta_overhead(tframe=1.36765)
+
+
+def test_dhs_data_excess_uses_no_ta_allocation_overhead():
+    _, without_overhead = estimate_dhs_data_excess(
+        "sub260s4_8-spectra", "dhs3", 100, exposure_hours=5.7931374583
+    )
+    _, with_overhead = estimate_dhs_data_excess(
+        "sub260s4_8-spectra",
+        "dhs3",
+        100,
+        exposure_hours=5.7931374583,
+        allocation_overhead_seconds=nircam_dhs_no_ta_overhead(1.36765),
+    )
+
+    assert without_overhead == pytest.approx(9.006139368, abs=1e-6)
+    assert with_overhead == pytest.approx(6.574764707, abs=1e-6)
+
+
+def test_standard_nircam_optimizer_reaches_first_recommended_readout():
+    selected = None
+    for readout in NIRCAM_READOUT_PATTERNS:
+        _, total = estimate_nircam_data_excess(
+            "subgrism64", readout, ngroup=100, exposure_hours=6.0
+        )
+        if total <= DHS_DATA_EXCESS_RECOMMENDED_LIMIT_GB:
+            selected = readout
+            break
+
+    assert selected == "bright1"
+
+
+def test_standard_nircam_one_output_subarray_can_retain_rapid():
+    rate, total = estimate_nircam_data_excess(
+        "subgrism64 (noutputs=1)", "rapid", ngroup=100,
+        exposure_hours=6.0,
+    )
+
+    assert rate < 0
+    assert total == 0
+
+
+def test_standard_nircam_multiframe_readout_includes_frame_zero():
+    bright1_rate, _ = estimate_nircam_data_excess(
+        "subgrism64", "bright1", ngroup=2, exposure_hours=1.0
+    )
+    bright2_rate, _ = estimate_nircam_data_excess(
+        "subgrism64", "bright2", ngroup=2, exposure_hours=1.0
+    )
+
+    assert bright2_rate > bright1_rate
+
+
+def test_standard_nircam_data_excess_matches_apt_bright1_setup():
+    _, total = estimate_nircam_data_excess(
+        "subgrism64",
+        "bright1",
+        ngroup=14,
+        exposure_hours=21622.625 / 3600.0,
+        allocation_overhead_seconds=nircam_no_ta_overhead(0.34061),
+    )
+
+    assert total == pytest.approx(4.5875, abs=0.002)
+
+
+def test_standard_nircam_data_excess_warning_is_exposed():
+    timing = _timing(nsuperstripe=1)
+    timing["Estimated NIRCam Data Excess (GB)"] = 10.0
+    warnings = add_warnings(
+        {"warnings": {}},
+        timing,
+        sat_level=0.8,
+        flags={
+            "flag_default": "All good",
+            "flag_high": "All good",
+            "flag_min_nint": "All good",
+            "flag_nircam_readout": "Selected BRIGHT1 after RAPID.",
+        },
+        instrument="nircam",
+    )
+
+    assert warnings["NIRCam Readout Optimization"].startswith(
+        "Selected BRIGHT1"
+    )
+    assert "above the 5 GB lower threshold" in warnings[
+        "NIRCam Data Excess?"
+    ]
+    assert "10.0 GB" in warnings["NIRCam Data Excess?"]
+    assert "10.00 GB" not in warnings["NIRCam Data Excess?"]
+
+
+def test_dhs_optimization_configs_are_independent_of_displayed_channel():
+    base_conf = {
+        'instrument': {
+            'instrument': 'nircam',
+            'mode': 'sw_tsgrism',
+            'filter': 'f150w2',
+            'pandexofilterpair': 'f322w2',
+            'aperture': 'dhs0spec8',
+            'disperser': 'dhs0',
+        },
+        'detector': {
+            'readout_pattern': 'rapid',
+            'subarray': 'sub260s4_8-spectra',
+            'ngroup': 'optimize',
+        },
+    }
+    long_wave_conf = deepcopy(base_conf)
+    long_wave_conf['instrument'].update(
+        mode='lw_tsgrism',
+        filter='f322w2',
+        pandexofilterpair='f150w2',
+        aperture='lw',
+        disperser='grismr',
+    )
+
+    short_display_configs = _nircam_dhs_optimization_configs(base_conf)
+    long_display_configs = _nircam_dhs_optimization_configs(long_wave_conf)
+
+    for short_display, long_display in zip(
+        short_display_configs, long_display_configs
+    ):
+        for key in (
+            'filter', 'pandexofilterpair', 'mode', 'aperture', 'disperser'
+        ):
+            assert short_display['instrument'][key] == (
+                long_display['instrument'][key]
+            )
+        assert short_display['detector'] == long_display['detector']
+    assert short_display_configs[0]['instrument']['filter'] == 'f150w2'
+    assert short_display_configs[1]['instrument']['filter'] == 'f322w2'
+    assert base_conf['instrument']['aperture'] == 'dhs0spec8'
+    assert long_wave_conf['instrument']['aperture'] == 'lw'
 
 
 def _timing(nsuperstripe, ngroup=3, mingroups=2):
@@ -224,6 +405,25 @@ def test_multigroup_measurement_time_preserves_first_minus_last_interval():
     assert timing["Measurement Time per Integration (sec)"] == pytest.approx(4.0)
 
 
+def test_skipped_frames_contribute_to_elapsed_integration_time():
+    timing, _ = compute_timing(
+        {
+            "ngroup": 3,
+            "tframe": 2.0,
+            "nframe": 1,
+            "mingroups": 2,
+            "nskip": 2,
+            "nsuperstripe": 1,
+        },
+        transit_duration=24.0,
+        expfact_out=1.0,
+        noccultations=1,
+    )
+
+    assert timing["Time/Integration incl reset (sec)"] == pytest.approx(16.0)
+    assert timing["Measurement Time per Integration (sec)"] == pytest.approx(12.0)
+
+
 def test_multistripe_effective_time_is_divided_by_nsuperstripe():
     timing = _timing(nsuperstripe=4)
 
@@ -411,6 +611,29 @@ def test_user_multistripe_timing_warns_without_changing_ngroups_below_minimum():
     assert warnings["Minimum Integrations?"] == flags["flag_min_nint"]
 
 
+def test_dhs_lower_threshold_warning_is_exposed():
+    timing = _timing(nsuperstripe=1)
+    timing["Estimated DHS Data Excess (GB)"] = 10.0
+    warnings = add_warnings(
+        {"warnings": {}},
+        timing,
+        sat_level=0.8,
+        flags={
+            "flag_default": "All good",
+            "flag_high": "All good",
+            "flag_min_nint": "All good",
+            "flag_dhs_readout": "Selected DHS3 after RAPID, BRIGHT1 exceeded the limit.",
+        },
+        instrument="nircam",
+    )
+
+    assert warnings["DHS Readout Optimization"].startswith("Selected DHS3")
+    assert "above the 5 GB lower threshold" in warnings["DHS Data Excess?"]
+    assert "acceptable for DHS" in warnings["DHS Data Excess?"]
+    assert "10.0 GB" in warnings["DHS Data Excess?"]
+    assert "10.00 GB" not in warnings["DHS Data Excess?"]
+
+
 def test_multistripe_timing_display_uses_apt_and_calculation_tables():
     timing = _timing_with_pandeia_cycle(
         nsuperstripe=4,
@@ -432,6 +655,20 @@ def test_multistripe_timing_display_uses_apt_and_calculation_tables():
     assert "Effective Per-Wavelength" not in html
     assert "Time/Integration incl reset" not in html
     assert "Measurement Time per Integration" not in html
+
+
+def test_timing_display_includes_estimated_dhs_data_excess():
+    timing = _timing(nsuperstripe=1)
+    timing["Estimated DHS Data Excess (GB)"] = 4.26
+    timing["Assumed DHS Allocation Overhead (sec)"] = 2794.68
+    _, calculation_div = build_timing_display_div(_pandeia_out(), timing)
+
+    html = calculation_div.decode()
+
+    assert "Estimated DHS Data Excess (GB)" in html
+    assert "4.3 (Verify using APT)" in html
+    assert "4.26" not in html
+    assert "Assumed No-TA Scheduling + Slew Overhead (sec)" in html
 
 
 def test_view_template_owns_timing_table_headings():
@@ -481,6 +718,15 @@ def test_timing_display_formats_transit_and_integration_counts_as_integers():
     assert "<td>1.0</td>" not in html
     assert "<td>12.0</td>" not in html
     assert "<td>15.0</td>" not in html
+
+
+def test_niriss_timing_display_omits_filter_row():
+    timing = _timing(nsuperstripe=1)
+    apt_div, _ = build_timing_display_div(_pandeia_out(), timing)
+    html = apt_div.decode()
+
+    assert "<th>Filter</th>" not in html
+    assert "<td>clear</td>" not in html
 
 
 def test_nircam_timing_display_shows_channel_and_pupil_rows():
@@ -544,6 +790,34 @@ def test_nircam_lw_only_timing_display_shows_imaging_sw_channel():
     assert "CHOOSE THIS USING ETC" in html
     assert "Long Pupil+Filter" in html
     assert "GRISMR+F322W2" in html
+
+
+def test_nircam_timing_display_formats_estimated_data_excess():
+    timing = _timing(nsuperstripe=1)
+    timing['Estimated NIRCam Data Excess (GB)'] = 4.5875
+    timing['Assumed NIRCam Allocation Overhead (sec)'] = 2794.0
+    _, calculation_div = build_timing_display_div(
+        _pandeia_out(
+            instrument={
+                "instrument": "nircam",
+                "mode": "lw_tsgrism",
+                "filter": "f322w2",
+                "aperture": "lw",
+                "disperser": "grismr",
+            },
+            detector={
+                "subarray": "subgrism64",
+                "readout_pattern": "bright1",
+            },
+        ),
+        timing,
+    )
+    html = calculation_div.decode()
+
+    assert "Estimated NIRCam Data Excess (GB)" in html
+    assert "4.6 (Verify using APT)" in html
+    assert "4.6 GB" not in html
+    assert "4.5875" not in html
 
 
 @pytest.mark.parametrize(
@@ -851,8 +1125,32 @@ def test_pandeia_dhs_readout_uses_slope_without_superstripes():
 
     with open("pandexo/engine/reference/nircam_dhs_input.json") as handle:
         conf = json.load(handle)["configuration"]
+    assert conf["detector"]["readout_pattern"] == "optimize"
+    conf["detector"]["readout_pattern"] = "rapid"
     conf["detector"]["ngroup"] = 2
     exp_pars = InstrumentFactory(config=conf).the_detector.exposure_spec
 
     assert exp_pars.nsuperstripe == 1
     assert select_calculation("um", exp_pars.nsuperstripe, is_dhs=True) == "slope method"
+
+
+def test_dhs_throughput_resolves_optimized_readout_before_pandeia(monkeypatch):
+    from pandexo.engine import justdoit
+
+    captured = {}
+
+    class FakeInstrument:
+        def __init__(self, config):
+            captured.update(config)
+
+        def get_wave_range(self):
+            return {"wmin": 1.0, "wmax": 2.0}
+
+        def get_total_eff(self, wave):
+            return np.ones_like(wave)
+
+    monkeypatch.setattr(justdoit, "InstrumentFactory", FakeInstrument)
+
+    justdoit.get_thruput("NIRCam DHS")
+
+    assert captured["detector"]["readout_pattern"] == "rapid"

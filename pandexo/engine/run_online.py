@@ -595,13 +595,16 @@ class CalculationNewHandler(BaseHandler):
                 pandata = json.load(data_file)
                 pandata["configuration"]["instrument"]["filter"] = self.get_argument("nircamfilter")
                 pandata["configuration"]["detector"]["subarray"] = self.get_argument("nircamsubarray")
+                pandata["configuration"]["detector"]["readout_pattern"] = (
+                    self.get_argument("nircamreadout", "optimize")
+                )
 
         if instrument == "nircamdhs":
             with open(os.path.join(os.path.dirname(__file__), "reference", "nircam_dhs_input.json")) as data_file:
                 pandata = json.load(data_file)
                 # SW and LW are observed together, but PandExo displays one at a time.
                 sw_or_lw = self.get_argument("nircammode")
-                filter_to_sim = "nircam{}".format(sw_or_lw)
+                filter_to_sim = f"nircam{sw_or_lw}"
                 if "sw" in filter_to_sim:
                     pair_filter = "nircamlw"
                 else:
@@ -609,6 +612,9 @@ class CalculationNewHandler(BaseHandler):
                 pandata["configuration"]["instrument"]["filter"] = self.get_argument(filter_to_sim)
                 pandata["configuration"]["instrument"]["pandexofilterpair"] = self.get_argument(pair_filter)
                 pandata["configuration"]["detector"]["subarray"] = self.get_argument("nircamsubarraydhs")
+                pandata["configuration"]["detector"]["readout_pattern"] = (
+                    self.get_argument("nircamdhsreadout", "optimize")
+                )
 
         if instrument == "niriss":
             with open(os.path.join(os.path.dirname(__file__), "reference", "niriss_input.json")) as data_file:
