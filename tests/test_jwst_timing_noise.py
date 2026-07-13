@@ -23,7 +23,10 @@ from pandexo.engine.jwst import (
     estimate_nircam_data_excess,
     nircam_dhs_no_ta_overhead,
     nircam_no_ta_overhead,
+    nirspec_prism_apt_parameters,
+    nirspec_prism_exposure_warning,
     select_calculation,
+    update_nirspec_prism_apt_timing,
     update_timing_measurement_time,
     validate_miri_lrs_subarray,
 )
@@ -220,7 +223,9 @@ def _timing(nsuperstripe, ngroup=3, mingroups=2):
     return timing
 
 
-def _timing_with_pandeia_cycle(nsuperstripe, exposure_time_per_int, ngroup=3):
+def _timing_with_pandeia_cycle(
+        nsuperstripe, exposure_time_per_int, ngroup=3,
+        transit_duration=48.0):
     timing, _ = compute_timing(
         {
             "ngroup": ngroup,
@@ -232,7 +237,7 @@ def _timing_with_pandeia_cycle(nsuperstripe, exposure_time_per_int, ngroup=3):
             "exposure_time_per_int": exposure_time_per_int,
             "exposure_time_ngroup": ngroup,
         },
-        transit_duration=48.0,
+        transit_duration=transit_duration,
         expfact_out=1.0,
         noccultations=1,
         max_ngroup_instrument=65536,
@@ -424,18 +429,21 @@ def test_skipped_frames_contribute_to_elapsed_integration_time():
     assert timing["Measurement Time per Integration (sec)"] == pytest.approx(12.0)
 
 
-def test_multistripe_effective_time_is_divided_by_nsuperstripe():
+def test_multistripe_cycles_are_not_divided_by_nsuperstripe():
     timing = _timing(nsuperstripe=4)
 
-    assert timing["Effective Integrations In Transit"] == pytest.approx(
-        timing["Num Integrations In Transit"] / 4.0
+    assert (
+        timing["Effective Integrations In Transit"]
+        == timing["Num Integrations In Transit"]
     )
-    assert timing["Effective Integrations Out of Transit"] == pytest.approx(
-        timing["Num Integrations Out of Transit"] / 4.0
+    assert (
+        timing["Effective Integrations Out of Transit"]
+        == timing["Num Integrations Out of Transit"]
     )
     assert timing["On Source Time In Transit"] == pytest.approx(
-        timing["Effective Integrations In Transit"]
+        timing["Num Integrations In Transit"]
         * timing["Measurement Time per Integration (sec)"]
+        / timing["Num Superstripes"]
     )
     assert timing["Effective On Source Time In Transit"] == pytest.approx(
         timing["On Source Time In Transit"]
@@ -463,10 +471,10 @@ def test_pandeia_measurement_time_update_controls_on_source_metadata():
 
     assert timing["Measurement Time per Integration (sec)"] == 32.0
     assert timing["On Source Time In Transit"] == pytest.approx(
-        timing["Effective Integrations In Transit"] * 32.0
+        timing["Num Integrations In Transit"] * 32.0 / 4.0
     )
     assert timing["Effective On Source Time In Transit"] == pytest.approx(
-        timing["Effective Integrations In Transit"] * 32.0
+        timing["On Source Time In Transit"]
     )
 
 
@@ -479,7 +487,7 @@ def test_multistripe_timing_uses_pandeia_full_cycle_clock_for_real_integrations(
 
     assert timing["Time/Integration incl reset (sec)"] == pytest.approx(40.0)
     assert timing["Num Integrations In Transit"] == 2
-    assert timing["Effective Integrations In Transit"] == pytest.approx(0.5)
+    assert timing["Effective Integrations In Transit"] == 2
     assert timing["Measurement Time per Integration (sec)"] == pytest.approx(16.0)
     assert timing["On Source Time In Transit"] == pytest.approx(8.0)
 
@@ -530,7 +538,8 @@ def test_soss_sub17stripe_clock_time_matches_pandeia_full_cycle():
         "Num Superstripes"
     ] == pytest.approx(0.43148)
     assert timing["Num Integrations In Transit"] == 147
-    assert timing["Effective Integrations In Transit"] == pytest.approx(147 / 120.0)
+    assert timing["Effective Integrations In Transit"] == 147
+    assert timing["On Source Time In Transit"] == pytest.approx(147 * 0.43148)
 
 
 def test_soss_multistripe_efficiency_uses_per_stripe_science_time():
@@ -649,7 +658,8 @@ def test_multistripe_timing_display_uses_apt_and_calculation_tables():
     assert "Groups per Integration" in html
     assert "Integrations per Occultation" in html
     assert "Number of Stripes" in html
-    assert "Elapsed Time per APT Integration incl. Reset (sec)" in html
+    assert "Elapsed Time per Full Multistripe Cycle incl. Reset (sec)" in html
+    assert "Elapsed Time per APT Stripe Integration" not in html
     assert "Science Time per Full Multistripe Cycle excl. Reset (sec)" in html
     assert "Science Time per Stripe excl. Reset (sec)" in html
     assert "Effective Per-Wavelength" not in html
@@ -669,6 +679,127 @@ def test_timing_display_includes_estimated_dhs_data_excess():
     assert "4.3 (Verify using APT)" in html
     assert "4.26" not in html
     assert "Assumed No-TA Scheduling + Slew Overhead (sec)" in html
+
+
+def test_nirspec_prism_apt_parameters_match_published_multistripe_example():
+    timing = {
+        "Num Superstripes": 8,
+        "Num Integrations In Transit": 15405,
+        "Num Integrations Out of Transit": 15405,
+        "Time/Integration incl reset (sec)": 1.09312,
+    }
+
+    parameters = nirspec_prism_apt_parameters(timing)
+
+    assert parameters["cycles"] == 30810
+    assert parameters["required_integrations"] == 246480
+    assert parameters["exposures_per_dither"] == 4
+    assert parameters["integrations_per_exposure"] == 61620
+    assert parameters["scheduled_integrations"] == 246480
+    assert parameters["stripe_elapsed_time"] == pytest.approx(0.13664)
+    assert parameters["exposure_duration"] == pytest.approx(33679.0272)
+
+
+def test_nirspec_prism_apt_values_are_available_to_offline_outputs():
+    timing = {
+        "Num Superstripes": 8,
+        "Num Integrations In Transit": 15405,
+        "Num Integrations Out of Transit": 15405,
+        "Time/Integration incl reset (sec)": 1.09312,
+        "APT: Num Integrations per Occultation": 30810,
+    }
+
+    update_nirspec_prism_apt_timing(timing)
+
+    assert timing["Num Multistripe Cycles per Occultation"] == 30810
+    assert timing["APT: Exposures/Dith"] == 4
+    assert timing["APT: Num Integrations per Exposure"] == 61620
+    assert timing["APT: Num Integrations per Occultation"] == 246480
+
+
+def test_nirspec_prism_apt_parameters_round_up_without_exceeding_limit():
+    timing = {
+        "Num Superstripes": 8,
+        "Num Integrations In Transit": 8192,
+        "Num Integrations Out of Transit": 8192,
+        "Time/Integration incl reset (sec)": 1.09312,
+    }
+
+    parameters = nirspec_prism_apt_parameters(timing)
+
+    assert parameters["required_integrations"] == 131072
+    assert parameters["exposures_per_dither"] == 3
+    assert parameters["integrations_per_exposure"] == 43691
+    assert parameters["integrations_per_exposure"] <= 65535
+    assert parameters["scheduled_integrations"] == 131073
+
+
+def test_nirspec_prism_timing_display_uses_apt_stripe_integrations():
+    timing = _timing_with_pandeia_cycle(
+        nsuperstripe=8,
+        exposure_time_per_int=1.09312,
+        ngroup=3,
+    )
+    timing.update({
+        "Num Integrations In Transit": 15405,
+        "Num Integrations Out of Transit": 15405,
+        "Effective Integrations In Transit": 15405,
+        "Effective Integrations Out of Transit": 15405,
+        "APT: Num Integrations per Occultation": 30810,
+    })
+    apt_div, calculation_div = build_timing_display_div(
+        _pandeia_out(
+            instrument={
+                "instrument": "nirspec",
+                "mode": "bots",
+                "filter": "clear",
+                "aperture": "s1600a1",
+                "disperser": "prism",
+            },
+            detector={
+                "subarray": "s64m8_prm",
+                "readout_pattern": "nrsrapid",
+            },
+        ),
+        timing,
+    )
+    apt_html = apt_div.decode()
+    calculation_html = calculation_div.decode()
+
+    assert "Exposures/Dith" in apt_html
+    assert "<td>4</td>" in apt_html
+    assert "Integrations/Exp" in apt_html
+    assert "<td>61620</td>" in apt_html
+    assert "Integrations per Occultation" not in apt_html
+    assert "Elapsed Time per Full Multistripe Cycle incl. Reset (sec)" in calculation_html
+    assert "<td>1.093120</td>" in calculation_html
+    assert "Elapsed Time per APT Stripe Integration incl. Reset (sec)" in calculation_html
+    assert "<td>0.136640</td>" in calculation_html
+
+
+def test_nirspec_multistripe_hga_warning_is_included_when_relevant():
+    long_timing = {
+        "Num Superstripes": 8,
+        "Num Integrations In Transit": 15405,
+        "Num Integrations Out of Transit": 15405,
+        "Time/Integration incl reset (sec)": 1.09312,
+    }
+    warning = nirspec_prism_exposure_warning(long_timing)
+    warnings = add_warnings(
+        {"warnings": {}},
+        _timing(nsuperstripe=8),
+        sat_level=0.8,
+        flags={
+            "flag_default": "All good",
+            "flag_high": "All good",
+            "flag_min_nint": "All good",
+            "flag_hga_repoint": warning,
+        },
+        instrument="nirspec",
+    )
+
+    assert warnings["Exposure Duration?"].startswith("APT will warn")
+    assert "NIRSpec BOTS permits longer exposures" in warnings["Exposure Duration?"]
 
 
 def test_view_template_owns_timing_table_headings():
@@ -912,16 +1043,31 @@ def test_miri_lrs_timing_display_uses_dither_not_filter_and_uppercase_readout():
     assert "<td>fastr1</td>" not in html
 
 
-def test_slope_uncertainty_increases_by_sqrt_nsuperstripe():
+def test_slope_noise_uses_real_multistripe_cycle_count():
     nsuperstripe = 9
     normal = _slope_result(_timing(nsuperstripe=1))
     multistripe = _slope_result(_timing(nsuperstripe=nsuperstripe))
 
     ratio = _fractional_uncertainty(multistripe) / _fractional_uncertainty(normal)
 
-    assert ratio == pytest.approx(np.sqrt(nsuperstripe))
+    assert ratio == pytest.approx(1.0)
     assert multistripe["on_source_in"] == pytest.approx(normal["on_source_in"] / nsuperstripe)
-    assert multistripe["nint_in"] == pytest.approx(normal["nint_in"] / nsuperstripe)
+    assert multistripe["nint_in"] == normal["nint_in"]
+
+
+def test_fixed_wall_time_retains_multistripe_cycle_penalty():
+    normal = _slope_result(_timing_with_pandeia_cycle(
+        1, 10.0, transit_duration=270.0
+    ))
+    multistripe = _slope_result(_timing_with_pandeia_cycle(
+        9, 90.0, transit_duration=270.0
+    ))
+
+    ratio = _fractional_uncertainty(multistripe) / _fractional_uncertainty(normal)
+
+    assert normal["nint_in"] == 27
+    assert multistripe["nint_in"] == 3
+    assert ratio == pytest.approx(3.0)
 
 
 def test_single_group_fml_path_stays_finite():
@@ -1088,6 +1234,31 @@ def test_pandeia_nirspec_prism_multistripe_exposes_superstripes(
     assert select_calculation("um", exp_pars.nsuperstripe) == "slope method"
     assert timing["Num Superstripes"] == expected_nsuperstripe
     assert timing["Observing Efficiency (%)"] < 100.0
+
+
+def test_pandeia_nirspec_multistripe_nint_counts_complete_cycles():
+    _skip_if_pandeia_refdata_invalid()
+    from pandeia.engine.instrument_factory import InstrumentFactory
+
+    one_cycle_config = _nirspec_prism_config("s64m8_prm")
+    one_cycle_config["detector"]["nint"] = 1
+    one_cycle_config["detector"]["nexp"] = 1
+    eight_cycle_config = deepcopy(one_cycle_config)
+    eight_cycle_config["detector"]["nint"] = 8
+
+    one_cycle = InstrumentFactory(
+        config=one_cycle_config
+    ).the_detector.exposure_spec
+    eight_cycles = InstrumentFactory(
+        config=eight_cycle_config
+    ).the_detector.exposure_spec
+
+    assert one_cycle.nsuperstripe == 8
+    assert one_cycle.nramps == 1
+    assert eight_cycles.nramps == 8
+    assert eight_cycles.measurement_time == pytest.approx(
+        8 * one_cycle.measurement_time
+    )
 
 
 def test_pandeia_miri_lrs_slit_supports_subslit():
