@@ -15,12 +15,13 @@ import pickle
 #max groups in integration
 max_ngroup = {'nirspec':65535,
               'miri':65535,
-              'niriss':65535,
+              'niriss':30,
               'nircam':100}
 #minimum number of integrations
 min_nint_trans = 3
 DHS_F150W_MIN_WAVELENGTH = 0.96
-NIRSPEC_APT_MAX_INTEGRATIONS_PER_EXPOSURE = 65535
+APT_MAX_INTEGRATIONS_PER_EXPOSURE = 65535
+MAX_FRAMES_PER_EXPOSURE = 196608
 NIRSPEC_HGA_REPOINT_WARNING_SECONDS = 10000.0
 MIRI_LRS_ALLOWED_SUBARRAYS = {
     "lrsslitless": ("slitlessprism", "slitlessprism_ip", "slitlessprism_ips"),
@@ -793,7 +794,7 @@ def compute_full_sim(dictinput,verbose=False):
         log("Finished Duty Cycle Calc")
 
     #calculate all timing info
-    max_ngroup_instrument = max_ngroup[pandeia_input["configuration"]["instrument"]["instrument"]]
+    max_ngroup_instrument = max_ngroup[str(instrument).lower()]
     timing, flags = compute_timing(m,transit_duration,expfact_out,noccultations,max_ngroup_instrument)
     if optimize_nircam_readout:
         selected = None
@@ -929,11 +930,21 @@ def compute_full_sim(dictinput,verbose=False):
             "acquisition and a standard 2,100-second initial slew."
         )
 
-    if (
+    is_nirspec_prism_multistripe = (
             str(instrument).lower() == "nirspec"
             and str(conf["instrument"].get("disperser")).lower() == "prism"
-            and nsuperstripe > 1):
-        update_nirspec_prism_apt_timing(timing)
+            and nsuperstripe > 1
+    )
+    integration_multiplier = nsuperstripe if is_nirspec_prism_multistripe else 1
+    update_apt_timing(
+        timing,
+        integration_multiplier=integration_multiplier,
+        max_frames_per_exposure=MAX_FRAMES_PER_EXPOSURE,
+        frames_per_integration=(
+            timing['APT: Num Groups per Integration'] * (nframe + nskip)
+        ),
+    )
+    if is_nirspec_prism_multistripe:
         flags["flag_hga_repoint"] = nirspec_prism_exposure_warning(timing)
     
     #Simulate out trans and in transit
@@ -1391,10 +1402,6 @@ def compute_timing(m,transit_duration,expfact_out,noccultations,max_ngroup_instr
         #if you exceed that limit, set it to the maximum value instead.
         #also set another check for saturation
 
-        if ngroups_per_int > max_ngroup_instrument:
-            ngroups_per_int = max_ngroup_instrument
-            flag_high = f"Optimized NGROUPS above maximum ({max_ngroup_instrument}). SET TO NGROUPS={max_ngroup_instrument}"
- 
         if (ngroups_per_int < mingroups) | np.isnan(ngroups_per_int):
             ngroups_per_int = mingroups
             nframes_per_int = mingroups
@@ -1411,6 +1418,16 @@ def compute_timing(m,transit_duration,expfact_out,noccultations,max_ngroup_instr
         ngroups_per_int = mingroups
         nframes_per_int = mingroups
         flag_default = f"Something went wrong. SET TO NGROUPS={mingroups}"
+
+    if ngroups_per_int > max_ngroup_instrument:
+        original_ngroups_per_int = ngroups_per_int
+        ngroups_per_int = max_ngroup_instrument
+        source = "Optimized" if optimized_ngroups else "User-specified"
+        flag_high = (
+            f"{source} NGROUPS ({int(original_ngroups_per_int)}) exceeds "
+            f"the maximum ({int(max_ngroup_instrument)}). SET TO "
+            f"NGROUPS={int(max_ngroup_instrument)}"
+        )
 
     timing_values = _timing_values(ngroups_per_int)
     frame_zero_dead = timing_values["frame_zero_dead"]
@@ -2146,9 +2163,101 @@ def _is_nirspec_prism_multistripe(instrument, disperser, nstripes):
     )
 
 
+def apt_exposure_parameters(
+        timing,
+        integration_multiplier=1,
+        max_integrations_per_exposure=APT_MAX_INTEGRATIONS_PER_EXPOSURE,
+        max_frames_per_exposure=None,
+        frames_per_integration=None):
+    """Split an observation into valid APT exposures.
+
+    Parameters
+    ----------
+    timing : dict
+        PandExo timing dictionary.
+    integration_multiplier : int, optional
+        Number of APT integrations represented by one PandExo integration.
+        This is one for ordinary modes and the stripe count for NIRSpec PRISM
+        multistripe observations.
+    max_integrations_per_exposure : int, optional
+        Universal maximum number of integrations in one APT exposure. The
+        default is 65,535.
+    max_frames_per_exposure : int, optional
+        Additional instrument limit on the number of frames in one exposure.
+    frames_per_integration : int, optional
+        Number of detector frames in one APT integration. Required when
+        ``max_frames_per_exposure`` is supplied.
+
+    Returns
+    -------
+    dict
+        Required and scheduled integrations, exposures per dither,
+        integrations per exposure, and the resulting exposure duration.
+
+    Raises
+    ------
+    ValueError
+        If a supplied count or limit is not positive.
+    """
+    integration_multiplier = int(integration_multiplier)
+    if integration_multiplier < 1:
+        raise ValueError('integration_multiplier must be positive')
+    if max_integrations_per_exposure < 1:
+        raise ValueError('max_integrations_per_exposure must be positive')
+
+    effective_limit = int(max_integrations_per_exposure)
+    if max_frames_per_exposure is not None:
+        if frames_per_integration is None:
+            raise ValueError(
+                'frames_per_integration is required with a frame limit'
+            )
+        frames_per_integration = int(frames_per_integration)
+        if frames_per_integration < 1 or max_frames_per_exposure < 1:
+            raise ValueError('frame counts and limits must be positive')
+        frame_limited_integrations = int(
+            max_frames_per_exposure // frames_per_integration
+        )
+        if frame_limited_integrations < 1:
+            raise ValueError(
+                'one integration exceeds the maximum frames per exposure'
+            )
+        effective_limit = min(effective_limit, frame_limited_integrations)
+
+    integrations = int(
+        timing['Num Integrations In Transit']
+        + timing['Num Integrations Out of Transit']
+    )
+    required_integrations = integrations * integration_multiplier
+    exposures_per_dither = max(
+        1,
+        int(np.ceil(required_integrations / float(effective_limit))),
+    )
+    integrations_per_exposure = int(np.ceil(
+        required_integrations / float(exposures_per_dither)
+    ))
+    scheduled_integrations = exposures_per_dither * integrations_per_exposure
+    elapsed_time_per_apt_integration = (
+        timing['Time/Integration incl reset (sec)']
+        / float(integration_multiplier)
+    )
+
+    return {
+        'integrations': integrations,
+        'required_integrations': required_integrations,
+        'scheduled_integrations': scheduled_integrations,
+        'exposures_per_dither': exposures_per_dither,
+        'integrations_per_exposure': integrations_per_exposure,
+        'elapsed_time_per_apt_integration': elapsed_time_per_apt_integration,
+        'exposure_duration': (
+            scheduled_integrations * elapsed_time_per_apt_integration
+        ),
+        'max_integrations_per_exposure': effective_limit,
+    }
+
+
 def nirspec_prism_apt_parameters(
         timing,
-        max_integrations_per_exposure=NIRSPEC_APT_MAX_INTEGRATIONS_PER_EXPOSURE):
+        max_integrations_per_exposure=APT_MAX_INTEGRATIONS_PER_EXPOSURE):
     """Convert Pandeia multistripe cycles into NIRSpec BOTS APT inputs.
 
     Pandeia counts one complete pass through all stripes as one integration.
@@ -2179,39 +2288,16 @@ def nirspec_prism_apt_parameters(
     nstripes = int(timing.get('Num Superstripes', 1) or 1)
     if nstripes < 1:
         raise ValueError('Num Superstripes must be positive')
-    if max_integrations_per_exposure < 1:
-        raise ValueError('max_integrations_per_exposure must be positive')
-
-    cycles = int(
-        timing['Num Integrations In Transit']
-        + timing['Num Integrations Out of Transit']
+    parameters = apt_exposure_parameters(
+        timing,
+        integration_multiplier=nstripes,
+        max_integrations_per_exposure=max_integrations_per_exposure,
     )
-    required_integrations = cycles * nstripes
-    exposures_per_dither = max(
-        1,
-        int(np.ceil(
-            required_integrations / float(max_integrations_per_exposure)
-        )),
+    parameters['cycles'] = parameters.pop('integrations')
+    parameters['stripe_elapsed_time'] = parameters.pop(
+        'elapsed_time_per_apt_integration'
     )
-    integrations_per_exposure = int(np.ceil(
-        required_integrations / float(exposures_per_dither)
-    ))
-    scheduled_integrations = (
-        exposures_per_dither * integrations_per_exposure
-    )
-    stripe_elapsed_time = (
-        timing['Time/Integration incl reset (sec)'] / float(nstripes)
-    )
-
-    return {
-        'cycles': cycles,
-        'required_integrations': required_integrations,
-        'scheduled_integrations': scheduled_integrations,
-        'exposures_per_dither': exposures_per_dither,
-        'integrations_per_exposure': integrations_per_exposure,
-        'stripe_elapsed_time': stripe_elapsed_time,
-        'exposure_duration': scheduled_integrations * stripe_elapsed_time,
-    }
+    return parameters
 
 
 def nirspec_prism_exposure_warning(timing):
@@ -2244,6 +2330,30 @@ def nirspec_prism_exposure_warning(timing):
     )
 
 
+def update_apt_timing(
+        timing,
+        integration_multiplier=1,
+        max_frames_per_exposure=None,
+        frames_per_integration=None):
+    """Add universal APT exposure-splitting values to a timing dictionary."""
+    apt_parameters = apt_exposure_parameters(
+        timing,
+        integration_multiplier=integration_multiplier,
+        max_frames_per_exposure=max_frames_per_exposure,
+        frames_per_integration=frames_per_integration,
+    )
+    timing.update({
+        'APT: Exposures/Dith': apt_parameters['exposures_per_dither'],
+        'APT: Num Integrations per Exposure': (
+            apt_parameters['integrations_per_exposure']
+        ),
+        'APT: Num Integrations per Occultation': (
+            apt_parameters['scheduled_integrations']
+        ),
+    })
+    return timing
+
+
 def update_nirspec_prism_apt_timing(timing):
     """Add NIRSpec PRISM multistripe APT values to a timing dictionary.
 
@@ -2261,17 +2371,12 @@ def update_nirspec_prism_apt_timing(timing):
     dict
         The updated timing dictionary.
     """
-    apt_parameters = nirspec_prism_apt_parameters(timing)
-    timing.update({
-        'Num Multistripe Cycles per Occultation': apt_parameters['cycles'],
-        'APT: Exposures/Dith': apt_parameters['exposures_per_dither'],
-        'APT: Num Integrations per Exposure': (
-            apt_parameters['integrations_per_exposure']
-        ),
-        'APT: Num Integrations per Occultation': (
-            apt_parameters['scheduled_integrations']
-        ),
-    })
+    nstripes = int(timing.get('Num Superstripes', 1) or 1)
+    timing['Num Multistripe Cycles per Occultation'] = int(
+        timing['Num Integrations In Transit']
+        + timing['Num Integrations Out of Transit']
+    )
+    update_apt_timing(timing, integration_multiplier=nstripes)
     return timing
 
 
@@ -2376,15 +2481,18 @@ def build_timing_display_div(out, timing):
     ])
     if is_nirspec_prism_multistripe:
         apt_parameters = nirspec_prism_apt_parameters(timing)
-        apt_rows.extend([
-            ('Exposures/Dith', apt_parameters['exposures_per_dither']),
-            ('Integrations/Exp', apt_parameters['integrations_per_exposure']),
-        ])
+        exposures_per_dither = apt_parameters['exposures_per_dither']
+        integrations_per_exposure = apt_parameters['integrations_per_exposure']
     else:
-        apt_rows.append((
-            'Integrations per Occultation',
-            timing['APT: Num Integrations per Occultation']
-        ))
+        exposures_per_dither = timing.get('APT: Exposures/Dith', 1)
+        integrations_per_exposure = timing.get(
+            'APT: Num Integrations per Exposure',
+            timing['APT: Num Integrations per Occultation'],
+        )
+    apt_rows.extend([
+        ('Exposures/Dith', exposures_per_dither),
+        ('Integrations/Exp', integrations_per_exposure),
+    ])
 
     calculation_rows = [
         ('Transit Duration (hr)', timing['Transit Duration']),

@@ -17,6 +17,7 @@ from pandexo.engine.jwst import (
     _nircam_dhs_optimization_configs,
     _table_html,
     add_warnings,
+    apt_exposure_parameters,
     build_timing_display_div,
     compute_timing,
     estimate_dhs_data_excess,
@@ -27,6 +28,7 @@ from pandexo.engine.jwst import (
     nirspec_prism_exposure_warning,
     select_calculation,
     update_nirspec_prism_apt_timing,
+    update_apt_timing,
     update_timing_measurement_time,
     validate_miri_lrs_subarray,
 )
@@ -656,7 +658,8 @@ def test_multistripe_timing_display_uses_apt_and_calculation_tables():
     assert "Calculation Details" not in html
     assert html.count("<table") == 2
     assert "Groups per Integration" in html
-    assert "Integrations per Occultation" in html
+    assert "Exposures/Dith" in html
+    assert "Integrations/Exp" in html
     assert "Number of Stripes" in html
     assert "Elapsed Time per Full Multistripe Cycle incl. Reset (sec)" in html
     assert "Elapsed Time per APT Stripe Integration" not in html
@@ -732,6 +735,65 @@ def test_nirspec_prism_apt_parameters_round_up_without_exceeding_limit():
     assert parameters["integrations_per_exposure"] == 43691
     assert parameters["integrations_per_exposure"] <= 65535
     assert parameters["scheduled_integrations"] == 131073
+
+
+def test_apt_integration_limit_is_applied_to_standard_modes():
+    timing = {
+        "Num Integrations In Transit": 40000,
+        "Num Integrations Out of Transit": 40000,
+        "Time/Integration incl reset (sec)": 2.0,
+    }
+
+    update_apt_timing(timing)
+
+    assert timing["APT: Exposures/Dith"] == 2
+    assert timing["APT: Num Integrations per Exposure"] == 40000
+    assert timing["APT: Num Integrations per Occultation"] == 80000
+
+
+def test_frame_limit_can_require_additional_exposures():
+    timing = {
+        "Num Integrations In Transit": 25000,
+        "Num Integrations Out of Transit": 25000,
+        "Time/Integration incl reset (sec)": 10.0,
+    }
+
+    parameters = apt_exposure_parameters(
+        timing,
+        max_frames_per_exposure=196608,
+        frames_per_integration=10,
+    )
+
+    assert parameters["max_integrations_per_exposure"] == 19660
+    assert parameters["exposures_per_dither"] == 3
+    assert parameters["integrations_per_exposure"] == 16667
+    assert parameters["integrations_per_exposure"] * 10 <= 196608
+
+
+def test_niriss_soss_groups_are_limited_to_30():
+    from pandexo.engine.jwst import max_ngroup
+
+    assert max_ngroup["niriss"] == 30
+
+
+def test_user_specified_groups_are_capped_at_instrument_limit():
+    timing, flags = compute_timing(
+        {
+            "ngroup": 31,
+            "tframe": 2.0,
+            "nframe": 1,
+            "mingroups": 2,
+            "nskip": 0,
+            "nsuperstripe": 1,
+        },
+        transit_duration=240.0,
+        expfact_out=1.0,
+        noccultations=1,
+        max_ngroup_instrument=30,
+    )
+
+    assert timing["APT: Num Groups per Integration"] == 30
+    assert "User-specified NGROUPS (31) exceeds the maximum (30)" in flags["flag_high"]
 
 
 def test_nirspec_prism_timing_display_uses_apt_stripe_integrations():
