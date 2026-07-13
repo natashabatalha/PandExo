@@ -455,6 +455,23 @@ def test_non_multistripe_timing_display_omits_stripe_rows():
     assert "Science Time per Stripe" not in html
 
 
+def test_timing_display_formats_transit_and_integration_counts_as_integers():
+    timing = _timing(nsuperstripe=1)
+    timing['Number of Transits'] = 1.0
+    timing['Num Integrations In Transit'] = 12.0
+    timing['Num Integrations Out of Transit'] = 15.0
+
+    apt_div, calculation_div = build_timing_display_div(_pandeia_out(), timing)
+    html = (apt_div + calculation_div).decode()
+
+    assert "<td>1</td>" in html
+    assert "<td>12</td>" in html
+    assert "<td>15</td>" in html
+    assert "<td>1.0</td>" not in html
+    assert "<td>12.0</td>" not in html
+    assert "<td>15.0</td>" not in html
+
+
 def test_nircam_timing_display_shows_channel_and_pupil_rows():
     timing = _timing(nsuperstripe=1)
     apt_div, calculation_div = build_timing_display_div(

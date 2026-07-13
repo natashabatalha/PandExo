@@ -1464,10 +1464,17 @@ def target_acq(instrument, both_spec, warning):
 
 
 def _table_html(rows):
+    def format_value(value):
+        if isinstance(value, (float, np.floating)):
+            if np.isfinite(value) and float(value).is_integer():
+                return str(int(value))
+            return f'{value:.6f}'
+        return str(value)
+
     table = pd.DataFrame(rows, columns=['Parameter', 'Value'])
     table = table.set_index('Parameter')
     table.index.name = None
-    table = table.to_html()
+    table = table.to_html(formatters={'Value': format_value})
     return '<table class="table table-striped"> \n' + table[36:len(table)]
 
 
@@ -1540,6 +1547,15 @@ def _upper_or_none(value):
     return str(value).upper()
 
 
+def _integer_display(value):
+    """Return whole-number values as integers for display."""
+    try:
+        integer_value = int(value)
+    except (TypeError, ValueError):
+        return value
+    return integer_value if integer_value == value else value
+
+
 def _nircam_pupil_rows(filter_name, paired_filter):
     short_filter = None
     long_filter = None
@@ -1609,7 +1625,6 @@ def build_timing_display_div(out, timing):
         apt_rows.append(
             ('No. of Output Channels', _nircam_output_channels(detector_config.get('subarray')))
         )
-    apt_rows.append(('Exposures/Dith', 1))
     if str(instrument).lower() == 'nircam':
         apt_rows.extend(_nircam_pupil_rows(filter_name, paired_filter))
     elif not (
@@ -1636,15 +1651,21 @@ def build_timing_display_div(out, timing):
 
     calculation_rows = [
         ('Transit Duration (hr)', timing['Transit Duration']),
-        ('Number of Transits', timing['Number of Transits']),
+        ('Number of Transits', _integer_display(timing['Number of Transits'])),
         (
             'Transit + Baseline, No Overhead (hr)',
             timing['Transit+Baseline, no overhead (hrs)']
         ),
         ('Observing Efficiency (%)', timing['Observing Efficiency (%)']),
         ('Frame Time (sec)', timing['Seconds per Frame']),
-        ('Integrations In Transit', timing['Num Integrations In Transit']),
-        ('Integrations Out of Transit', timing['Num Integrations Out of Transit']),
+        (
+            'Integrations In Transit',
+            _integer_display(timing['Num Integrations In Transit'])
+        ),
+        (
+            'Integrations Out of Transit',
+            _integer_display(timing['Num Integrations Out of Transit'])
+        ),
     ]
 
     if nstripes > 1:
