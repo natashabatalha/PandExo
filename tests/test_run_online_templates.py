@@ -130,6 +130,7 @@ def test_new_calculation_template_lists_dhs_readout_patterns():
 
     assert 'name="nircamdhsreadout"' in template
     assert template.count('class="row dhs-control-row"') == 2
+    assert template.count('class="col-md-3 dhs-selector-column"') == 5
     assert 'class="col-md-12 dhs-notes"' in template
     assert template.count(
         '<option value="optimize" selected>Optimize readout</option>'
