@@ -87,6 +87,33 @@ def test_new_calculation_template_lists_nirspec_prism_multistripe_subarrays():
     assert 'value="s128m4_prm"' in template
     assert 'value="s64m8_prm"' in template
     assert 'value="s32m16_prm"' in template
+    assert "Multistripe SUB256M2_PRISM" in template
+    assert "Multistripe SUB128M4_PRISM" in template
+    assert "Multistripe SUB64M8_PRISM" in template
+    assert "Multistripe SUB32M16_PRISM" in template
+    assert "PRISM SUB256M2_PRISM" not in template
+
+
+def test_new_calculation_template_gates_nirspec_multistripe_subarrays():
+    template = Path("pandexo/engine/templates/new.html").read_text()
+
+    assert "nirspecStandardSubarrayOptions" in template
+    assert "nirspecPrismMultistripeSubarrayOptions" in template
+    assert 'if (mode === "prismclear")' in template
+    assert "options.concat(nirspecPrismMultistripeSubarrayOptions)" in template
+    assert '$("#nirspecmode").change(updateNirspecSubarrayOptions)' in template
+    assert "updateNirspecSubarrayOptions();" in template
+
+
+def test_online_nirspec_multistripe_subarrays_are_prism_only():
+    from pandexo.engine.run_online import NIRSPEC_PRISM_MULTISTRIPE_SUBARRAYS
+
+    assert NIRSPEC_PRISM_MULTISTRIPE_SUBARRAYS == (
+        "s256m2_prm",
+        "s128m4_prm",
+        "s64m8_prm",
+        "s32m16_prm",
+    )
 
 
 def test_new_calculation_template_uses_subgrism256_label():

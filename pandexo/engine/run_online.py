@@ -44,6 +44,12 @@ MIRI_LRS_ALLOWED_SUBARRAYS = {
     "lrsslitless": ("slitlessprism", "slitlessprism_ip", "slitlessprism_ips"),
     "lrsslit": ("subslit", "full"),
 }
+NIRSPEC_PRISM_MULTISTRIPE_SUBARRAYS = (
+    "s256m2_prm",
+    "s128m4_prm",
+    "s64m8_prm",
+    "s32m16_prm",
+)
 
 #define location of fort grids
 try:
@@ -568,9 +574,21 @@ class CalculationNewHandler(BaseHandler):
             with open(os.path.join(os.path.dirname(__file__), "reference", "nirspec_input.json")) as data_file:
                 pandata = json.load(data_file)
                 nirspecmode = self.get_argument("nirspecmode")
+                nirspecsubarray = self.get_argument("nirspecsubarray")
+                if (
+                    nirspecmode != "prismclear"
+                    and nirspecsubarray in NIRSPEC_PRISM_MULTISTRIPE_SUBARRAYS
+                ):
+                    raise tornado.web.HTTPError(
+                        400,
+                        reason=(
+                            "NIRSpec PRISM multistripe subarrays are only "
+                            "available with Prism R=100 No filter."
+                        ),
+                    )
                 pandata["configuration"]["instrument"]["disperser"] = nirspecmode[0:5]
                 pandata["configuration"]["instrument"]["filter"] = nirspecmode[5:11]
-                pandata["configuration"]["detector"]["subarray"] = self.get_argument("nirspecsubarray")
+                pandata["configuration"]["detector"]["subarray"] = nirspecsubarray
 
         if instrument == "nircam":
             with open(os.path.join(os.path.dirname(__file__), "reference", "nircam_input.json")) as data_file:
