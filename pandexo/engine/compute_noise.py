@@ -58,26 +58,29 @@ class ExtractSpec():
         self.real_nint_out = timing["Num Integrations Out of Transit"]
         self.real_nint_in = timing["Num Integrations In Transit"]
         self.nsuperstripe = timing.get("Num Superstripes", 1)
-        self.nint_out = timing.get("Effective Integrations Out of Transit",
-                                   self.real_nint_out)
-        self.nint_in = timing.get("Effective Integrations In Transit",
-                                  self.real_nint_in)
+        self.nint_out = self.real_nint_out
+        self.nint_in = self.real_nint_in
         self.tframe = timing["Seconds per Frame"]
         self.frame_zero_dead = timing["Zero Frame Efficiency Loss"]
         self.rn = rn 
         self.extraction_area = extraction_area
 
-        # Pandeia is run with nint=1. Its scalar measurement_time is the
-        # per-integration science time PandExo scales below. For SOSS
-        # multistripe modes that Pandeia value includes all superstripes, so
-        # timing supplies effective per-wavelength integration counts.
+        # Pandeia is run with nint=1. In multistripe modes measurement_time
+        # includes every stripe in one complete cycle, while each wavelength
+        # receives only the per-stripe fraction of that science time. Every
+        # completed cycle nevertheless contributes one independent ramp at
+        # every wavelength.
         self.exptime_per_int = timing.get(
             "Measurement Time per Integration (sec)",
             self.tframe * (self.ngroups_per_int+self.frame_zero_dead) * self.nsuperstripe
         )
         measurement_time_in = self.inn.get('scalar', self.out['scalar'])['measurement_time']
-        self.on_source_in = measurement_time_in * self.nint_in
-        self.on_source_out = self.out['scalar']['measurement_time'] * self.nint_out #self.tframe * (self.ngroups_per_int+self.frame_zero_dead) 
+        self.on_source_in = measurement_time_in / self.nsuperstripe * self.nint_in
+        self.on_source_out = (
+            self.out['scalar']['measurement_time']
+            / self.nsuperstripe
+            * self.nint_out
+        )
 
     def loopingL(self, cen, signal_col, noise_col, bkg_col):
         """Finds bottom of the optimal extraction region.

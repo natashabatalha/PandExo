@@ -15,11 +15,14 @@ import pickle
 #max groups in integration
 max_ngroup = {'nirspec':65535,
               'miri':65535,
-              'niriss':65535,
+              'niriss':30,
               'nircam':100}
 #minimum number of integrations
 min_nint_trans = 3
 DHS_F150W_MIN_WAVELENGTH = 0.96
+APT_MAX_INTEGRATIONS_PER_EXPOSURE = 65535
+MAX_FRAMES_PER_EXPOSURE = 196608
+NIRSPEC_HGA_REPOINT_WARNING_SECONDS = 10000.0
 MIRI_LRS_ALLOWED_SUBARRAYS = {
     "lrsslitless": ("slitlessprism", "slitlessprism_ip", "slitlessprism_ips"),
     "lrsslit": ("subslit", "full"),
@@ -791,9 +794,8 @@ def compute_full_sim(dictinput,verbose=False):
         log("Finished Duty Cycle Calc")
 
     #calculate all timing info
-    max_ngroup_instrument = max_ngroup[pandeia_input["configuration"]["instrument"]["instrument"]]
+    max_ngroup_instrument = max_ngroup[str(instrument).lower()]
     timing, flags = compute_timing(m,transit_duration,expfact_out,noccultations,max_ngroup_instrument)
-
     if optimize_nircam_readout:
         selected = None
         rejected_readouts = []
@@ -927,6 +929,23 @@ def compute_full_sim(dictinput,verbose=False):
             "optimization was not performed. Estimate assumes no target "
             "acquisition and a standard 2,100-second initial slew."
         )
+
+    is_nirspec_prism_multistripe = (
+            str(instrument).lower() == "nirspec"
+            and str(conf["instrument"].get("disperser")).lower() == "prism"
+            and nsuperstripe > 1
+    )
+    integration_multiplier = nsuperstripe if is_nirspec_prism_multistripe else 1
+    update_apt_timing(
+        timing,
+        integration_multiplier=integration_multiplier,
+        max_frames_per_exposure=MAX_FRAMES_PER_EXPOSURE,
+        frames_per_integration=(
+            timing['APT: Num Groups per Integration'] * (nframe + nskip)
+        ),
+    )
+    if is_nirspec_prism_multistripe:
+        flags["flag_hga_repoint"] = nirspec_prism_exposure_warning(timing)
     
     #Simulate out trans and in transit
     log("Starting Out of Transit Simulation")
@@ -1383,10 +1402,6 @@ def compute_timing(m,transit_duration,expfact_out,noccultations,max_ngroup_instr
         #if you exceed that limit, set it to the maximum value instead.
         #also set another check for saturation
 
-        if ngroups_per_int > max_ngroup_instrument:
-            ngroups_per_int = max_ngroup_instrument
-            flag_high = f"Optimized NGROUPS above maximum ({max_ngroup_instrument}). SET TO NGROUPS={max_ngroup_instrument}"
- 
         if (ngroups_per_int < mingroups) | np.isnan(ngroups_per_int):
             ngroups_per_int = mingroups
             nframes_per_int = mingroups
@@ -1403,6 +1418,16 @@ def compute_timing(m,transit_duration,expfact_out,noccultations,max_ngroup_instr
         ngroups_per_int = mingroups
         nframes_per_int = mingroups
         flag_default = f"Something went wrong. SET TO NGROUPS={mingroups}"
+
+    if ngroups_per_int > max_ngroup_instrument:
+        original_ngroups_per_int = ngroups_per_int
+        ngroups_per_int = max_ngroup_instrument
+        source = "Optimized" if optimized_ngroups else "User-specified"
+        flag_high = (
+            f"{source} NGROUPS ({int(original_ngroups_per_int)}) exceeds "
+            f"the maximum ({int(max_ngroup_instrument)}). SET TO "
+            f"NGROUPS={int(max_ngroup_instrument)}"
+        )
 
     timing_values = _timing_values(ngroups_per_int)
     frame_zero_dead = timing_values["frame_zero_dead"]
@@ -1466,15 +1491,17 @@ def compute_timing(m,transit_duration,expfact_out,noccultations,max_ngroup_instr
     if nint_out < min_nint_trans:
         nint_out = min_nint_trans
 
-    effective_nint_in = nint_in / float(nsuperstripe)
-    effective_nint_out = nint_out / float(nsuperstripe)
-    # measurement_time_per_int is the Pandeia value for one nint=1
-    # calculation. In SOSS multistripe modes it includes all superstripes,
-    # so the per-wavelength on-source time must use effective_nint_*.
-    on_source_in = effective_nint_in * measurement_time_per_int
-    on_source_out = effective_nint_out * measurement_time_per_int
-    effective_on_source_in = effective_nint_in * measurement_time_per_int
-    effective_on_source_out = effective_nint_out * measurement_time_per_int
+    # Pandeia's nint is the number of complete multistripe cycles. Each cycle
+    # contributes one independent ramp to every stripe, so the integration
+    # count is not divided by nsuperstripe. The full-cycle measurement time is
+    # divided only when calculating the science time seen by one wavelength.
+    effective_nint_in = nint_in
+    effective_nint_out = nint_out
+    science_time_per_stripe = measurement_time_per_int / float(nsuperstripe)
+    on_source_in = nint_in * science_time_per_stripe
+    on_source_out = nint_out * science_time_per_stripe
+    effective_on_source_in = on_source_in
+    effective_on_source_out = on_source_out
    
     timing = {
         "Transit Duration" : (transit_duration)/60.0/60.0,
@@ -1508,23 +1535,22 @@ def update_timing_measurement_time(timing, measurement_time_per_int):
     """Sync timing metadata to the measurement_time reported by Pandeia.
 
     PandExo runs Pandeia with nint=1 and scales integrations internally. For
-    SOSS multistripe modes, Pandeia's one-integration measurement_time includes
-    all superstripes, so per-wavelength time uses the effective integration
-    counts in the timing dictionary.
+    multistripe modes, Pandeia's one-integration measurement time includes a
+    complete cycle through every stripe. Each wavelength receives the
+    per-stripe fraction of that time once per real integration.
     """
     nsuperstripe = float(timing.get("Num Superstripes", 1) or 1)
     nint_in = timing["Num Integrations In Transit"]
     nint_out = timing["Num Integrations Out of Transit"]
-    effective_nint_in = nint_in / nsuperstripe
-    effective_nint_out = nint_out / nsuperstripe
+    science_time_per_stripe = measurement_time_per_int / nsuperstripe
 
     timing["Measurement Time per Integration (sec)"] = measurement_time_per_int
-    timing["Effective Integrations In Transit"] = effective_nint_in
-    timing["Effective Integrations Out of Transit"] = effective_nint_out
-    timing["On Source Time In Transit"] = effective_nint_in * measurement_time_per_int
-    timing["On Source Time Out of Transit"] = effective_nint_out * measurement_time_per_int
-    timing["Effective On Source Time In Transit"] = effective_nint_in * measurement_time_per_int
-    timing["Effective On Source Time Out of Transit"] = effective_nint_out * measurement_time_per_int
+    timing["Effective Integrations In Transit"] = nint_in
+    timing["Effective Integrations Out of Transit"] = nint_out
+    timing["On Source Time In Transit"] = nint_in * science_time_per_stripe
+    timing["On Source Time Out of Transit"] = nint_out * science_time_per_stripe
+    timing["Effective On Source Time In Transit"] = timing["On Source Time In Transit"]
+    timing["Effective On Source Time Out of Transit"] = timing["On Source Time Out of Transit"]
 
 def remove_QY(pandeia_dict, instrument):
     """Removes Quantum Yield from Pandeia Fluxes. Place Holder. 
@@ -1761,6 +1787,9 @@ def add_warnings(pand_dict, timing, sat_level, flags,instrument):
             ),
         )
         warnings[f'{data_excess_mode} Data Excess?'] = data_excess_warning
+
+    if "flag_hga_repoint" in flags:
+        warnings["Exposure Duration?"] = flags["flag_hga_repoint"]
 
     return warnings     
     
@@ -2126,6 +2155,231 @@ def _integer_display(value):
     return integer_value if integer_value == value else value
 
 
+def _is_nirspec_prism_multistripe(instrument, disperser, nstripes):
+    return (
+        str(instrument).lower() == 'nirspec'
+        and str(disperser).lower() == 'prism'
+        and nstripes > 1
+    )
+
+
+def apt_exposure_parameters(
+        timing,
+        integration_multiplier=1,
+        max_integrations_per_exposure=APT_MAX_INTEGRATIONS_PER_EXPOSURE,
+        max_frames_per_exposure=None,
+        frames_per_integration=None):
+    """Split an observation into valid APT exposures.
+
+    Parameters
+    ----------
+    timing : dict
+        PandExo timing dictionary.
+    integration_multiplier : int, optional
+        Number of APT integrations represented by one PandExo integration.
+        This is one for ordinary modes and the stripe count for NIRSpec PRISM
+        multistripe observations.
+    max_integrations_per_exposure : int, optional
+        Universal maximum number of integrations in one APT exposure. The
+        default is 65,535.
+    max_frames_per_exposure : int, optional
+        Additional instrument limit on the number of frames in one exposure.
+    frames_per_integration : int, optional
+        Number of detector frames in one APT integration. Required when
+        ``max_frames_per_exposure`` is supplied.
+
+    Returns
+    -------
+    dict
+        Required and scheduled integrations, exposures per dither,
+        integrations per exposure, and the resulting exposure duration.
+
+    Raises
+    ------
+    ValueError
+        If a supplied count or limit is not positive.
+    """
+    integration_multiplier = int(integration_multiplier)
+    if integration_multiplier < 1:
+        raise ValueError('integration_multiplier must be positive')
+    if max_integrations_per_exposure < 1:
+        raise ValueError('max_integrations_per_exposure must be positive')
+
+    effective_limit = int(max_integrations_per_exposure)
+    if max_frames_per_exposure is not None:
+        if frames_per_integration is None:
+            raise ValueError(
+                'frames_per_integration is required with a frame limit'
+            )
+        frames_per_integration = int(frames_per_integration)
+        if frames_per_integration < 1 or max_frames_per_exposure < 1:
+            raise ValueError('frame counts and limits must be positive')
+        frame_limited_integrations = int(
+            max_frames_per_exposure // frames_per_integration
+        )
+        if frame_limited_integrations < 1:
+            raise ValueError(
+                'one integration exceeds the maximum frames per exposure'
+            )
+        effective_limit = min(effective_limit, frame_limited_integrations)
+
+    integrations = int(
+        timing['Num Integrations In Transit']
+        + timing['Num Integrations Out of Transit']
+    )
+    required_integrations = integrations * integration_multiplier
+    exposures_per_dither = max(
+        1,
+        int(np.ceil(required_integrations / float(effective_limit))),
+    )
+    integrations_per_exposure = int(np.ceil(
+        required_integrations / float(exposures_per_dither)
+    ))
+    scheduled_integrations = exposures_per_dither * integrations_per_exposure
+    elapsed_time_per_apt_integration = (
+        timing['Time/Integration incl reset (sec)']
+        / float(integration_multiplier)
+    )
+
+    return {
+        'integrations': integrations,
+        'required_integrations': required_integrations,
+        'scheduled_integrations': scheduled_integrations,
+        'exposures_per_dither': exposures_per_dither,
+        'integrations_per_exposure': integrations_per_exposure,
+        'elapsed_time_per_apt_integration': elapsed_time_per_apt_integration,
+        'exposure_duration': (
+            scheduled_integrations * elapsed_time_per_apt_integration
+        ),
+        'max_integrations_per_exposure': effective_limit,
+    }
+
+
+def nirspec_prism_apt_parameters(
+        timing,
+        max_integrations_per_exposure=APT_MAX_INTEGRATIONS_PER_EXPOSURE):
+    """Convert Pandeia multistripe cycles into NIRSpec BOTS APT inputs.
+
+    Pandeia counts one complete pass through all stripes as one integration.
+    APT instead counts the integration performed on each individual stripe.
+    If the resulting stripe-level count exceeds APT's per-exposure limit, the
+    integrations are distributed as evenly as possible over multiple
+    ``Exposures/Dith`` entries.
+
+    Parameters
+    ----------
+    timing : dict
+        PandExo timing dictionary for a NIRSpec PRISM multistripe calculation.
+    max_integrations_per_exposure : int, optional
+        Maximum APT ``Integrations/Exp`` value. The default is 65,535.
+
+    Returns
+    -------
+    dict
+        Number of full Pandeia cycles, required and scheduled APT stripe
+        integrations, ``Exposures/Dith``, ``Integrations/Exp``, and the
+        resulting APT exposure duration in seconds.
+
+    Raises
+    ------
+    ValueError
+        If the stripe count or integration limit is not positive.
+    """
+    nstripes = int(timing.get('Num Superstripes', 1) or 1)
+    if nstripes < 1:
+        raise ValueError('Num Superstripes must be positive')
+    parameters = apt_exposure_parameters(
+        timing,
+        integration_multiplier=nstripes,
+        max_integrations_per_exposure=max_integrations_per_exposure,
+    )
+    parameters['cycles'] = parameters.pop('integrations')
+    parameters['stripe_elapsed_time'] = parameters.pop(
+        'elapsed_time_per_apt_integration'
+    )
+    return parameters
+
+
+def nirspec_prism_exposure_warning(timing):
+    """Return APT's long-exposure guidance for PRISM multistripe BOTS.
+
+    NIRSpec BOTS observations may exceed APT's nominal 10,000-second exposure
+    limit. Such observations are permitted, but a high-gain antenna repoint can
+    briefly move the spectrum and produce a flux excursion.
+
+    Parameters
+    ----------
+    timing : dict
+        PandExo timing dictionary for a NIRSpec PRISM multistripe calculation.
+
+    Returns
+    -------
+    str
+        ``"All good"`` below the nominal limit, otherwise an informational
+        warning describing the possible repoint interruption.
+    """
+    exposure_duration = nirspec_prism_apt_parameters(
+        timing
+    )['exposure_duration']
+    if exposure_duration <= NIRSPEC_HGA_REPOINT_WARNING_SECONDS:
+        return 'All good'
+    return (
+        "APT will warn that the exposure duration exceeds 10,000 seconds. "
+        "NIRSpec BOTS permits longer exposures, but a high-gain antenna "
+        "repoint may cause an approximately 60-second flux excursion."
+    )
+
+
+def update_apt_timing(
+        timing,
+        integration_multiplier=1,
+        max_frames_per_exposure=None,
+        frames_per_integration=None):
+    """Add universal APT exposure-splitting values to a timing dictionary."""
+    apt_parameters = apt_exposure_parameters(
+        timing,
+        integration_multiplier=integration_multiplier,
+        max_frames_per_exposure=max_frames_per_exposure,
+        frames_per_integration=frames_per_integration,
+    )
+    timing.update({
+        'APT: Exposures/Dith': apt_parameters['exposures_per_dither'],
+        'APT: Num Integrations per Exposure': (
+            apt_parameters['integrations_per_exposure']
+        ),
+        'APT: Num Integrations per Occultation': (
+            apt_parameters['scheduled_integrations']
+        ),
+    })
+    return timing
+
+
+def update_nirspec_prism_apt_timing(timing):
+    """Add NIRSpec PRISM multistripe APT values to a timing dictionary.
+
+    The original in- and out-of-transit counts remain Pandeia full-cycle
+    counts. APT-facing fields are converted to stripe-level integrations and
+    split across exposures where necessary.
+
+    Parameters
+    ----------
+    timing : dict
+        PandExo timing dictionary to update in place.
+
+    Returns
+    -------
+    dict
+        The updated timing dictionary.
+    """
+    nstripes = int(timing.get('Num Superstripes', 1) or 1)
+    timing['Num Multistripe Cycles per Occultation'] = int(
+        timing['Num Integrations In Transit']
+        + timing['Num Integrations Out of Transit']
+    )
+    update_apt_timing(timing, integration_multiplier=nstripes)
+    return timing
+
+
 def _nircam_pupil_rows(filter_name, paired_filter):
     short_filter = None
     long_filter = None
@@ -2177,6 +2431,9 @@ def build_timing_display_div(out, timing):
         detector_config.get('readmode')
     )
     nstripes = int(timing.get('Num Superstripes', 1) or 1)
+    is_nirspec_prism_multistripe = _is_nirspec_prism_multistripe(
+        instrument, disperser, nstripes
+    )
 
     apt_rows = [
         ('Instrument', _jwst_instrument_name(instrument)),
@@ -2221,10 +2478,20 @@ def build_timing_display_div(out, timing):
             'Groups per Integration',
             timing['APT: Num Groups per Integration']
         ),
-        (
-            'Integrations per Occultation',
-            timing['APT: Num Integrations per Occultation']
-        ),
+    ])
+    if is_nirspec_prism_multistripe:
+        apt_parameters = nirspec_prism_apt_parameters(timing)
+        exposures_per_dither = apt_parameters['exposures_per_dither']
+        integrations_per_exposure = apt_parameters['integrations_per_exposure']
+    else:
+        exposures_per_dither = timing.get('APT: Exposures/Dith', 1)
+        integrations_per_exposure = timing.get(
+            'APT: Num Integrations per Exposure',
+            timing['APT: Num Integrations per Occultation'],
+        )
+    apt_rows.extend([
+        ('Exposures/Dith', exposures_per_dither),
+        ('Integrations/Exp', integrations_per_exposure),
     ])
 
     calculation_rows = [
@@ -2274,9 +2541,16 @@ def build_timing_display_div(out, timing):
         calculation_rows.extend([
             ('Number of Stripes', nstripes),
             (
-                'Elapsed Time per APT Integration incl. Reset (sec)',
+                'Elapsed Time per Full Multistripe Cycle incl. Reset (sec)',
                 timing['Time/Integration incl reset (sec)']
             ),
+        ])
+        if is_nirspec_prism_multistripe:
+            calculation_rows.append((
+                'Elapsed Time per APT Stripe Integration incl. Reset (sec)',
+                timing['Time/Integration incl reset (sec)'] / float(nstripes)
+            ))
+        calculation_rows.extend([
             (
                 'Science Time per Full Multistripe Cycle excl. Reset (sec)',
                 timing['Measurement Time per Integration (sec)']
