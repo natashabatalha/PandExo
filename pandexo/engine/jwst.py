@@ -2126,10 +2126,7 @@ def build_timing_display_div(out, timing):
     if data_excess_mode is not None:
         data_excess_label = f'Estimated {data_excess_mode} Data Excess (GB)'
         data_excess_value = timing[data_excess_label]
-        if data_excess_mode == 'NIRCam':
-            data_excess_value = (
-                f'{data_excess_value:.1f} (Verify using APT)'
-            )
+        data_excess_value = f'{data_excess_value:.1f} (Verify using APT)'
         calculation_rows.extend([
             (
                 data_excess_label,

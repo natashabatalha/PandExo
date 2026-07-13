@@ -610,13 +610,16 @@ def test_multistripe_timing_display_uses_apt_and_calculation_tables():
 
 def test_timing_display_includes_estimated_dhs_data_excess():
     timing = _timing(nsuperstripe=1)
-    timing["Estimated DHS Data Excess (GB)"] = 4.25
+    timing["Estimated DHS Data Excess (GB)"] = 4.26
     timing["Assumed DHS Allocation Overhead (sec)"] = 2794.68
     _, calculation_div = build_timing_display_div(_pandeia_out(), timing)
 
-    assert "Estimated DHS Data Excess (GB)" in calculation_div.decode()
-    assert "4.25" in calculation_div.decode()
-    assert "Assumed No-TA Scheduling + Slew Overhead (sec)" in calculation_div.decode()
+    html = calculation_div.decode()
+
+    assert "Estimated DHS Data Excess (GB)" in html
+    assert "4.3 (Verify using APT)" in html
+    assert "4.26" not in html
+    assert "Assumed No-TA Scheduling + Slew Overhead (sec)" in html
 
 
 def test_view_template_owns_timing_table_headings():
