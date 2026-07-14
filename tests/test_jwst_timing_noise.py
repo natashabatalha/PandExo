@@ -163,6 +163,34 @@ def test_standard_nircam_data_excess_warning_is_exposed():
     assert "10.00 GB" not in warnings["NIRCam Data Excess?"]
 
 
+@pytest.mark.parametrize(
+    ("fraction_saturation", "sat_level", "expected"),
+    [
+        (0.7, 0.8, "All good (70% < 80%)"),
+        (0.9, 0.8, "% full well>80% (90% > 80%)"),
+    ],
+)
+def test_full_well_warning_reports_saturation_percentage(
+    fraction_saturation, sat_level, expected
+):
+    warnings = add_warnings(
+        {
+            "warnings": {},
+            "scalar": {"fraction_saturation": fraction_saturation},
+        },
+        _timing(nsuperstripe=1),
+        sat_level=sat_level,
+        flags={
+            "flag_default": "All good",
+            "flag_high": "All good",
+            "flag_min_nint": "All good",
+        },
+        instrument="nircam",
+    )
+
+    assert warnings["% full well high?"] == expected
+
+
 def test_dhs_optimization_configs_are_independent_of_displayed_channel():
     base_conf = {
         'instrument': {
