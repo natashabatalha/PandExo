@@ -725,7 +725,8 @@ def compute_full_sim(dictinput,verbose=False):
         #convert to seconds, then remove quantity and convert back to float 
         transit_duration = float((pandexo_input['planet']['transit_duration']*u.Unit(pandexo_input['planet']['td_unit'])).to(u.second)/u.second)
 
-    #amount of exposure time out-of-occultation, as a fraction of in-occ time 
+    #amount of exposure time out-of-occultation, as a fraction of in-occ time
+    total_observing_time = None
     try:
         expfact_out = pandexo_input['observation']['fraction'] 
         log("WARNING: key input fraction has been replaced with new 'baseline option'. See notebook example")
@@ -735,9 +736,19 @@ def compute_full_sim(dictinput,verbose=False):
         if pandexo_input['observation']['baseline_unit'] =='frac':
             expfact_out = pandexo_input['observation']['baseline'] 
         elif pandexo_input['observation']['baseline_unit'] =='total':
-            expfact_out = transit_duration/( pandexo_input['observation']['baseline'] - transit_duration)
+            total_observing_time = float(
+                pandexo_input['observation']['baseline']
+            )
+            expfact_out = transit_duration/(
+                total_observing_time - transit_duration
+            )
         elif pandexo_input['observation']['baseline_unit'] =='total_hrs':
-            expfact_out = transit_duration/( pandexo_input['observation']['baseline']*3600.0 - transit_duration)
+            total_observing_time = float(
+                pandexo_input['observation']['baseline']
+            ) * 3600.0
+            expfact_out = transit_duration/(
+                total_observing_time - transit_duration
+            )
         else: 
             raise Exception("Wrong units for baseine: either 'frac' or 'total' or 'total_hrs' accepted")
 
@@ -795,7 +806,10 @@ def compute_full_sim(dictinput,verbose=False):
 
     #calculate all timing info
     max_ngroup_instrument = max_ngroup[str(instrument).lower()]
-    timing, flags = compute_timing(m,transit_duration,expfact_out,noccultations,max_ngroup_instrument)
+    timing, flags = compute_timing(
+        m, transit_duration, expfact_out, noccultations,
+        max_ngroup_instrument, total_observing_time=total_observing_time,
+    )
     if optimize_nircam_readout:
         selected = None
         rejected_readouts = []
@@ -834,6 +848,7 @@ def compute_full_sim(dictinput,verbose=False):
                 expfact_out,
                 noccultations,
                 max_ngroup_instrument,
+                total_observing_time=total_observing_time,
             )
             allocation_overhead = nircam_no_ta_overhead(
                 candidate_exposure.tframe
@@ -1283,7 +1298,9 @@ def compute_maxexptime_per_int(pandeia_input, sat_level):
     
     return maxexptime_per_int
         
-def compute_timing(m,transit_duration,expfact_out,noccultations,max_ngroup_instrument=65536.0):
+def compute_timing(
+        m, transit_duration, expfact_out, noccultations,
+        max_ngroup_instrument=65536.0, total_observing_time=None):
     """Computes all timing info for observation
     
     Computes all JWST specific timing info for observation including. Some pertinent 
@@ -1304,6 +1321,14 @@ def compute_timing(m,transit_duration,expfact_out,noccultations,max_ngroup_instr
         fraction of time spent in transit versus out of transit 
     noccultations : int 
         number of transits 
+    max_ngroup_instrument : int or float, optional
+        Maximum groups per integration for the selected instrument.
+    total_observing_time : float, optional
+        Requested total in- plus out-of-transit observing time in seconds.
+        When supplied, the total number of integrations is quantized once and
+        the out-of-transit count is the remainder after assigning the
+        in-transit integrations. When omitted, ``expfact_out`` determines the
+        out-of-transit count.
     
     Returns
     ------- 
@@ -1328,6 +1353,11 @@ def compute_timing(m,transit_duration,expfact_out,noccultations,max_ngroup_instr
     nsuperstripe = int(m.get("nsuperstripe", 1) or 1)
     if nsuperstripe < 1:
         nsuperstripe = 1
+    def _ceil_count(value):
+        # Remove a one-ULP floating-point overshoot at exact integration
+        # boundaries without treating a genuinely longer duration as exact.
+        return int(np.ceil(np.nextafter(float(value), -np.inf)))
+
     def _clocktime_per_int(ngroups):
         if (m.get("exposure_time_per_int") is not None and
                 ngroups == m.get("exposure_time_ngroup")):
@@ -1358,8 +1388,14 @@ def compute_timing(m,transit_duration,expfact_out,noccultations,max_ngroup_instr
         clocktime_per_int = _clocktime_per_int(ngroups)
         eff = measurement_time_per_int/float(nsuperstripe)/clocktime_per_int
         nint_per_occultation = transit_duration/clocktime_per_int
-        nint_in = np.ceil(nint_per_occultation)
-        nint_out = np.ceil(nint_in/expfact_out)
+        nint_in = _ceil_count(nint_per_occultation)
+        if total_observing_time is None:
+            nint_out = _ceil_count(nint_in/expfact_out)
+        else:
+            total_nint = _ceil_count(
+                total_observing_time/clocktime_per_int
+            )
+            nint_out = max(0, total_nint - nint_in)
 
         return {
             "frame_zero_dead": frame_zero_dead,
@@ -2223,6 +2259,11 @@ def apt_exposure_parameters(
             )
         effective_limit = min(effective_limit, frame_limited_integrations)
 
+    if integration_multiplier > effective_limit:
+        raise ValueError(
+            'one complete multistripe cycle exceeds the per-exposure limit'
+        )
+
     integrations = int(
         timing['Num Integrations In Transit']
         + timing['Num Integrations Out of Transit']
@@ -2232,9 +2273,21 @@ def apt_exposure_parameters(
         1,
         int(np.ceil(required_integrations / float(effective_limit))),
     )
-    integrations_per_exposure = int(np.ceil(
-        required_integrations / float(exposures_per_dither)
-    ))
+    while True:
+        minimum_integrations = int(np.ceil(
+            required_integrations / float(exposures_per_dither)
+        ))
+        # End every exposure on a complete multistripe cycle so that each
+        # stripe receives the same number of integrations in every exposure.
+        per_exposure_multiple = integration_multiplier
+        integrations_per_exposure = int(
+            np.ceil(
+                minimum_integrations / float(per_exposure_multiple)
+            ) * per_exposure_multiple
+        )
+        if integrations_per_exposure <= effective_limit:
+            break
+        exposures_per_dither += 1
     scheduled_integrations = exposures_per_dither * integrations_per_exposure
     elapsed_time_per_apt_integration = (
         timing['Time/Integration incl reset (sec)']

@@ -684,7 +684,40 @@ def test_timing_display_includes_estimated_dhs_data_excess():
     assert "Assumed No-TA Scheduling + Slew Overhead (sec)" in html
 
 
-def test_nirspec_prism_apt_parameters_match_published_multistripe_example():
+def test_total_observing_time_is_quantized_once_for_multistripe_timing():
+    cycle_time = 1.09312
+    requested_cycles = 30810
+    total_observing_time = requested_cycles * cycle_time
+    transit_duration = 3.816 * 3600.0
+
+    timing, _ = compute_timing(
+        {
+            "ngroup": 3,
+            "tframe": 0.02904,
+            "nframe": 1,
+            "mingroups": 2,
+            "nskip": 0,
+            "nsuperstripe": 8,
+            "exposure_time_per_int": cycle_time,
+            "exposure_time_ngroup": 3,
+        },
+        transit_duration=transit_duration,
+        expfact_out=transit_duration / (
+            total_observing_time - transit_duration
+        ),
+        noccultations=1,
+        total_observing_time=total_observing_time,
+    )
+
+    assert timing["Num Integrations In Transit"] == 12568
+    assert timing["Num Integrations Out of Transit"] == 18242
+    assert timing["APT: Num Integrations per Occultation"] == requested_cycles
+    assert timing["Transit+Baseline, no overhead (hrs)"] == pytest.approx(
+        total_observing_time / 3600.0
+    )
+
+
+def test_nirspec_prism_apt_parameters_pad_published_example_to_full_cycles():
     timing = {
         "Num Superstripes": 8,
         "Num Integrations In Transit": 15405,
@@ -697,10 +730,11 @@ def test_nirspec_prism_apt_parameters_match_published_multistripe_example():
     assert parameters["cycles"] == 30810
     assert parameters["required_integrations"] == 246480
     assert parameters["exposures_per_dither"] == 4
-    assert parameters["integrations_per_exposure"] == 61620
-    assert parameters["scheduled_integrations"] == 246480
+    assert parameters["integrations_per_exposure"] == 61624
+    assert parameters["scheduled_integrations"] == 246496
+    assert parameters["integrations_per_exposure"] % 8 == 0
     assert parameters["stripe_elapsed_time"] == pytest.approx(0.13664)
-    assert parameters["exposure_duration"] == pytest.approx(33679.0272)
+    assert parameters["exposure_duration"] == pytest.approx(33681.21344)
 
 
 def test_nirspec_prism_apt_values_are_available_to_offline_outputs():
@@ -716,8 +750,8 @@ def test_nirspec_prism_apt_values_are_available_to_offline_outputs():
 
     assert timing["Num Multistripe Cycles per Occultation"] == 30810
     assert timing["APT: Exposures/Dith"] == 4
-    assert timing["APT: Num Integrations per Exposure"] == 61620
-    assert timing["APT: Num Integrations per Occultation"] == 246480
+    assert timing["APT: Num Integrations per Exposure"] == 61624
+    assert timing["APT: Num Integrations per Occultation"] == 246496
 
 
 def test_nirspec_prism_apt_parameters_round_up_without_exceeding_limit():
@@ -732,9 +766,10 @@ def test_nirspec_prism_apt_parameters_round_up_without_exceeding_limit():
 
     assert parameters["required_integrations"] == 131072
     assert parameters["exposures_per_dither"] == 3
-    assert parameters["integrations_per_exposure"] == 43691
+    assert parameters["integrations_per_exposure"] == 43696
     assert parameters["integrations_per_exposure"] <= 65535
-    assert parameters["scheduled_integrations"] == 131073
+    assert parameters["integrations_per_exposure"] % 8 == 0
+    assert parameters["scheduled_integrations"] == 131088
 
 
 def test_apt_integration_limit_is_applied_to_standard_modes():
@@ -768,6 +803,22 @@ def test_frame_limit_can_require_additional_exposures():
     assert parameters["exposures_per_dither"] == 3
     assert parameters["integrations_per_exposure"] == 16667
     assert parameters["integrations_per_exposure"] * 10 <= 196608
+
+
+def test_exposure_limit_must_fit_one_complete_multistripe_cycle():
+    timing = {
+        "Num Integrations In Transit": 1,
+        "Num Integrations Out of Transit": 1,
+        "Time/Integration incl reset (sec)": 8.0,
+    }
+
+    with pytest.raises(
+            ValueError, match="one complete multistripe cycle"):
+        apt_exposure_parameters(
+            timing,
+            integration_multiplier=8,
+            max_integrations_per_exposure=7,
+        )
 
 
 def test_niriss_soss_groups_are_limited_to_30():
@@ -831,7 +882,7 @@ def test_nirspec_prism_timing_display_uses_apt_stripe_integrations():
     assert "Exposures/Dith" in apt_html
     assert "<td>4</td>" in apt_html
     assert "Integrations/Exp" in apt_html
-    assert "<td>61620</td>" in apt_html
+    assert "<td>61624</td>" in apt_html
     assert "Integrations per Occultation" not in apt_html
     assert "Elapsed Time per Full Multistripe Cycle incl. Reset (sec)" in calculation_html
     assert "<td>1.093120</td>" in calculation_html
