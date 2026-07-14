@@ -20,6 +20,7 @@ max_ngroup = {'nirspec':65535,
 #minimum number of integrations
 min_nint_trans = 3
 DHS_F150W_MIN_WAVELENGTH = 0.96
+MIRI_LRS_IPS_MAX_WAVELENGTH = 12.5
 APT_MAX_INTEGRATIONS_PER_EXPOSURE = 65535
 MAX_FRAMES_PER_EXPOSURE = 196608
 NIRSPEC_HGA_REPOINT_WARNING_SECONDS = 10000.0
@@ -439,6 +440,43 @@ def dhs_f150w_wavelength_mask(conf, wave):
         return None
 
     return np.asarray(wave, dtype=float) >= DHS_F150W_MIN_WAVELENGTH
+
+
+def miri_lrs_wavelength_mask(conf, wave):
+    """Build a wavelength mask for the MIRI LRS IPS red-end cutoff.
+
+    The ``SLITLESSPRISM_IPS`` subarray is shorter in the dispersion direction
+    than the other MIRI LRS slitless subarrays. It therefore cannot record the
+    full nominal LRS wavelength range: wavelengths above approximately 12.5
+    microns fall beyond the red edge of the detector region being read out.
+
+    Parameters
+    ----------
+    conf : dict
+        Pandeia ``configuration`` dictionary for the calculation. The helper
+        inspects ``conf["instrument"]`` and ``conf["detector"]`` to identify a
+        MIRI LRS slitless calculation using ``SLITLESSPRISM_IPS``.
+    wave : array-like
+        Wavelength samples in microns.
+
+    Returns
+    -------
+    numpy.ndarray or None
+        Boolean mask selecting wavelengths at or below
+        ``MIRI_LRS_IPS_MAX_WAVELENGTH``. Returns ``None`` for other
+        instruments, MIRI modes, or subarrays so those calculations are left
+        unchanged.
+    """
+    instrument = conf.get('instrument', {})
+    detector = conf.get('detector', {})
+    if str(instrument.get('instrument', '')).lower() != 'miri':
+        return None
+    if str(instrument.get('mode', '')).lower() != 'lrsslitless':
+        return None
+    if str(detector.get('subarray', '')).lower() != 'slitlessprism_ips':
+        return None
+
+    return np.asarray(wave, dtype=float) <= MIRI_LRS_IPS_MAX_WAVELENGTH
 
 
 def _no_valid_spectral_channels_message(conf, scalar):
@@ -1097,6 +1135,26 @@ def compute_full_sim(dictinput,verbose=False):
         result['rn[out,in]'] = sort_by_wave_order(result['rn[out,in]'], dhs_wavelength_channel)
         result['bkg[out,in]'] = sort_by_wave_order(result['bkg[out,in]'], dhs_wavelength_channel)
         pandeia_snr_int = sort_by_wave_order(pandeia_snr_int, dhs_wavelength_channel)
+
+    miri_wavelength_channel = None
+    if not is_phase_spec(calculation):
+        miri_wavelength_channel = miri_lrs_wavelength_mask(conf, w)
+    if miri_wavelength_channel is not None:
+        w = w[miri_wavelength_channel]
+        varin = varin[miri_wavelength_channel]
+        varout = varout[miri_wavelength_channel]
+        extracted_flux_out = extracted_flux_out[miri_wavelength_channel]
+        extracted_flux_inn = extracted_flux_inn[miri_wavelength_channel]
+        if extracted_flux_per_int_out is not None:
+            extracted_flux_per_int_out = extracted_flux_per_int_out[miri_wavelength_channel]
+        if pandeia_extracted_noise is not None:
+            pandeia_extracted_noise = pandeia_extracted_noise[miri_wavelength_channel]
+        if pandeia_full_saturation is not None:
+            pandeia_full_saturation = pandeia_full_saturation[miri_wavelength_channel]
+        result['rn[out,in]'] = sort_by_wave_order(result['rn[out,in]'], miri_wavelength_channel)
+        result['bkg[out,in]'] = sort_by_wave_order(result['bkg[out,in]'], miri_wavelength_channel)
+        if pandeia_snr_int is not None:
+            pandeia_snr_int = sort_by_wave_order(pandeia_snr_int, miri_wavelength_channel)
 
         
     #bin the data according to user input 
