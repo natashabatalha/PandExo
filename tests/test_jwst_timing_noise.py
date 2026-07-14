@@ -16,6 +16,7 @@ from pandexo.engine.jwst import (
     NIRCAM_READOUT_PATTERNS,
     _nircam_dhs_optimization_configs,
     _table_html,
+    _warnings_table_html,
     add_warnings,
     apt_exposure_parameters,
     build_timing_display_div,
@@ -961,6 +962,20 @@ def test_summary_tables_use_shared_fixed_column_layout():
     assert '.pandexo-summary-table {' in template
     assert 'table-layout: fixed;' in template
     assert 'width: 50%;' in template
+
+
+def test_warnings_table_renders_pandeia_newlines_as_breaks():
+    html = _warnings_table_html(
+        {
+            "Non linear?": (
+                "Partial saturation:\n There are 24 pixels saturated at the "
+                "end of a ramp. Partial ramps may still be used in some cases."
+            )
+        }
+    )
+
+    assert "Partial saturation:<br> There are 24 pixels" in html
+    assert "\\n" not in html
 
 
 def test_non_multistripe_timing_display_omits_stripe_rows():
