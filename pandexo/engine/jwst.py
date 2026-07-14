@@ -2156,7 +2156,7 @@ def _display_subarray(subarray):
         return None
     display_subarray = str(subarray).split(' (')[0].upper()
     if display_subarray.endswith('_PRM'):
-        return f'{display_subarray[:-4]}_PRISM'
+        display_subarray = f'SUB{display_subarray[1:-4]}_PRISM'
     return display_subarray
 
 
