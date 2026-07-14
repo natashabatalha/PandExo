@@ -2093,7 +2093,7 @@ def target_acq(instrument, both_spec, warning):
             'saturation':rphot['2d']['saturation']}
 
 
-def _table_html(rows):
+def _table_html(rows, escape_values=True):
     def format_value(value):
         if isinstance(value, (float, np.floating)):
             if np.isfinite(value) and float(value).is_integer():
@@ -2104,8 +2104,20 @@ def _table_html(rows):
     table = pd.DataFrame(rows, columns=['Parameter', 'Value'])
     table = table.set_index('Parameter')
     table.index.name = None
-    table = table.to_html(formatters={'Value': format_value})
+    table = table.to_html(
+        formatters={'Value': format_value},
+        escape=escape_values,
+    )
     return '<table class="table table-striped pandexo-summary-table"> \n' + table[36:len(table)]
+
+
+def _warnings_table_html(warnings):
+    rows = []
+    for parameter, value in warnings.items():
+        if isinstance(value, str):
+            value = value.replace('\\n', '<br>').replace('\n', '<br>')
+        rows.append((parameter, value))
+    return _table_html(rows, escape_values=False)
 
 
 def _jwst_instrument_name(instrument):
@@ -2740,14 +2752,7 @@ def as_dict(out, both_spec ,binned, timing, mag, sat_level, warnings, punit, unb
     if punit == 'fp/f*': p = -1.0
     apt_div, calculation_div = build_timing_display_div(out, timing)
 
-    warnings_div = pd.DataFrame.from_dict(warnings, orient='index')
-    warnings_div.columns = ['Value']
-    warnings_div = warnings_div.to_html()
-    warnings_div = (
-        '<table class="table table-striped pandexo-summary-table"> \n'
-        + warnings_div[36:len(warnings_div)]
-    )
-    warnings_div = warnings_div.encode()
+    warnings_div = _warnings_table_html(warnings).encode()
     
     map_dhs_names = {'sub40stripe1_dhs':'SUB40S1_2-SPECTRA',
                      'sub80stripe2_dhs':'SUB80S2_4-SPECTRA',
