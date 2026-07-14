@@ -576,7 +576,7 @@ def is_phase_spec(calculation):
 
 def compute_full_sim(dictinput,verbose=False): 
     """Top level function to set up exoplanet obs. for JW
-    
+
     Function to set up explanet observations for JWST only and 
     compute simulated spectrum. It uses STScI's Pandeia to compute 
     instrument throughputs and WebbPSF to compute PSFs. 
@@ -1818,16 +1818,31 @@ def add_warnings(pand_dict, timing, sat_level, flags,instrument):
         
     #check for too small number of groups
     flag_low = "All good"
-    flag_perc = "All good"
+    scalar = pand_dict.get('scalar') or {}
+    max_fullwell = scalar.get('fraction_saturation', sat_level)
+    if not np.isfinite(max_fullwell):
+        max_fullwell = sat_level
+    max_fullwell_percent = f"{max_fullwell:.0%}"
+    sat_level_percent = f"{sat_level:.0%}"
+    if max_fullwell < sat_level:
+        flag_perc = (
+            f"All good ({max_fullwell_percent} < {sat_level_percent})"
+        )
+    elif max_fullwell > sat_level:
+        flag_perc = (
+            f"% full well>{sat_level_percent} "
+            f"({max_fullwell_percent} > {sat_level_percent})"
+        )
+    else:
+        flag_perc = (
+            f"All good ({max_fullwell_percent} = {sat_level_percent})"
+        )
 
-    if (sat_level > .80) & (ngroups_per_int <3):
+    if (sat_level > .80) & (ngroups_per_int < 3):
         flag_low = "% full well>80% & only " + str(ngroups_per_int) + " groups"
     if ngroups_per_int==1:
         flag_low+='. Ngroups=1 is a new mode since Cycle 4 and has not been rigorously tested. Proceed with caution.'
-    if (sat_level > .80): 
-        flag_perc = "% full well>80%"
 
-     
     warnings = {
             "Group Number Too Low?" : flag_low,
             "Group Number Too High?": flags["flag_high"],
