@@ -62,6 +62,7 @@ def test_new_calculation_template_lists_new_miri_lrs_subarrays():
     assert 'value="slitlessprism_ip"' in template
     assert 'value="slitlessprism_ips"' in template
     assert 'SLITLESSPRISM (Not Recommended' in template
+    assert 'Slit LRS (Not Currently Offered for TSOs)' in template
     assert 'value="full"' in template
     assert "FULL (tframe=2.775)" in template
     assert 'value="subslit"' in template

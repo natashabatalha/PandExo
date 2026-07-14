@@ -1853,6 +1853,17 @@ def add_warnings(pand_dict, timing, sat_level, flags,instrument):
             "Minimum Integrations?": flags.get("flag_min_nint", "All good")
     }
 
+    configuration = (pand_dict.get('input') or {}).get('configuration') or {}
+    observation_instrument = configuration.get('instrument') or {}
+    if (
+        str(observation_instrument.get('instrument', '')).lower() == 'miri'
+        and str(observation_instrument.get('mode', '')).lower() == 'lrsslit'
+    ):
+        warnings['MIRI LRS Slit TSO?'] = (
+            'MIRI LRS slit mode is not currently offered for time-series '
+            'observations.'
+        )
+
     data_excess_mode = next(
         (
             mode_name for mode_name in ('DHS', 'NIRCam')

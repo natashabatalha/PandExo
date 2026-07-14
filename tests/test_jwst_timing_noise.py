@@ -192,6 +192,40 @@ def test_full_well_warning_reports_saturation_percentage(
     assert warnings["% full well high?"] == expected
 
 
+@pytest.mark.parametrize(
+    ("mode", "expected_warning"),
+    [
+        (
+            "lrsslit",
+            "MIRI LRS slit mode is not currently offered for time-series "
+            "observations.",
+        ),
+        ("lrsslitless", None),
+    ],
+)
+def test_miri_lrs_slit_tso_warning_is_exposed(mode, expected_warning):
+    warnings = add_warnings(
+        {
+            "warnings": {},
+            "input": {
+                "configuration": {
+                    "instrument": {"instrument": "miri", "mode": mode}
+                }
+            },
+        },
+        _timing(nsuperstripe=1),
+        sat_level=0.8,
+        flags={
+            "flag_default": "All good",
+            "flag_high": "All good",
+            "flag_min_nint": "All good",
+        },
+        instrument="miri",
+    )
+
+    assert warnings.get("MIRI LRS Slit TSO?") == expected_warning
+
+
 def test_dhs_optimization_configs_are_independent_of_displayed_channel():
     base_conf = {
         'instrument': {
