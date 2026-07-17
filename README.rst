@@ -1,11 +1,6 @@
-.. raw:: html
-
-   <div align="center">
-   <img src="docs/logo.png" width="450px">
-   </img>
-   <br/>
-   </div>
-   <br/><br/>
+.. image:: https://raw.githubusercontent.com/natashabatalha/PandExo/master/docs/logo.png
+   :alt: PandExo
+   :width: 450px
 
 
 Getting Started
