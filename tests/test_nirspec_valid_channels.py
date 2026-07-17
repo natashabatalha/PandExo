@@ -4,6 +4,7 @@ import pytest
 from pandexo.engine.jwst import (
     dhs_f150w_wavelength_mask,
     nirspec_valid_channel_mask,
+    nirspec_prism_multistripe_wavelength_mask,
 )
 
 
@@ -100,3 +101,66 @@ def test_dhs_f150w_mask_truncates_below_minimum_wavelength():
 )
 def test_dhs_f150w_mask_only_applies_to_dhs_f150w(conf):
     assert dhs_f150w_wavelength_mask(conf, np.array([0.94, 1.0])) is None
+
+
+@pytest.mark.parametrize(
+    ("subarray", "max_wavelength"),
+    [
+        ("s256m2_prm", 5.22),
+        ("s128m4_prm", 5.14),
+        ("s64m8_prm", 4.98),
+        ("s32m16_prm", 4.66),
+    ],
+)
+def test_nirspec_prism_multistripe_mask_truncates_red_edge(
+    subarray, max_wavelength
+):
+    conf = {
+        "instrument": {
+            "instrument": "nirspec",
+            "disperser": "prism",
+            "filter": "clear",
+        },
+        "detector": {"subarray": subarray},
+    }
+
+    mask = nirspec_prism_multistripe_wavelength_mask(
+        conf, np.array([max_wavelength - 0.01, max_wavelength, max_wavelength + 0.01])
+    )
+
+    assert mask.tolist() == [True, True, False]
+
+
+@pytest.mark.parametrize(
+    "conf",
+    [
+        {
+            "instrument": {
+                "instrument": "nirspec",
+                "disperser": "prism",
+                "filter": "clear",
+            },
+            "detector": {"subarray": "sub512"},
+        },
+        {
+            "instrument": {
+                "instrument": "nirspec",
+                "disperser": "g395m",
+                "filter": "f290lp",
+            },
+            "detector": {"subarray": "s32m16_prm"},
+        },
+        {
+            "instrument": {
+                "instrument": "nirspec",
+                "disperser": "prism",
+                "filter": "f100lp",
+            },
+            "detector": {"subarray": "s32m16_prm"},
+        },
+    ],
+)
+def test_nirspec_prism_multistripe_mask_only_applies_to_supported_modes(conf):
+    assert nirspec_prism_multistripe_wavelength_mask(
+        conf, np.array([4.0, 5.0])
+    ) is None
