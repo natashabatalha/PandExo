@@ -7,6 +7,8 @@ any system observed with WFC3/IR.
 
 .. code:: python
     
+    from importlib.resources import files
+
     import pandexo.engine.justdoit as jdi
 
 Editting Input Dictionaries
@@ -28,7 +30,9 @@ Edit stellar and planet inputs
     exo_dict['star']['mag']      = 9.397                # H magnitude of the system
     #WASP-43b
     exo_dict['planet']['type']    = 'user'               # user specified inputs
-    exo_dict['planet']['exopath'] = 'WASP43b-Eclipse_Spectrum.txt' # filename for model spectrum
+    exo_dict['planet']['exopath'] = str(
+        files('pandexo.engine.reference').joinpath('WASP43b-Eclipse_Spectrum.txt')
+    ) # packaged model spectrum
     exo_dict['planet']['w_unit']  = 'um'                 # wavelength unit
     exo_dict['planet']['f_unit']  = 'fp/f*'              # flux ratio unit (can also put "rp^2/r*^2")
     exo_dict['planet']['depth']   = 4.0e-3               # flux ratio

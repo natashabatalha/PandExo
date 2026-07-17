@@ -42,12 +42,12 @@ Warning (contains 6 keys)
    less than 5 and the saturation level less than 60%.
 -  **Group Number Too High?**: Prints out warning if number of groups
    per integration exceeds 65536
--  **Saturated?**: This is an output directly taken from Pandeia’s “hard
-   saturation” flag. If there are any saturated pixels, it will alert
+-  **Saturated?**: This is an output directly taken from Pandeia's "hard
+   saturation" flag. If there are any saturated pixels, it will alert
    you here. You can also see the saturation profile.
--  **Non linear?**: This is an output directly taken from Pandeia’s
-   “soft saturation” flag.
--  **% full well high?**: If you’ve set the saturation level over 80%,
+-  **Non linear?**: This is an output directly taken from Pandeia's
+   "soft saturation" flag.
+-  **% full well high?**: If you've set the saturation level over 80%,
    it will warn you.
 
 .. code:: python 
@@ -57,8 +57,8 @@ Warning (contains 6 keys)
 PandeiaOutTrans (contains 9 keys)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This is the raw output of Pandeia’s simulation of the out of transit
-observation. For a complete breakdown of these outputs go to `STScI’s
+This is the raw output of Pandeia's simulation of the out of transit
+observation. For a complete breakdown of these outputs go to `STScI's
 Pandeia Documentation`_. 
 
 - **sub\_reports** 
@@ -134,4 +134,4 @@ website output page.
 
 .. _Python Dictionaries: http://www.tutorialspoint.com/python/python_dictionary.htm
 .. _example notebooks: https://github.com/natashabatalha/PandExo/wiki/Notebooks
-.. _STScI’s Pandeia Documentation: https://jwst.etc.stsci.edu
+.. _STScI's Pandeia Documentation: https://jwst.etc.stsci.edu

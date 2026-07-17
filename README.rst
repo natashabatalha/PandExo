@@ -1,11 +1,6 @@
-.. raw:: html
-
-   <div align="center">
-   <img src="docs/logo.png" width="450px">
-   </img>
-   <br/>
-   </div>
-   <br/><br/>
+.. image:: https://raw.githubusercontent.com/natashabatalha/PandExo/master/docs/logo.png
+   :alt: PandExo
+   :width: 450px
 
 
 Getting Started
@@ -13,7 +8,7 @@ Getting Started
 
 Tools to help the community with planning exoplanet observations.
 
-PandExo is both an online tool and a python package for generating instrument simulations of JWST’s NIRSpec, NIRCam, NIRISS and NIRCam and HST WFC3. It uses throughput calculations from STScI’s Exposure Time Calculator, Pandeia: Pandeia + Exoplanets = PandExo. This documentation contains information on how to download, install and analyze PandExo output.
+PandExo is both an online tool and a python package for generating instrument simulations of JWST's NIRSpec, NIRCam, NIRISS, and MIRI, and HST's WFC3. It uses throughput calculations from STScI's Exposure Time Calculator, Pandeia: Pandeia + Exoplanets = PandExo. This documentation contains information on how to download, install and analyze PandExo output.
 
 Should I install PandExo or use the online interface? 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -50,5 +45,5 @@ Requires
    :target: https://zenodo.org/badge/latestdoi/67237418
 
 
-.. image:: https://travis-ci.org/natashabatalha/PandExo.svg?branch=master
-    :target: https://travis-ci.org/natashabatalha/PandExo
+.. image:: https://github.com/natashabatalha/PandExo/actions/workflows/tests.yml/badge.svg?branch=master
+   :target: https://github.com/natashabatalha/PandExo/actions/workflows/tests.yml
