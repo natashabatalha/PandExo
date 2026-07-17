@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pandexo.engine"
-version = "2026.2"
+version = "2026.7"
 authors = [
   { name="Natasha Batalha at NASA Ames", email="natasha.e.batalha@nasa.gov" },
 ]
@@ -26,7 +26,7 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 dependencies = [
-    "pandeia.engine==2026.2",
+    "pandeia.engine==2026.7",
     "numpy>=1.21",
     "bokeh>=3.4,<4",
     "ipython",
