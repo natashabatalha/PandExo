@@ -74,7 +74,7 @@ result in nonsense runs
 Edit exoplanet host star inputs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Note… If you select ``phoenix`` you **do not** have to provide a
+Note... If you select ``phoenix`` you **do not** have to provide a
 ``starpath``, ``w_unit`` or ``f_unit``, but you **do** have to provide a
 ``temp``, ``metal`` and ``logg``. If you select ``user`` you **do not**
 need to provide a ``temp``, ``metal`` and ``logg``, but you **do** need
@@ -220,7 +220,7 @@ NIRSpec G140H - MIRI LRS - NIRISS SOSS
     #Another way to display this is to print out the keys
     inst_dict.keys()
 
-Don’t know what instrument options there are?
+Don't know what instrument options there are?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code:: ipython3
@@ -365,7 +365,7 @@ You can loop through anything in the exoplanet dictionary. It will be
 planet, star or observation followed by whatever you want to loop
 through in that set.
 
-i.e. planet+exopath, star+temp, star+metal, star+logg,
+i.e. planet+exopath, star+temp, star+metal, star+logg,
 observation+sat_level.. etc
 
 .. code:: ipython3
