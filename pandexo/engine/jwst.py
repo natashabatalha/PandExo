@@ -21,6 +21,13 @@ max_ngroup = {'nirspec':65535,
 min_nint_trans = 3
 DHS_F150W_MIN_WAVELENGTH = 0.96
 MIRI_LRS_IPS_MAX_WAVELENGTH = 12.5
+# NIRSpec limits taken from https://jwst-docs.stsci.edu/jwst-near-infrared-spectrograph/nirspec-operations/nirspec-bots-operations/nirspec-bots-wavelength-ranges-and-gaps
+NIRSPEC_PRISM_MULTISTRIPE_MAX_WAVELENGTHS = {
+    "s256m2_prm": 5.22,
+    "s128m4_prm": 5.14,
+    "s64m8_prm": 4.98,
+    "s32m16_prm": 4.66,
+}
 APT_MAX_INTEGRATIONS_PER_EXPOSURE = 65535
 MAX_FRAMES_PER_EXPOSURE = 196608
 NIRSPEC_HGA_REPOINT_WARNING_SECONDS = 10000.0
@@ -477,6 +484,45 @@ def miri_lrs_wavelength_mask(conf, wave):
         return None
 
     return np.asarray(wave, dtype=float) <= MIRI_LRS_IPS_MAX_WAVELENGTH
+
+
+def nirspec_prism_multistripe_wavelength_mask(conf, wave):
+    """Build a wavelength mask for NIRSpec PRISM multistripe red cutoffs.
+
+    PRISM multistripe subarrays interleave four reference pixels at the start
+    of every stripe. This reduces the number of science pixels relative to
+    SUB512 and removes wavelength coverage at the red end. The limits follow
+    the approximate BOTS ranges published in the JWST User Documentation.
+
+    Parameters
+    ----------
+    conf : dict
+        Pandeia ``configuration`` dictionary for the calculation.
+    wave : array-like
+        Wavelength samples in microns.
+
+    Returns
+    -------
+    numpy.ndarray or None
+        Boolean mask selecting wavelengths at or below the applicable
+        multistripe cutoff. Returns ``None`` for non-PRISM/CLEAR NIRSpec
+        configurations and standard subarrays.
+    """
+    instrument = conf.get('instrument', {})
+    detector = conf.get('detector', {})
+    if str(instrument.get('instrument', '')).lower() != 'nirspec':
+        return None
+    if str(instrument.get('disperser', '')).lower() != 'prism':
+        return None
+    if str(instrument.get('filter', '')).lower() != 'clear':
+        return None
+
+    subarray = str(detector.get('subarray', '')).lower()
+    max_wavelength = NIRSPEC_PRISM_MULTISTRIPE_MAX_WAVELENGTHS.get(subarray)
+    if max_wavelength is None:
+        return None
+
+    return np.asarray(wave, dtype=float) <= max_wavelength
 
 
 def _no_valid_spectral_channels_message(conf, scalar):
@@ -1155,6 +1201,40 @@ def compute_full_sim(dictinput,verbose=False):
         result['bkg[out,in]'] = sort_by_wave_order(result['bkg[out,in]'], miri_wavelength_channel)
         if pandeia_snr_int is not None:
             pandeia_snr_int = sort_by_wave_order(pandeia_snr_int, miri_wavelength_channel)
+
+    nirspec_prism_multistripe_wavelength_channel = None
+    if not is_phase_spec(calculation):
+        nirspec_prism_multistripe_wavelength_channel = (
+            nirspec_prism_multistripe_wavelength_mask(conf, w)
+        )
+    if nirspec_prism_multistripe_wavelength_channel is not None:
+        w = w[nirspec_prism_multistripe_wavelength_channel]
+        varin = varin[nirspec_prism_multistripe_wavelength_channel]
+        varout = varout[nirspec_prism_multistripe_wavelength_channel]
+        extracted_flux_out = extracted_flux_out[nirspec_prism_multistripe_wavelength_channel]
+        extracted_flux_inn = extracted_flux_inn[nirspec_prism_multistripe_wavelength_channel]
+        if extracted_flux_per_int_out is not None:
+            extracted_flux_per_int_out = extracted_flux_per_int_out[
+                nirspec_prism_multistripe_wavelength_channel
+            ]
+        if pandeia_extracted_noise is not None:
+            pandeia_extracted_noise = pandeia_extracted_noise[
+                nirspec_prism_multistripe_wavelength_channel
+            ]
+        if pandeia_full_saturation is not None:
+            pandeia_full_saturation = pandeia_full_saturation[
+                nirspec_prism_multistripe_wavelength_channel
+            ]
+        result['rn[out,in]'] = sort_by_wave_order(
+            result['rn[out,in]'], nirspec_prism_multistripe_wavelength_channel
+        )
+        result['bkg[out,in]'] = sort_by_wave_order(
+            result['bkg[out,in]'], nirspec_prism_multistripe_wavelength_channel
+        )
+        if pandeia_snr_int is not None:
+            pandeia_snr_int = sort_by_wave_order(
+                pandeia_snr_int, nirspec_prism_multistripe_wavelength_channel
+            )
 
         
     #bin the data according to user input 
