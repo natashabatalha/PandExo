@@ -190,7 +190,10 @@ class Application(tornado.web.Application):
             (r"/about", AboutHandler),
             (r"/dashboard", DashboardHandler),
             (r"/dashboardhst", DashboardHSTHandler),
-            (r"/calculation/?", tornado.web.RedirectHandler, {"url": "/dashboard"}),
+            # Relative redirects preserve a reverse-proxy prefix such as
+            # ``/pandexo`` while still working from the local application root.
+            (r"/calculation", tornado.web.RedirectHandler, {"url": "dashboard"}),
+            (r"/calculation/", tornado.web.RedirectHandler, {"url": "../dashboard"}),
             (r"/tables", TablesHandler),
             (r"/helpfulplots", HelpfulPlotsHandler),
             (r"/calculation/new", CalculationNewHandler),
