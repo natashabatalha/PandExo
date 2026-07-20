@@ -14,48 +14,40 @@ environment variables.
 
 JWST Reference Data
 ````````````````````
-JWST Reference data has been updated to 2026.2.
+JWST reference data has been updated to 2026.7.
 
 .. warning::
     Reference data must match the software version. For example, Pandeia
-    reference data 2026.2 should match the Pandeia software release 2026.2,
-    and that should match PandExo 2026.2.
+    reference data 2026.7 should match the Pandeia software release 2026.7,
+    and that should match PandExo 2026.7.
 
-The 2026.2 JWST reference data is available here:
+The 2026.7 JWST reference data is available here:
 
-- `Pandeia data v2026p2 JWST <https://stsci.box.com/v/pandeia-data-v2026p2-jwst>`_
-- `Pandeia PSFs v2026p2 JWST <https://stsci.box.com/v/pandeia-psfs-v2026p2-jwst>`_
+- `Pandeia data v2026p7 JWST <https://stsci.app.box.com/v/pandeia-data-v2026p7-jwst>`_
+- `Pandeia PSFs v2026p7 JWST <https://stsci.app.box.com/v/pandeia-psfs-v2026p7-jwst>`_
 
-More information on `pandeia installation can be found here <https://outerspace.stsci.edu/display/PEN/Pandeia+Engine+Installation>`_
-
-
-After you have downloaded the reference data, create environment variable (`more resources on how to create environment variables are located here <https://natashabatalha.github.io/picaso/installation.html#create-environment-variable>`_). 
-
-You can verify your installation by opening up a terminal with access to the conda installation, and type
-
-.. code-block:: bash 
-
-    python -c "import pandeia.engine; pandeia.engine.pandeia_version()"
-
-If properly installed and configured, it should show the refdata version and
-stellar reference-data directory, like this:
-
-.. code-block:: bash 
-
-    Pandeia Engine version:  2026.2
-    Pandeia RefData version:  2026.2
-    Pandeia PSFs version:    2026.2
-    Synphot Data:  /your/data/directory/synphot
+More information is available in the `Pandeia Engine installation guide <https://outerspace.stsci.edu/spaces/PEN/pages/77530136/Pandeia+Engine+Installation>`_.
 
 
-.. code-block:: bash 
+After downloading the reference data, add the environment variables to your
+shell startup file so they persist across terminal sessions. For Bash, use
+``~/.bashrc`` or ``~/.bash_profile``; for Zsh, use ``~/.zshrc``. Add these lines
+to the appropriate file, replacing the example paths:
 
-    export pandeia_refdata=/path/to/pandeia-data-v2026p2-jwst
-    export PSF_DIR=/path/to/pandeia-psfs-v2026p2-jwst
+.. code-block:: bash
 
-These commands set the variables for the current shell session. To make them
-persist, add them to your shell startup file, such as ``~/.bashrc``,
-``~/.bash_profile``, ``~/.zshrc``, or the equivalent file for your shell.
+    export pandeia_refdata=/path/to/pandeia_data-2026.7-jwst
+    export PSF_DIR=/path/to/pandeia_psfs-2026.7-jwst
+
+Source the startup file to make the changes available in your current terminal,
+for example:
+
+.. code-block:: bash
+
+    source ~/.bashrc
+
+Use the path to the file you edited, such as ``source ~/.bash_profile`` or
+``source ~/.zshrc``. Opening a new terminal will also load the saved variables.
 
 Stellar SEDs  
 ````````````
@@ -66,14 +58,15 @@ Once untarred, the files will produce a directory tree of `grp/redcat/trds`. The
 
 **Environment variable: $PYSYN_CDBS must point to the trds directory (NOT grp)**
 
-Create your environment variable:
+Add this environment variable to the same shell startup file and source that
+file again:
 
 .. code-block:: bash 
 
-    echo 'export PYSYN_CDBS="$USRDIR/grp/redcat/trds"' >>~/.bash_profile
+    export PYSYN_CDBS=/path/to/grp/redcat/trds
 
 Normalization Files  
-````````````````````
+```````````````````
 PandExo also needs the STScI/CDBS-style throughput files used for J/H/K
 normalization bandpasses.
 
@@ -88,17 +81,37 @@ Once untarred this will also produce a directory tree of `grp/redcat/trds` with 
 
 Now you should have three folders in your `trds` folder. 
 
-Fortney+ 20210  Planet Grid (Optional)
-````````````````````````````````````````
+Verify the complete reference-data setup with:
+
+.. code-block:: bash
+
+    python -c "import pandeia.engine; pandeia.engine.pandeia_version()"
+
+If properly installed and configured, it should show the matching versions and
+stellar reference-data directory, like this:
+
+.. code-block:: text
+
+    Pandeia Engine version:  2026.7
+    Pandeia RefData version: 2026.7
+    Pandeia PSFs version:    2026.7
+    Synphot Data:            /path/to/grp/redcat/trds
+
+Fortney+ 2010 Planet Grid (Optional)
+````````````````````````````````````
 A user may want to install a grid of atmospheric models to simulate planet atmospheres. Some of the example notebooks use an atmospheric model grid. This grid can be obtained from:
 
-- `The ExoCTK Website <https://github.com/ExoCTK/exoctk#obtain-the-exoctk-data>`_.
+The required ``fortney_models.db`` database is included in the `ExoCTK Fortney
+data archive <https://data.science.stsci.edu/redirect/JWST/ExoCTK/compressed/fortney.tar.gz>`_.
+Download and extract that archive, or install ExoCTK and run
+``exoctk.utils.download_exoctk_data('fortney')``.
 
-After downloading the Fortney files, create an environmental variable to point to them.
+After downloading the Fortney files, add this optional environment variable to
+the same shell startup file and source that file again:
 
 .. code-block:: bash 
 
-    echo 'export FORTGRID_DIR="$USRDIR/fortney_models.db"' >>~/.bash_profile
+    export FORTGRID_DIR=/path/to/exoctk_data/fortney/fortney_models.db
 
 
 Installation with Pip or Git
@@ -108,16 +121,16 @@ Install with pip:
 
 .. code-block:: bash
 
-    pip install pandexo.engine
+    python -m pip install pandexo.engine
 
 
 OR Download PandExo's repository via Github. The Github also has helpful notebooks for getting started!
 
 .. code-block:: bash
 
-    git clone --recursive https://github.com/natashabatalha/pandexo
-    cd pandexo
-    pip install .
+    git clone https://github.com/natashabatalha/PandExo.git
+    cd PandExo
+    python -m pip install .
 
 
 
@@ -131,38 +144,33 @@ Run the smoke test to confirm that your code is working:
     python -m pytest tests/test_run.py -q
 
 
-Troubleshooting-Common Errors
-=============================
-
-
-
 The Importance of Upgrading PandExo
 ===================================
 
-It is crucial that your verison of PandExo is up to date. There were many critical updates in the reference files after launch, and as a result of the commissioning work. Updating PandExo requires three crucial steps: 
+It is crucial that your version of PandExo is up to date. There were many critical updates in the reference files after launch and as a result of commissioning work. Updating PandExo requires three crucial steps:
 
 
 1) Verify pandexo.engine is Current 
-````````````````````````````````````
+```````````````````````````````````
 
 .. code-block:: bash 
 
-    pip install pandexo.engine --upgrade 
+    python -m pip install --upgrade pandexo.engine
 
 
 2) Verify pandeia.engine version compatible
-````````````````````````````````````````````
+```````````````````````````````````````````
 
-Currently PandExo requires pandeia.engine==2026.2.
+Currently PandExo requires pandeia.engine==2026.7.
 
 .. code-block:: bash 
 
-    pip install pandeia.engine==2026.2
+    python -m pip install pandeia.engine==2026.7
 
-3) Grab pandeia.engine data 2026.2
-````````````````````````````````
+3) Grab pandeia.engine data 2026.7
+``````````````````````````````````
 
-The 2026.2 JWST reference data is available here:
+The 2026.7 JWST reference data is available here:
 
-- `Pandeia data v2026p2 JWST <https://stsci.box.com/v/pandeia-data-v2026p2-jwst>`_
-- `Pandeia PSFs v2026p2 JWST <https://stsci.box.com/v/pandeia-psfs-v2026p2-jwst>`_
+- `Pandeia data v2026p7 JWST <https://stsci.app.box.com/v/pandeia-data-v2026p7-jwst>`_
+- `Pandeia PSFs v2026p7 JWST <https://stsci.app.box.com/v/pandeia-psfs-v2026p7-jwst>`_

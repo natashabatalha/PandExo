@@ -29,14 +29,14 @@ Here you will learn how to:
     import os
     #pip install pandexo.engine --upgrade
 
-Make sure that your environment path is set to match the correct version
-of pandeia
+Confirm that the Pandeia engine, reference data, and PSF library all
+match the version required by PandExo.
 
 .. code:: ipython3
 
     print(os.environ['pandeia_refdata'] )
     import pandeia.engine
-    print(pandeia.engine.__version__)
+    pandeia.engine.pandeia_version()
 
 Load blank exo dictionary
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -50,11 +50,14 @@ fill these out for yourself in the next step.
     print(exo_dict.keys())
     #print(exo_dict['star']['w_unit'])
 
+Editing Input Dictionaries
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 Edit exoplanet observation inputs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Editting each keys are annoying. But, do this carefully or it could
-result in nonsense runs
+Review each input value and its units carefully so the calculation is
+reproducible.
 
 .. code:: ipython3
 
@@ -195,8 +198,8 @@ automatically load in instrument dictionaries. Skip this if you plan on
 observing with one of the following and want to use the subarray with
 the smallest frame time and the readout mode with 1 frame/1 group
 (standard): - NIRCam F444W - NIRSpec Prism - NIRSpec G395M - NIRSpec
-G395H - NIRSpec G235H - NIRSpec G235M - NIRCam F322W - NIRSpec G140M -
-NIRSpec G140H - MIRI LRS - NIRISS SOSS
+G395H - NIRSpec G235H - NIRSpec G235M - NIRCam F322W2 - NIRCam DHS -
+NIRSpec G140M - NIRSpec G140H - MIRI LRS - NIRISS SOSS
 
 .. code:: ipython3
 
@@ -242,7 +245,7 @@ Don't know what instrument options there are?
                                                                     #possible groups before saturation.
                                                                     #You can also write in any integer between 2-65536
 
-    inst_dict["configuration"]["detector"]["subarray"] = 'substrip256'   #change the subbaray
+    inst_dict["configuration"]["detector"]["subarray"] = 'sub2048'   #change the NIRSpec subarray
 
 
 
@@ -269,10 +272,9 @@ set to extract Order 1. Below you can see how to extract the second
 order.
 
 **NOTE!** Users should be careful with this calculation. Saturation will
-be limited by the **first** order. Therefore, I suggest running one
-calculation with ``ngroup='optmize'`` for Order 1. This will give you an
-idea of a good number of groups to use. Then, you can use that in this
-order 2 calculation.
+be limited by the **first** order. Therefore, first run one calculation
+with ``ngroup='optimize'`` for Order 1, then use that group count for
+the Order 2 calculation.
 
 .. code:: ipython3
 
@@ -317,6 +319,9 @@ If you forget which instruments are available run
     result = jdi.run_pandexo(exo_dict, ['MIRI LRS'])
 
 Note, you can turn off print statements with ``verbose=False``
+
+Analyzing Output
+^^^^^^^^^^^^^^^^
 
 The output dictionary can be passed directly to ``justplotit`` to
 inspect the simulated transit or eclipse spectrum and the expected

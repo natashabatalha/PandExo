@@ -37,7 +37,7 @@ def smooth(x,window_len=10,window='hanning'):
     Todos
     -----
     The window parameter could be the window itself if an array instead of a string
-	Source: http://www.scipy.org/Cookbook/SignalSmooth		2009-03-13 
+    Adapted from the SciPy Cookbook ``SignalSmooth`` example (2009-03-13).
     """
 
     if x.ndim != 1:

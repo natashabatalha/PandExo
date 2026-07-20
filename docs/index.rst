@@ -12,11 +12,6 @@
    </div>
    <br/><br/>
 
-News 
-=====
-
-PandExo 2.0 is now available for download!!
-
 The Documentation
 =================
 
@@ -26,9 +21,9 @@ Tools to help the community with planning exoplanet observations.
     The online PandExo module has moved to
     `STScI's ExoCTK <https://exoctk.stsci.edu/pandexo/>`_. 
 
-PandExo is both an online tool and a python package for generating instrument simulations of JWST's NIRSpec, NIRCam, NIRISS and NIRCam and HST WFC3. It uses throughput calculations from STScI's Exposure Time Calculator, Pandeia: Pandeia + Exoplanets = PandExo. This documentation contains information on how to download, install and analyze PandExo output.
+PandExo is both an online tool and a Python package for generating instrument simulations of JWST's NIRSpec, NIRCam, NIRISS, and MIRI, and HST's WFC3. It uses throughput calculations from STScI's Exposure Time Calculator, Pandeia: Pandeia + Exoplanets = PandExo. This documentation contains information on how to download, install, and analyze PandExo output.
 
-Citation: `PandExo: A Community Tool for Transiting Exoplanet Science with JWST and HST <http://adsabs.harvard.edu/abs/2017PASP..129f4501B>`_
+Citation: `PandExo: A Community Tool for Transiting Exoplanet Science with JWST and HST <https://ui.adsabs.harvard.edu/abs/2017PASP..129f4501B>`_
 
 Contents:
 
@@ -51,4 +46,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-

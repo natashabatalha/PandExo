@@ -140,7 +140,7 @@ def nircam_no_ta_overhead(tframe):
     another half frame. The standard 2,100-second initial slew is then added
     because it contributes to the nominal data allocation used by APT.
 
-    https://jwst-docs.stsci.edu/jppom/visit-overheads-timing-model/instrument-specific-overheads/nircam-overheads#gsc.tab=0
+    https://jwst-docs.stsci.edu/jppom/visit-overheads-timing-model/instrument-specific-overheads/nircam-overheads
 
     Parameters
     ----------
