@@ -1,6 +1,6 @@
 .. note::
-    Before reading further, if you do not wish to install PandExo,\
-    there is an online version of the code here at \
+    Before reading further, if you do not wish to install PandExo, there is an
+    online version of the code here at \
     `STScI's ExoCTK <https://exoctk.stsci.edu/pandexo/>`_. 
 
 
@@ -72,14 +72,31 @@ normalization bandpasses.
 
 `Download the file here <https://archive.stsci.edu/hlsps/reference-atlases/hlsp_reference-atlases_hst_multi_everything_multi_v11_sed.tar>`_
 
-Once untarred this will also produce a directory tree of `grp/redcat/trds` with two folders `comp` and `mtab`. Place these folders into the folder you created above `$USRDIR/grp/redcat/trds` 
+Once untarred, this archive also produces a ``grp/redcat/trds`` directory with
+``comp`` and ``mtab`` subdirectories. Merge their contents into the existing
+``comp`` and ``mtab`` directories under ``$PYSYN_CDBS``. Do not create a second
+``grp/redcat/trds`` tree inside ``$PYSYN_CDBS``.
 
-.. code-block:: bash 
+For example, if ``NORMALIZATION_TRDS`` is the ``trds`` directory extracted
+from the normalization archive:
 
-    >> ls $USRDIR/grp/redcat/trds
-    comp grid mtab
+.. code-block:: bash
 
-Now you should have three folders in your `trds` folder. 
+    NORMALIZATION_TRDS=/path/to/extracted/grp/redcat/trds
+    rsync -a "$NORMALIZATION_TRDS/comp/" "$PYSYN_CDBS/comp/"
+    rsync -a "$NORMALIZATION_TRDS/mtab/" "$PYSYN_CDBS/mtab/"
+
+The ``$PYSYN_CDBS`` directory should now contain ``comp``, ``grid``, and
+``mtab`` (among other synphot directories). Verify that layout and the files
+PandExo uses for J/H/K normalization and PHOENIX spectra:
+
+.. code-block:: bash
+
+    ls "$PYSYN_CDBS"
+    ls "$PYSYN_CDBS/comp/nonhst/bessell_j_003_syn.fits"
+    ls "$PYSYN_CDBS/comp/nonhst/bessell_h_004_syn.fits"
+    ls "$PYSYN_CDBS/comp/nonhst/bessell_k_003_syn.fits"
+    ls "$PYSYN_CDBS/grid/phoenix/catalog.fits"
 
 Verify the complete reference-data setup with:
 
@@ -136,11 +153,21 @@ OR Download PandExo's repository via Github. The Github also has helpful noteboo
 
 Final Test for Success
 ======================
- 
-Run the smoke test to confirm that your code is working:
 
-.. code-block:: bash 
+For a normal pip installation, run this installed-package smoke test. It loads
+PandExo's bundled NIRSpec configuration and does not download data, start the
+web application, or run a simulation:
 
+.. code-block:: bash
+
+    python -c "import pandexo.engine.justdoit as jdi; mode = jdi.load_mode_dict('NIRSpec Prism'); assert mode['configuration']['instrument']['disperser'] == 'prism'; print('PandExo configuration smoke test passed.')"
+
+If you cloned the PandExo source repository and want to run its regression
+test, install the test dependency and run the test from the repository root:
+
+.. code-block:: bash
+
+    python -m pip install -e ".[test]"
     python -m pytest tests/test_run.py -q
 
 
