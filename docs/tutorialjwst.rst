@@ -50,6 +50,9 @@ fill these out for yourself in the next step.
     print(exo_dict.keys())
     #print(exo_dict['star']['w_unit'])
 
+Editing Input Dictionaries
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 Edit exoplanet observation inputs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -316,6 +319,9 @@ If you forget which instruments are available run
     result = jdi.run_pandexo(exo_dict, ['MIRI LRS'])
 
 Note, you can turn off print statements with ``verbose=False``
+
+Analyzing Output
+^^^^^^^^^^^^^^^^
 
 The output dictionary can be passed directly to ``justplotit`` to
 inspect the simulated transit or eclipse spectrum and the expected

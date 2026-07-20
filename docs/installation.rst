@@ -49,23 +49,6 @@ for example:
 Use the path to the file you edited, such as ``source ~/.bash_profile`` or
 ``source ~/.zshrc``. Opening a new terminal will also load the saved variables.
 
-You can verify your installation by opening up a terminal with access to the conda installation, and type
-
-.. code-block:: bash 
-
-    python -c "import pandeia.engine; pandeia.engine.pandeia_version()"
-
-If properly installed and configured, it should show the refdata version and
-stellar reference-data directory, like this:
-
-.. code-block:: bash 
-
-    Pandeia Engine version:  2026.7
-    Pandeia RefData version:  2026.7
-    Pandeia PSFs version:    2026.7
-    Synphot Data:  /your/data/directory/synphot
-
-
 Stellar SEDs  
 ````````````
 PandExo uses synphot/stsynphot for stellar spectra and PHOENIX model
@@ -97,6 +80,22 @@ Once untarred this will also produce a directory tree of `grp/redcat/trds` with 
     comp grid mtab
 
 Now you should have three folders in your `trds` folder. 
+
+Verify the complete reference-data setup with:
+
+.. code-block:: bash
+
+    python -c "import pandeia.engine; pandeia.engine.pandeia_version()"
+
+If properly installed and configured, it should show the matching versions and
+stellar reference-data directory, like this:
+
+.. code-block:: text
+
+    Pandeia Engine version:  2026.7
+    Pandeia RefData version: 2026.7
+    Pandeia PSFs version:    2026.7
+    Synphot Data:            /path/to/grp/redcat/trds
 
 Fortney+ 2010 Planet Grid (Optional)
 ````````````````````````````````````

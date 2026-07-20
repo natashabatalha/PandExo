@@ -2,7 +2,8 @@ Possible Instrument Input Params
 ================================
 
 Instrument dictionaries use Pandeia's lowercase configuration values. Load a
-template with ``jdi.load_mode_dict()``, then edit its ``configuration`` keys.
+template with ``jdi.load_mode_dict('NIRSpec G395H')``, then edit its
+``configuration`` keys.
 The values below are the combinations exposed by PandExo's web interface;
 confirm final timing and detector settings in the current APT.
 

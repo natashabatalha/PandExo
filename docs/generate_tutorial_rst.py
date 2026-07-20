@@ -52,11 +52,26 @@ def _strip_trailing_whitespace(body):
     return "\n".join(line.rstrip() for line in body.splitlines()) + "\n"
 
 
+def _normalize_ascii_punctuation(body):
+    """Keep generated documentation consistent with the ASCII source style."""
+    return body.translate(str.maketrans({
+        "\u00a0": " ",
+        "\u2018": "'",
+        "\u2019": "'",
+        "\u201c": '"',
+        "\u201d": '"',
+        "\u2013": "-",
+        "\u2014": "-",
+        "\u2026": "...",
+    }))
+
+
 def _render_notebook(notebook_path, title):
     notebook = nbformat.read(notebook_path, as_version=4)
     notebook = _strip_generated_toc(notebook)
 
     body, _resources = RSTExporter().from_notebook_node(notebook)
+    body = _normalize_ascii_punctuation(body)
     body = _strip_trailing_whitespace(_demote_rst_headings(body.lstrip()))
 
     header = [
