@@ -1116,15 +1116,15 @@ def compute_full_sim(dictinput,verbose=False):
     pandeia_snr_int = None
     pandeia_full_saturation = None
     if not is_phase_spec(calculation):
-        pandeia_extracted_noise = np.asarray(
-            out['1d']['extracted_noise'][1], dtype=float
+        pandeia_extracted_noise = _pandeia_1d_values_at_wave(
+            out, 'extracted_noise', w
         )
         pandeia_full_saturation = _pandeia_1d_values_at_wave(
             out, 'n_full_saturated', w
         )
         pandeia_snr_int = [
-            np.asarray(out['1d']['sn'][0], dtype=float),
-            np.asarray(out['1d']['sn'][1], dtype=float),
+            np.asarray(w, dtype=float),
+            _pandeia_1d_values_at_wave(out, 'sn', w),
         ]
 
     input_wave_order = np.argsort(w, kind='mergesort')
