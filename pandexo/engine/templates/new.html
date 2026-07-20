@@ -678,6 +678,9 @@
             var mode = $("#nirspecmode").val();
             var options = nirspecStandardSubarrayOptions.slice();
             if (mode === "prismclear") {
+                options = options.filter(function (option) {
+                    return option.value !== "sub1024a";
+                });
                 options = options.concat(nirspecPrismMultistripeSubarrayOptions);
             }
             var current = $("#nirspecsubarray").val();

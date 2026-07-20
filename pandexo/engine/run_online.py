@@ -23,6 +23,7 @@ from astroquery.simbad import Simbad
 import astropy.units as u
 
 from .pandexo import wrapper
+from .jwst import validate_nirspec_prism_subarray
 from .utils.plotters import create_component_jwst, create_component_hst
 from .logs import jwst_log, hst_log
 from .exomast import async_get_target_data
@@ -597,6 +598,10 @@ class CalculationNewHandler(BaseHandler):
                 pandata["configuration"]["instrument"]["disperser"] = nirspecmode[0:5]
                 pandata["configuration"]["instrument"]["filter"] = nirspecmode[5:11]
                 pandata["configuration"]["detector"]["subarray"] = nirspecsubarray
+                try:
+                    validate_nirspec_prism_subarray(pandata["configuration"])
+                except ValueError as exc:
+                    raise tornado.web.HTTPError(400, reason=str(exc))
 
         if instrument == "nircam":
             with open(os.path.join(os.path.dirname(__file__), "reference", "nircam_input.json")) as data_file:
