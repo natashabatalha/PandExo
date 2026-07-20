@@ -73,7 +73,7 @@ Create your environment variable:
     echo 'export PYSYN_CDBS="$USRDIR/grp/redcat/trds"' >>~/.bash_profile
 
 Normalization Files  
-````````````````````
+```````````````````
 PandExo also needs the STScI/CDBS-style throughput files used for J/H/K
 normalization bandpasses.
 
@@ -89,7 +89,7 @@ Once untarred this will also produce a directory tree of `grp/redcat/trds` with 
 Now you should have three folders in your `trds` folder. 
 
 Fortney+ 20210  Planet Grid (Optional)
-````````````````````````````````````````
+``````````````````````````````````````
 A user may want to install a grid of atmospheric models to simulate planet atmospheres. Some of the example notebooks use an atmospheric model grid. This grid can be obtained from:
 
 - `The ExoCTK Website <https://github.com/ExoCTK/exoctk#obtain-the-exoctk-data>`_.
@@ -143,7 +143,7 @@ It is crucial that your verison of PandExo is up to date. There were many critic
 
 
 1) Verify pandexo.engine is Current 
-````````````````````````````````````
+```````````````````````````````````
 
 .. code-block:: bash 
 
@@ -151,7 +151,7 @@ It is crucial that your verison of PandExo is up to date. There were many critic
 
 
 2) Verify pandeia.engine version compatible
-````````````````````````````````````````````
+```````````````````````````````````````````
 
 Currently PandExo requires pandeia.engine==2026.2.
 
@@ -160,7 +160,7 @@ Currently PandExo requires pandeia.engine==2026.2.
     pip install pandeia.engine==2026.2
 
 3) Grab pandeia.engine data 2026.2
-````````````````````````````````
+``````````````````````````````````
 
 The 2026.2 JWST reference data is available here:
 

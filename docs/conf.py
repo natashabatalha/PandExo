@@ -13,13 +13,11 @@
 # serve to show the default.
 
 import sys
-import os
+from pathlib import Path
 import sphinx_rtd_theme
 
-# If extensions (or modules to document with autodoc) are in another directory,
-# add these directories to sys.path here. If the directory is relative to the
-# documentation root, use os.path.abspath to make it absolute, like shown here.
-sys.path.insert(0, os.path.abspath('/Users/nbatalh1/Documents/codes/PandExo/pandexo'))
+# Import the in-tree package when building documentation from any checkout.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 # -- General configuration ------------------------------------------------
 
@@ -39,7 +37,7 @@ extensions = [
 templates_path = ['_templates']
 
 # The suffix of source filenames.
-source_suffix = '.rst'
+source_suffix = {'.rst': 'restructuredtext'}
 
 # The encoding of source files.
 #source_encoding = 'utf-8-sig'
@@ -111,7 +109,6 @@ html_theme = 'sphinx_rtd_theme'
 #html_theme_options = {}
 
 # Add any paths that contain custom themes here, relative to this directory.
-html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".

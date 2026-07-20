@@ -36,7 +36,7 @@ of pandeia
 
     print(os.environ['pandeia_refdata'] )
     import pandeia.engine
-    print(pandeia.engine.__version__)
+    pandeia.engine.pandeia_version()
 
 Load blank exo dictionary
 ~~~~~~~~~~~~~~~~~~~~~~~~~

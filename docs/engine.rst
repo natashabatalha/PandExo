@@ -2,115 +2,109 @@ The Code
 ==============
 
 
-engine.justdoit
----------------
+pandexo.engine.justdoit
+-----------------------
 
-.. automodule:: engine.justdoit
+.. automodule:: pandexo.engine.justdoit
     :members:
     :undoc-members:
     :show-inheritance:
 
-engine.justplotit
------------------
+pandexo.engine.justplotit
+-------------------------
 
-.. automodule:: engine.justplotit
+.. automodule:: pandexo.engine.justplotit
     :members:
     :undoc-members:
     :show-inheritance:
 
-engine.bintools
------------------
+pandexo.engine.bintools
+-----------------------
 
-.. automodule:: engine.bintools
+.. automodule:: pandexo.engine.bintools
     :members:
     :undoc-members:
     :show-inheritance:
 
-engine.run_online
------------------
+pandexo.engine.run_online
+-------------------------
 
-.. automodule:: engine.run_online
+.. automodule:: pandexo.engine.run_online
     :members:
     :undoc-members:
     :show-inheritance:
 
-engine.compute_noise
---------------------
+pandexo.engine.compute_noise
+----------------------------
 
-.. automodule:: engine.compute_noise
+.. automodule:: pandexo.engine.compute_noise
+    :members:
+    :undoc-members:
+    :show-inheritance:
+    :no-index:
+
+pandexo.engine.create_input
+---------------------------
+
+.. automodule:: pandexo.engine.create_input
     :members:
     :undoc-members:
     :show-inheritance:
 
-engine.create_input
+pandexo.engine.hst
+------------------
+
+.. automodule:: pandexo.engine.hst
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+pandexo.engine.jwst
 -------------------
 
-.. automodule:: engine.create_input
+.. automodule:: pandexo.engine.jwst
+    :members:
+    :exclude-members: ExtractSpec
+    :undoc-members:
+    :show-inheritance:
+
+pandexo.engine.load_modes
+-------------------------
+
+.. automodule:: pandexo.engine.load_modes
     :members:
     :undoc-members:
     :show-inheritance:
 
-engine.hst
-----------
+pandexo.engine.pandexo
+----------------------
 
-.. automodule:: engine.hst
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-engine.jwst
------------
-
-.. automodule:: engine.jwst
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-engine.load_modes
------------------
-
-.. automodule:: engine.load_modes
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-engine.pandexo
---------------
-
-.. automodule:: engine.pandexo
+.. automodule:: pandexo.engine.pandexo
     :members:
     :undoc-members:
     :show-inheritance:
     
 
-engine.elements
----------------
+pandexo.engine.elements
+-----------------------
 
-.. automodule:: engine.elements
+.. automodule:: pandexo.engine.elements
     :members:
     :undoc-members:
     :show-inheritance:
 
-engine.hst_smooth
------------------
+pandexo.engine.hst_smooth
+-------------------------
 
-.. automodule:: engine.hst_smooth
+.. automodule:: pandexo.engine.hst_smooth
     :members:
     :undoc-members:
     :show-inheritance:
 
-engine.logs
------------------
+pandexo.engine.logs
+-------------------
 
-.. automodule:: engine.logs
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: engine
+.. automodule:: pandexo.engine.logs
     :members:
     :undoc-members:
     :show-inheritance:

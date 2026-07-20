@@ -45,6 +45,7 @@ htmlcov/
 
 # Build and packaging output
 build/
+docs/_build/
 dist/
 *.egg-info/
 *.egg
