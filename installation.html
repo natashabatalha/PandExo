@@ -93,7 +93,8 @@
              
   <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Before reading further, if you do not wish to install PandExo,there is an online version of the code here at <a class="reference external" href="https://exoctk.stsci.edu/pandexo/">STScI’s ExoCTK</a>.</p>
+<p>Before reading further, if you do not wish to install PandExo, there is an
+online version of the code here at <a class="reference external" href="https://exoctk.stsci.edu/pandexo/">STScI’s ExoCTK</a>.</p>
 </div>
 <section id="pre-installation-data-download">
 <h1>Pre-installation Data Download<a class="headerlink" href="#pre-installation-data-download" title="Link to this heading"></a></h1>
@@ -149,12 +150,27 @@ file again:</p>
 <p>PandExo also needs the STScI/CDBS-style throughput files used for J/H/K
 normalization bandpasses.</p>
 <p><a class="reference external" href="https://archive.stsci.edu/hlsps/reference-atlases/hlsp_reference-atlases_hst_multi_everything_multi_v11_sed.tar">Download the file here</a></p>
-<p>Once untarred this will also produce a directory tree of <cite>grp/redcat/trds</cite> with two folders <cite>comp</cite> and <cite>mtab</cite>. Place these folders into the folder you created above <cite>$USRDIR/grp/redcat/trds</cite></p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&gt;&gt;<span class="w"> </span>ls<span class="w"> </span><span class="nv">$USRDIR</span>/grp/redcat/trds
-comp<span class="w"> </span>grid<span class="w"> </span>mtab
+<p>Once untarred, this archive also produces a <code class="docutils literal notranslate"><span class="pre">grp/redcat/trds</span></code> directory with
+<code class="docutils literal notranslate"><span class="pre">comp</span></code> and <code class="docutils literal notranslate"><span class="pre">mtab</span></code> subdirectories. Merge their contents into the existing
+<code class="docutils literal notranslate"><span class="pre">comp</span></code> and <code class="docutils literal notranslate"><span class="pre">mtab</span></code> directories under <code class="docutils literal notranslate"><span class="pre">$PYSYN_CDBS</span></code>. Do not create a second
+<code class="docutils literal notranslate"><span class="pre">grp/redcat/trds</span></code> tree inside <code class="docutils literal notranslate"><span class="pre">$PYSYN_CDBS</span></code>.</p>
+<p>For example, if <code class="docutils literal notranslate"><span class="pre">NORMALIZATION_TRDS</span></code> is the <code class="docutils literal notranslate"><span class="pre">trds</span></code> directory extracted
+from the normalization archive:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">NORMALIZATION_TRDS</span><span class="o">=</span>/path/to/extracted/grp/redcat/trds
+rsync<span class="w"> </span>-a<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$NORMALIZATION_TRDS</span><span class="s2">/comp/&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$PYSYN_CDBS</span><span class="s2">/comp/&quot;</span>
+rsync<span class="w"> </span>-a<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$NORMALIZATION_TRDS</span><span class="s2">/mtab/&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$PYSYN_CDBS</span><span class="s2">/mtab/&quot;</span>
 </pre></div>
 </div>
-<p>Now you should have three folders in your <cite>trds</cite> folder.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">$PYSYN_CDBS</span></code> directory should now contain <code class="docutils literal notranslate"><span class="pre">comp</span></code>, <code class="docutils literal notranslate"><span class="pre">grid</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">mtab</span></code> (among other synphot directories). Verify that layout and the files
+PandExo uses for J/H/K normalization and PHOENIX spectra:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ls<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$PYSYN_CDBS</span><span class="s2">&quot;</span>
+ls<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$PYSYN_CDBS</span><span class="s2">/comp/nonhst/bessell_j_003_syn.fits&quot;</span>
+ls<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$PYSYN_CDBS</span><span class="s2">/comp/nonhst/bessell_h_004_syn.fits&quot;</span>
+ls<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$PYSYN_CDBS</span><span class="s2">/comp/nonhst/bessell_k_003_syn.fits&quot;</span>
+ls<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$PYSYN_CDBS</span><span class="s2">/grid/phoenix/catalog.fits&quot;</span>
+</pre></div>
+</div>
 <p>Verify the complete reference-data setup with:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import pandeia.engine; pandeia.engine.pandeia_version()&quot;</span>
 </pre></div>
@@ -197,8 +213,16 @@ python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </sp
 </section>
 <section id="final-test-for-success">
 <h1>Final Test for Success<a class="headerlink" href="#final-test-for-success" title="Link to this heading"></a></h1>
-<p>Run the smoke test to confirm that your code is working:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>tests/test_run.py<span class="w"> </span>-q
+<p>For a normal pip installation, run this installed-package smoke test. It loads
+PandExo’s bundled NIRSpec configuration and does not download data, start the
+web application, or run a simulation:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import pandexo.engine.justdoit as jdi; mode = jdi.load_mode_dict(&#39;NIRSpec Prism&#39;); assert mode[&#39;configuration&#39;][&#39;instrument&#39;][&#39;disperser&#39;] == &#39;prism&#39;; print(&#39;PandExo configuration smoke test passed.&#39;)&quot;</span>
+</pre></div>
+</div>
+<p>If you cloned the PandExo source repository and want to run its regression
+test, install the test dependency and run the test from the repository root:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[test]&quot;</span>
+python<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>tests/test_run.py<span class="w"> </span>-q
 </pre></div>
 </div>
 </section>
