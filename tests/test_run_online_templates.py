@@ -101,6 +101,7 @@ def test_new_calculation_template_gates_nirspec_multistripe_subarrays():
     assert "nirspecStandardSubarrayOptions" in template
     assert "nirspecPrismMultistripeSubarrayOptions" in template
     assert 'if (mode === "prismclear")' in template
+    assert 'option.value !== "sub1024a"' in template
     assert "options.concat(nirspecPrismMultistripeSubarrayOptions)" in template
     assert '$("#nirspecmode").change(updateNirspecSubarrayOptions)' in template
     assert "updateNirspecSubarrayOptions();" in template

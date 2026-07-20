@@ -23,6 +23,7 @@ from astroquery.simbad import Simbad
 import astropy.units as u
 
 from .pandexo import wrapper
+from .jwst import validate_miri_lrs_subarray, validate_nirspec_prism_subarray
 from .utils.plotters import create_component_jwst, create_component_hst
 from .logs import jwst_log, hst_log
 from .exomast import async_get_target_data
@@ -50,6 +51,89 @@ NIRSPEC_PRISM_MULTISTRIPE_SUBARRAYS = (
     "s64m8_prm",
     "s32m16_prm",
 )
+NIRSPEC_WEB_MODES = (
+    "g140mf070lp", "g140hf070lp", "g140mf100lp", "g140hf100lp",
+    "g235mf170lp", "g235hf170lp", "g395mf290lp", "g395hf290lp",
+    "prismclear",
+)
+NIRSPEC_STANDARD_SUBARRAYS = ("sub2048", "sub1024a", "sub1024b", "sub512")
+NIRCAM_WEB_FILTERS = ("f322w2", "f444w")
+NIRCAM_WEB_SUBARRAYS = (
+    "subgrism64", "subgrism128", "subgrism256",
+    "subgrism64 (noutputs=1)", "subgrism128 (noutputs=1)",
+    "subgrism256 (noutputs=1)",
+)
+NIRCAM_WEB_READOUTS = (
+    "optimize", "rapid", "bright1", "bright2", "shallow2", "shallow4",
+    "medium2", "medium8", "mediumdeep2", "mediumdeep8", "deep2", "deep8",
+)
+NIRCAM_DHS_WEB_FILTERS = ("f070w", "f090w", "f115w", "f150w2", "f200w")
+NIRCAM_DHS_WEB_SUBARRAYS = (
+    "sub41s1_2-spectra", "sub82s2_4-spectra", "sub164s4_8-spectra",
+    "sub260s4_8-spectra",
+)
+NIRCAM_DHS_WEB_READOUTS = (
+    "optimize", "rapid", "bright1", "dhs3", "dhs4", "dhs5", "dhs6", "dhs7",
+)
+NIRISS_WEB_SUBARRAYS = (
+    "substrip256", "substrip96", "sub17stripe_soss", "sub60stripe_soss",
+    "sub204stripe_soss", "sub680stripe_soss",
+)
+
+
+def validate_online_instrument_configuration(conf):
+    """Reject incomplete or unsupported instrument selections before queuing work."""
+    instrument = conf.get("instrument", {})
+    detector = conf.get("detector", {})
+    name = str(instrument.get("instrument", "")).lower()
+    subarray = str(detector.get("subarray", "")).lower()
+    readout = str(detector.get("readout_pattern", "")).lower()
+
+    if name == "miri":
+        mode = str(instrument.get("mode", "")).lower()
+        if mode not in MIRI_LRS_ALLOWED_SUBARRAYS:
+            raise ValueError(f"Unsupported MIRI LRS mode: {mode}.")
+        validate_miri_lrs_subarray(conf)
+    elif name == "nirspec":
+        mode = f"{instrument.get('disperser', '')}{instrument.get('filter', '')}".lower()
+        if mode not in NIRSPEC_WEB_MODES:
+            raise ValueError(f"Unsupported NIRSpec BOTS mode: {mode}.")
+        allowed = NIRSPEC_STANDARD_SUBARRAYS
+        if mode == "prismclear":
+            allowed = tuple(
+                item for item in NIRSPEC_STANDARD_SUBARRAYS if item != "sub1024a"
+            ) + NIRSPEC_PRISM_MULTISTRIPE_SUBARRAYS
+        if subarray not in allowed:
+            raise ValueError(
+                f"NIRSpec mode {mode.upper()} does not support subarray "
+                f"{subarray.upper()}."
+            )
+        validate_nirspec_prism_subarray(conf)
+    elif name == "nircam" and subarray.endswith("-spectra"):
+        mode = str(instrument.get("mode", "")).lower()
+        filt = str(instrument.get("filter", "")).lower()
+        pair = str(instrument.get("pandexofilterpair", "")).lower()
+        if mode == "sw_tsgrism":
+            valid_filters = filt in NIRCAM_DHS_WEB_FILTERS and pair in NIRCAM_WEB_FILTERS
+        elif mode == "lw_tsgrism":
+            valid_filters = filt in NIRCAM_WEB_FILTERS and pair in NIRCAM_DHS_WEB_FILTERS
+        else:
+            valid_filters = False
+        if not valid_filters:
+            raise ValueError("Choose a valid paired NIRCam DHS filter configuration.")
+        if subarray not in NIRCAM_DHS_WEB_SUBARRAYS:
+            raise ValueError("Choose a valid NIRCam DHS subarray.")
+        if readout not in NIRCAM_DHS_WEB_READOUTS:
+            raise ValueError("Choose a valid NIRCam DHS readout pattern.")
+    elif name == "nircam":
+        if instrument.get("filter") not in NIRCAM_WEB_FILTERS:
+            raise ValueError("Choose F322W2 or F444W for NIRCam grism time series.")
+        if subarray not in NIRCAM_WEB_SUBARRAYS:
+            raise ValueError("Choose a valid NIRCam grism subarray.")
+        if readout not in NIRCAM_WEB_READOUTS:
+            raise ValueError("Choose a valid NIRCam grism readout pattern.")
+    elif name == "niriss" and subarray not in NIRISS_WEB_SUBARRAYS:
+        raise ValueError("Choose a valid NIRISS SOSS subarray.")
 
 #define location of fort grids
 try:
@@ -559,6 +643,10 @@ class CalculationNewHandler(BaseHandler):
             with open(os.path.join(os.path.dirname(__file__), "reference", "miri_input.json")) as data_file:
                 pandata = json.load(data_file)
                 mirimode = self.get_argument("mirimode")
+                if mirimode not in MIRI_LRS_ALLOWED_SUBARRAYS:
+                    raise tornado.web.HTTPError(
+                        400, reason=f"Unsupported MIRI LRS mode: {mirimode}."
+                    )
                 mirisubarray = self.get_argument(
                     "mirisubarray", MIRI_LRS_ALLOWED_SUBARRAYS[mirimode][0]
                 )
@@ -612,6 +700,10 @@ class CalculationNewHandler(BaseHandler):
                 pandata = json.load(data_file)
                 # SW and LW are observed together, but PandExo displays one at a time.
                 sw_or_lw = self.get_argument("nircammode")
+                if sw_or_lw not in ("sw", "lw"):
+                    raise tornado.web.HTTPError(
+                        400, reason="Choose the NIRCam DHS short- or long-wave channel."
+                    )
                 filter_to_sim = f"nircam{sw_or_lw}"
                 if "sw" in filter_to_sim:
                     pair_filter = "nircamlw"
@@ -630,9 +722,23 @@ class CalculationNewHandler(BaseHandler):
                 nirissmode = self.get_argument("nirissmode")
                 pandata["configuration"]["detector"]["subarray"] = nirissmode
                 if nirissmode == "substrip256":
-                    pandata["strategy"]["order"] = int(self.get_argument("nirissorders"))
+                    try:
+                        order = int(self.get_argument("nirissorders"))
+                    except ValueError:
+                        raise tornado.web.HTTPError(
+                            400, reason="NIRISS SOSS order must be 1 or 2."
+                        )
+                    if order not in (1, 2):
+                        raise tornado.web.HTTPError(
+                            400, reason="NIRISS SOSS order must be 1 or 2."
+                        )
+                    pandata["strategy"]["order"] = order
 
         pandata['configuration']['instrument']['instrument'] = instrument.replace('dhs', '')
+        try:
+            validate_online_instrument_configuration(pandata["configuration"])
+        except ValueError as exc:
+            raise tornado.web.HTTPError(400, reason=str(exc))
 
         # write in optimal groups or set a number
         try:

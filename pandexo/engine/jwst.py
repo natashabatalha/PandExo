@@ -28,6 +28,7 @@ NIRSPEC_PRISM_MULTISTRIPE_MAX_WAVELENGTHS = {
     "s64m8_prm": 4.98,
     "s32m16_prm": 4.66,
 }
+NIRSPEC_PRISM_CLEAR_UNSUPPORTED_SUBARRAYS = ("sub1024a",)
 APT_MAX_INTEGRATIONS_PER_EXPOSURE = 65535
 MAX_FRAMES_PER_EXPOSURE = 196608
 NIRSPEC_HGA_REPOINT_WARNING_SECONDS = 10000.0
@@ -333,6 +334,28 @@ def validate_miri_lrs_subarray(conf):
         raise ValueError(
             f"MIRI LRS {mode.upper()} supports only these subarrays: "
             f"{allowed_display}. Got {subarray.upper()}."
+        )
+
+
+def validate_nirspec_prism_subarray(conf):
+    """Validate NIRSpec PRISM/CLEAR subarrays before calling Pandeia."""
+    instrument = conf.get("instrument", {})
+    detector = conf.get("detector", {})
+    if str(instrument.get("instrument", "")).lower() != "nirspec":
+        return
+
+    disperser = str(instrument.get("disperser", "")).lower()
+    filt = str(instrument.get("filter", "")).lower()
+    subarray = str(detector.get("subarray", "")).lower()
+    if (
+        disperser == "prism"
+        and filt == "clear"
+        and subarray in NIRSPEC_PRISM_CLEAR_UNSUPPORTED_SUBARRAYS
+    ):
+        raise ValueError(
+            "NIRSpec PRISM/CLEAR does not support the SUB1024A subarray. "
+            "Choose SUB512, SUB1024B, SUB2048, or a PRISM multistripe "
+            "subarray."
         )
 
 
@@ -678,6 +701,7 @@ def compute_full_sim(dictinput,verbose=False):
     instrument = pandeia_input['configuration']['instrument']['instrument']
     conf = pandeia_input['configuration']
     validate_miri_lrs_subarray(conf)
+    validate_nirspec_prism_subarray(conf)
 
     #now fix DHS #of spectra depending on the subarray
     is_dhs = 'dhs' in conf['instrument']['aperture']

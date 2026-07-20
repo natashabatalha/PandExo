@@ -3,9 +3,11 @@ import pytest
 
 from pandexo.engine.jwst import (
     _pandeia_1d_values_at_wave,
+    compute_full_sim,
     dhs_f150w_wavelength_mask,
     nirspec_valid_channel_mask,
     nirspec_prism_multistripe_wavelength_mask,
+    validate_nirspec_prism_subarray,
 )
 
 
@@ -63,6 +65,35 @@ def test_nirspec_mask_rejects_unobserved_channels():
     )
 
     assert mask.tolist() == [True, False, False, False, True]
+
+
+def test_nirspec_prism_clear_rejects_sub1024a():
+    conf = {
+        "instrument": {
+            "instrument": "nirspec",
+            "disperser": "prism",
+            "filter": "clear",
+        },
+        "detector": {"subarray": "sub1024a"},
+    }
+
+    with pytest.raises(ValueError, match="PRISM/CLEAR.*SUB1024A"):
+        compute_full_sim(
+            {"pandeia_input": {"configuration": conf}, "pandexo_input": {}}
+        )
+
+
+def test_nirspec_prism_clear_accepts_supported_subarray():
+    conf = {
+        "instrument": {
+            "instrument": "nirspec",
+            "disperser": "prism",
+            "filter": "clear",
+        },
+        "detector": {"subarray": "sub1024b"},
+    }
+
+    assert validate_nirspec_prism_subarray(conf) is None
 
 
 @pytest.mark.parametrize(
