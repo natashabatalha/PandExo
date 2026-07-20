@@ -1,19 +1,21 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Getting Started &mdash; PandExo  documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+  <title>Getting Started &mdash; PandExo 2026.7 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
   
-        <script src="_static/documentation_options.js?v=5929fcd5"></script>
-        <script src="_static/doctools.js?v=888ff710"></script>
-        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=57d3cf08"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -49,14 +51,13 @@
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Pre-installation Data Download</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html#installation-with-pip-or-git">Installation with Pip or Git</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html#final-test-for-success">Final Test for Success</a></li>
-<li class="toctree-l1"><a class="reference internal" href="installation.html#troubleshooting-common-errors">Troubleshooting-Common Errors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html#the-importance-of-upgrading-pandexo">The Importance of Upgrading PandExo</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation_windows.html">Windows Installing Guide for PandExo</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorialjwst.html">JWST Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="jwstinput.html">Possible Instrument Input Params</a></li>
 <li class="toctree-l1"><a class="reference internal" href="jwstdict.html">Py Dict Structure of JWST Output</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorialhst.html">HST Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="engine.html">The Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="engine.html">API Reference</a></li>
 </ul>
 
         </div>
@@ -83,17 +84,15 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <div align="center">
-<img src="docs/logo.png" width="450px">
-</img>
-<br/>
-</div>
-<br/><br/><section id="getting-started">
-<h1>Getting Started<a class="headerlink" href="#getting-started" title="Link to this heading">¶</a></h1>
+  <a class="reference internal image-reference" href="https://raw.githubusercontent.com/natashabatalha/PandExo/master/docs/logo.png"><img alt="PandExo" src="https://raw.githubusercontent.com/natashabatalha/PandExo/master/docs/logo.png" style="width: 450px;" />
+</a>
+<section id="getting-started">
+<h1>Getting Started<a class="headerlink" href="#getting-started" title="Link to this heading"></a></h1>
 <p>Tools to help the community with planning exoplanet observations.</p>
-<p>PandExo is both an online tool and a python package for generating instrument simulations of JWST’s NIRSpec, NIRCam, NIRISS and NIRCam and HST WFC3. It uses throughput calculations from STScI’s Exposure Time Calculator, Pandeia: Pandeia + Exoplanets = PandExo. This documentation contains information on how to download, install and analyze PandExo output.</p>
+<p>PandExo is both an online tool and a python package for generating instrument simulations of JWST’s NIRSpec, NIRCam, NIRISS, and MIRI, and HST’s WFC3. It uses throughput calculations from STScI’s Exposure Time Calculator, Pandeia: Pandeia + Exoplanets = PandExo. This documentation contains information on how to download, install and analyze PandExo output.</p>
+<p>Try PandExo online through the <a class="reference external" href="https://exoctk.stsci.edu/pandexo/">STScI ExoCTK website</a>.</p>
 <section id="should-i-install-pandexo-or-use-the-online-interface">
-<h2>Should I install PandExo or use the online interface?<a class="headerlink" href="#should-i-install-pandexo-or-use-the-online-interface" title="Link to this heading">¶</a></h2>
+<h2>Should I install PandExo or use the online interface?<a class="headerlink" href="#should-i-install-pandexo-or-use-the-online-interface" title="Link to this heading"></a></h2>
 <p>Install if…</p>
 <ul class="simple">
 <li><p>I will be using PandExo for more than 10 runs</p></li>
@@ -111,14 +110,21 @@
 </ul>
 </section>
 <section id="requires">
-<h2>Requires<a class="headerlink" href="#requires" title="Link to this heading">¶</a></h2>
+<h2>Requires<a class="headerlink" href="#requires" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p>Python &gt;=3.8</p></li>
+<li><p>Python &gt;=3.10</p></li>
 <li><p>Installation: <a class="reference external" href="https://natashabatalha.github.io/PandExo/installation.html">https://natashabatalha.github.io/PandExo/installation.html</a></p></li>
-<li><p>PandExo now requires downloading <strong>three folders</strong>: 1) JWST instrument info (from pandeia), 2) stellar SEDs (pysynphot), and 3) normalization bandasses (pysynphot). See installation for furthur instructions: <a class="reference external" href="https://natashabatalha.github.io/PandExo/installation.html">https://natashabatalha.github.io/PandExo/installation.html</a></p></li>
+<li><p>PandExo requires downloading reference data for 1) JWST instrument info
+(from Pandeia), 2) JWST PSFs, 3) stellar SEDs used by
+synphot/stsynphot, and 4) normalization bandpasses. It also requires
+setting up <code class="docutils literal notranslate"><span class="pre">pandeia_refdata</span></code>, <code class="docutils literal notranslate"><span class="pre">PSF_DIR</span></code>, and <code class="docutils literal notranslate"><span class="pre">PYSYN_CDBS</span></code>. See
+installation for further instructions:
+<a class="reference external" href="https://natashabatalha.github.io/PandExo/installation.html">https://natashabatalha.github.io/PandExo/installation.html</a></p></li>
 </ul>
-<a class="reference external image-reference" href="https://zenodo.org/badge/latestdoi/67237418"><img alt="https://zenodo.org/badge/67237418.svg" src="https://zenodo.org/badge/67237418.svg" /></a>
-<a class="reference external image-reference" href="https://travis-ci.org/natashabatalha/PandExo"><img alt="https://travis-ci.org/natashabatalha/PandExo.svg?branch=master" src="https://travis-ci.org/natashabatalha/PandExo.svg?branch=master" /></a>
+<a class="reference external image-reference" href="https://zenodo.org/badge/latestdoi/67237418"><img alt="https://zenodo.org/badge/67237418.svg" src="https://zenodo.org/badge/67237418.svg" />
+</a>
+<a class="reference external image-reference" href="https://github.com/natashabatalha/PandExo/actions/workflows/tests.yml"><img alt="https://github.com/natashabatalha/PandExo/actions/workflows/tests.yml/badge.svg?branch=master" src="https://github.com/natashabatalha/PandExo/actions/workflows/tests.yml/badge.svg?branch=master" />
+</a>
 </section>
 </section>
 
@@ -133,7 +139,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright Updated 2022.</p>
+    <p>&#169; Copyright 2016-2026, PandExo developers.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

@@ -1,19 +1,21 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Windows Installing Guide for PandExo &mdash; PandExo  documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+  <title>Windows Installing Guide for PandExo &mdash; PandExo 2026.7 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
   
-        <script src="_static/documentation_options.js?v=5929fcd5"></script>
-        <script src="_static/doctools.js?v=888ff710"></script>
-        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=57d3cf08"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -45,7 +47,6 @@
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Pre-installation Data Download</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html#installation-with-pip-or-git">Installation with Pip or Git</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html#final-test-for-success">Final Test for Success</a></li>
-<li class="toctree-l1"><a class="reference internal" href="installation.html#troubleshooting-common-errors">Troubleshooting-Common Errors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html#the-importance-of-upgrading-pandexo">The Importance of Upgrading PandExo</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Windows Installing Guide for PandExo</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#step-1">Step 1</a></li>
@@ -62,7 +63,7 @@
 <li class="toctree-l1"><a class="reference internal" href="jwstinput.html">Possible Instrument Input Params</a></li>
 <li class="toctree-l1"><a class="reference internal" href="jwstdict.html">Py Dict Structure of JWST Output</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorialhst.html">HST Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="engine.html">The Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="engine.html">API Reference</a></li>
 </ul>
 
         </div>
@@ -90,73 +91,89 @@
            <div itemprop="articleBody">
              
   <section id="windows-installing-guide-for-pandexo">
-<h1>Windows Installing Guide for PandExo<a class="headerlink" href="#windows-installing-guide-for-pandexo" title="Link to this heading">¶</a></h1>
-<p>Created by J. N. van Haastere (Physics and Astronomy Bachelorstudent)
-Univesity of Amsterdam and VU University Amsterdam</p>
+<h1>Windows Installing Guide for PandExo<a class="headerlink" href="#windows-installing-guide-for-pandexo" title="Link to this heading"></a></h1>
+<p>Created by J. N. van Haastere (Physics and Astronomy bachelor’s student),
+University of Amsterdam and VU University Amsterdam.</p>
 <section id="step-1">
-<h2>Step 1<a class="headerlink" href="#step-1" title="Link to this heading">¶</a></h2>
-<p>You may want to uninstall older python versions to prevent troubles along the way.</p>
+<h2>Step 1<a class="headerlink" href="#step-1" title="Link to this heading"></a></h2>
+<p>Create a dedicated conda environment; uninstalling other Python versions is
+not necessary.</p>
 </section>
 <section id="step-2">
-<h2>Step 2<a class="headerlink" href="#step-2" title="Link to this heading">¶</a></h2>
-<p><a class="reference external" href="https://www.anaconda.com/download/">Download most recent Anaconda version</a> (tested with Python 3.6.4 64 bit)</p>
+<h2>Step 2<a class="headerlink" href="#step-2" title="Link to this heading"></a></h2>
+<p><a class="reference external" href="https://www.anaconda.com/download/">Download most recent Anaconda version</a>.
+PandExo supports Python 3.10 and newer.</p>
 </section>
 <section id="step-3">
-<h2>Step 3<a class="headerlink" href="#step-3" title="Link to this heading">¶</a></h2>
-<p>Install Anaconda as main python and add to path environment</p>
+<h2>Step 3<a class="headerlink" href="#step-3" title="Link to this heading"></a></h2>
+<p>Install Anaconda or Miniconda, then create and activate an environment:</p>
+<div class="highlight-bat notranslate"><div class="highlight"><pre><span></span>conda create -n pandexo python=3.11
+conda activate pandexo
+</pre></div>
+</div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>If succesfully installed you can open CMD and type <cite>&gt;&gt;python</cite> and <cite>&gt;&gt;quit()</cite> to check version</p>
+<p>If successfully installed, <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">--version</span></code> reports Python 3.10 or newer.</p>
 </div>
 </section>
 <section id="step-4">
-<h2>Step 4<a class="headerlink" href="#step-4" title="Link to this heading">¶</a></h2>
-<p><a class="reference external" href="https://www.visualstudio.com/downloads/#build-tools-for-visual-studio-2017">Install Build Tools for Visual Studio 2017</a>.</p>
+<h2>Step 4<a class="headerlink" href="#step-4" title="Link to this heading"></a></h2>
+<p>Visual Studio build tools are not normally required. If pip must compile a
+dependency, install the current <a class="reference external" href="https://visualstudio.microsoft.com/visual-cpp-build-tools/">Microsoft C++ Build Tools</a>.</p>
 </section>
 <section id="step-5">
-<h2>Step 5<a class="headerlink" href="#step-5" title="Link to this heading">¶</a></h2>
+<h2>Step 5<a class="headerlink" href="#step-5" title="Link to this heading"></a></h2>
 <p><a class="reference external" href="https://natashabatalha.github.io/PandExo/installation.html">Follow PandExo Installation guide in getting files</a></p>
 <ul class="simple">
-<li><p>get pandeia_data</p></li>
-<li><p>get pysynphot_data (includes phoenix models and throughputs)</p></li>
+<li><p>get Pandeia data v2026p7</p></li>
+<li><p>get Pandeia PSFs v2026p7</p></li>
+<li><p>get stellar reference data for synphot/stsynphot (includes phoenix models and
+throughputs)</p></li>
 </ul>
 </section>
 <section id="step-6-setting-reference-data">
-<h2>Step 6: Setting Reference Data<a class="headerlink" href="#step-6-setting-reference-data" title="Link to this heading">¶</a></h2>
-<p>Using an achiver (eg. Winrar, 7Zip) extract Pandeia and Pysynphot data in two seperate folders.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>C:/Users/USERNAME/pandeia_data
-C:/Users/USERNAME/pysynphot_data
+<h2>Step 6: Setting Reference Data<a class="headerlink" href="#step-6-setting-reference-data" title="Link to this heading"></a></h2>
+<p>Using an archiver (for example, 7-Zip), extract Pandeia, the Pandeia PSFs, and
+the stellar reference data into separate folders. The 2026.7 JWST files are
+available here:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://stsci.app.box.com/v/pandeia-data-v2026p7-jwst">Pandeia data v2026p7 JWST</a></p></li>
+<li><p><a class="reference external" href="https://stsci.app.box.com/v/pandeia-psfs-v2026p7-jwst">Pandeia PSFs v2026p7 JWST</a></p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>C:/Users/USERNAME/pandeia_data-2026.7-jwst
+C:/Users/USERNAME/pandeia_psfs-2026.7-jwst
+C:/Users/USERNAME/stellar_reference_data/grp/redcat/trds
 </pre></div>
 </div>
-<p>Check the variable names</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;export VARIABLE_NAME = &quot;..&quot;&#39;</span>
-</pre></div>
-</div>
-<p>In case nothing changes these should be <cite>PYSYN_CDBS</cite> &amp; <cite>pandeia_refdata</cite></p>
+<p>The variable names are <code class="docutils literal notranslate"><span class="pre">pandeia_refdata</span></code>, <code class="docutils literal notranslate"><span class="pre">PSF_DIR</span></code>, and <code class="docutils literal notranslate"><span class="pre">PYSYN_CDBS</span></code>.</p>
 <p>Set these in Windows environment variables / registry using SETX. Open CMD or Anaconda Prompt and run:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>SETX<span class="w"> </span>PYSYN_CDBS<span class="w"> </span><span class="s1">&#39;C:/Users/USERNAME/pysynphot_data&#39;</span>
-SETX<span class="w"> </span>pandeia_refdata<span class="w"> </span><span class="s1">&#39;C:/Users/USERNAME/pysynphot_data&#39;</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>SETX<span class="w"> </span>pandeia_refdata<span class="w"> </span><span class="s2">&quot;C:/Users/USERNAME/pandeia_data-2026.7-jwst&quot;</span>
+SETX<span class="w"> </span>PSF_DIR<span class="w"> </span><span class="s2">&quot;C:/Users/USERNAME/pandeia_psfs-2026.7-jwst&quot;</span>
+SETX<span class="w"> </span>PYSYN_CDBS<span class="w"> </span><span class="s2">&quot;C:/Users/USERNAME/stellar_reference_data/grp/redcat/trds&quot;</span>
 </pre></div>
 </div>
+<p>The <code class="docutils literal notranslate"><span class="pre">SETX</span></code> command persists these variables for future terminals, but it
+usually does not update the current open terminal. Close and reopen CMD,
+PowerShell, or Anaconda Prompt before checking the values.</p>
 <p>You can check this step by opening a new CMD and run &gt; SET</p>
 </section>
 <section id="step-7-installing-needed-packages">
-<h2>Step 7: Installing needed Packages<a class="headerlink" href="#step-7-installing-needed-packages" title="Link to this heading">¶</a></h2>
+<h2>Step 7: Installing needed Packages<a class="headerlink" href="#step-7-installing-needed-packages" title="Link to this heading"></a></h2>
 <p>Install PandExo Engine</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>pandexo.engine
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>pandexo.engine
 </pre></div>
 </div>
-<p>Check troubleshooting if you run into problems. <a class="reference external" href="https://natashabatalha.github.io/PandExo/installation.html#troubleshooting-common-errors">Troubleshooting here</a>.</p>
+<p>See the main <a class="reference internal" href="installation.html"><span class="doc">Pre-installation Data Download</span></a> guide if you run into problems.</p>
 </section>
 <section id="step-8-run-test">
-<h2>Step 8: Run Test<a class="headerlink" href="#step-8-run-test" title="Link to this heading">¶</a></h2>
-<p>Navigate to your pandexo-master and run the run_test. Check in the <a class="reference external" href="https://natashabatalha.github.io/PandExo/installation.html#pandexo-startup-bash-script">installation</a> guide on the exact expected output.</p>
+<h2>Step 8: Run Test<a class="headerlink" href="#step-8-run-test" title="Link to this heading"></a></h2>
+<p>Navigate to the PandExo source checkout and run the smoke test.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span><span class="s1">&#39;...&#39;</span>
-python<span class="w"> </span>run_test.py
+python<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>tests/test_run.py<span class="w"> </span>-q
 </pre></div>
 </div>
-<p>Congrats on being persevering/stubborn enough to get it on to work on Windows!
-There are some test Jupyter files to try out in <cite>pandexo-master/notebooks</cite></p>
+<p>Congrats on being persevering/stubborn enough to get PandExo to work on Windows!
+There are some example Jupyter notebooks to try in <code class="docutils literal notranslate"><span class="pre">PandExo/notebooks</span></code>.</p>
 </section>
 </section>
 
@@ -171,7 +188,7 @@ There are some test Jupyter files to try out in <cite>pandexo-master/notebooks</
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright Updated 2022.</p>
+    <p>&#169; Copyright 2016-2026, PandExo developers.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

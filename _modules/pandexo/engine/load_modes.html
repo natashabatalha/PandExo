@@ -1,0 +1,245 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pandexo.engine.load_modes &mdash; PandExo  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            PandExo
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../includeme.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Pre-installation Data Download</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html#installation-with-pip-or-git">Installation with Pip or Git</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html#final-test-for-success">Final Test for Success</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html#troubleshooting-common-errors">Troubleshooting-Common Errors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html#the-importance-of-upgrading-pandexo">The Importance of Upgrading PandExo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation_windows.html">Windows Installing Guide for PandExo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorialjwst.html">JWST Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../jwstinput.html">Possible Instrument Input Params</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../jwstdict.html">Py Dict Structure of JWST Output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorialhst.html">HST Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../engine.html">The Code</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">PandExo</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pandexo.engine.load_modes</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pandexo.engine.load_modes</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+
+<div class="viewcode-block" id="SetDefaultModes">
+<a class="viewcode-back" href="../../../engine.html#pandexo.engine.load_modes.SetDefaultModes">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SetDefaultModes</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Class to load default instrument mode dicts</span>
+<span class="sd">    </span>
+<span class="sd">    This class contains functionality for loading observing modes for exoplanet observations </span>
+<span class="sd">    This is NOT a complete set of ALL possibleobserving modes. Instead, it offers a starting point for </span>
+<span class="sd">    choosing one instrument specification. There is one function for each instrument. For example, </span>
+<span class="sd">    It sets slitless mode for MIRI LRS. If users are interested in other specific observation modes </span>
+<span class="sd">    they should load in the dictionary and then edit individual keys. </span>
+<span class="sd">    </span>
+<span class="sd">    Included modes are: </span>
+<span class="sd">       - &quot;MIRI LRS&quot;</span>
+<span class="sd">       - &quot;NIRISS SOSS&quot;</span>
+<span class="sd">       - &quot;NIRSpec G140M&quot;</span>
+<span class="sd">       - &quot;NIRSpec G140H&quot;</span>
+<span class="sd">       - &quot;NIRSpec G235M&quot;</span>
+<span class="sd">       - &quot;NIRSpec G235H&quot;</span>
+<span class="sd">       - &quot;NIRSpec G395M&quot;</span>
+<span class="sd">       - &quot;NIRSpec G395H&quot;</span>
+<span class="sd">       - &quot;NIRSpec Prism&quot;</span>
+<span class="sd">       - &quot;NIRCam F322W2&quot;</span>
+<span class="sd">       - &quot;NIRCam F444W&quot;</span>
+<span class="sd">       - &quot;NIRCam DHS&quot;</span>
+<span class="sd">       - &quot;WFC3 G102&quot;</span>
+<span class="sd">       - &quot;WFC3 G141&quot;</span>
+<span class="sd">       </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    inst : str</span>
+<span class="sd">        Allowable strings listed above </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inst</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user_input</span><span class="o">=</span><span class="n">inst</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instrument</span> <span class="o">=</span> <span class="n">inst</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span><span class="n">inst</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>  
+
+    
+<div class="viewcode-block" id="SetDefaultModes.pick">
+<a class="viewcode-back" href="../../../engine.html#pandexo.engine.load_modes.SetDefaultModes.pick">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pick</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Points to specific instrument based on key choice</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span> 
+            <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">instrument</span><span class="p">)()</span>
+        <span class="k">except</span><span class="p">:</span> 
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;INVALID INSTRUMENT NAME&quot;</span><span class="p">)</span>
+            <span class="k">return</span> </div>
+
+                                   
+<div class="viewcode-block" id="SetDefaultModes.wfc3">
+<a class="viewcode-back" href="../../../engine.html#pandexo.engine.load_modes.SetDefaultModes.wfc3">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">wfc3</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handles WFC3 template</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">#wfc3_input</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s2">&quot;reference&quot;</span><span class="p">,</span>
+                               <span class="s2">&quot;wfc3_input.json&quot;</span><span class="p">))</span> <span class="k">as</span> <span class="n">data_file</span><span class="p">:</span>
+            <span class="n">pandeia_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">data_file</span><span class="p">)</span>
+            <span class="n">pandeia_data</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">][</span><span class="s2">&quot;instrument&quot;</span><span class="p">][</span><span class="s2">&quot;disperser&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span>
+        <span class="k">return</span> <span class="n">pandeia_data</span></div>
+
+    
+<div class="viewcode-block" id="SetDefaultModes.niriss">
+<a class="viewcode-back" href="../../../engine.html#pandexo.engine.load_modes.SetDefaultModes.niriss">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">niriss</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handles NIRISS template</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">#need to add in functionality for two orders, right now you only have option to do sub80</span>
+        
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s2">&quot;reference&quot;</span><span class="p">,</span>
+                               <span class="s2">&quot;niriss_input.json&quot;</span><span class="p">))</span> <span class="k">as</span> <span class="n">data_file</span><span class="p">:</span>
+            <span class="n">pandeia_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">data_file</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">pandeia_data</span></div>
+
+
+<div class="viewcode-block" id="SetDefaultModes.nirspec">
+<a class="viewcode-back" href="../../../engine.html#pandexo.engine.load_modes.SetDefaultModes.nirspec">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">nirspec</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handles NIRSpec template</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">filters</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;g140m&#39;</span><span class="p">:</span><span class="s1">&#39;f100lp&#39;</span><span class="p">,</span><span class="s1">&#39;g140h&#39;</span><span class="p">:</span><span class="s1">&#39;f100lp&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;g235m&#39;</span><span class="p">:</span><span class="s1">&#39;f170lp&#39;</span><span class="p">,</span><span class="s1">&#39;g235h&#39;</span><span class="p">:</span><span class="s1">&#39;f170lp&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;g395m&#39;</span><span class="p">:</span><span class="s1">&#39;f290lp&#39;</span><span class="p">,</span><span class="s1">&#39;g395h&#39;</span><span class="p">:</span><span class="s1">&#39;f290lp&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;prism&#39;</span><span class="p">:</span> <span class="s1">&#39;clear&#39;</span>
+                    <span class="p">}</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s2">&quot;reference&quot;</span><span class="p">,</span>
+                               <span class="s2">&quot;nirspec_input.json&quot;</span><span class="p">))</span> <span class="k">as</span> <span class="n">data_file</span><span class="p">:</span>
+            <span class="n">pandeia_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">data_file</span><span class="p">)</span>
+            <span class="n">pandeia_data</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">][</span><span class="s2">&quot;instrument&quot;</span><span class="p">][</span><span class="s2">&quot;disperser&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span>
+            <span class="n">pandeia_data</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">][</span><span class="s2">&quot;instrument&quot;</span><span class="p">][</span><span class="s2">&quot;filter&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">filters</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">]</span>    
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">==</span> <span class="s1">&#39;prism&#39;</span><span class="p">:</span>
+                <span class="n">pandeia_data</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">][</span><span class="s2">&quot;detector&quot;</span><span class="p">][</span><span class="s2">&quot;subarray&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;sub512&#39;</span>
+
+        <span class="k">return</span> <span class="n">pandeia_data</span></div>
+
+
+<div class="viewcode-block" id="SetDefaultModes.nircam">
+<a class="viewcode-back" href="../../../engine.html#pandexo.engine.load_modes.SetDefaultModes.nircam">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">nircam</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handles NIRCam template</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s1">&#39;dhs&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">:</span> 
+            <span class="n">add</span><span class="o">=</span><span class="s1">&#39;dhs_&#39;</span>
+        <span class="k">else</span><span class="p">:</span> 
+            <span class="n">add</span><span class="o">=</span><span class="s1">&#39;&#39;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s2">&quot;reference&quot;</span><span class="p">,</span>
+                               <span class="sa">f</span><span class="s2">&quot;nircam_</span><span class="si">{</span><span class="n">add</span><span class="si">}</span><span class="s2">input.json&quot;</span><span class="p">))</span> <span class="k">as</span> <span class="n">data_file</span><span class="p">:</span>
+            <span class="n">pandeia_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">data_file</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="s1">&#39;dhs&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">:</span> 
+            <span class="n">pandeia_data</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">][</span><span class="s2">&quot;instrument&quot;</span><span class="p">][</span><span class="s2">&quot;filter&quot;</span><span class="p">]</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span>
+
+        <span class="k">return</span> <span class="n">pandeia_data</span></div>
+
+
+<div class="viewcode-block" id="SetDefaultModes.miri">
+<a class="viewcode-back" href="../../../engine.html#pandexo.engine.load_modes.SetDefaultModes.miri">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">miri</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handles MIRI template</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">#only lrs slit less     </span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s2">&quot;reference&quot;</span><span class="p">,</span>
+                               <span class="s2">&quot;miri_input.json&quot;</span><span class="p">))</span> <span class="k">as</span> <span class="n">data_file</span><span class="p">:</span>
+                <span class="n">pandeia_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">data_file</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">pandeia_data</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Updated 2022.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,19 +1,21 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Py Dict Structure of JWST Output &mdash; PandExo  documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+  <title>Py Dict Structure of JWST Output &mdash; PandExo 2026.7 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
   
-        <script src="_static/documentation_options.js?v=5929fcd5"></script>
-        <script src="_static/doctools.js?v=888ff710"></script>
-        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=57d3cf08"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -45,24 +47,23 @@
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Pre-installation Data Download</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html#installation-with-pip-or-git">Installation with Pip or Git</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html#final-test-for-success">Final Test for Success</a></li>
-<li class="toctree-l1"><a class="reference internal" href="installation.html#troubleshooting-common-errors">Troubleshooting-Common Errors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html#the-importance-of-upgrading-pandexo">The Importance of Upgrading PandExo</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation_windows.html">Windows Installing Guide for PandExo</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorialjwst.html">JWST Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="jwstinput.html">Possible Instrument Input Params</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Py Dict Structure of JWST Output</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#finalspectrum-contains-4-keys">FinalSpectrum (contains 4 keys)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#originalinput-contains-2-keys">OriginalInput (contains 2 keys)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#warning-contains-6-keys">Warning (contains 6 keys)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#pandeiaouttrans-contains-9-keys">PandeiaOutTrans (contains 9 keys)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#rawdata-contains-6-keys">RawData (contains 6 keys)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#timing-contains-10-keys">Timing (contains 10 keys)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#input-contains-10-keys">Input (contains 10 keys)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#timing-warning-and-input-divs-all-contain-html-script">Timing, Warning, and Input Divs (all contain html script)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#finalspectrum">FinalSpectrum</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#originalinput">OriginalInput</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#warning">warning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#pandeiaouttrans">PandeiaOutTrans</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#rawdata">RawData</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#timing">timing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#input">input</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#html-display-fields">HTML display fields</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="tutorialhst.html">HST Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="engine.html">The Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="engine.html">API Reference</a></li>
 </ul>
 
         </div>
@@ -90,13 +91,13 @@
            <div itemprop="articleBody">
              
   <section id="py-dict-structure-of-jwst-output">
-<h1>Py Dict Structure of JWST Output<a class="headerlink" href="#py-dict-structure-of-jwst-output" title="Link to this heading">¶</a></h1>
-<p>The PandExo output is organized into <a class="reference external" href="http://www.tutorialspoint.com/python/python_dictionary.htm">Python Dictionaries</a>. See
-<a class="reference external" href="https://github.com/natashabatalha/PandExo/wiki/Notebooks">example notebooks</a> for an explanation of how to manipulate these and
+<h1>Py Dict Structure of JWST Output<a class="headerlink" href="#py-dict-structure-of-jwst-output" title="Link to this heading"></a></h1>
+<p>The PandExo output is organized into <a class="reference external" href="https://docs.python.org/3/tutorial/datastructures.html#dictionaries">Python Dictionaries</a>. See
+<a class="reference external" href="https://github.com/natashabatalha/PandExo/tree/master/notebooks">example notebooks</a> for an explanation of how to manipulate these and
 plot the most common outputs. Below is a breakdown of everything
 contained in the PandExo output dictionary.</p>
-<section id="finalspectrum-contains-4-keys">
-<h2>FinalSpectrum (contains 4 keys)<a class="headerlink" href="#finalspectrum-contains-4-keys" title="Link to this heading">¶</a></h2>
+<section id="finalspectrum">
+<h2>FinalSpectrum<a class="headerlink" href="#finalspectrum" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p><strong>spectrum_w_rand</strong>: Planet spectrum with random noise added in
 units of <em>(Rp/Rs)2</em> or <em>(Fp/Fs)</em></p></li>
@@ -105,30 +106,28 @@ units of <em>(Rp/Rs)2</em> or <em>(Fp/Fs)</em></p></li>
 was specified, there is no floor.</p></li>
 <li><p><strong>wave</strong>: wavelength (microns)</p></li>
 </ul>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span> <span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;FinalSpectrum&#39;</span><span class="p">][</span><span class="s1">&#39;spectrum_w_rand&#39;</span><span class="p">]</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;FinalSpectrum&#39;</span><span class="p">][</span><span class="s1">&#39;spectrum_w_rand&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
 </section>
-<section id="originalinput-contains-2-keys">
-<h2>OriginalInput (contains 2 keys)<a class="headerlink" href="#originalinput-contains-2-keys" title="Link to this heading">¶</a></h2>
+<section id="originalinput">
+<h2>OriginalInput<a class="headerlink" href="#originalinput" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p><strong>model_wave</strong>: original wavelength input by user</p></li>
 <li><p><strong>model_spec</strong>: original spectrum input by user</p></li>
+<li><p><strong>star_spec</strong>: out-of-transit stellar spectrum used by PandExo</p></li>
 </ul>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span> <span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;OriginalInput&#39;</span><span class="p">][</span><span class="s1">&#39;model_wave&#39;</span><span class="p">]</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;OriginalInput&#39;</span><span class="p">][</span><span class="s1">&#39;model_wave&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
 </section>
-<section id="warning-contains-6-keys">
-<h2>Warning (contains 6 keys)<a class="headerlink" href="#warning-contains-6-keys" title="Link to this heading">¶</a></h2>
+<section id="warning">
+<h2>warning<a class="headerlink" href="#warning" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p><strong>Num Groups Reset?</strong>: Before PandExo simulates in and out of transit
-observations, it computes a single integration with 2 groups in order
-to figure out how many additional groups it can add before hitting
-saturation. If it computes a number less than 2, it resets the number
-of groups to 2.</p></li>
-<li><p><strong>Group Number Too Low?</strong>: Prints out warning if number of groups is
-less than 5 and the saturation level less than 60%.</p></li>
+<li><p><strong>Num Groups Reset?</strong>: Reports whether optimization had to reset the group
+count to the detector minimum.</p></li>
+<li><p><strong>Group Number Too Low?</strong>: Reports a high requested full-well level with
+fewer than three groups, and cautions when a one-group ramp is used.</p></li>
 <li><p><strong>Group Number Too High?</strong>: Prints out warning if number of groups
 per integration exceeds 65536</p></li>
 <li><p><strong>Saturated?</strong>: This is an output directly taken from Pandeia’s “hard
@@ -138,15 +137,21 @@ you here. You can also see the saturation profile.</p></li>
 “soft saturation” flag.</p></li>
 <li><p><strong>% full well high?</strong>: If you’ve set the saturation level over 80%,
 it will warn you.</p></li>
+<li><p><strong>Minimum Integrations?</strong>: Reports when the calculation has fewer than
+three in-transit integrations or when optimization reduces the group count
+to retain at least three.</p></li>
 </ul>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span> <span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;Warning&#39;</span><span class="p">][</span><span class="s1">&#39;Num Groups Reset?&#39;</span><span class="p">]</span>
+<p>Mode-specific calculations can add warnings for NIRCam readout optimization
+and data excess, NIRSpec long exposures, MIRI slit-mode TSO use, or target
+acquisition.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;warning&#39;</span><span class="p">][</span><span class="s1">&#39;Num Groups Reset?&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
 </section>
-<section id="pandeiaouttrans-contains-9-keys">
-<h2>PandeiaOutTrans (contains 9 keys)<a class="headerlink" href="#pandeiaouttrans-contains-9-keys" title="Link to this heading">¶</a></h2>
+<section id="pandeiaouttrans">
+<h2>PandeiaOutTrans<a class="headerlink" href="#pandeiaouttrans" title="Link to this heading"></a></h2>
 <p>This is the raw output of Pandeia’s simulation of the out of transit
-observation. For a complete breakdown of these outputs go to <a class="reference external" href="https://jwst.etc.stsci.edu">STScI’s
+observation. For a complete breakdown of these outputs go to <a class="reference external" href="https://jwst-docs.stsci.edu/jwst-exposure-time-calculator-overview/jwst-etc-pandeia-engine-tutorial">STScI’s
 Pandeia Documentation</a>.</p>
 <ul class="simple">
 <li><p><strong>sub_reports</strong></p></li>
@@ -157,47 +162,48 @@ Pandeia Documentation</a>.</p>
 <li><p><strong>scalar</strong></p></li>
 <li><p><strong>1d</strong></p></li>
 <li><p><strong>input</strong></p></li>
-<li><p><strong>3d</strong></p></li>
 </ul>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span> <span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;PandeiaOutTrans&#39;</span><span class="p">][</span><span class="s1">&#39;information&#39;</span><span class="p">]</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;PandeiaOutTrans&#39;</span><span class="p">][</span><span class="s1">&#39;information&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
 </section>
-<section id="rawdata-contains-6-keys">
-<h2>RawData (contains 6 keys)<a class="headerlink" href="#rawdata-contains-6-keys" title="Link to this heading">¶</a></h2>
+<section id="rawdata">
+<h2>RawData<a class="headerlink" href="#rawdata" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p><strong>var_in</strong>: The variance of only the in transit data</p></li>
 <li><p><strong>wave</strong>: wavelength vector</p></li>
-<li><p><strong>flux_in</strong>: Flux of the in transit data in units of e-/s</p></li>
-<li><p><strong>flux_out</strong>: Flux of the out of transit data in units of e-/s</p></li>
+<li><p><strong>electrons_in</strong>, <strong>electrons_out</strong>: Total in- and out-of-transit electrons</p></li>
+<li><p><strong>e_rate_in</strong>, <strong>e_rate_out</strong>: In- and out-of-transit electron rates</p></li>
+<li><p><strong>electron_per_int</strong> and <strong>snr_int</strong>: Per-integration diagnostics</p></li>
 <li><p><strong>error_no_floor</strong>: Error without any noise floor</p></li>
 <li><p><strong>var_out</strong>: The variance of only the out of transit data</p></li>
+<li><p><strong>rn[out,in]</strong> and <strong>bkg[out,in]</strong>: Read-noise and background diagnostics</p></li>
 </ul>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span> <span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;RawData&#39;</span><span class="p">][</span><span class="s1">&#39;var_in&#39;</span><span class="p">]</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;RawData&#39;</span><span class="p">][</span><span class="s1">&#39;var_in&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
 </section>
-<section id="timing-contains-10-keys">
-<h2>Timing (contains 10 keys)<a class="headerlink" href="#timing-contains-10-keys" title="Link to this heading">¶</a></h2>
+<section id="timing">
+<h2>timing<a class="headerlink" href="#timing" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p><strong>Seconds per Frame</strong></p></li>
-<li><p><strong>Number of Transits</strong></p></li>
-<li><p><strong>Observing Efficiency (%)</strong> = (num groups - 1)/(num groups + 1)</p></li>
-<li><p><strong>Num Integrations Out of Transit</strong></p></li>
-<li><p><strong>On Source Time</strong></p></li>
-<li><p><strong>Exposure Time Per Integration (secs)</strong></p></li>
-<li><p><strong>Reset time Plus TA time (hrs)</strong>: Target acquisition time is assumed
-to be 30 minutes</p></li>
-<li><p><strong>Num Integrations In Transit</strong></p></li>
-<li><p><strong>Num Groups per Integration</strong></p></li>
-<li><p><strong>Num Integrations per Occultation</strong></p></li>
+<li><p><strong>Transit Duration</strong> and <strong>Number of Transits</strong></p></li>
+<li><p><strong>Seconds per Frame</strong> and <strong>Time/Integration incl reset (sec)</strong></p></li>
+<li><p><strong>Measurement Time per Integration (sec)</strong></p></li>
+<li><p><strong>APT: Num Groups per Integration</strong></p></li>
+<li><p><strong>Num Integrations In Transit</strong> and <strong>Num Integrations Out of Transit</strong></p></li>
+<li><p><strong>APT: Exposures/Dith</strong>, <strong>APT: Num Integrations per Exposure</strong>, and
+<strong>APT: Num Integrations per Occultation</strong></p></li>
+<li><p><strong>Observing Efficiency (%)</strong></p></li>
+<li><p><strong>Transit+Baseline, no overhead (hrs)</strong></p></li>
 </ul>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span> <span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;Timing&#39;</span><span class="p">][</span><span class="s1">&#39;Seconds per Frame&#39;</span><span class="p">]</span>
+<p>Multistripe and NIRCam modes add mode-specific stripe, on-source-time, and
+data-excess fields.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;timing&#39;</span><span class="p">][</span><span class="s1">&#39;Seconds per Frame&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
 </section>
-<section id="input-contains-10-keys">
-<h2>Input (contains 10 keys)<a class="headerlink" href="#input-contains-10-keys" title="Link to this heading">¶</a></h2>
+<section id="input">
+<h2>input<a class="headerlink" href="#input" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p><strong>Target Mag</strong></p></li>
 <li><p><strong>Readmode</strong></p></li>
@@ -210,14 +216,15 @@ to be 30 minutes</p></li>
 <li><p><strong>Subarray</strong></p></li>
 <li><p><strong>Primary/Secondary</strong></p></li>
 </ul>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span> <span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;Input&#39;</span><span class="p">][</span><span class="s1">&#39;Target Mag&#39;</span><span class="p">]</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;Target Mag&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
 </section>
-<section id="timing-warning-and-input-divs-all-contain-html-script">
-<h2>Timing, Warning, and Input Divs (all contain html script)<a class="headerlink" href="#timing-warning-and-input-divs-all-contain-html-script" title="Link to this heading">¶</a></h2>
-<p>Here are the html scripts for the three tables that are rendered on the
-website output page.</p>
+<section id="html-display-fields">
+<h2>HTML display fields<a class="headerlink" href="#html-display-fields" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">apt_div</span></code>, <code class="docutils literal notranslate"><span class="pre">calculation_div</span></code>, <code class="docutils literal notranslate"><span class="pre">timing_div</span></code>, <code class="docutils literal notranslate"><span class="pre">input_div</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">warnings_div</span></code> contain HTML tables rendered on the website. Use the
+corresponding dictionaries for programmatic analysis.</p>
 </section>
 </section>
 
@@ -232,7 +239,7 @@ website output page.</p>
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright Updated 2022.</p>
+    <p>&#169; Copyright 2016-2026, PandExo developers.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

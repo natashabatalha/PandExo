@@ -6,8 +6,8 @@ The PandExo output is organized into `Python Dictionaries`_. See
 plot the most common outputs. Below is a breakdown of everything
 contained in the PandExo output dictionary. 
 
-FinalSpectrum (contains 4 keys)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+FinalSpectrum
+~~~~~~~~~~~~~
 
 -  **spectrum\_w\_rand**: Planet spectrum with random noise added in
    units of *(Rp/Rs)2* or *(Fp/Fs)*
@@ -18,47 +18,52 @@ FinalSpectrum (contains 4 keys)
 
 .. code:: python 
 
-    print dict['FinalSpectrum']['spectrum_w_rand'] 
+    print(result['FinalSpectrum']['spectrum_w_rand'])
 
-OriginalInput (contains 2 keys)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+OriginalInput
+~~~~~~~~~~~~~
 
 -  **model\_wave**: original wavelength input by user
 -  **model\_spec**: original spectrum input by user
+-  **star\_spec**: out-of-transit stellar spectrum used by PandExo
 
 .. code:: python 
 
-    print dict['OriginalInput']['model_wave']
+    print(result['OriginalInput']['model_wave'])
 
-Warning (contains 6 keys)
-~~~~~~~~~~~~~~~~~~~~~~~~~
+warning
+~~~~~~~
 
--  **Num Groups Reset?**: Before PandExo simulates in and out of transit
-   observations, it computes a single integration with 2 groups in order
-   to figure out how many additional groups it can add before hitting
-   saturation. If it computes a number less than 2, it resets the number
-   of groups to 2.
--  **Group Number Too Low?**: Prints out warning if number of groups is
-   less than 5 and the saturation level less than 60%.
+-  **Num Groups Reset?**: Reports whether optimization had to reset the group
+   count to the detector minimum.
+-  **Group Number Too Low?**: Reports a high requested full-well level with
+   fewer than three groups, and cautions when a one-group ramp is used.
 -  **Group Number Too High?**: Prints out warning if number of groups
    per integration exceeds 65536
--  **Saturated?**: This is an output directly taken from Pandeia’s “hard
-   saturation” flag. If there are any saturated pixels, it will alert
+-  **Saturated?**: This is an output directly taken from Pandeia's "hard
+   saturation" flag. If there are any saturated pixels, it will alert
    you here. You can also see the saturation profile.
--  **Non linear?**: This is an output directly taken from Pandeia’s
-   “soft saturation” flag.
--  **% full well high?**: If you’ve set the saturation level over 80%,
+-  **Non linear?**: This is an output directly taken from Pandeia's
+   "soft saturation" flag.
+-  **% full well high?**: If you've set the saturation level over 80%,
    it will warn you.
+-  **Minimum Integrations?**: Reports when the calculation has fewer than
+   three in-transit integrations or when optimization reduces the group count
+   to retain at least three.
+
+Mode-specific calculations can add warnings for NIRCam readout optimization
+and data excess, NIRSpec long exposures, MIRI slit-mode TSO use, or target
+acquisition.
 
 .. code:: python 
 
-    print dict['Warning']['Num Groups Reset?']
+    print(result['warning']['Num Groups Reset?'])
 
-PandeiaOutTrans (contains 9 keys)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+PandeiaOutTrans
+~~~~~~~~~~~~~~~
 
-This is the raw output of Pandeia’s simulation of the out of transit
-observation. For a complete breakdown of these outputs go to `STScI’s
+This is the raw output of Pandeia's simulation of the out of transit
+observation. For a complete breakdown of these outputs go to `STScI's
 Pandeia Documentation`_. 
 
 - **sub\_reports** 
@@ -69,47 +74,49 @@ Pandeia Documentation`_.
 - **scalar** 
 - **1d** 
 - **input**
-- **3d**
 
 .. code:: python 
 
-    print dict['PandeiaOutTrans']['information']
+    print(result['PandeiaOutTrans']['information'])
 
-RawData (contains 6 keys)
-~~~~~~~~~~~~~~~~~~~~~~~~~
+RawData
+~~~~~~~
 
 -  **var\_in**: The variance of only the in transit data
 -  **wave**: wavelength vector
--  **flux\_in**: Flux of the in transit data in units of e-/s
--  **flux\_out**: Flux of the out of transit data in units of e-/s
+-  **electrons\_in**, **electrons\_out**: Total in- and out-of-transit electrons
+-  **e\_rate\_in**, **e\_rate\_out**: In- and out-of-transit electron rates
+-  **electron\_per\_int** and **snr\_int**: Per-integration diagnostics
 -  **error\_no\_floor**: Error without any noise floor
 -  **var\_out**: The variance of only the out of transit data
+-  **rn[out,in]** and **bkg[out,in]**: Read-noise and background diagnostics
 
 .. code:: python
     
-    print dict['RawData']['var_in']    
+    print(result['RawData']['var_in'])
 
-Timing (contains 10 keys)
-~~~~~~~~~~~~~~~~~~~~~~~~~
+timing
+~~~~~~
 
--  **Seconds per Frame**
--  **Number of Transits**
--  **Observing Efficiency (%)** = (num groups - 1)/(num groups + 1)
--  **Num Integrations Out of Transit**
--  **On Source Time**
--  **Exposure Time Per Integration (secs)**
--  **Reset time Plus TA time (hrs)**: Target acquisition time is assumed
-   to be 30 minutes
--  **Num Integrations In Transit**
--  **Num Groups per Integration**
--  **Num Integrations per Occultation**
+-  **Transit Duration** and **Number of Transits**
+-  **Seconds per Frame** and **Time/Integration incl reset (sec)**
+-  **Measurement Time per Integration (sec)**
+-  **APT: Num Groups per Integration**
+-  **Num Integrations In Transit** and **Num Integrations Out of Transit**
+-  **APT: Exposures/Dith**, **APT: Num Integrations per Exposure**, and
+   **APT: Num Integrations per Occultation**
+-  **Observing Efficiency (%)**
+-  **Transit+Baseline, no overhead (hrs)**
+
+Multistripe and NIRCam modes add mode-specific stripe, on-source-time, and
+data-excess fields.
 
 .. code:: python 
   
-    print dict['Timing']['Seconds per Frame']
+    print(result['timing']['Seconds per Frame'])
 
-Input (contains 10 keys)
-~~~~~~~~~~~~~~~~~~~~~~~~
+input
+~~~~~
 
 -  **Target Mag**
 -  **Readmode**
@@ -124,14 +131,15 @@ Input (contains 10 keys)
 
 .. code:: python
  
-    print dict['Input']['Target Mag']
+    print(result['input']['Target Mag'])
 
-Timing, Warning, and Input Divs (all contain html script)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+HTML display fields
+~~~~~~~~~~~~~~~~~~~
 
-Here are the html scripts for the three tables that are rendered on the
-website output page.
+``apt_div``, ``calculation_div``, ``timing_div``, ``input_div``, and
+``warnings_div`` contain HTML tables rendered on the website. Use the
+corresponding dictionaries for programmatic analysis.
 
-.. _Python Dictionaries: http://www.tutorialspoint.com/python/python_dictionary.htm
-.. _example notebooks: https://github.com/natashabatalha/PandExo/wiki/Notebooks
-.. _STScI’s Pandeia Documentation: https://jwst.etc.stsci.edu
+.. _Python Dictionaries: https://docs.python.org/3/tutorial/datastructures.html#dictionaries
+.. _example notebooks: https://github.com/natashabatalha/PandExo/tree/master/notebooks
+.. _STScI's Pandeia Documentation: https://jwst-docs.stsci.edu/jwst-exposure-time-calculator-overview/jwst-etc-pandeia-engine-tutorial
