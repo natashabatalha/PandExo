@@ -1,5 +1,5 @@
-The Code
-==============
+API Reference
+=============
 
 
 pandexo.engine.justdoit
@@ -84,14 +84,6 @@ pandexo.engine.pandexo
     :undoc-members:
     :show-inheritance:
     
-
-pandexo.engine.elements
------------------------
-
-.. automodule:: pandexo.engine.elements
-    :members:
-    :undoc-members:
-    :show-inheritance:
 
 pandexo.engine.hst_smooth
 -------------------------

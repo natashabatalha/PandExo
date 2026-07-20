@@ -1,9 +1,9 @@
 HST Tutorial 
 ===============
 
-This file demonstrates how to use TExoNS to predict the: 1.
-Transmission/emission spectrum S/N ratio 2. Observation start window for
-any system observed with WFC3/IR.
+This file demonstrates how to use PandExo to predict the:
+1. Transmission/emission spectrum S/N ratio
+2. Observation start window for any system observed with WFC3/IR.
 
 .. code:: python
     
@@ -11,7 +11,7 @@ any system observed with WFC3/IR.
 
     import pandexo.engine.justdoit as jdi
 
-Editting Input Dictionaries
+Editing Input Dictionaries
 ---------------------------
 
 Step 1) Load in a blank exoplanet dictionary
@@ -27,7 +27,8 @@ Edit stellar and planet inputs
 .. code:: python
 
     #WASP-43
-    exo_dict['star']['mag']      = 9.397                # H magnitude of the system
+    exo_dict['star']['jmag']     = 9.995                # J magnitude of the system
+    exo_dict['star']['hmag']     = 9.397                # H magnitude of the system
     #WASP-43b
     exo_dict['planet']['type']    = 'user'               # user specified inputs
     exo_dict['planet']['exopath'] = str(
@@ -63,17 +64,17 @@ Edit HST/WFC3 detector and observation inputs
     inst_dict['configuration']['detector']['nsamp']        = 10           # WFC3 N_SAMP, 1..15
     inst_dict['configuration']['detector']['samp_seq']     = 'SPARS5'     # WFC3 SAMP_SEQ, SPARS5 or SPARS10
     inst_dict['strategy']['norbits']                       = 4            # Number of HST orbits
-    inst_dict['strategy']['nchan']                       = 15           # Number of spectrophotometric channels
-    inst_dict['strategy']['scanDirection']               = 'Forward'    # Spatial scan direction, Forward or Round Trip
-    inst_dict['strategy']['schedulability']              = 30           # 30 for small/medium program, 100 for large program
-    inst_dict['strategy']['windowSize']                  = 20           # (optional) Observation start window size in minutes. Default is 20 minutes.
+    inst_dict['strategy']['nchan']                         = 15           # Number of spectrophotometric channels
+    inst_dict['strategy']['scanDirection']                 = 'Forward'    # Spatial scan direction, Forward or Round Trip
+    inst_dict['strategy']['schedulability']                = 30           # 30 for small/medium program, 100 for large program
+    inst_dict['strategy']['windowSize']                    = 20           # (optional) Observation start window size in minutes. Default is 20 minutes.
 
 Run PandExo Command Line
 ------------------------
 
 ``jdi.run_pandexo(exo, inst, param_space = 0, param_range = 0,save_file = True,                             output_path=os.getcwd(), output_file = '')``
 
-See wiki Attributes for more thorough explanation fo inputs
+See the API reference for a more thorough explanation of the inputs.
 
 .. code:: python
 
@@ -90,7 +91,7 @@ See wiki Attributes for more thorough explanation fo inputs
 
 .. code:: python
 
-    exo_dict['observation']['scanDirection'] = 'Round Trip'
+    inst_dict['strategy']['scanDirection'] = 'Round Trip'
     hst = jdi.run_pandexo(exo_dict, inst_dict, output_file='wasp43b.p')
     Running Single Case w/ User Instrument Dict
 

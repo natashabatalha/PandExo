@@ -236,7 +236,7 @@ def get_thruput(inst, niriss=1, nirspec='f100lp', wmin='default', wmax='default'
     niriss : int
         (Optional) defines which niriss order you want (1 or 2)
     nirspec : str
-        (Optional) for NIRISS G140M/H there are two available filters (f100lp and f070lp)
+        (Optional) for NIRSpec G140M/H there are two available filters (f100lp and f070lp)
         if you are selecting G140M or G140H, this allows you to pick which one
     wmin : str / float
         (Optional) minimum wavlength to compute PCE across, 'default' will use
@@ -393,7 +393,7 @@ def run_pandexo(exo, inst, param_space = 0, param_range = 0,save_file = True,
     -------
     dict
         For single run output will just be a single PandExo output dictionary
-        https://github.com/natashabatalha/PandExo/wiki/PandExo-Output
+        as described in the JWST Output Dictionary documentation.
         For multiple runs the output will be organized into a list with each
         a dictionary named by whatever you are looping through
         i.e. [{'First temp': PandExoDict}, {'Second temp': PandExoDict}, etc..]
