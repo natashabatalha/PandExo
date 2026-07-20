@@ -342,9 +342,16 @@ def _pandeia_1d_values_at_wave(pand_dict, key, wave):
     if key not in pandeia_1d:
         return np.zeros(len(wave), dtype=float)
 
-    diagnostic_wave = np.asarray(pandeia_1d[key][0], dtype=float)
-    diagnostic_value = np.asarray(pandeia_1d[key][1], dtype=float)
+    diagnostic_wave = np.ravel(np.asarray(pandeia_1d[key][0], dtype=float))
+    diagnostic_value = np.ravel(np.asarray(pandeia_1d[key][1], dtype=float))
     wave = np.asarray(wave, dtype=float)
+
+    # Pandeia can return one extra extraction value for a multistripe PRISM
+    # report, without a corresponding wavelength. That sample is beyond the
+    # reported detector coverage, so retain only wavelength/value pairs.
+    paired_length = min(len(diagnostic_wave), len(diagnostic_value))
+    diagnostic_wave = diagnostic_wave[:paired_length]
+    diagnostic_value = diagnostic_value[:paired_length]
 
     if (
         diagnostic_wave.shape == wave.shape
@@ -1116,15 +1123,15 @@ def compute_full_sim(dictinput,verbose=False):
     pandeia_snr_int = None
     pandeia_full_saturation = None
     if not is_phase_spec(calculation):
-        pandeia_extracted_noise = np.asarray(
-            out['1d']['extracted_noise'][1], dtype=float
+        pandeia_extracted_noise = _pandeia_1d_values_at_wave(
+            out, 'extracted_noise', w
         )
         pandeia_full_saturation = _pandeia_1d_values_at_wave(
             out, 'n_full_saturated', w
         )
         pandeia_snr_int = [
-            np.asarray(out['1d']['sn'][0], dtype=float),
-            np.asarray(out['1d']['sn'][1], dtype=float),
+            np.asarray(w, dtype=float),
+            _pandeia_1d_values_at_wave(out, 'sn', w),
         ]
 
     input_wave_order = np.argsort(w, kind='mergesort')
@@ -1158,7 +1165,10 @@ def compute_full_sim(dictinput,verbose=False):
         extracted_flux_inn = extracted_flux_inn[valid_channel]
         if extracted_flux_per_int_out is not None:
             extracted_flux_per_int_out = extracted_flux_per_int_out[valid_channel]
-        pandeia_full_saturation = pandeia_full_saturation[valid_channel]
+        if pandeia_extracted_noise is not None:
+            pandeia_extracted_noise = pandeia_extracted_noise[valid_channel]
+        if pandeia_full_saturation is not None:
+            pandeia_full_saturation = pandeia_full_saturation[valid_channel]
         result['rn[out,in]'] = sort_by_wave_order(result['rn[out,in]'], valid_channel)
         result['bkg[out,in]'] = sort_by_wave_order(result['bkg[out,in]'], valid_channel)
         pandeia_snr_int = sort_by_wave_order(pandeia_snr_int, valid_channel)

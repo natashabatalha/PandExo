@@ -58,9 +58,13 @@ try:
 except:
     print('FORTNEY DATABASE NOT INSTALLED')
 
-#add Simbad query info 
-Simbad.add_votable_fields('flux(H)')
-Simbad.add_votable_fields('flux(J)')
+# SIMBAD field registration may require a network request. The target resolver
+# already handles lookup failures, so an outage must not prevent web startup.
+try:
+    Simbad.add_votable_fields('flux(H)')
+    Simbad.add_votable_fields('flux(J)')
+except Exception:
+    logger.warning("Unable to configure SIMBAD magnitude fields at startup")
 
 define("port", default=1111, help="run on the given port", type=int)
 define("debug", default=False, help="automatically detect code changes in development")
@@ -186,6 +190,7 @@ class Application(tornado.web.Application):
             (r"/about", AboutHandler),
             (r"/dashboard", DashboardHandler),
             (r"/dashboardhst", DashboardHSTHandler),
+            (r"/calculation/?", tornado.web.RedirectHandler, {"url": "/dashboard"}),
             (r"/tables", TablesHandler),
             (r"/helpfulplots", HelpfulPlotsHandler),
             (r"/calculation/new", CalculationNewHandler),
@@ -216,7 +221,7 @@ class BaseHandler(tornado.web.RequestHandler):
     """
     Logic to handle user information and database access might go here.
     """
-    executor = ProcessPoolExecutor(max_workers=16)
+    executor = None
     buffer = OrderedDict()
 
     @staticmethod

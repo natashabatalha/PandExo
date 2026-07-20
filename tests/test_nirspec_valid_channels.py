@@ -2,10 +2,47 @@ import numpy as np
 import pytest
 
 from pandexo.engine.jwst import (
+    _pandeia_1d_values_at_wave,
     dhs_f150w_wavelength_mask,
     nirspec_valid_channel_mask,
     nirspec_prism_multistripe_wavelength_mask,
 )
+
+
+def test_pandeia_diagnostic_is_resampled_to_extracted_flux_grid():
+    pandeia_output = {
+        "1d": {
+            "extracted_noise": [
+                np.array([0.6, 1.0, 2.0, 3.0, 5.0]),
+                np.array([60.0, 100.0, 200.0, 300.0, 500.0]),
+            ],
+        },
+    }
+
+    extracted_flux_wave = np.array([1.0, 2.0, 3.0, 4.0])
+    extracted_noise = _pandeia_1d_values_at_wave(
+        pandeia_output, "extracted_noise", extracted_flux_wave
+    )
+
+    np.testing.assert_allclose(extracted_noise, [100.0, 200.0, 300.0, 400.0])
+
+
+def test_pandeia_diagnostic_discards_unpaired_trailing_value():
+    """Handle Pandeia multistripe reports with one extra diagnostic value."""
+    pandeia_output = {
+        "1d": {
+            "extracted_noise": [
+                np.array([1.0, 2.0, 3.0]),
+                np.array([10.0, 20.0, 30.0, 40.0]),
+            ],
+        },
+    }
+
+    extracted_noise = _pandeia_1d_values_at_wave(
+        pandeia_output, "extracted_noise", np.array([1.0, 2.0, 3.0])
+    )
+
+    np.testing.assert_allclose(extracted_noise, [10.0, 20.0, 30.0])
 
 
 def test_nirspec_mask_rejects_unobserved_channels():
