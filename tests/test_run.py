@@ -64,6 +64,17 @@ def _require_readable_phoenix_grid():
         pytest.skip(f"PYSYN_CDBS PHOENIX reference grid is unreadable: {exc}")
 
 
+def _require_fortney_grid():
+    path = os.environ.get("FORTGRID_DIR")
+    if path is None or not os.path.isfile(path):
+        pytest.skip(f"FORTGRID_DIR is unavailable: {path}")
+    try:
+        with open(path, "rb") as handle:
+            handle.read(1)
+    except OSError as exc:
+        pytest.skip(f"FORTGRID_DIR is unreadable: {exc}")
+
+
 def _default_smoke_exo_dict(jdi):
     exo_dict = jdi.load_exo_dict()
     exo_dict["observation"]["sat_level"] = 80
@@ -112,3 +123,54 @@ def test_run_pandexo_smoke_has_sorted_wavelengths(instrument):
 
     wave = np.asarray(result["FinalSpectrum"]["wave"])
     assert np.all(np.diff(wave) >= 0), f"{instrument} produced unsorted wavelengths"
+
+
+def test_run_pandexo_wasp12b_grid_nirspec_prism_multistripe():
+    """Exercise the Fortney-grid path with the NIRSpec PRISM multistripe mode."""
+    _require_valid_pandeia_refdata()
+    _require_fortney_grid()
+    jdi = _import_justdoit()
+
+    exo_dict = _default_smoke_exo_dict(jdi)
+    exo_dict["star"].update(
+        {
+            "mag": 10.19,
+            "temp": 6300,
+            "metal": 0.3,
+            "logg": 4.2,
+            "radius": 1.63,
+        }
+    )
+    exo_dict["planet"].update(
+        {
+            "type": "grid",
+            "temp": 2500,
+            "chem": "noTiO",
+            "cloud": "ray10",
+            "mass": 1.4,
+            "m_unit": "M_jup",
+            "radius": 1.9,
+            "transit_duration": 3.0 * 60.0 * 60.0,
+        }
+    )
+    inst_dict = jdi.load_mode_dict("NIRSpec Prism")
+    inst_dict["configuration"]["detector"].update(
+        {
+            "subarray": "s64m8_prm",
+            "readout_pattern": "nrsrapid",
+            "ngroup": "optimize",
+            "nint": 1,
+        }
+    )
+
+    result = jdi.run_pandexo(
+        exo_dict, inst_dict, save_file=False, verbose=False
+    )
+
+    final_spectrum = result["FinalSpectrum"]
+    wave = np.asarray(final_spectrum["wave"])
+    assert len(wave) > 0
+    assert np.all(np.diff(wave) >= 0)
+    assert wave[-1] <= 4.98
+    assert len(final_spectrum["spectrum"]) == len(wave)
+    assert len(final_spectrum["error_w_floor"]) == len(wave)

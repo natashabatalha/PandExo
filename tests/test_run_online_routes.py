@@ -8,7 +8,8 @@ class TestCalculationRedirect(tornado.testing.AsyncHTTPTestCase):
         return Application()
 
     def test_calculation_redirects_to_dashboard(self):
-        response = self.fetch("/calculation", follow_redirects=False)
+        for path in ("/calculation", "/calculation/"):
+            response = self.fetch(path, follow_redirects=False)
 
-        assert response.code == 301
-        assert response.headers["Location"] == "/dashboard"
+            assert response.code == 301
+            assert response.headers["Location"] == "/dashboard"

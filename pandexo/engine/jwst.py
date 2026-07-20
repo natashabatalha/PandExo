@@ -1165,7 +1165,10 @@ def compute_full_sim(dictinput,verbose=False):
         extracted_flux_inn = extracted_flux_inn[valid_channel]
         if extracted_flux_per_int_out is not None:
             extracted_flux_per_int_out = extracted_flux_per_int_out[valid_channel]
-        pandeia_full_saturation = pandeia_full_saturation[valid_channel]
+        if pandeia_extracted_noise is not None:
+            pandeia_extracted_noise = pandeia_extracted_noise[valid_channel]
+        if pandeia_full_saturation is not None:
+            pandeia_full_saturation = pandeia_full_saturation[valid_channel]
         result['rn[out,in]'] = sort_by_wave_order(result['rn[out,in]'], valid_channel)
         result['bkg[out,in]'] = sort_by_wave_order(result['bkg[out,in]'], valid_channel)
         pandeia_snr_int = sort_by_wave_order(pandeia_snr_int, valid_channel)
