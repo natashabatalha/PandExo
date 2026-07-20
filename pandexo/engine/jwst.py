@@ -342,9 +342,16 @@ def _pandeia_1d_values_at_wave(pand_dict, key, wave):
     if key not in pandeia_1d:
         return np.zeros(len(wave), dtype=float)
 
-    diagnostic_wave = np.asarray(pandeia_1d[key][0], dtype=float)
-    diagnostic_value = np.asarray(pandeia_1d[key][1], dtype=float)
+    diagnostic_wave = np.ravel(np.asarray(pandeia_1d[key][0], dtype=float))
+    diagnostic_value = np.ravel(np.asarray(pandeia_1d[key][1], dtype=float))
     wave = np.asarray(wave, dtype=float)
+
+    # Pandeia can return one extra extraction value for a multistripe PRISM
+    # report, without a corresponding wavelength. That sample is beyond the
+    # reported detector coverage, so retain only wavelength/value pairs.
+    paired_length = min(len(diagnostic_wave), len(diagnostic_value))
+    diagnostic_wave = diagnostic_wave[:paired_length]
+    diagnostic_value = diagnostic_value[:paired_length]
 
     if (
         diagnostic_wave.shape == wave.shape

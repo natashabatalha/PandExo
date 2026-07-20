@@ -27,6 +27,24 @@ def test_pandeia_diagnostic_is_resampled_to_extracted_flux_grid():
     np.testing.assert_allclose(extracted_noise, [100.0, 200.0, 300.0, 400.0])
 
 
+def test_pandeia_diagnostic_discards_unpaired_trailing_value():
+    """Handle Pandeia multistripe reports with one extra diagnostic value."""
+    pandeia_output = {
+        "1d": {
+            "extracted_noise": [
+                np.array([1.0, 2.0, 3.0]),
+                np.array([10.0, 20.0, 30.0, 40.0]),
+            ],
+        },
+    }
+
+    extracted_noise = _pandeia_1d_values_at_wave(
+        pandeia_output, "extracted_noise", np.array([1.0, 2.0, 3.0])
+    )
+
+    np.testing.assert_allclose(extracted_noise, [10.0, 20.0, 30.0])
+
+
 def test_nirspec_mask_rejects_unobserved_channels():
     """Keep only NIRSpec channels with finite positive extracted noise.
 
