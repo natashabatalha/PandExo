@@ -764,23 +764,35 @@
         function showSelectedInstrumentMode() {
             $("#instrument-mode-section").removeClass("hidden");
             $("#MIRI, #NIRSpec, #NIRISS, #NIRCam, #NIRCamDHS").addClass("hidden");
+            $("#MIRI, #NIRSpec, #NIRISS, #NIRCam, #NIRCamDHS")
+                .find("select")
+                .prop("required", false);
             var selopt = $("#instrument").val();
+            var activeSection = "";
             switch (selopt) {
                 case "MIRI":
                     $("#MIRI").removeClass("hidden");
+                    activeSection = "#MIRI";
                     break;
                 case "NIRSpec":
                     $("#NIRSpec").removeClass("hidden");
+                    activeSection = "#NIRSpec";
                     break;
                 case "NIRISS":
                     $("#NIRISS").removeClass("hidden");
+                    activeSection = "#NIRISS";
                     break;
                 case "NIRCam":
                     $("#NIRCam").removeClass("hidden");
+                    activeSection = "#NIRCam";
                     break;
                 case "NIRCamDHS":
                     $("#NIRCamDHS").removeClass("hidden");
+                    activeSection = "#NIRCamDHS";
                     break;
+            }
+            if (activeSection) {
+                $(activeSection).find("select").prop("required", true);
             }
         }
 
