@@ -4,19 +4,28 @@
    contain the root `toctree` directive.
 
 .. image:: logo.png
+   :alt: PandExo logo.
    :width: 450px
    :align: center
 
-The Documentation
-=================
+PandExo Documentation
+=====================
 
 Tools to help the community with planning exoplanet observations.
 
 .. note::
-    The online PandExo module has moved to
-    `STScI's ExoCTK <https://exoctk.stsci.edu/pandexo/>`_. 
+    Use the `PandExo web interface on STScI's ExoCTK
+    <https://exoctk.stsci.edu/pandexo/>`_ for browser-based calculations.
 
-PandExo is both an online tool and a Python package for generating instrument simulations of JWST's NIRSpec, NIRCam, NIRISS, and MIRI, and HST's WFC3. It uses throughput calculations from STScI's Exposure Time Calculator, Pandeia: Pandeia + Exoplanets = PandExo. This documentation contains information on how to download, install, and analyze PandExo output.
+PandExo is both an online tool and a Python package for generating instrument
+simulations of JWST's NIRSpec, NIRCam, NIRISS, and MIRI, and HST's WFC3. It
+uses throughput calculations from STScI's Exposure Time Calculator, Pandeia:
+Pandeia + Exoplanets = PandExo.
+
+Start with :doc:`installation` to configure the local package and required
+reference data. Then follow the :doc:`tutorialjwst` or :doc:`tutorialhst`, use
+:doc:`jwstinput` to select a supported instrument configuration, and consult
+:doc:`jwstdict` when analyzing a completed calculation.
 
 Citation: `PandExo: A Community Tool for Transiting Exoplanet Science with JWST and HST <https://ui.adsabs.harvard.edu/abs/2017PASP..129f4501B>`_
 

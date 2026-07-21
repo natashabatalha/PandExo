@@ -1,20 +1,28 @@
-Py Dict Structure of JWST Output
-================================
+JWST Output Dictionary
+======================
 
-The PandExo output is organized into `Python Dictionaries`_. See
-`example notebooks`_ for an explanation of how to manipulate these and
-plot the most common outputs. Below is a breakdown of everything
-contained in the PandExo output dictionary. 
+PandExo returns a nested `Python dictionary`_. See the `example notebooks`_
+for common analysis and plotting patterns. The exact fields vary by instrument
+mode and selected options, so inspect the result you receive rather than
+assuming every calculation has every key:
+
+.. code:: python
+
+    print(result.keys())
+    print(result['FinalSpectrum'].keys())
+
+The arrays in ``FinalSpectrum`` and ``RawData`` are NumPy arrays. Wavelengths
+are in microns unless a field name or the associated metadata states otherwise.
 
 FinalSpectrum
 ~~~~~~~~~~~~~
 
--  **spectrum\_w\_rand**: Planet spectrum with random noise added in
-   units of *(Rp/Rs)2* or *(Fp/Fs)*
--  **spectrum**: Planet spectrum with no random noise
+-  **spectrum\_w\_rand**: Planet spectrum with random noise added, in
+   ``(Rp/Rs)^2`` or ``Fp/Fs``.
+-  **spectrum**: Planet spectrum without random noise.
 -  **error\_w\_floor**: Error with user defined noise floor. If no floor
    was specified, there is no floor.
--  **wave**: wavelength (microns)
+-  **wave**: Wavelength in microns.
 
 .. code:: python 
 
@@ -23,9 +31,9 @@ FinalSpectrum
 OriginalInput
 ~~~~~~~~~~~~~
 
--  **model\_wave**: original wavelength input by user
--  **model\_spec**: original spectrum input by user
--  **star\_spec**: out-of-transit stellar spectrum used by PandExo
+-  **model\_wave**: Original wavelength array supplied by the user.
+-  **model\_spec**: Original planet spectrum supplied by the user.
+-  **star\_spec**: Out-of-transit stellar spectrum used by PandExo.
 
 .. code:: python 
 
@@ -53,7 +61,7 @@ warning
 
 Mode-specific calculations can add warnings for NIRCam readout optimization
 and data excess, NIRSpec long exposures, MIRI slit-mode TSO use, or target
-acquisition.
+acquisition. Warning values and their availability vary by mode.
 
 .. code:: python 
 
@@ -62,9 +70,9 @@ acquisition.
 PandeiaOutTrans
 ~~~~~~~~~~~~~~~
 
-This is the raw output of Pandeia's simulation of the out of transit
-observation. For a complete breakdown of these outputs go to `STScI's
-Pandeia Documentation`_. 
+This is the raw output of Pandeia's out-of-transit simulation. For a complete
+breakdown, see `STScI's Pandeia documentation`_. Its nested fields are
+Pandeia-version and mode dependent.
 
 - **sub\_reports** 
 - **information** 
@@ -82,10 +90,10 @@ Pandeia Documentation`_.
 RawData
 ~~~~~~~
 
--  **var\_in**: The variance of only the in transit data
--  **wave**: wavelength vector
--  **electrons\_in**, **electrons\_out**: Total in- and out-of-transit electrons
--  **e\_rate\_in**, **e\_rate\_out**: In- and out-of-transit electron rates
+-  **var\_in**: Variance of the in-transit data.
+-  **wave**: Wavelength vector in microns.
+-  **electrons\_in**, **electrons\_out**: Total in- and out-of-transit electrons.
+-  **e\_rate\_in**, **e\_rate\_out**: In- and out-of-transit electron rates.
 -  **electron\_per\_int** and **snr\_int**: Per-integration diagnostics
 -  **error\_no\_floor**: Error without any noise floor
 -  **var\_out**: The variance of only the out of transit data
@@ -124,7 +132,7 @@ input
 -  **Filter**
 -  **Instrument**
 -  **Mode**
--  **Saturation Level (electons)**
+-  **Saturation Level (electrons)**
 -  **Aperture**
 -  **Subarray**
 -  **Primary/Secondary**
@@ -140,6 +148,16 @@ HTML display fields
 ``warnings_div`` contain HTML tables rendered on the website. Use the
 corresponding dictionaries for programmatic analysis.
 
-.. _Python Dictionaries: https://docs.python.org/3/tutorial/datastructures.html#dictionaries
+Saved ``.p`` results are Python pickle files. Only load files from trusted
+sources, because unpickling an untrusted file can execute arbitrary code.
+
+.. code:: python
+
+    import pickle
+
+    with open("singlerun.p", "rb") as handle:
+        result = pickle.load(handle)  # Load only files from trusted sources.
+
+.. _Python dictionary: https://docs.python.org/3/tutorial/datastructures.html#dictionaries
 .. _example notebooks: https://github.com/natashabatalha/PandExo/tree/master/notebooks
 .. _STScI's Pandeia Documentation: https://jwst-docs.stsci.edu/jwst-exposure-time-calculator-overview/jwst-etc-pandeia-engine-tutorial

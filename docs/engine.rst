@@ -1,21 +1,24 @@
 API Reference
 =============
 
+Primary Public API
+------------------
 
 pandexo.engine.justdoit
 -----------------------
 
 .. automodule:: pandexo.engine.justdoit
     :members:
-    :undoc-members:
     :show-inheritance:
+
+Plotting Helpers
+----------------
 
 pandexo.engine.justplotit
 -------------------------
 
 .. automodule:: pandexo.engine.justplotit
     :members:
-    :undoc-members:
     :show-inheritance:
 
 pandexo.engine.bintools
@@ -23,8 +26,24 @@ pandexo.engine.bintools
 
 .. automodule:: pandexo.engine.bintools
     :members:
-    :undoc-members:
     :show-inheritance:
+
+Configuration Helpers
+---------------------
+
+pandexo.engine.load_modes
+-------------------------
+
+.. automodule:: pandexo.engine.load_modes
+    :members:
+    :show-inheritance:
+
+Advanced and Internal Modules
+-----------------------------
+
+These modules support PandExo's calculation engine and web application. Their
+interfaces may change between releases; use ``pandexo.engine.justdoit`` for
+new scripts when possible.
 
 pandexo.engine.run_online
 -------------------------
@@ -65,14 +84,6 @@ pandexo.engine.jwst
 .. automodule:: pandexo.engine.jwst
     :members:
     :exclude-members: ExtractSpec
-    :undoc-members:
-    :show-inheritance:
-
-pandexo.engine.load_modes
--------------------------
-
-.. automodule:: pandexo.engine.load_modes
-    :members:
     :undoc-members:
     :show-inheritance:
 
