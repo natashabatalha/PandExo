@@ -47,12 +47,13 @@
 <li class="toctree-l1"><a class="reference internal" href="installation.html#installation-with-pip-or-git">Installation with Pip or Git</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html#final-test-for-success">Final Test for Success</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html#the-importance-of-upgrading-pandexo">The Importance of Upgrading PandExo</a></li>
-<li class="toctree-l1"><a class="reference internal" href="installation_windows.html">Windows Installing Guide for PandExo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation_windows.html">Windows Installation Guide for PandExo</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorialjwst.html">JWST Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="jwstinput.html">Possible Instrument Input Params</a></li>
-<li class="toctree-l1"><a class="reference internal" href="jwstdict.html">Py Dict Structure of JWST Output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="jwstinput.html">Instrument Configuration Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="jwstdict.html">JWST Output Dictionary</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorialhst.html">HST Tutorial</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#primary-public-api">Primary Public API</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-pandexo.engine.justdoit">pandexo.engine.justdoit</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#pandexo.engine.justdoit.dispersers"><code class="docutils literal notranslate"><span class="pre">dispersers()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pandexo.engine.justdoit.filters"><code class="docutils literal notranslate"><span class="pre">filters()</span></code></a></li>
@@ -68,6 +69,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#pandexo.engine.justdoit.subarrays"><code class="docutils literal notranslate"><span class="pre">subarrays()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#plotting-helpers">Plotting Helpers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-pandexo.engine.justplotit">pandexo.engine.justplotit</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#pandexo.engine.justplotit.bin_wave_to_R"><code class="docutils literal notranslate"><span class="pre">bin_wave_to_R()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pandexo.engine.justplotit.hst_simulated_lightcurve"><code class="docutils literal notranslate"><span class="pre">hst_simulated_lightcurve()</span></code></a></li>
@@ -90,6 +92,20 @@
 <li class="toctree-l3"><a class="reference internal" href="#pandexo.engine.bintools.uniform_tophat_mean"><code class="docutils literal notranslate"><span class="pre">uniform_tophat_mean()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#configuration-helpers">Configuration Helpers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-pandexo.engine.load_modes">pandexo.engine.load_modes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#pandexo.engine.load_modes.SetDefaultModes"><code class="docutils literal notranslate"><span class="pre">SetDefaultModes</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pandexo.engine.load_modes.SetDefaultModes.miri"><code class="docutils literal notranslate"><span class="pre">SetDefaultModes.miri()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pandexo.engine.load_modes.SetDefaultModes.nircam"><code class="docutils literal notranslate"><span class="pre">SetDefaultModes.nircam()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pandexo.engine.load_modes.SetDefaultModes.niriss"><code class="docutils literal notranslate"><span class="pre">SetDefaultModes.niriss()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pandexo.engine.load_modes.SetDefaultModes.nirspec"><code class="docutils literal notranslate"><span class="pre">SetDefaultModes.nirspec()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pandexo.engine.load_modes.SetDefaultModes.pick"><code class="docutils literal notranslate"><span class="pre">SetDefaultModes.pick()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pandexo.engine.load_modes.SetDefaultModes.wfc3"><code class="docutils literal notranslate"><span class="pre">SetDefaultModes.wfc3()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#advanced-and-internal-modules">Advanced and Internal Modules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-pandexo.engine.run_online">pandexo.engine.run_online</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#pandexo.engine.run_online.AboutHandler"><code class="docutils literal notranslate"><span class="pre">AboutHandler</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#pandexo.engine.run_online.AboutHandler.get"><code class="docutils literal notranslate"><span class="pre">AboutHandler.get()</span></code></a></li>
@@ -247,18 +263,6 @@
 <li class="toctree-l3"><a class="reference internal" href="#pandexo.engine.jwst.validate_saturation_state"><code class="docutils literal notranslate"><span class="pre">validate_saturation_state()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#module-pandexo.engine.load_modes">pandexo.engine.load_modes</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#pandexo.engine.load_modes.SetDefaultModes"><code class="docutils literal notranslate"><span class="pre">SetDefaultModes</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#pandexo.engine.load_modes.SetDefaultModes.miri"><code class="docutils literal notranslate"><span class="pre">SetDefaultModes.miri()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pandexo.engine.load_modes.SetDefaultModes.nircam"><code class="docutils literal notranslate"><span class="pre">SetDefaultModes.nircam()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pandexo.engine.load_modes.SetDefaultModes.niriss"><code class="docutils literal notranslate"><span class="pre">SetDefaultModes.niriss()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pandexo.engine.load_modes.SetDefaultModes.nirspec"><code class="docutils literal notranslate"><span class="pre">SetDefaultModes.nirspec()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pandexo.engine.load_modes.SetDefaultModes.pick"><code class="docutils literal notranslate"><span class="pre">SetDefaultModes.pick()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pandexo.engine.load_modes.SetDefaultModes.wfc3"><code class="docutils literal notranslate"><span class="pre">SetDefaultModes.wfc3()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
 <li class="toctree-l2"><a class="reference internal" href="#module-pandexo.engine.pandexo">pandexo.engine.pandexo</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#pandexo.engine.pandexo.wrapper"><code class="docutils literal notranslate"><span class="pre">wrapper()</span></code></a></li>
 </ul>
@@ -303,6 +307,9 @@
              
   <section id="api-reference">
 <h1>API Reference<a class="headerlink" href="#api-reference" title="Link to this heading"></a></h1>
+<section id="primary-public-api">
+<h2>Primary Public API<a class="headerlink" href="#primary-public-api" title="Link to this heading"></a></h2>
+</section>
 <section id="module-pandexo.engine.justdoit">
 <span id="pandexo-engine-justdoit"></span><h2>pandexo.engine.justdoit<a class="headerlink" href="#module-pandexo.engine.justdoit" title="Link to this heading"></a></h2>
 <dl class="py function">
@@ -314,7 +321,7 @@
 <dd class="field-odd"><p><strong>inst</strong> (<em>str</em>) – string of either niriss, nirspec, miri or nircam</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>lsit with available dispersers</p>
+<dd class="field-even"><p>List of available dispersers.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>list</p>
@@ -325,13 +332,13 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="pandexo.engine.justdoit.filters">
 <span class="sig-prename descclassname"><span class="pre">pandexo.engine.justdoit.</span></span><span class="sig-name descname"><span class="pre">filters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inst</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pandexo/engine/justdoit.html#filters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pandexo.engine.justdoit.filters" title="Link to this definition"></a></dt>
-<dd><p>Function to show availalbe filters</p>
+<dd><p>Show available filters.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>inst</strong> (<em>str</em>) – string of either niriss, nirspec, miri or nircam</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>list with availalbe filters</p>
+<dd class="field-even"><p>List of available filters.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>list</p>
@@ -367,9 +374,9 @@ Pulls complete instrument photon to electron conversion efficiency
 <li><p><strong>niriss</strong> (<em>int</em>) – (Optional) defines which niriss order you want (1 or 2)</p></li>
 <li><p><strong>nirspec</strong> (<em>str</em>) – (Optional) for NIRSpec G140M/H there are two available filters (f100lp and f070lp)
 if you are selecting G140M or G140H, this allows you to pick which one</p></li>
-<li><p><strong>wmin</strong> (<em>str / float</em>) – (Optional) minimum wavlength to compute PCE across, ‘default’ will use
+<li><p><strong>wmin</strong> (<em>str / float</em>) – (Optional) minimum wavelength to compute PCE across; ‘default’ uses
 values from Pandeia.</p></li>
-<li><p><strong>wmax</strong> (<em>str / float</em>) – (Optional) maximum wavlength to compute PCE across, ‘default’ will use
+<li><p><strong>wmax</strong> (<em>str / float</em>) – (Optional) maximum wavelength to compute PCE across; ‘default’ uses
 values from Pandeia.</p></li>
 </ul>
 </dd>
@@ -381,7 +388,7 @@ values from Pandeia.</p></li>
 </dd>
 </dl>
 <p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">thru_dict</span> <span class="o">=</span> <span class="n">get_thruput</span><span class="p">(</span><span class="s1">&#39;NIRISS SOSS_Or1&#39;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">thru_dict</span> <span class="o">=</span> <span class="n">get_thruput</span><span class="p">(</span><span class="s1">&#39;NIRISS SOSS&#39;</span><span class="p">,</span> <span class="n">niriss</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -390,10 +397,10 @@ values from Pandeia.</p></li>
 <dt class="sig sig-object py" id="pandexo.engine.justdoit.grid_options">
 <span class="sig-prename descclassname"><span class="pre">pandexo.engine.justdoit.</span></span><span class="sig-name descname"><span class="pre">grid_options</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fortney'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pandexo/engine/justdoit.html#grid_options"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pandexo.engine.justdoit.grid_options" title="Link to this definition"></a></dt>
 <dd><p>Function to show available grid options</p>
-<p>PandExo now supports various grid options. Currently, the only one that is availalbe
+<p>PandExo now supports various grid options. Currently, the only one that is available
 is the Fortney grid for giant planets. We will be implementing others, as they
 become available. It will become increasingly difficult for users to see what
-options are availalbe to them. This function should guide users to choose
+options are available to them. This function should guide users to choose
 the grid that best fits their needs.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -404,7 +411,7 @@ the grid that best fits their needs.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pandexo.engine.justdoit.load_exo_dict">
-<span class="sig-prename descclassname"><span class="pre">pandexo.engine.justdoit.</span></span><span class="sig-name descname"><span class="pre">load_exo_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">planet_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pl_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pandexo/engine/justdoit.html#load_exo_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pandexo.engine.justdoit.load_exo_dict" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">pandexo.engine.justdoit.</span></span><span class="sig-name descname"><span class="pre">load_exo_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">planet_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pl_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pandexo/engine/justdoit.html#load_exo_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pandexo.engine.justdoit.load_exo_dict" title="Link to this definition"></a></dt>
 <dd><p>Loads in empty exoplanet dictionary for pandexo input</p>
 <p>Loads in empty exoplanet dictionary so that the user can manually edit different planet
 parameters. Must be done for every bash run. User must edit each keys within the dictionary.</p>
@@ -443,7 +450,7 @@ dictionary for a specific instrument mode.</p>
 use <cite>print_instruments()</cite></p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Filled out template of instrument dictionary, which can be editted before
+<dd class="field-even"><p>Filled out template of instrument dictionary, which can be edited before
 running to PandExo (not required).</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
@@ -491,7 +498,7 @@ looped through.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pandexo.engine.justdoit.run_pandexo">
-<span class="sig-prename descclassname"><span class="pre">pandexo.engine.justdoit.</span></span><span class="sig-name descname"><span class="pre">run_pandexo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_space</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'/Users/tbell/Functional/PandExo/docs'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_cores</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">16</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pandexo/engine/justdoit.html#run_pandexo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pandexo.engine.justdoit.run_pandexo" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">pandexo.engine.justdoit.</span></span><span class="sig-name descname"><span class="pre">run_pandexo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_space</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_cores</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pandexo/engine/justdoit.html#run_pandexo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pandexo.engine.justdoit.run_pandexo" title="Link to this definition"></a></dt>
 <dd><p>Submits multiple runs of pandexo in parallel.</p>
 <p>Functionality: program contains functionality for running single or
 multiple runs of PandExo</p>
@@ -499,33 +506,41 @@ multiple runs of PandExo</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>exo</strong> (<em>dict</em>) – exoplanet input dictionary</p></li>
-<li><p><strong>inst</strong> (<em>dict</em><em> or </em><em>str</em><em> or </em><em>list</em><em> of </em><em>str</em>) – instrument input dictionary OR LIST of keys (for allowable keys see <cite>print_instruments()</cite></p></li>
-<li><p><strong>param_space</strong> (<em>str</em><em> or </em><em>0</em>) – (Optional) Default is 0 = no exoplanet parameter space. To run through a parameter
-specify which one need to specify two keys from exo dict with + in between.
-i.e. observation+fraction
-star+temp
-planet+exopath</p></li>
-<li><p><strong>param_range</strong> (<em>list</em><em> of </em><em>str</em><em> or </em><em>list</em><em> of </em><em>float</em>) – (Optional) Default = 0 An array or list over which to run the parameters space.
-i.e. array of temperatures if running through stellar temp or
-array of files if running through planet models. Must specify param_space
-if using this.</p></li>
+<li><p><strong>inst</strong> (<em>dict</em><em> or </em><em>list</em><em> of </em><em>str</em>) – Instrument input dictionary or a list of instrument keys. For allowable
+keys, see <code class="docutils literal notranslate"><span class="pre">print_instruments()</span></code>.</p></li>
+<li><p><strong>param_space</strong> (<em>str</em><em> or </em><em>0</em>) – (Optional) Default is 0 = no exoplanet parameter space. To run through
+a parameter, specify two exoplanet dictionary keys separated by <code class="docutils literal notranslate"><span class="pre">+</span></code>;
+for example, <code class="docutils literal notranslate"><span class="pre">observation+fraction</span></code>, <code class="docutils literal notranslate"><span class="pre">star+temp</span></code>, or
+<code class="docutils literal notranslate"><span class="pre">planet+exopath</span></code>.</p></li>
+<li><p><strong>param_range</strong> (<em>list</em><em> of </em><em>str</em><em> or </em><em>list</em><em> of </em><em>float</em>) – (Optional) Default = 0. Array or list over which to run parameter
+space, such as temperatures for <code class="docutils literal notranslate"><span class="pre">star+temp</span></code> or files for
+<code class="docutils literal notranslate"><span class="pre">planet+exopath</span></code>. Requires <code class="docutils literal notranslate"><span class="pre">param_space</span></code>.</p></li>
 <li><p><strong>save_file</strong> (<em>bool</em>) – (Optional) Default = True saves file, False does not</p></li>
-<li><p><strong>output_path</strong> (<em>str</em>) – (Optional) Defaults to current working directory</p></li>
-<li><p><strong>output_file</strong> (<em>str</em>) – (Optional) Default is “singlerun.p” for single runs, “param_space.p” for exo parameter runs
-or “instrument_run.p” for instrument parameter space runs.</p></li>
-<li><p><strong>verbose</strong> (<em>bool</em>) – (Optional) For single runs, if false, it turns off all print statements. For parameter space
-runs it is defaulted to never print statements out.</p></li>
+<li><p><strong>output_path</strong> (<em>str</em><em> or </em><em>path-like</em><em>, </em><em>optional</em>) – Directory for saved output. Defaults to the current working directory
+when the function is called.</p></li>
+<li><p><strong>output_file</strong> (<em>str</em>) – (Optional) Default is <code class="docutils literal notranslate"><span class="pre">singlerun.p</span></code> for single runs,
+<code class="docutils literal notranslate"><span class="pre">param_space.p</span></code> for exoplanet parameter runs, or
+<code class="docutils literal notranslate"><span class="pre">instrument_run.p</span></code> for instrument runs.</p></li>
+<li><p><strong>num_cores</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of parallel worker processes. Defaults to the CPU count when the
+function is called.</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em>) – (Optional) Turns off print statements for single runs when false.
+Parameter-space runs are quiet by default.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>For single run output will just be a single PandExo output dictionary
-as described in the JWST Output Dictionary documentation.
-For multiple runs the output will be organized into a list with each
-a dictionary named by whatever you are looping through
-i.e. [{‘First temp’: PandExoDict}, {‘Second temp’: PandExoDict}, etc..]</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dict</p>
+<dd class="field-even"><p><ul class="simple">
+<li><p><em>dict</em> – PandExo result for an instrument dictionary or a one-element list of
+named instruments without a parameter range.</p></li>
+<li><p><em>list of dict</em> – Results for an exoplanet parameter-space run, multiple named
+instruments, or <code class="docutils literal notranslate"><span class="pre">['RUN</span> <span class="pre">ALL']</span></code>. Each element is a one-key dictionary
+whose value is a PandExo result. Parameter-space keys are the basename
+of each <code class="docutils literal notranslate"><span class="pre">param_range</span></code> value; instrument runs are keyed by instrument
+name. List order matches <code class="docutils literal notranslate"><span class="pre">param_range</span></code>, the supplied instrument list,
+or the <code class="docutils literal notranslate"><span class="pre">ALL</span></code> instrument order, respectively.</p></li>
+<li><p><em>None</em> – Returned after printing input guidance when <code class="docutils literal notranslate"><span class="pre">inst</span></code> is neither a
+dictionary nor a list.</p></li>
+</ul>
+</p>
 </dd>
 </dl>
 <p class="rubric">Example</p>
@@ -578,7 +593,7 @@ looped through.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="pandexo.engine.justdoit.subarrays">
 <span class="sig-prename descclassname"><span class="pre">pandexo.engine.justdoit.</span></span><span class="sig-name descname"><span class="pre">subarrays</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inst</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pandexo/engine/justdoit.html#subarrays"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pandexo.engine.justdoit.subarrays" title="Link to this definition"></a></dt>
-<dd><p>function to show availalble subarrays and their times (in secons)</p>
+<dd><p>Show available subarrays and their frame times in seconds.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>inst</strong> (<em>str</em>) – string of either niriss, nirspec, miri or nircam</p>
@@ -592,6 +607,9 @@ looped through.</p>
 </dl>
 </dd></dl>
 
+</section>
+<section id="plotting-helpers">
+<h2>Plotting Helpers<a class="headerlink" href="#plotting-helpers" title="Link to this heading"></a></h2>
 </section>
 <section id="module-pandexo.engine.justplotit">
 <span id="pandexo-engine-justplotit"></span><h2>pandexo.engine.justplotit<a class="headerlink" href="#module-pandexo.engine.justplotit" title="Link to this heading"></a></h2>
@@ -722,7 +740,7 @@ looped through.</p>
 <li><p><strong>result_dict</strong> (<em>dict</em>) – Dictionary from pandexo output. If parameter space was run in run_pandexo
 make sure to restructure the input as a list of dictionaries without they key words
 that run_pandexo assigns.</p></li>
-<li><p><strong>plot</strong> (<em>bool</em>) – (Optional) True renders plot, Flase does not. Default=True</p></li>
+<li><p><strong>plot</strong> (<em>bool</em>) – (Optional) True renders a plot; False does not. Default=True</p></li>
 <li><p><strong>output_file</strong> (<em>str</em>) – (Optional) Default = bkt.html</p></li>
 </ul>
 </dd>
@@ -750,7 +768,7 @@ that run_pandexo assigns.</p></li>
 <li><p><strong>result_dict</strong> (<em>dict</em>) – Dictionary from pandexo output. If parameter space was run in run_pandexo
 make sure to restructure the input as a list of dictionaries without they key words
 that run_pandexo assigns.</p></li>
-<li><p><strong>plot</strong> (<em>bool</em>) – (Optional) True renders plot, Flase does not. Default=True</p></li>
+<li><p><strong>plot</strong> (<em>bool</em>) – (Optional) True renders a plot; False does not. Default=True</p></li>
 <li><p><strong>output_file</strong> (<em>str</em>) – (Optional) Default = ‘flux.html’</p></li>
 </ul>
 </dd>
@@ -778,7 +796,7 @@ that run_pandexo assigns.</p></li>
 <li><p><strong>result_dict</strong> (<em>dict</em>) – Dictionary from pandexo output. If parameter space was run in run_pandexo
 make sure to restructure the input as a list of dictionaries without they key words
 that run_pandexo assigns.</p></li>
-<li><p><strong>plot</strong> (<em>bool</em>) – (Optional) True renders plot, Flase does not. Default=True</p></li>
+<li><p><strong>plot</strong> (<em>bool</em>) – (Optional) True renders a plot; False does not. Default=True</p></li>
 <li><p><strong>output_file</strong> (<em>str</em>) – (Optional) Default = ‘snr.html’</p></li>
 </ul>
 </dd>
@@ -856,7 +874,7 @@ to the first dictionary input, x[1] to the second, etc.</p>
 <li><p><strong>result_dict</strong> (<em>dict</em>) – Dictionary from pandexo output. If parameter space was run in run_pandexo
 make sure to restructure the input as a list of dictionaries without they key words
 that run_pandexo assigns.</p></li>
-<li><p><strong>plot</strong> (<em>bool</em>) – (Optional) True renders plot, Flase does not. Default=True</p></li>
+<li><p><strong>plot</strong> (<em>bool</em>) – (Optional) True renders a plot; False does not. Default=True</p></li>
 <li><p><strong>output_file</strong> (<em>str</em>) – (Optional) Default = ‘det2d.html’</p></li>
 </ul>
 </dd>
@@ -883,7 +901,7 @@ that run_pandexo assigns.</p></li>
 <li><p><strong>result_dict</strong> (<em>dict</em>) – Dictionary from pandexo output. If parameter space was run in run_pandexo
 make sure to restructure the input as a list of dictionaries without they key words
 that run_pandexo assigns.</p></li>
-<li><p><strong>plot</strong> (<em>bool</em>) – (Optional) True renders plot, Flase does not. Default=True</p></li>
+<li><p><strong>plot</strong> (<em>bool</em>) – (Optional) True renders a plot; False does not. Default=True</p></li>
 <li><p><strong>output_file</strong> (<em>str</em>) – (Optional) Default = ‘sat2d.html’</p></li>
 </ul>
 </dd>
@@ -910,7 +928,7 @@ that run_pandexo assigns.</p></li>
 <li><p><strong>result_dict</strong> (<em>dict</em>) – Dictionary from pandexo output. If parameter space was run in run_pandexo
 make sure to restructure the input as a list of dictionaries without they key words
 that run_pandexo assigns.</p></li>
-<li><p><strong>plot</strong> (<em>bool</em>) – (Optional) True renders plot, Flase does not. Default=True</p></li>
+<li><p><strong>plot</strong> (<em>bool</em>) – (Optional) True renders a plot; False does not. Default=True</p></li>
 <li><p><strong>output_file</strong> (<em>str</em>) – (Optional) Default = ‘noise.html’</p></li>
 </ul>
 </dd>
@@ -1112,6 +1130,90 @@ bin_n : number of points contained in each bin</p>
 </div>
 </dd></dl>
 
+</section>
+<section id="configuration-helpers">
+<h2>Configuration Helpers<a class="headerlink" href="#configuration-helpers" title="Link to this heading"></a></h2>
+</section>
+<section id="module-pandexo.engine.load_modes">
+<span id="pandexo-engine-load-modes"></span><h2>pandexo.engine.load_modes<a class="headerlink" href="#module-pandexo.engine.load_modes" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pandexo.engine.load_modes.SetDefaultModes">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pandexo.engine.load_modes.</span></span><span class="sig-name descname"><span class="pre">SetDefaultModes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inst</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pandexo/engine/load_modes.html#SetDefaultModes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pandexo.engine.load_modes.SetDefaultModes" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class to load default instrument mode dicts</p>
+<p>This class contains functionality for loading observing modes for exoplanet observations
+This is NOT a complete set of ALL possibleobserving modes. Instead, it offers a starting point for
+choosing one instrument specification. There is one function for each instrument. For example,
+It sets slitless mode for MIRI LRS. If users are interested in other specific observation modes
+they should load in the dictionary and then edit individual keys.</p>
+<dl class="simple">
+<dt>Included modes are:</dt><dd><ul class="simple">
+<li><p>“MIRI LRS”</p></li>
+<li><p>“NIRISS SOSS”</p></li>
+<li><p>“NIRSpec G140M”</p></li>
+<li><p>“NIRSpec G140H”</p></li>
+<li><p>“NIRSpec G235M”</p></li>
+<li><p>“NIRSpec G235H”</p></li>
+<li><p>“NIRSpec G395M”</p></li>
+<li><p>“NIRSpec G395H”</p></li>
+<li><p>“NIRSpec Prism”</p></li>
+<li><p>“NIRCam F322W2”</p></li>
+<li><p>“NIRCam F444W”</p></li>
+<li><p>“NIRCam DHS”</p></li>
+<li><p>“WFC3 G102”</p></li>
+<li><p>“WFC3 G141”</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>inst</strong> (<em>str</em>) – Allowable strings listed above</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pandexo.engine.load_modes.SetDefaultModes.miri">
+<span class="sig-name descname"><span class="pre">miri</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pandexo/engine/load_modes.html#SetDefaultModes.miri"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pandexo.engine.load_modes.SetDefaultModes.miri" title="Link to this definition"></a></dt>
+<dd><p>Handles MIRI template</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pandexo.engine.load_modes.SetDefaultModes.nircam">
+<span class="sig-name descname"><span class="pre">nircam</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pandexo/engine/load_modes.html#SetDefaultModes.nircam"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pandexo.engine.load_modes.SetDefaultModes.nircam" title="Link to this definition"></a></dt>
+<dd><p>Handles NIRCam template</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pandexo.engine.load_modes.SetDefaultModes.niriss">
+<span class="sig-name descname"><span class="pre">niriss</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pandexo/engine/load_modes.html#SetDefaultModes.niriss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pandexo.engine.load_modes.SetDefaultModes.niriss" title="Link to this definition"></a></dt>
+<dd><p>Handles NIRISS template</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pandexo.engine.load_modes.SetDefaultModes.nirspec">
+<span class="sig-name descname"><span class="pre">nirspec</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pandexo/engine/load_modes.html#SetDefaultModes.nirspec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pandexo.engine.load_modes.SetDefaultModes.nirspec" title="Link to this definition"></a></dt>
+<dd><p>Handles NIRSpec template</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pandexo.engine.load_modes.SetDefaultModes.pick">
+<span class="sig-name descname"><span class="pre">pick</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pandexo/engine/load_modes.html#SetDefaultModes.pick"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pandexo.engine.load_modes.SetDefaultModes.pick" title="Link to this definition"></a></dt>
+<dd><p>Points to specific instrument based on key choice</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pandexo.engine.load_modes.SetDefaultModes.wfc3">
+<span class="sig-name descname"><span class="pre">wfc3</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pandexo/engine/load_modes.html#SetDefaultModes.wfc3"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pandexo.engine.load_modes.SetDefaultModes.wfc3" title="Link to this definition"></a></dt>
+<dd><p>Handles WFC3 template</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="advanced-and-internal-modules">
+<h2>Advanced and Internal Modules<a class="headerlink" href="#advanced-and-internal-modules" title="Link to this heading"></a></h2>
+<p>These modules support PandExo’s calculation engine and web application. Their
+interfaces may change between releases; use <code class="docutils literal notranslate"><span class="pre">pandexo.engine.justdoit</span></code> for
+new scripts when possible.</p>
 </section>
 <section id="module-pandexo.engine.run_online">
 <span id="pandexo-engine-run-online"></span><h2>pandexo.engine.run_online<a class="headerlink" href="#module-pandexo.engine.run_online" title="Link to this heading"></a></h2>
@@ -2918,81 +3020,6 @@ per-stripe fraction of that time once per real integration.</p>
 <dt class="sig sig-object py" id="pandexo.engine.jwst.validate_saturation_state">
 <span class="sig-prename descclassname"><span class="pre">pandexo.engine.jwst.</span></span><span class="sig-name descname"><span class="pre">validate_saturation_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pand_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extracted_noise</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pandexo/engine/jwst.html#validate_saturation_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pandexo.engine.jwst.validate_saturation_state" title="Link to this definition"></a></dt>
 <dd><p>Warn on partial saturation and fail when no spectral channel is usable.</p>
-</dd></dl>
-
-</section>
-<section id="module-pandexo.engine.load_modes">
-<span id="pandexo-engine-load-modes"></span><h2>pandexo.engine.load_modes<a class="headerlink" href="#module-pandexo.engine.load_modes" title="Link to this heading"></a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="pandexo.engine.load_modes.SetDefaultModes">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pandexo.engine.load_modes.</span></span><span class="sig-name descname"><span class="pre">SetDefaultModes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inst</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pandexo/engine/load_modes.html#SetDefaultModes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pandexo.engine.load_modes.SetDefaultModes" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Class to load default instrument mode dicts</p>
-<p>This class contains functionality for loading observing modes for exoplanet observations
-This is NOT a complete set of ALL possibleobserving modes. Instead, it offers a starting point for
-choosing one instrument specification. There is one function for each instrument. For example,
-It sets slitless mode for MIRI LRS. If users are interested in other specific observation modes
-they should load in the dictionary and then edit individual keys.</p>
-<dl class="simple">
-<dt>Included modes are:</dt><dd><ul class="simple">
-<li><p>“MIRI LRS”</p></li>
-<li><p>“NIRISS SOSS”</p></li>
-<li><p>“NIRSpec G140M”</p></li>
-<li><p>“NIRSpec G140H”</p></li>
-<li><p>“NIRSpec G235M”</p></li>
-<li><p>“NIRSpec G235H”</p></li>
-<li><p>“NIRSpec G395M”</p></li>
-<li><p>“NIRSpec G395H”</p></li>
-<li><p>“NIRSpec Prism”</p></li>
-<li><p>“NIRCam F322W2”</p></li>
-<li><p>“NIRCam F444W”</p></li>
-<li><p>“NIRCam DHS”</p></li>
-<li><p>“WFC3 G102”</p></li>
-<li><p>“WFC3 G141”</p></li>
-</ul>
-</dd>
-</dl>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>inst</strong> (<em>str</em>) – Allowable strings listed above</p>
-</dd>
-</dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="pandexo.engine.load_modes.SetDefaultModes.miri">
-<span class="sig-name descname"><span class="pre">miri</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pandexo/engine/load_modes.html#SetDefaultModes.miri"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pandexo.engine.load_modes.SetDefaultModes.miri" title="Link to this definition"></a></dt>
-<dd><p>Handles MIRI template</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pandexo.engine.load_modes.SetDefaultModes.nircam">
-<span class="sig-name descname"><span class="pre">nircam</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pandexo/engine/load_modes.html#SetDefaultModes.nircam"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pandexo.engine.load_modes.SetDefaultModes.nircam" title="Link to this definition"></a></dt>
-<dd><p>Handles NIRCam template</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pandexo.engine.load_modes.SetDefaultModes.niriss">
-<span class="sig-name descname"><span class="pre">niriss</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pandexo/engine/load_modes.html#SetDefaultModes.niriss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pandexo.engine.load_modes.SetDefaultModes.niriss" title="Link to this definition"></a></dt>
-<dd><p>Handles NIRISS template</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pandexo.engine.load_modes.SetDefaultModes.nirspec">
-<span class="sig-name descname"><span class="pre">nirspec</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pandexo/engine/load_modes.html#SetDefaultModes.nirspec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pandexo.engine.load_modes.SetDefaultModes.nirspec" title="Link to this definition"></a></dt>
-<dd><p>Handles NIRSpec template</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pandexo.engine.load_modes.SetDefaultModes.pick">
-<span class="sig-name descname"><span class="pre">pick</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pandexo/engine/load_modes.html#SetDefaultModes.pick"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pandexo.engine.load_modes.SetDefaultModes.pick" title="Link to this definition"></a></dt>
-<dd><p>Points to specific instrument based on key choice</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pandexo.engine.load_modes.SetDefaultModes.wfc3">
-<span class="sig-name descname"><span class="pre">wfc3</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pandexo/engine/load_modes.html#SetDefaultModes.wfc3"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pandexo.engine.load_modes.SetDefaultModes.wfc3" title="Link to this definition"></a></dt>
-<dd><p>Handles WFC3 template</p>
-</dd></dl>
-
 </dd></dl>
 
 </section>

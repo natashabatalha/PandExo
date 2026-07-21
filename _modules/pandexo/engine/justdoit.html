@@ -45,10 +45,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../installation.html#installation-with-pip-or-git">Installation with Pip or Git</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../installation.html#final-test-for-success">Final Test for Success</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../installation.html#the-importance-of-upgrading-pandexo">The Importance of Upgrading PandExo</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../installation_windows.html">Windows Installing Guide for PandExo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation_windows.html">Windows Installation Guide for PandExo</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorialjwst.html">JWST Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../jwstinput.html">Possible Instrument Input Params</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../jwstdict.html">Py Dict Structure of JWST Output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../jwstinput.html">Instrument Configuration Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../jwstdict.html">JWST Output Dictionary</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorialhst.html">HST Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../engine.html">API Reference</a></li>
 </ul>
@@ -112,8 +112,6 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">astropy.units</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">u</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
 
-<span class="n">user_cores</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">()</span>
-
 <span class="n">ALL</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;WFC3 G141&quot;</span><span class="p">:</span><span class="kc">False</span><span class="p">,</span>
        <span class="s2">&quot;MIRI LRS&quot;</span><span class="p">:</span><span class="kc">False</span><span class="p">,</span>
        <span class="s2">&quot;NIRISS SOSS&quot;</span><span class="p">:</span><span class="kc">False</span><span class="p">,</span>
@@ -166,7 +164,7 @@
 
 <div class="viewcode-block" id="load_exo_dict">
 <a class="viewcode-back" href="../../../engine.html#pandexo.engine.justdoit.load_exo_dict">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">load_exo_dict</span><span class="p">(</span><span class="n">planet_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">pl_kwargs</span><span class="o">=</span><span class="p">{}):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">load_exo_dict</span><span class="p">(</span><span class="n">planet_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pl_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Loads in empty exoplanet dictionary for pandexo input</span>
 
 <span class="sd">    Loads in empty exoplanet dictionary so that the user can manually edit different planet</span>
@@ -191,8 +189,11 @@
 <span class="sd">    &gt;&gt;&gt; exo_dict = load_exo_dict()</span>
 <span class="sd">    &gt;&gt;&gt; exo_dict[&#39;planet&#39;][&#39;transit_duration&#39;] = 2*60*60 #2 hours</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">pl_kwargs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">pl_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
+
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s2">&quot;reference&quot;</span><span class="p">,</span>
-                               <span class="s2">&quot;exo_input.json&quot;</span><span class="p">))</span> <span class="k">as</span> <span class="n">data_file</span><span class="p">:</span>
+                           <span class="s2">&quot;exo_input.json&quot;</span><span class="p">))</span> <span class="k">as</span> <span class="n">data_file</span><span class="p">:</span>
         <span class="n">pandexo_input</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">data_file</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">planet_name</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">)):</span>
@@ -303,7 +304,7 @@
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    dict</span>
-<span class="sd">        Filled out template of instrument dictionary, which can be editted before</span>
+<span class="sd">        Filled out template of instrument dictionary, which can be edited before</span>
 <span class="sd">        running to PandExo (not required).</span>
 
 <span class="sd">    Example</span>
@@ -333,10 +334,10 @@
 <span class="sd">        (Optional) for NIRSpec G140M/H there are two available filters (f100lp and f070lp)</span>
 <span class="sd">        if you are selecting G140M or G140H, this allows you to pick which one</span>
 <span class="sd">    wmin : str / float</span>
-<span class="sd">        (Optional) minimum wavlength to compute PCE across, &#39;default&#39; will use</span>
+<span class="sd">        (Optional) minimum wavelength to compute PCE across; &#39;default&#39; uses</span>
 <span class="sd">        values from Pandeia.</span>
 <span class="sd">    wmax : str / float</span>
-<span class="sd">        (Optional) maximum wavlength to compute PCE across, &#39;default&#39; will use</span>
+<span class="sd">        (Optional) maximum wavelength to compute PCE across; &#39;default&#39; uses</span>
 <span class="sd">        values from Pandeia.</span>
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -345,7 +346,7 @@
 
 <span class="sd">    Example</span>
 <span class="sd">    -------</span>
-<span class="sd">    &gt;&gt;&gt; thru_dict = get_thruput(&#39;NIRISS SOSS_Or1&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; thru_dict = get_thruput(&#39;NIRISS SOSS&#39;, niriss=1)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1">#pull correct dictionary</span>
@@ -457,8 +458,17 @@
 
 <div class="viewcode-block" id="run_pandexo">
 <a class="viewcode-back" href="../../../engine.html#pandexo.engine.justdoit.run_pandexo">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">run_pandexo</span><span class="p">(</span><span class="n">exo</span><span class="p">,</span> <span class="n">inst</span><span class="p">,</span> <span class="n">param_space</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">param_range</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span><span class="n">save_file</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-                            <span class="n">output_path</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="n">output_file</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span><span class="n">num_cores</span><span class="o">=</span><span class="n">user_cores</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">run_pandexo</span><span class="p">(</span>
+    <span class="n">exo</span><span class="p">,</span>
+    <span class="n">inst</span><span class="p">,</span>
+    <span class="n">param_space</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">param_range</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">save_file</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">output_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">output_file</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+    <span class="n">num_cores</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Submits multiple runs of pandexo in parallel.</span>
 
 <span class="sd">    Functionality: program contains functionality for running single or</span>
@@ -468,38 +478,49 @@
 <span class="sd">    ----------</span>
 <span class="sd">    exo : dict</span>
 <span class="sd">        exoplanet input dictionary</span>
-<span class="sd">    inst : dict or str or list of str</span>
-<span class="sd">        instrument input dictionary OR LIST of keys (for allowable keys see `print_instruments()`</span>
+<span class="sd">    inst : dict or list of str</span>
+<span class="sd">        Instrument input dictionary or a list of instrument keys. For allowable</span>
+<span class="sd">        keys, see ``print_instruments()``.</span>
 <span class="sd">    param_space : str or 0</span>
-<span class="sd">        (Optional) Default is 0 = no exoplanet parameter space. To run through a parameter</span>
-<span class="sd">        specify which one need to specify two keys from exo dict with + in between.</span>
-<span class="sd">        i.e. observation+fraction</span>
-<span class="sd">        star+temp</span>
-<span class="sd">        planet+exopath</span>
+<span class="sd">        (Optional) Default is 0 = no exoplanet parameter space. To run through</span>
+<span class="sd">        a parameter, specify two exoplanet dictionary keys separated by ``+``;</span>
+<span class="sd">        for example, ``observation+fraction``, ``star+temp``, or</span>
+<span class="sd">        ``planet+exopath``.</span>
 <span class="sd">    param_range : list of str or list of float</span>
-<span class="sd">        (Optional) Default = 0 An array or list over which to run the parameters space.</span>
-<span class="sd">        i.e. array of temperatures if running through stellar temp or</span>
-<span class="sd">        array of files if running through planet models. Must specify param_space</span>
-<span class="sd">        if using this.</span>
+<span class="sd">        (Optional) Default = 0. Array or list over which to run parameter</span>
+<span class="sd">        space, such as temperatures for ``star+temp`` or files for</span>
+<span class="sd">        ``planet+exopath``. Requires ``param_space``.</span>
 <span class="sd">    save_file : bool</span>
 <span class="sd">        (Optional) Default = True saves file, False does not</span>
-<span class="sd">    output_path : str</span>
-<span class="sd">        (Optional) Defaults to current working directory</span>
+<span class="sd">    output_path : str or path-like, optional</span>
+<span class="sd">        Directory for saved output. Defaults to the current working directory</span>
+<span class="sd">        when the function is called.</span>
 <span class="sd">    output_file : str</span>
-<span class="sd">        (Optional) Default is &quot;singlerun.p&quot; for single runs, &quot;param_space.p&quot; for exo parameter runs</span>
-<span class="sd">        or &quot;instrument_run.p&quot; for instrument parameter space runs.</span>
-<span class="sd">    verbose : bool </span>
-<span class="sd">        (Optional) For single runs, if false, it turns off all print statements. For parameter space </span>
-<span class="sd">        runs it is defaulted to never print statements out.</span>
+<span class="sd">        (Optional) Default is ``singlerun.p`` for single runs,</span>
+<span class="sd">        ``param_space.p`` for exoplanet parameter runs, or</span>
+<span class="sd">        ``instrument_run.p`` for instrument runs.</span>
+<span class="sd">    num_cores : int, optional</span>
+<span class="sd">        Number of parallel worker processes. Defaults to the CPU count when the</span>
+<span class="sd">        function is called.</span>
+<span class="sd">    verbose : bool</span>
+<span class="sd">        (Optional) Turns off print statements for single runs when false.</span>
+<span class="sd">        Parameter-space runs are quiet by default.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    dict</span>
-<span class="sd">        For single run output will just be a single PandExo output dictionary</span>
-<span class="sd">        as described in the JWST Output Dictionary documentation.</span>
-<span class="sd">        For multiple runs the output will be organized into a list with each</span>
-<span class="sd">        a dictionary named by whatever you are looping through</span>
-<span class="sd">        i.e. [{&#39;First temp&#39;: PandExoDict}, {&#39;Second temp&#39;: PandExoDict}, etc..]</span>
+<span class="sd">        PandExo result for an instrument dictionary or a one-element list of</span>
+<span class="sd">        named instruments without a parameter range.</span>
+<span class="sd">    list of dict</span>
+<span class="sd">        Results for an exoplanet parameter-space run, multiple named</span>
+<span class="sd">        instruments, or ``[&#39;RUN ALL&#39;]``. Each element is a one-key dictionary</span>
+<span class="sd">        whose value is a PandExo result. Parameter-space keys are the basename</span>
+<span class="sd">        of each ``param_range`` value; instrument runs are keyed by instrument</span>
+<span class="sd">        name. List order matches ``param_range``, the supplied instrument list,</span>
+<span class="sd">        or the ``ALL`` instrument order, respectively.</span>
+<span class="sd">    None</span>
+<span class="sd">        Returned after printing input guidance when ``inst`` is neither a</span>
+<span class="sd">        dictionary nor a list.</span>
 
 <span class="sd">    Example</span>
 <span class="sd">    -------</span>
@@ -516,6 +537,11 @@
 <span class="sd">    &gt;&gt;&gt; a = run_pandexo(exo_dict, [&#39;NIRSpec G395M&#39;],</span>
 <span class="sd">            param_space =&#39;star+mag&#39;,param_range = np.linspace(6,10,5))</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">output_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">output_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">num_cores</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">num_cores</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">()</span>
 
     <span class="c1">#single instrument mode with dictionary input OR single planet</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">inst</span><span class="p">)</span> <span class="o">==</span> <span class="nb">dict</span><span class="p">:</span>
@@ -600,7 +626,7 @@
 <div class="viewcode-block" id="subarrays">
 <a class="viewcode-back" href="../../../engine.html#pandexo.engine.justdoit.subarrays">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">subarrays</span><span class="p">(</span><span class="n">inst</span><span class="p">):</span>
-<span class="w">  </span><span class="sd">&quot;&quot;&quot;function to show availalble subarrays and their times (in secons)</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;Show available subarrays and their frame times in seconds.</span>
 
 <span class="sd">  Parameters</span>
 <span class="sd">  ----------</span>
@@ -647,7 +673,7 @@
 <span class="sd">  Returns</span>
 <span class="sd">  -------</span>
 <span class="sd">  list</span>
-<span class="sd">    lsit with available dispersers</span>
+<span class="sd">    List of available dispersers.</span>
 <span class="sd">  &quot;&quot;&quot;</span>
   <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Dispersers field stored in inst_dict[&#39;configuration&#39;][&#39;instrument&#39;][&#39;disperser&#39;]&quot;</span><span class="p">)</span>
   <span class="k">if</span> <span class="n">inst</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;niriss&#39;</span><span class="p">:</span>
@@ -665,7 +691,7 @@
 <div class="viewcode-block" id="filters">
 <a class="viewcode-back" href="../../../engine.html#pandexo.engine.justdoit.filters">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">filters</span><span class="p">(</span><span class="n">inst</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Function to show availalbe filters</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Show available filters.</span>
 
 <span class="sd">  Parameters</span>
 <span class="sd">  ----------</span>
@@ -675,7 +701,7 @@
 <span class="sd">  Returns</span>
 <span class="sd">  -------</span>
 <span class="sd">  list</span>
-<span class="sd">    list with availalbe filters</span>
+<span class="sd">    List of available filters.</span>
 <span class="sd">  &quot;&quot;&quot;</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Filters field stored in inst_dict[&#39;configuration&#39;][&#39;instrument&#39;][&#39;filter&#39;]&quot;</span><span class="p">)</span>
 
@@ -697,10 +723,10 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">grid_options</span><span class="p">(</span><span class="n">grid</span> <span class="o">=</span> <span class="s1">&#39;fortney&#39;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Function to show available grid options</span>
 
-<span class="sd">    PandExo now supports various grid options. Currently, the only one that is availalbe</span>
+<span class="sd">    PandExo now supports various grid options. Currently, the only one that is available</span>
 <span class="sd">    is the Fortney grid for giant planets. We will be implementing others, as they</span>
 <span class="sd">    become available. It will become increasingly difficult for users to see what</span>
-<span class="sd">    options are availalbe to them. This function should guide users to choose</span>
+<span class="sd">    options are available to them. This function should guide users to choose</span>
 <span class="sd">    the grid that best fits their needs.</span>
 
 <span class="sd">    Parameters</span>
