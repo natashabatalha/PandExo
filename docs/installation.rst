@@ -134,20 +134,31 @@ the same shell startup file and source that file again:
 Installation with Pip or Git
 ============================
 
-Install with pip: 
+Install PandExo in a dedicated virtual environment so its dependencies do not
+affect other projects. For example, with Python's built-in ``venv``:
+
+.. code-block:: bash
+
+    python -m venv pandexo-env
+    source pandexo-env/bin/activate
+
+On Windows, use the conda-based instructions in :doc:`installation_windows`.
+
+Install with pip:
 
 .. code-block:: bash
 
     python -m pip install pandexo.engine
 
 
-OR Download PandExo's repository via Github. The Github also has helpful notebooks for getting started!
+Alternatively, clone PandExo from GitHub. The repository includes notebooks for
+getting started:
 
 .. code-block:: bash
 
     git clone https://github.com/natashabatalha/PandExo.git
     cd PandExo
-    python -m pip install .
+    python -m pip install -e .
 
 
 
@@ -168,7 +179,11 @@ test, install the test dependency and run the test from the repository root:
 .. code-block:: bash
 
     python -m pip install -e ".[test]"
-    python -m pytest tests/test_run.py -q
+    python -m pytest tests/test_import.py -q
+
+The full ``tests/test_run.py`` suite runs Pandeia calculations and requires the
+reference data configured above. Run it only when validating a source checkout
+with a complete local data installation.
 
 
 The Importance of Upgrading PandExo

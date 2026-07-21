@@ -32,8 +32,6 @@ from astroquery.simbad import Simbad
 import astropy.units as u
 import copy
 
-user_cores = multiprocessing.cpu_count()
-
 ALL = {"WFC3 G141":False,
        "MIRI LRS":False,
        "NIRISS SOSS":False,
@@ -78,7 +76,7 @@ def getStarName(planet_name):
     # Return trimmed string:
     return star_name.strip()
 
-def load_exo_dict(planet_name=None,pl_kwargs={}):
+def load_exo_dict(planet_name=None, pl_kwargs=None):
     """Loads in empty exoplanet dictionary for pandexo input
 
     Loads in empty exoplanet dictionary so that the user can manually edit different planet
@@ -103,8 +101,11 @@ def load_exo_dict(planet_name=None,pl_kwargs={}):
     >>> exo_dict = load_exo_dict()
     >>> exo_dict['planet']['transit_duration'] = 2*60*60 #2 hours
     """
+    if pl_kwargs is None:
+        pl_kwargs = {}
+
     with open(os.path.join(os.path.dirname(__file__), "reference",
-                               "exo_input.json")) as data_file:
+                           "exo_input.json")) as data_file:
         pandexo_input = json.load(data_file)
 
     if not isinstance(planet_name, type(None)):
@@ -212,7 +213,7 @@ def load_mode_dict(inst):
     Returns
     -------
     dict
-        Filled out template of instrument dictionary, which can be editted before
+        Filled out template of instrument dictionary, which can be edited before
         running to PandExo (not required).
 
     Example
@@ -239,10 +240,10 @@ def get_thruput(inst, niriss=1, nirspec='f100lp', wmin='default', wmax='default'
         (Optional) for NIRSpec G140M/H there are two available filters (f100lp and f070lp)
         if you are selecting G140M or G140H, this allows you to pick which one
     wmin : str / float
-        (Optional) minimum wavlength to compute PCE across, 'default' will use
+        (Optional) minimum wavelength to compute PCE across; 'default' uses
         values from Pandeia.
     wmax : str / float
-        (Optional) maximum wavlength to compute PCE across, 'default' will use
+        (Optional) maximum wavelength to compute PCE across; 'default' uses
         values from Pandeia.
     Returns
     -------
@@ -251,7 +252,7 @@ def get_thruput(inst, niriss=1, nirspec='f100lp', wmin='default', wmax='default'
 
     Example
     -------
-    >>> thru_dict = get_thruput('NIRISS SOSS_Or1')
+    >>> thru_dict = get_thruput('NIRISS SOSS', niriss=1)
     """
 
     #pull correct dictionary
@@ -354,8 +355,8 @@ def run_inst_space(inst,exo, verbose=False):
     return {inst: wrapper({"pandeia_input": inst_dict , "pandexo_input":exo}, verbose=run_verbose)}
 
 
-def run_pandexo(exo, inst, param_space = 0, param_range = 0,save_file = True,
-                            output_path=os.getcwd(), output_file = '',num_cores=user_cores, verbose=True):
+def run_pandexo(exo, inst, param_space=0, param_range=0, save_file=True,
+                output_path=None, output_file='', num_cores=None, verbose=True):
     """Submits multiple runs of pandexo in parallel.
 
     Functionality: program contains functionality for running single or
@@ -380,11 +381,15 @@ def run_pandexo(exo, inst, param_space = 0, param_range = 0,save_file = True,
         if using this.
     save_file : bool
         (Optional) Default = True saves file, False does not
-    output_path : str
-        (Optional) Defaults to current working directory
+    output_path : str or path-like, optional
+        Directory for saved output. Defaults to the current working directory
+        when the function is called.
     output_file : str
         (Optional) Default is "singlerun.p" for single runs, "param_space.p" for exo parameter runs
         or "instrument_run.p" for instrument parameter space runs.
+    num_cores : int, optional
+        Number of parallel worker processes. Defaults to the CPU count when the
+        function is called.
     verbose : bool 
         (Optional) For single runs, if false, it turns off all print statements. For parameter space 
         runs it is defaulted to never print statements out.
@@ -413,6 +418,11 @@ def run_pandexo(exo, inst, param_space = 0, param_range = 0,save_file = True,
     >>> a = run_pandexo(exo_dict, ['NIRSpec G395M'],
             param_space ='star+mag',param_range = np.linspace(6,10,5))
     """
+
+    if output_path is None:
+        output_path = os.getcwd()
+    if num_cores is None:
+        num_cores = multiprocessing.cpu_count()
 
     #single instrument mode with dictionary input OR single planet
     if type(inst) == dict:
@@ -494,7 +504,7 @@ def run_pandexo(exo, inst, param_space = 0, param_range = 0,save_file = True,
         return results
 
 def subarrays(inst):
-  """function to show availalble subarrays and their times (in secons)
+  """Show available subarrays and their frame times in seconds.
 
   Parameters
   ----------
@@ -538,7 +548,7 @@ def dispersers(inst):
   Returns
   -------
   list
-    lsit with available dispersers
+    List of available dispersers.
   """
   print("Dispersers field stored in inst_dict['configuration']['instrument']['disperser']")
   if inst.lower() == 'niriss':
@@ -553,7 +563,7 @@ def dispersers(inst):
     raise Exception("Only instruments are niriss, nirspec, miri, nircam. Pick one.")
 
 def filters(inst):
-    """Function to show availalbe filters
+    """Show available filters.
 
   Parameters
   ----------
@@ -563,7 +573,7 @@ def filters(inst):
   Returns
   -------
   list
-    list with availalbe filters
+    List of available filters.
   """
     print("Filters field stored in inst_dict['configuration']['instrument']['filter']")
 
@@ -582,10 +592,10 @@ def filters(inst):
 def grid_options(grid = 'fortney'):
     """Function to show available grid options
 
-    PandExo now supports various grid options. Currently, the only one that is availalbe
+    PandExo now supports various grid options. Currently, the only one that is available
     is the Fortney grid for giant planets. We will be implementing others, as they
     become available. It will become increasingly difficult for users to see what
-    options are availalbe to them. This function should guide users to choose
+    options are available to them. This function should guide users to choose
     the grid that best fits their needs.
 
     Parameters

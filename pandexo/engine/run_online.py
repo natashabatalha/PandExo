@@ -939,7 +939,6 @@ class CalculationNewHSTHandler(BaseHandler):
         pandata['strategy']['targetFluence'] = float(self.get_argument("targetFluence"))
 
         #import pickle as pk
-        #a = pk.load(open('/Users/natashabatalha/Desktop/JWST/testing/ui.pk','rb'))
         #pandata = a['pandeia_input']
         #exodata  = a['pandexo_input']
 

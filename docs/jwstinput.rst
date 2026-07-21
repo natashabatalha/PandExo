@@ -1,11 +1,11 @@
-Possible Instrument Input Params
-================================
+Instrument Configuration Parameters
+====================================
 
 Instrument dictionaries use Pandeia's lowercase configuration values. Load a
 template with ``jdi.load_mode_dict('NIRSpec G395H')``, then edit its
-``configuration`` keys.
-The values below are the combinations exposed by PandExo's web interface;
-confirm final timing and detector settings in the current APT.
+``configuration`` keys. The values below describe the 2026.7 PandExo release
+and the combinations exposed by its web interface; confirm final timing and
+detector settings in the current APT.
 
 NIRSpec 
 -------
@@ -57,7 +57,8 @@ Groups and readouts
 
 Set ``inst_dict['configuration']['detector']['ngroup'] = 'optimize'`` to let
 PandExo select a group count, or enter an integer valid for the selected
-Pandeia detector configuration. NIRCam and DHS templates also accept
+Pandeia detector configuration. ``optimize`` is a PandExo convenience value,
+not a native Pandeia detector value. NIRCam and DHS templates also accept
 ``readout_pattern = 'optimize'`` to account for saturation and estimated data
 excess when choosing a readout.
 

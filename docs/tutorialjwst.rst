@@ -23,7 +23,7 @@ Here you will learn how to:
 
     import warnings
     warnings.filterwarnings('ignore')
-    import pandexo.engine.justdoit as jdi # THIS IS THE HOLY GRAIL OF PANDEXO
+    import pandexo.engine.justdoit as jdi
     import pandexo.engine.justplotit as jpi
     import numpy as np
     import os
@@ -65,7 +65,7 @@ reproducible.
     exo_dict['observation']['sat_unit'] = '%'
     exo_dict['observation']['noccultations'] = 1 #number of transits
     exo_dict['observation']['R'] = None          #fixed binning. I usually suggest ZERO binning.. you can always bin later
-                                                 #without having to redo the calcualtion
+                                                 #without having to redo the calculation
     exo_dict['observation']['baseline_unit'] = 'total'  #Defines how you specify out of transit observing time
                                                         #'frac' : fraction of time in transit versus out = in/out
                                                         #'total' : total observing time (seconds)
@@ -101,28 +101,19 @@ Option 2) Input as dictionary or filename
 
 .. code:: ipython3
 
-    #Let's create a little fake stellar input
-
-    import scipy.constants as sc
+    # Create an arbitrary user-supplied stellar spectral shape. PandExo
+    # normalizes it to the magnitude and reference wavelength below.
     wl = np.linspace(0.5, 15, 3000)
-    nu = sc.c/(wl*1e-6)  # frequency in sec^-1
-    teff = 5500.0
-    planck_5500K = nu**3 / (np.exp(sc.h*nu/sc.k/teff) - 1)
 
-    #can either be dictionary input
-    starflux = {'f':planck_5500K, 'w':wl}
-    #or can be as a stellar file
-    #starflux = 'planck_5500K.dat'
-    #with open(starflux, 'w') as sf:
-    #    for w,f in zip(wl, planck_5500K):
-    #        sf.write(f'{w:.15f}   {f:.15e}\n')
+    # A user spectrum can be supplied as a dictionary or a two-column file.
+    starflux = {'f': (wl / 1.25)**-2, 'w': wl}
 
     exo_dict['star']['type'] = 'user'
     exo_dict['star']['mag'] = 10.0              #magnitude of the system
     exo_dict['star']['ref_wave'] = 1.25
     exo_dict['star']['starpath'] = starflux
     exo_dict['star']['w_unit'] = 'um'
-    exo_dict['star']['f_unit'] = 'erg/cm2/s/Hz'
+    exo_dict['star']['f_unit'] = 'jy'
 
 Edit exoplanet inputs using one of three options
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -136,14 +127,13 @@ Edit exoplanet inputs using one of three options
 
 .. code:: ipython3
 
-    exo_dict['planet']['type'] ='user'                       #tells pandexo you are uploading your own spectrum
-    exo_dict['planet']['exopath'] = 'wasp12b.txt'
+    exo_dict['planet']['type'] = 'user'                      # Upload a user spectrum.
+    wavelength = np.linspace(0.6, 5.3, 500)
+    spectrum = np.full_like(wavelength, 0.015)
+    exo_dict['planet']['exopath'] = {'f': spectrum, 'w': wavelength}
 
-    #or as a dictionary
-    #exo_dict['planet']['exopath'] = {'f':spectrum, 'w':wavelength}
-
-    exo_dict['planet']['w_unit'] = 'cm'                      #other options include "um","nm" ,"Angs", "sec" (for phase curves)
-    exo_dict['planet']['f_unit'] = 'rp^2/r*^2'               #other options are 'fp/f*'
+    exo_dict['planet']['w_unit'] = 'um'                      # Other options include nm, Angs, and sec (phase curves).
+    exo_dict['planet']['f_unit'] = 'rp^2/r*^2'               # The other option is fp/f*.
     exo_dict['planet']['transit_duration'] = 2.0*60.0*60.0   #transit duration
     exo_dict['planet']['td_unit'] = 's'                      #Any unit of time in accordance with astropy.units can be added
 
@@ -166,11 +156,10 @@ Edit exoplanet inputs using one of three options
     #exo_dict['planet']['f_unit'] = 'fp/f*'
     #exo_dict['planet']['temp'] = 1000
 
-3) Select from grid
-"""""""""""""""""""
+3) Select from a grid
+"""""""""""""""""""""
 
-NOTE: Currently only the fortney grid for hot Jupiters from Fortney+2010
-is supported. Holler though, if you want another grid supported
+Currently, PandExo supports the Fortney et al. (2010) hot-Jupiter grid.
 
 .. code:: ipython3
 
@@ -209,10 +198,9 @@ NIRSpec G140M - NIRSpec G140H - MIRI LRS - NIRISS SOSS
 
     inst_dict = jdi.load_mode_dict('NIRSpec G140H')
 
-    #loading in instrument dictionaries allow you to personalize some of
-    #the fields that are predefined in the templates. The templates have
-    #the subbarays with the lowest frame times and the readmodes with 1 frame per group.
-    #if that is not what you want. change these fields
+    # Loading an instrument dictionary lets you personalize template fields.
+    # Templates use subarrays with the lowest frame times and readout modes
+    # with one frame per group; change these fields when needed.
 
     #Try printing this out to get a feel for how it is structured:
 
@@ -287,10 +275,10 @@ the Order 2 calculation.
 Running PandExo
 ~~~~~~~~~~~~~~~
 
-You have **four options** for running PandExo. All of them are accessed
-through attribute **jdi.run_pandexo**. See examples below.
+You have **four options** for running PandExo. All use
+**jdi.run_pandexo**.
 
-``jdi.run_pandexo(exo, inst, param_space = 0, param_range = 0,save_file = True,                             output_path=os.getcwd(), output_file = '', verbose=True)``
+``jdi.run_pandexo(exo, inst, param_space=0, param_range=0, save_file=True, output_path=None, output_file='', num_cores=None, verbose=True)``
 
 Option 1- Run single instrument mode, single planet
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -316,7 +304,7 @@ If you forget which instruments are available run
     exo_dict['star']['r_unit'] = 'R_sun'
     exo_dict['planet']['f_unit'] = 'rp^2/r*^2'
 
-    result = jdi.run_pandexo(exo_dict, ['MIRI LRS'])
+    result = jdi.run_pandexo(exo_dict, ['MIRI LRS'], save_file=False)
 
 Note, you can turn off print statements with ``verbose=False``
 
@@ -334,16 +322,15 @@ precision. Here the spectrum is binned to ``R=100`` for display.
 Option 2- Run single instrument mode (with user dict), single planet
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-This is the same thing as option 1 but instead of feeding it a list of
-keys, you can feed it a instrument dictionary (this is for users who
-wanted to simulate something NOT pre defined within pandexo)
+This is the same as option 1, but it accepts an instrument dictionary so
+you can customize a supported configuration.
 
 .. code:: ipython3
 
     inst_dict = jdi.load_mode_dict('NIRSpec G140H')
-    #personalize subarray
+    # Personalize the subarray.
     inst_dict["configuration"]["detector"]["subarray"] = 'sub2048'
-    result = jdi.run_pandexo(exo_dict, inst_dict)
+    result = jdi.run_pandexo(exo_dict, inst_dict, save_file=False)
 
 Option 3- Run several modes, single planet
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -352,26 +339,25 @@ Use several modes from **print_instruments()** options.
 
 .. code:: ipython3
 
-    #choose select
+    # Choose selected modes.
     result = jdi.run_pandexo(exo_dict,['NIRSpec G140M','NIRSpec G235M','NIRSpec G395M'],
-                   output_file='three_nirspec_modes.p',verbose=True)
+                   save_file=False, verbose=True)
     #run all
     #result = jdi.run_pandexo(exo_dict, ['RUN ALL'], save_file = False)
 
 Option 4- Run single mode, several planet cases
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Use a single mode from **print_instruments()** options. But explore
-parameter space with respect to **any** parameter in the exo dict. The
-example below uses a few planet radii so the notebook remains runnable
-without external model files.
+Use a single mode from **print_instruments()** and explore parameter
+space for **any** value in the exoplanet dictionary. The example below
+uses a few planet radii so the notebook remains runnable without
+external model files.
 
-You can loop through anything in the exoplanet dictionary. It will be
-planet, star or observation followed by whatever you want to loop
-through in that set.
+Use ``planet``, ``star``, or ``observation`` followed by the key to
+vary.
 
-i.e. planet+exopath, star+temp, star+metal, star+logg,
-observation+sat_level.. etc
+For example: ``planet+exopath``, ``star+temp``, ``star+metal``,
+``star+logg``, or ``observation+sat_level``.
 
 .. code:: ipython3
 

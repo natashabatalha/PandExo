@@ -384,7 +384,7 @@ def jwst_1d_flux(result_dict, plot=True, output_file= 'flux.html'):
         make sure to restructure the input as a list of dictionaries without they key words
         that run_pandexo assigns.
     plot : bool
-        (Optional) True renders plot, Flase does not. Default=True
+        (Optional) True renders a plot; False does not. Default=True
     output_file : str
         (Optional) Default = 'flux.html'
     Return
@@ -428,7 +428,7 @@ def jwst_1d_snr(result_dict, plot=True, output_file='snr.html'):
         make sure to restructure the input as a list of dictionaries without they key words
         that run_pandexo assigns.
     plot : bool
-        (Optional) True renders plot, Flase does not. Default=True
+        (Optional) True renders a plot; False does not. Default=True
     output_file : str
         (Optional) Default = 'snr.html'
 
@@ -471,7 +471,7 @@ def jwst_1d_bkg(result_dict, plot=True, output_file='bkg.html'):
         make sure to restructure the input as a list of dictionaries without they key words
         that run_pandexo assigns.
     plot : bool
-        (Optional) True renders plot, Flase does not. Default=True
+        (Optional) True renders a plot; False does not. Default=True
     output_file : str
         (Optional) Default = bkt.html
 
@@ -512,7 +512,7 @@ def jwst_noise(result_dict, plot=True, output_file= 'noise.html'):
         make sure to restructure the input as a list of dictionaries without they key words
         that run_pandexo assigns.
     plot : bool
-        (Optional) True renders plot, Flase does not. Default=True
+        (Optional) True renders a plot; False does not. Default=True
     output_file : str
         (Optional) Default = 'noise.html'
     Return
@@ -559,7 +559,7 @@ def jwst_2d_det(result_dict, plot=True, output_file='det2d.html'):
         that run_pandexo assigns.
 
     plot : bool
-        (Optional) True renders plot, Flase does not. Default=True
+        (Optional) True renders a plot; False does not. Default=True
     output_file : str
         (Optional) Default = 'det2d.html'
 
@@ -610,7 +610,7 @@ def jwst_2d_sat(result_dict, plot=True, output_file='sat2d.html'):
         that run_pandexo assigns.
 
     plot : bool
-        (Optional) True renders plot, Flase does not. Default=True
+        (Optional) True renders a plot; False does not. Default=True
     output_file : str
         (Optional) Default = 'sat2d.html'
 
