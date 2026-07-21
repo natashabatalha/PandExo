@@ -355,8 +355,17 @@ def run_inst_space(inst,exo, verbose=False):
     return {inst: wrapper({"pandeia_input": inst_dict , "pandexo_input":exo}, verbose=run_verbose)}
 
 
-def run_pandexo(exo, inst, param_space=0, param_range=0, save_file=True,
-                output_path=None, output_file='', num_cores=None, verbose=True):
+def run_pandexo(
+    exo,
+    inst,
+    param_space=0,
+    param_range=0,
+    save_file=True,
+    output_path=None,
+    output_file='',
+    num_cores=None,
+    verbose=True,
+):
     """Submits multiple runs of pandexo in parallel.
 
     Functionality: program contains functionality for running single or
@@ -366,42 +375,49 @@ def run_pandexo(exo, inst, param_space=0, param_range=0, save_file=True,
     ----------
     exo : dict
         exoplanet input dictionary
-    inst : dict or str or list of str
-        instrument input dictionary OR LIST of keys (for allowable keys see `print_instruments()`
+    inst : dict or list of str
+        Instrument input dictionary or a list of instrument keys. For allowable
+        keys, see ``print_instruments()``.
     param_space : str or 0
-        (Optional) Default is 0 = no exoplanet parameter space. To run through a parameter
-        specify which one need to specify two keys from exo dict with + in between.
-        i.e. observation+fraction
-        star+temp
-        planet+exopath
+        (Optional) Default is 0 = no exoplanet parameter space. To run through
+        a parameter, specify two exoplanet dictionary keys separated by ``+``;
+        for example, ``observation+fraction``, ``star+temp``, or
+        ``planet+exopath``.
     param_range : list of str or list of float
-        (Optional) Default = 0 An array or list over which to run the parameters space.
-        i.e. array of temperatures if running through stellar temp or
-        array of files if running through planet models. Must specify param_space
-        if using this.
+        (Optional) Default = 0. Array or list over which to run parameter
+        space, such as temperatures for ``star+temp`` or files for
+        ``planet+exopath``. Requires ``param_space``.
     save_file : bool
         (Optional) Default = True saves file, False does not
     output_path : str or path-like, optional
         Directory for saved output. Defaults to the current working directory
         when the function is called.
     output_file : str
-        (Optional) Default is "singlerun.p" for single runs, "param_space.p" for exo parameter runs
-        or "instrument_run.p" for instrument parameter space runs.
+        (Optional) Default is ``singlerun.p`` for single runs,
+        ``param_space.p`` for exoplanet parameter runs, or
+        ``instrument_run.p`` for instrument runs.
     num_cores : int, optional
         Number of parallel worker processes. Defaults to the CPU count when the
         function is called.
-    verbose : bool 
-        (Optional) For single runs, if false, it turns off all print statements. For parameter space 
-        runs it is defaulted to never print statements out.
+    verbose : bool
+        (Optional) Turns off print statements for single runs when false.
+        Parameter-space runs are quiet by default.
 
     Returns
     -------
     dict
-        For single run output will just be a single PandExo output dictionary
-        as described in the JWST Output Dictionary documentation.
-        For multiple runs the output will be organized into a list with each
-        a dictionary named by whatever you are looping through
-        i.e. [{'First temp': PandExoDict}, {'Second temp': PandExoDict}, etc..]
+        PandExo result for an instrument dictionary or a one-element list of
+        named instruments without a parameter range.
+    list of dict
+        Results for an exoplanet parameter-space run, multiple named
+        instruments, or ``['RUN ALL']``. Each element is a one-key dictionary
+        whose value is a PandExo result. Parameter-space keys are the basename
+        of each ``param_range`` value; instrument runs are keyed by instrument
+        name. List order matches ``param_range``, the supplied instrument list,
+        or the ``ALL`` instrument order, respectively.
+    None
+        Returned after printing input guidance when ``inst`` is neither a
+        dictionary nor a list.
 
     Example
     -------

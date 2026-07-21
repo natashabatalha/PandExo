@@ -151,6 +151,13 @@ corresponding dictionaries for programmatic analysis.
 Saved ``.p`` results are Python pickle files. Only load files from trusted
 sources, because unpickling an untrusted file can execute arbitrary code.
 
+.. code:: python
+
+    import pickle
+
+    with open("singlerun.p", "rb") as handle:
+        result = pickle.load(handle)  # Load only files from trusted sources.
+
 .. _Python dictionary: https://docs.python.org/3/tutorial/datastructures.html#dictionaries
 .. _example notebooks: https://github.com/natashabatalha/PandExo/tree/master/notebooks
 .. _STScI's Pandeia Documentation: https://jwst-docs.stsci.edu/jwst-exposure-time-calculator-overview/jwst-etc-pandeia-engine-tutorial

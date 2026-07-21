@@ -75,16 +75,32 @@ the normalization archive:
 .. code-block:: powershell
 
     $normalizationTrds = "$HOME\pandexo-data\normalization\grp\redcat\trds"
-    Copy-Item -Recurse -Force "$normalizationTrds\comp\*" "$env:PYSYN_CDBS\comp\"
-    Copy-Item -Recurse -Force "$normalizationTrds\mtab\*" "$env:PYSYN_CDBS\mtab\"
+    New-Item -ItemType Directory -Force "$env:PYSYN_CDBS\comp" | Out-Null
+    New-Item -ItemType Directory -Force "$env:PYSYN_CDBS\mtab" | Out-Null
+
+    Copy-Item -Recurse -Force `
+        "$normalizationTrds\comp\*" `
+        "$env:PYSYN_CDBS\comp\"
+
+    Copy-Item -Recurse -Force `
+        "$normalizationTrds\mtab\*" `
+        "$env:PYSYN_CDBS\mtab\"
 
 Verify the current terminal's variables and required files:
 
 .. code-block:: powershell
 
-    Get-ChildItem $env:PYSYN_CDBS
+    $env:pandeia_refdata
+    $env:PSF_DIR
+    $env:PYSYN_CDBS
+    Test-Path $env:pandeia_refdata
+    Test-Path $env:PSF_DIR
+    Test-Path "$env:PYSYN_CDBS\comp"
+    Test-Path "$env:PYSYN_CDBS\grid"
+    Test-Path "$env:PYSYN_CDBS\mtab"
     Test-Path "$env:PYSYN_CDBS\comp\nonhst\bessell_j_003_syn.fits"
     Test-Path "$env:PYSYN_CDBS\grid\phoenix\catalog.fits"
+    (Get-ChildItem "$env:PYSYN_CDBS\mtab" -File -Recurse | Measure-Object).Count -gt 0
 
 For Command Prompt instead of PowerShell, set the current terminal and its
 persistent replacement separately:
@@ -123,6 +139,9 @@ test. It does not start the web application or run a simulation:
 To run repository tests, first clone the source checkout and install its test
 dependencies. This command applies only inside that checkout:
 
+Install `Git for Windows <https://git-scm.com/download/win>`_ to use
+``git clone``. Git is not required for a normal pip installation.
+
 .. code-block:: powershell
 
     git clone https://github.com/natashabatalha/PandExo.git
@@ -130,5 +149,5 @@ dependencies. This command applies only inside that checkout:
     python -m pip install -e ".[test]"
     python -m pytest tests/test_import.py -q
 
-Congrats on being persevering/stubborn enough to get PandExo to work on Windows!
-There are some example Jupyter notebooks to try in ``PandExo/notebooks``.
+PandExo is now ready to use. See the example Jupyter notebooks in
+``PandExo/notebooks`` to get started.
