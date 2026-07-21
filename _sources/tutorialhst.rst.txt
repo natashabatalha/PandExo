@@ -1,9 +1,10 @@
-HST Tutorial 
-===============
+HST Tutorial
+============
 
-This file demonstrates how to use PandExo to predict the:
-1. Transmission/emission spectrum S/N ratio
-2. Observation start window for any system observed with WFC3/IR.
+This tutorial demonstrates how to use PandExo to predict:
+
+1. The transmission or emission spectrum signal-to-noise ratio.
+2. The observation start window for a system observed with WFC3/IR.
 
 .. code:: python
     
@@ -26,21 +27,21 @@ Edit stellar and planet inputs
 
 .. code:: python
 
-    #WASP-43
+    # WASP-43
     exo_dict['star']['jmag']     = 9.995                # J magnitude of the system
     exo_dict['star']['hmag']     = 9.397                # H magnitude of the system
-    #WASP-43b
+    # WASP-43b
     exo_dict['planet']['type']    = 'user'               # user specified inputs
     exo_dict['planet']['exopath'] = str(
         files('pandexo.engine.reference').joinpath('WASP43b-Eclipse_Spectrum.txt')
-    ) # packaged model spectrum
+    )  # Packaged model spectrum.
     exo_dict['planet']['w_unit']  = 'um'                 # wavelength unit
     exo_dict['planet']['f_unit']  = 'fp/f*'              # flux ratio unit (can also put "rp^2/r*^2")
     exo_dict['planet']['depth']   = 4.0e-3               # flux ratio
     exo_dict['planet']['i']       = 82.6                 # Orbital inclination in degrees
     exo_dict['planet']['ars']     = 5.13                 # Semi-major axis / stellar radius
     exo_dict['planet']['period']  = 0.8135               # Orbital period in days   
-    exo_dict['planet']['transit_duration']= 4170.0/60/60/24#(optional if given above info) transit duration in days
+    exo_dict['planet']['transit_duration'] = 4170.0/60/60/24  # Optional if given above information.
     exo_dict['planet']['w']       = 90                   #(optional) longitude of periastron. Default is 90
     exo_dict['planet']['ecc']     = 0                    #(optional) eccentricity. Default is 0 
 
@@ -72,13 +73,17 @@ Edit HST/WFC3 detector and observation inputs
 Run PandExo Command Line
 ------------------------
 
-``jdi.run_pandexo(exo, inst, param_space = 0, param_range = 0,save_file = True,                             output_path=os.getcwd(), output_file = '')``
+``jdi.run_pandexo(exo, inst, param_space=0, param_range=0, save_file=True,
+output_path=None, output_file='', num_cores=None, verbose=True)``
 
-See the API reference for a more thorough explanation of the inputs.
+``output_path=None`` resolves to the working directory when the calculation is
+run. Set ``save_file=False`` while exploring examples to avoid overwriting a
+pickle file; use an explicit ``output_path`` and ``output_file`` when you want
+to retain a result.
 
 .. code:: python
 
-    foo = jdi.run_pandexo(exo_dict, inst_dict, output_file='wasp43b.p')
+    foo = jdi.run_pandexo(exo_dict, inst_dict, save_file=False)
     Running Single Case w/ User Instrument Dict
     ****WARNING: Observing plan may incur mid-orbit buffer dumps.  Check with APT.
 
@@ -86,43 +91,54 @@ See the API reference for a more thorough explanation of the inputs.
 
     inst_dict['configuration']['detector']['nsamp'] = None
     inst_dict['configuration']['detector']['samp_seq'] = None
-    bar = jdi.run_pandexo(exo_dict, inst_dict, output_file='wasp43b.p')
+    bar = jdi.run_pandexo(exo_dict, inst_dict, save_file=False)
     Running Single Case w/ User Instrument Dict
 
 .. code:: python
 
     inst_dict['strategy']['scanDirection'] = 'Round Trip'
-    hst = jdi.run_pandexo(exo_dict, inst_dict, output_file='wasp43b.p')
+    hst = jdi.run_pandexo(exo_dict, inst_dict, save_file=False)
     Running Single Case w/ User Instrument Dict
 
 Plot Results
 ------------
 
-Plot simulated spectrum using specified file
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Plot Simulated Spectrum
+~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: python
 
-    import pandexo.engine.justplotit as jpi 
-    #using foo from above
-    #other keys include model=True/False
+    import pandexo.engine.justplotit as jpi
+    # Use foo from above. Other keys include model=True/False.
     datawave, dataspec, dataerror, modelwave, modelspec = jpi.hst_spec(foo)
 
-.. image:: hst_spec.png
+.. figure:: hst_spec.png
+   :alt: Simulated WFC3 spectrum for the HST tutorial example.
 
-Compute earliest and latest start times for given start window size
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The errors in the time series are the error per wavelength channel.
+   Simulated WFC3 spectrum for the configured WASP-43b observation.
+
+Compute the Earliest and Latest Start Times
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The errors in the time series are the error per wavelength channel. Values are
+illustrative and can vary with the PandExo, Pandeia, and reference-data
+versions used for a calculation.
 
 .. code:: python
 
-    #using foo from above
+    # Use foo from above.
     obsphase1, obstr1, obsphase2, obstr2,rms = jpi.hst_time(foo)
 
-.. image:: hst_time1.png
-    :width: 49 %  
-.. image:: hst_time2.png
-    :width: 49 %
+.. figure:: hst_time1.png
+   :alt: First WFC3 start-window diagnostic for the HST tutorial example.
+   :width: 49%
+
+   First start-window diagnostic.
+
+.. figure:: hst_time2.png
+   :alt: Second WFC3 start-window diagnostic for the HST tutorial example.
+   :width: 49%
+
+   Second start-window diagnostic.
 
 Print important info for observation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

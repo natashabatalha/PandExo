@@ -20,7 +20,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="API Reference" href="engine.html" />
-    <link rel="prev" title="Py Dict Structure of JWST Output" href="jwstdict.html" /> 
+    <link rel="prev" title="JWST Output Dictionary" href="jwstdict.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -48,10 +48,10 @@
 <li class="toctree-l1"><a class="reference internal" href="installation.html#installation-with-pip-or-git">Installation with Pip or Git</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html#final-test-for-success">Final Test for Success</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html#the-importance-of-upgrading-pandexo">The Importance of Upgrading PandExo</a></li>
-<li class="toctree-l1"><a class="reference internal" href="installation_windows.html">Windows Installing Guide for PandExo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation_windows.html">Windows Installation Guide for PandExo</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorialjwst.html">JWST Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="jwstinput.html">Possible Instrument Input Params</a></li>
-<li class="toctree-l1"><a class="reference internal" href="jwstdict.html">Py Dict Structure of JWST Output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="jwstinput.html">Instrument Configuration Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="jwstdict.html">JWST Output Dictionary</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">HST Tutorial</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#editing-input-dictionaries">Editing Input Dictionaries</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#step-1-load-in-a-blank-exoplanet-dictionary">Step 1) Load in a blank exoplanet dictionary</a><ul>
@@ -66,8 +66,8 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#run-pandexo-command-line">Run PandExo Command Line</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#plot-results">Plot Results</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#plot-simulated-spectrum-using-specified-file">Plot simulated spectrum using specified file</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#compute-earliest-and-latest-start-times-for-given-start-window-size">Compute earliest and latest start times for given start window size</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#plot-simulated-spectrum">Plot Simulated Spectrum</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compute-the-earliest-and-latest-start-times">Compute the Earliest and Latest Start Times</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#print-important-info-for-observation">Print important info for observation</a></li>
 </ul>
 </li>
@@ -104,9 +104,11 @@
              
   <section id="hst-tutorial">
 <h1>HST Tutorial<a class="headerlink" href="#hst-tutorial" title="Link to this heading"></a></h1>
-<p>This file demonstrates how to use PandExo to predict the:
-1. Transmission/emission spectrum S/N ratio
-2. Observation start window for any system observed with WFC3/IR.</p>
+<p>This tutorial demonstrates how to use PandExo to predict:</p>
+<ol class="arabic simple">
+<li><p>The transmission or emission spectrum signal-to-noise ratio.</p></li>
+<li><p>The observation start window for a system observed with WFC3/IR.</p></li>
+</ol>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">importlib.resources</span><span class="w"> </span><span class="kn">import</span> <span class="n">files</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandexo.engine.justdoit</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">jdi</span>
@@ -121,21 +123,21 @@
 </div>
 <section id="edit-stellar-and-planet-inputs">
 <h4>Edit stellar and planet inputs<a class="headerlink" href="#edit-stellar-and-planet-inputs" title="Link to this heading"></a></h4>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">#WASP-43</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># WASP-43</span>
 <span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;star&#39;</span><span class="p">][</span><span class="s1">&#39;jmag&#39;</span><span class="p">]</span>     <span class="o">=</span> <span class="mf">9.995</span>                <span class="c1"># J magnitude of the system</span>
 <span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;star&#39;</span><span class="p">][</span><span class="s1">&#39;hmag&#39;</span><span class="p">]</span>     <span class="o">=</span> <span class="mf">9.397</span>                <span class="c1"># H magnitude of the system</span>
-<span class="c1">#WASP-43b</span>
+<span class="c1"># WASP-43b</span>
 <span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span>    <span class="o">=</span> <span class="s1">&#39;user&#39;</span>               <span class="c1"># user specified inputs</span>
 <span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;exopath&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span>
     <span class="n">files</span><span class="p">(</span><span class="s1">&#39;pandexo.engine.reference&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s1">&#39;WASP43b-Eclipse_Spectrum.txt&#39;</span><span class="p">)</span>
-<span class="p">)</span> <span class="c1"># packaged model spectrum</span>
+<span class="p">)</span>  <span class="c1"># Packaged model spectrum.</span>
 <span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;w_unit&#39;</span><span class="p">]</span>  <span class="o">=</span> <span class="s1">&#39;um&#39;</span>                 <span class="c1"># wavelength unit</span>
 <span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;f_unit&#39;</span><span class="p">]</span>  <span class="o">=</span> <span class="s1">&#39;fp/f*&#39;</span>              <span class="c1"># flux ratio unit (can also put &quot;rp^2/r*^2&quot;)</span>
 <span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;depth&#39;</span><span class="p">]</span>   <span class="o">=</span> <span class="mf">4.0e-3</span>               <span class="c1"># flux ratio</span>
 <span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;i&#39;</span><span class="p">]</span>       <span class="o">=</span> <span class="mf">82.6</span>                 <span class="c1"># Orbital inclination in degrees</span>
 <span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;ars&#39;</span><span class="p">]</span>     <span class="o">=</span> <span class="mf">5.13</span>                 <span class="c1"># Semi-major axis / stellar radius</span>
 <span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;period&#39;</span><span class="p">]</span>  <span class="o">=</span> <span class="mf">0.8135</span>               <span class="c1"># Orbital period in days</span>
-<span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;transit_duration&#39;</span><span class="p">]</span><span class="o">=</span> <span class="mf">4170.0</span><span class="o">/</span><span class="mi">60</span><span class="o">/</span><span class="mi">60</span><span class="o">/</span><span class="mi">24</span><span class="c1">#(optional if given above info) transit duration in days</span>
+<span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;transit_duration&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">4170.0</span><span class="o">/</span><span class="mi">60</span><span class="o">/</span><span class="mi">60</span><span class="o">/</span><span class="mi">24</span>  <span class="c1"># Optional if given above information.</span>
 <span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;w&#39;</span><span class="p">]</span>       <span class="o">=</span> <span class="mi">90</span>                   <span class="c1">#(optional) longitude of periastron. Default is 90</span>
 <span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;ecc&#39;</span><span class="p">]</span>     <span class="o">=</span> <span class="mi">0</span>                    <span class="c1">#(optional) eccentricity. Default is 0</span>
 </pre></div>
@@ -169,48 +171,68 @@
 </section>
 <section id="run-pandexo-command-line">
 <h2>Run PandExo Command Line<a class="headerlink" href="#run-pandexo-command-line" title="Link to this heading"></a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">jdi.run_pandexo(exo,</span> <span class="pre">inst,</span> <span class="pre">param_space</span> <span class="pre">=</span> <span class="pre">0,</span> <span class="pre">param_range</span> <span class="pre">=</span> <span class="pre">0,save_file</span> <span class="pre">=</span> <span class="pre">True,</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">output_path=os.getcwd(),</span> <span class="pre">output_file</span> <span class="pre">=</span> <span class="pre">'')</span></code></p>
-<p>See the API reference for a more thorough explanation of the inputs.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">foo</span> <span class="o">=</span> <span class="n">jdi</span><span class="o">.</span><span class="n">run_pandexo</span><span class="p">(</span><span class="n">exo_dict</span><span class="p">,</span> <span class="n">inst_dict</span><span class="p">,</span> <span class="n">output_file</span><span class="o">=</span><span class="s1">&#39;wasp43b.p&#39;</span><span class="p">)</span>
+<p><code class="docutils literal notranslate"><span class="pre">jdi.run_pandexo(exo,</span> <span class="pre">inst,</span> <span class="pre">param_space=0,</span> <span class="pre">param_range=0,</span> <span class="pre">save_file=True,</span>
+<span class="pre">output_path=None,</span> <span class="pre">output_file='',</span> <span class="pre">num_cores=None,</span> <span class="pre">verbose=True)</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">output_path=None</span></code> resolves to the working directory when the calculation is
+run. Set <code class="docutils literal notranslate"><span class="pre">save_file=False</span></code> while exploring examples to avoid overwriting a
+pickle file; use an explicit <code class="docutils literal notranslate"><span class="pre">output_path</span></code> and <code class="docutils literal notranslate"><span class="pre">output_file</span></code> when you want
+to retain a result.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">foo</span> <span class="o">=</span> <span class="n">jdi</span><span class="o">.</span><span class="n">run_pandexo</span><span class="p">(</span><span class="n">exo_dict</span><span class="p">,</span> <span class="n">inst_dict</span><span class="p">,</span> <span class="n">save_file</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="n">Running</span> <span class="n">Single</span> <span class="n">Case</span> <span class="n">w</span><span class="o">/</span> <span class="n">User</span> <span class="n">Instrument</span> <span class="n">Dict</span>
 <span class="o">****</span><span class="n">WARNING</span><span class="p">:</span> <span class="n">Observing</span> <span class="n">plan</span> <span class="n">may</span> <span class="n">incur</span> <span class="n">mid</span><span class="o">-</span><span class="n">orbit</span> <span class="n">buffer</span> <span class="n">dumps</span><span class="o">.</span>  <span class="n">Check</span> <span class="k">with</span> <span class="n">APT</span><span class="o">.</span>
 </pre></div>
 </div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">inst_dict</span><span class="p">[</span><span class="s1">&#39;configuration&#39;</span><span class="p">][</span><span class="s1">&#39;detector&#39;</span><span class="p">][</span><span class="s1">&#39;nsamp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="n">inst_dict</span><span class="p">[</span><span class="s1">&#39;configuration&#39;</span><span class="p">][</span><span class="s1">&#39;detector&#39;</span><span class="p">][</span><span class="s1">&#39;samp_seq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-<span class="n">bar</span> <span class="o">=</span> <span class="n">jdi</span><span class="o">.</span><span class="n">run_pandexo</span><span class="p">(</span><span class="n">exo_dict</span><span class="p">,</span> <span class="n">inst_dict</span><span class="p">,</span> <span class="n">output_file</span><span class="o">=</span><span class="s1">&#39;wasp43b.p&#39;</span><span class="p">)</span>
+<span class="n">bar</span> <span class="o">=</span> <span class="n">jdi</span><span class="o">.</span><span class="n">run_pandexo</span><span class="p">(</span><span class="n">exo_dict</span><span class="p">,</span> <span class="n">inst_dict</span><span class="p">,</span> <span class="n">save_file</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="n">Running</span> <span class="n">Single</span> <span class="n">Case</span> <span class="n">w</span><span class="o">/</span> <span class="n">User</span> <span class="n">Instrument</span> <span class="n">Dict</span>
 </pre></div>
 </div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">inst_dict</span><span class="p">[</span><span class="s1">&#39;strategy&#39;</span><span class="p">][</span><span class="s1">&#39;scanDirection&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Round Trip&#39;</span>
-<span class="n">hst</span> <span class="o">=</span> <span class="n">jdi</span><span class="o">.</span><span class="n">run_pandexo</span><span class="p">(</span><span class="n">exo_dict</span><span class="p">,</span> <span class="n">inst_dict</span><span class="p">,</span> <span class="n">output_file</span><span class="o">=</span><span class="s1">&#39;wasp43b.p&#39;</span><span class="p">)</span>
+<span class="n">hst</span> <span class="o">=</span> <span class="n">jdi</span><span class="o">.</span><span class="n">run_pandexo</span><span class="p">(</span><span class="n">exo_dict</span><span class="p">,</span> <span class="n">inst_dict</span><span class="p">,</span> <span class="n">save_file</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="n">Running</span> <span class="n">Single</span> <span class="n">Case</span> <span class="n">w</span><span class="o">/</span> <span class="n">User</span> <span class="n">Instrument</span> <span class="n">Dict</span>
 </pre></div>
 </div>
 </section>
 <section id="plot-results">
 <h2>Plot Results<a class="headerlink" href="#plot-results" title="Link to this heading"></a></h2>
-<section id="plot-simulated-spectrum-using-specified-file">
-<h3>Plot simulated spectrum using specified file<a class="headerlink" href="#plot-simulated-spectrum-using-specified-file" title="Link to this heading"></a></h3>
+<section id="plot-simulated-spectrum">
+<h3>Plot Simulated Spectrum<a class="headerlink" href="#plot-simulated-spectrum" title="Link to this heading"></a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pandexo.engine.justplotit</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">jpi</span>
-<span class="c1">#using foo from above</span>
-<span class="c1">#other keys include model=True/False</span>
+<span class="c1"># Use foo from above. Other keys include model=True/False.</span>
 <span class="n">datawave</span><span class="p">,</span> <span class="n">dataspec</span><span class="p">,</span> <span class="n">dataerror</span><span class="p">,</span> <span class="n">modelwave</span><span class="p">,</span> <span class="n">modelspec</span> <span class="o">=</span> <span class="n">jpi</span><span class="o">.</span><span class="n">hst_spec</span><span class="p">(</span><span class="n">foo</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="_images/hst_spec.png" src="_images/hst_spec.png" />
+<figure class="align-default" id="id1">
+<img alt="Simulated WFC3 spectrum for the HST tutorial example." src="_images/hst_spec.png" />
+<figcaption>
+<p><span class="caption-text">Simulated WFC3 spectrum for the configured WASP-43b observation.</span><a class="headerlink" href="#id1" title="Link to this image"></a></p>
+</figcaption>
+</figure>
 </section>
-<section id="compute-earliest-and-latest-start-times-for-given-start-window-size">
-<h3>Compute earliest and latest start times for given start window size<a class="headerlink" href="#compute-earliest-and-latest-start-times-for-given-start-window-size" title="Link to this heading"></a></h3>
-<p>The errors in the time series are the error per wavelength channel.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">#using foo from above</span>
+<section id="compute-the-earliest-and-latest-start-times">
+<h3>Compute the Earliest and Latest Start Times<a class="headerlink" href="#compute-the-earliest-and-latest-start-times" title="Link to this heading"></a></h3>
+<p>The errors in the time series are the error per wavelength channel. Values are
+illustrative and can vary with the PandExo, Pandeia, and reference-data
+versions used for a calculation.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Use foo from above.</span>
 <span class="n">obsphase1</span><span class="p">,</span> <span class="n">obstr1</span><span class="p">,</span> <span class="n">obsphase2</span><span class="p">,</span> <span class="n">obstr2</span><span class="p">,</span><span class="n">rms</span> <span class="o">=</span> <span class="n">jpi</span><span class="o">.</span><span class="n">hst_time</span><span class="p">(</span><span class="n">foo</span><span class="p">)</span>
 </pre></div>
 </div>
-<a class="reference internal image-reference" href="_images/hst_time1.png"><img alt="_images/hst_time1.png" src="_images/hst_time1.png" style="width: 49%;" />
+<figure class="align-default" id="id2">
+<a class="reference internal image-reference" href="_images/hst_time1.png"><img alt="First WFC3 start-window diagnostic for the HST tutorial example." src="_images/hst_time1.png" style="width: 49%;" />
 </a>
-<a class="reference internal image-reference" href="_images/hst_time2.png"><img alt="_images/hst_time2.png" src="_images/hst_time2.png" style="width: 49%;" />
+<figcaption>
+<p><span class="caption-text">First start-window diagnostic.</span><a class="headerlink" href="#id2" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<figure class="align-default" id="id3">
+<a class="reference internal image-reference" href="_images/hst_time2.png"><img alt="Second WFC3 start-window diagnostic for the HST tutorial example." src="_images/hst_time2.png" style="width: 49%;" />
 </a>
+<figcaption>
+<p><span class="caption-text">Second start-window diagnostic.</span><a class="headerlink" href="#id3" title="Link to this image"></a></p>
+</figcaption>
+</figure>
 <section id="print-important-info-for-observation">
 <h4>Print important info for observation<a class="headerlink" href="#print-important-info-for-observation" title="Link to this heading"></a></h4>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">foo</span><span class="p">[</span><span class="s1">&#39;wfc3_TExoNS&#39;</span><span class="p">][</span><span class="s1">&#39;info&#39;</span><span class="p">]</span>
@@ -236,7 +258,7 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="jwstdict.html" class="btn btn-neutral float-left" title="Py Dict Structure of JWST Output" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="jwstdict.html" class="btn btn-neutral float-left" title="JWST Output Dictionary" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="engine.html" class="btn btn-neutral float-right" title="API Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Py Dict Structure of JWST Output &mdash; PandExo 2026.7 documentation</title>
+  <title>JWST Output Dictionary &mdash; PandExo 2026.7 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
 
@@ -20,7 +20,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="HST Tutorial" href="tutorialhst.html" />
-    <link rel="prev" title="Possible Instrument Input Params" href="jwstinput.html" /> 
+    <link rel="prev" title="Instrument Configuration Parameters" href="jwstinput.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -48,10 +48,10 @@
 <li class="toctree-l1"><a class="reference internal" href="installation.html#installation-with-pip-or-git">Installation with Pip or Git</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html#final-test-for-success">Final Test for Success</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html#the-importance-of-upgrading-pandexo">The Importance of Upgrading PandExo</a></li>
-<li class="toctree-l1"><a class="reference internal" href="installation_windows.html">Windows Installing Guide for PandExo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation_windows.html">Windows Installation Guide for PandExo</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorialjwst.html">JWST Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="jwstinput.html">Possible Instrument Input Params</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Py Dict Structure of JWST Output</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="jwstinput.html">Instrument Configuration Parameters</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">JWST Output Dictionary</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#finalspectrum">FinalSpectrum</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#originalinput">OriginalInput</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#warning">warning</a></li>
@@ -80,7 +80,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Py Dict Structure of JWST Output</li>
+      <li class="breadcrumb-item active">JWST Output Dictionary</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/jwstdict.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -90,21 +90,27 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="py-dict-structure-of-jwst-output">
-<h1>Py Dict Structure of JWST Output<a class="headerlink" href="#py-dict-structure-of-jwst-output" title="Link to this heading"></a></h1>
-<p>The PandExo output is organized into <a class="reference external" href="https://docs.python.org/3/tutorial/datastructures.html#dictionaries">Python Dictionaries</a>. See
-<a class="reference external" href="https://github.com/natashabatalha/PandExo/tree/master/notebooks">example notebooks</a> for an explanation of how to manipulate these and
-plot the most common outputs. Below is a breakdown of everything
-contained in the PandExo output dictionary.</p>
+  <section id="jwst-output-dictionary">
+<h1>JWST Output Dictionary<a class="headerlink" href="#jwst-output-dictionary" title="Link to this heading"></a></h1>
+<p>PandExo returns a nested <a class="reference external" href="https://docs.python.org/3/tutorial/datastructures.html#dictionaries">Python dictionary</a>. See the <a class="reference external" href="https://github.com/natashabatalha/PandExo/tree/master/notebooks">example notebooks</a>
+for common analysis and plotting patterns. The exact fields vary by instrument
+mode and selected options, so inspect the result you receive rather than
+assuming every calculation has every key:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;FinalSpectrum&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>The arrays in <code class="docutils literal notranslate"><span class="pre">FinalSpectrum</span></code> and <code class="docutils literal notranslate"><span class="pre">RawData</span></code> are NumPy arrays. Wavelengths
+are in microns unless a field name or the associated metadata states otherwise.</p>
 <section id="finalspectrum">
 <h2>FinalSpectrum<a class="headerlink" href="#finalspectrum" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p><strong>spectrum_w_rand</strong>: Planet spectrum with random noise added in
-units of <em>(Rp/Rs)2</em> or <em>(Fp/Fs)</em></p></li>
-<li><p><strong>spectrum</strong>: Planet spectrum with no random noise</p></li>
+<li><p><strong>spectrum_w_rand</strong>: Planet spectrum with random noise added, in
+<code class="docutils literal notranslate"><span class="pre">(Rp/Rs)^2</span></code> or <code class="docutils literal notranslate"><span class="pre">Fp/Fs</span></code>.</p></li>
+<li><p><strong>spectrum</strong>: Planet spectrum without random noise.</p></li>
 <li><p><strong>error_w_floor</strong>: Error with user defined noise floor. If no floor
 was specified, there is no floor.</p></li>
-<li><p><strong>wave</strong>: wavelength (microns)</p></li>
+<li><p><strong>wave</strong>: Wavelength in microns.</p></li>
 </ul>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;FinalSpectrum&#39;</span><span class="p">][</span><span class="s1">&#39;spectrum_w_rand&#39;</span><span class="p">])</span>
 </pre></div>
@@ -113,9 +119,9 @@ was specified, there is no floor.</p></li>
 <section id="originalinput">
 <h2>OriginalInput<a class="headerlink" href="#originalinput" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p><strong>model_wave</strong>: original wavelength input by user</p></li>
-<li><p><strong>model_spec</strong>: original spectrum input by user</p></li>
-<li><p><strong>star_spec</strong>: out-of-transit stellar spectrum used by PandExo</p></li>
+<li><p><strong>model_wave</strong>: Original wavelength array supplied by the user.</p></li>
+<li><p><strong>model_spec</strong>: Original planet spectrum supplied by the user.</p></li>
+<li><p><strong>star_spec</strong>: Out-of-transit stellar spectrum used by PandExo.</p></li>
 </ul>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;OriginalInput&#39;</span><span class="p">][</span><span class="s1">&#39;model_wave&#39;</span><span class="p">])</span>
 </pre></div>
@@ -143,16 +149,16 @@ to retain at least three.</p></li>
 </ul>
 <p>Mode-specific calculations can add warnings for NIRCam readout optimization
 and data excess, NIRSpec long exposures, MIRI slit-mode TSO use, or target
-acquisition.</p>
+acquisition. Warning values and their availability vary by mode.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;warning&#39;</span><span class="p">][</span><span class="s1">&#39;Num Groups Reset?&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
 </section>
 <section id="pandeiaouttrans">
 <h2>PandeiaOutTrans<a class="headerlink" href="#pandeiaouttrans" title="Link to this heading"></a></h2>
-<p>This is the raw output of Pandeia’s simulation of the out of transit
-observation. For a complete breakdown of these outputs go to <a class="reference external" href="https://jwst-docs.stsci.edu/jwst-exposure-time-calculator-overview/jwst-etc-pandeia-engine-tutorial">STScI’s
-Pandeia Documentation</a>.</p>
+<p>This is the raw output of Pandeia’s out-of-transit simulation. For a complete
+breakdown, see <a class="reference external" href="https://jwst-docs.stsci.edu/jwst-exposure-time-calculator-overview/jwst-etc-pandeia-engine-tutorial">STScI’s Pandeia documentation</a>. Its nested fields are
+Pandeia-version and mode dependent.</p>
 <ul class="simple">
 <li><p><strong>sub_reports</strong></p></li>
 <li><p><strong>information</strong></p></li>
@@ -170,10 +176,10 @@ Pandeia Documentation</a>.</p>
 <section id="rawdata">
 <h2>RawData<a class="headerlink" href="#rawdata" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p><strong>var_in</strong>: The variance of only the in transit data</p></li>
-<li><p><strong>wave</strong>: wavelength vector</p></li>
-<li><p><strong>electrons_in</strong>, <strong>electrons_out</strong>: Total in- and out-of-transit electrons</p></li>
-<li><p><strong>e_rate_in</strong>, <strong>e_rate_out</strong>: In- and out-of-transit electron rates</p></li>
+<li><p><strong>var_in</strong>: Variance of the in-transit data.</p></li>
+<li><p><strong>wave</strong>: Wavelength vector in microns.</p></li>
+<li><p><strong>electrons_in</strong>, <strong>electrons_out</strong>: Total in- and out-of-transit electrons.</p></li>
+<li><p><strong>e_rate_in</strong>, <strong>e_rate_out</strong>: In- and out-of-transit electron rates.</p></li>
 <li><p><strong>electron_per_int</strong> and <strong>snr_int</strong>: Per-integration diagnostics</p></li>
 <li><p><strong>error_no_floor</strong>: Error without any noise floor</p></li>
 <li><p><strong>var_out</strong>: The variance of only the out of transit data</p></li>
@@ -211,7 +217,7 @@ data-excess fields.</p>
 <li><p><strong>Filter</strong></p></li>
 <li><p><strong>Instrument</strong></p></li>
 <li><p><strong>Mode</strong></p></li>
-<li><p><strong>Saturation Level (electons)</strong></p></li>
+<li><p><strong>Saturation Level (electrons)</strong></p></li>
 <li><p><strong>Aperture</strong></p></li>
 <li><p><strong>Subarray</strong></p></li>
 <li><p><strong>Primary/Secondary</strong></p></li>
@@ -225,6 +231,14 @@ data-excess fields.</p>
 <p><code class="docutils literal notranslate"><span class="pre">apt_div</span></code>, <code class="docutils literal notranslate"><span class="pre">calculation_div</span></code>, <code class="docutils literal notranslate"><span class="pre">timing_div</span></code>, <code class="docutils literal notranslate"><span class="pre">input_div</span></code>, and
 <code class="docutils literal notranslate"><span class="pre">warnings_div</span></code> contain HTML tables rendered on the website. Use the
 corresponding dictionaries for programmatic analysis.</p>
+<p>Saved <code class="docutils literal notranslate"><span class="pre">.p</span></code> results are Python pickle files. Only load files from trusted
+sources, because unpickling an untrusted file can execute arbitrary code.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pickle</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;singlerun.p&quot;</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">handle</span><span class="p">)</span>  <span class="c1"># Load only files from trusted sources.</span>
+</pre></div>
+</div>
 </section>
 </section>
 
@@ -232,7 +246,7 @@ corresponding dictionaries for programmatic analysis.</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="jwstinput.html" class="btn btn-neutral float-left" title="Possible Instrument Input Params" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="jwstinput.html" class="btn btn-neutral float-left" title="Instrument Configuration Parameters" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="tutorialhst.html" class="btn btn-neutral float-right" title="HST Tutorial" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

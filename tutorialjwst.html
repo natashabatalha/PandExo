@@ -19,8 +19,8 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Possible Instrument Input Params" href="jwstinput.html" />
-    <link rel="prev" title="Windows Installing Guide for PandExo" href="installation_windows.html" /> 
+    <link rel="next" title="Instrument Configuration Parameters" href="jwstinput.html" />
+    <link rel="prev" title="Windows Installation Guide for PandExo" href="installation_windows.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -48,7 +48,7 @@
 <li class="toctree-l1"><a class="reference internal" href="installation.html#installation-with-pip-or-git">Installation with Pip or Git</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html#final-test-for-success">Final Test for Success</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html#the-importance-of-upgrading-pandexo">The Importance of Upgrading PandExo</a></li>
-<li class="toctree-l1"><a class="reference internal" href="installation_windows.html">Windows Installing Guide for PandExo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation_windows.html">Windows Installation Guide for PandExo</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">JWST Tutorial</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#getting-started">Getting Started</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#load-blank-exo-dictionary">Load blank exo dictionary</a></li>
@@ -76,8 +76,8 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="jwstinput.html">Possible Instrument Input Params</a></li>
-<li class="toctree-l1"><a class="reference internal" href="jwstdict.html">Py Dict Structure of JWST Output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="jwstinput.html">Instrument Configuration Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="jwstdict.html">JWST Output Dictionary</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorialhst.html">HST Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="engine.html">API Reference</a></li>
 </ul>
@@ -123,7 +123,7 @@ should be completed!</p>
 </ul>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">pandexo.engine.justdoit</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">jdi</span> <span class="c1"># THIS IS THE HOLY GRAIL OF PANDEXO</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandexo.engine.justdoit</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">jdi</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandexo.engine.justplotit</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">jpi</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
@@ -157,7 +157,7 @@ reproducible.</p>
 <span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;observation&#39;</span><span class="p">][</span><span class="s1">&#39;sat_unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;%&#39;</span>
 <span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;observation&#39;</span><span class="p">][</span><span class="s1">&#39;noccultations&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> <span class="c1">#number of transits</span>
 <span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;observation&#39;</span><span class="p">][</span><span class="s1">&#39;R&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>          <span class="c1">#fixed binning. I usually suggest ZERO binning.. you can always bin later</span>
-                                             <span class="c1">#without having to redo the calcualtion</span>
+                                             <span class="c1">#without having to redo the calculation</span>
 <span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;observation&#39;</span><span class="p">][</span><span class="s1">&#39;baseline_unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;total&#39;</span>  <span class="c1">#Defines how you specify out of transit observing time</span>
                                                     <span class="c1">#&#39;frac&#39; : fraction of time in transit versus out = in/out</span>
                                                     <span class="c1">#&#39;total&#39; : total observing time (seconds)</span>
@@ -189,28 +189,19 @@ to provide units and starpath.</p>
 </section>
 <section id="option-2-input-as-dictionary-or-filename">
 <h5>Option 2) Input as dictionary or filename<a class="headerlink" href="#option-2-input-as-dictionary-or-filename" title="Link to this heading"></a></h5>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#Let&#39;s create a little fake stellar input</span>
-
-<span class="kn">import</span><span class="w"> </span><span class="nn">scipy.constants</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sc</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create an arbitrary user-supplied stellar spectral shape. PandExo</span>
+<span class="c1"># normalizes it to the magnitude and reference wavelength below.</span>
 <span class="n">wl</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">3000</span><span class="p">)</span>
-<span class="n">nu</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">c</span><span class="o">/</span><span class="p">(</span><span class="n">wl</span><span class="o">*</span><span class="mf">1e-6</span><span class="p">)</span>  <span class="c1"># frequency in sec^-1</span>
-<span class="n">teff</span> <span class="o">=</span> <span class="mf">5500.0</span>
-<span class="n">planck_5500K</span> <span class="o">=</span> <span class="n">nu</span><span class="o">**</span><span class="mi">3</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">sc</span><span class="o">.</span><span class="n">h</span><span class="o">*</span><span class="n">nu</span><span class="o">/</span><span class="n">sc</span><span class="o">.</span><span class="n">k</span><span class="o">/</span><span class="n">teff</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
 
-<span class="c1">#can either be dictionary input</span>
-<span class="n">starflux</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;f&#39;</span><span class="p">:</span><span class="n">planck_5500K</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">:</span><span class="n">wl</span><span class="p">}</span>
-<span class="c1">#or can be as a stellar file</span>
-<span class="c1">#starflux = &#39;planck_5500K.dat&#39;</span>
-<span class="c1">#with open(starflux, &#39;w&#39;) as sf:</span>
-<span class="c1">#    for w,f in zip(wl, planck_5500K):</span>
-<span class="c1">#        sf.write(f&#39;{w:.15f}   {f:.15e}\n&#39;)</span>
+<span class="c1"># A user spectrum can be supplied as a dictionary or a two-column file.</span>
+<span class="n">starflux</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;f&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">wl</span> <span class="o">/</span> <span class="mf">1.25</span><span class="p">)</span><span class="o">**-</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">:</span> <span class="n">wl</span><span class="p">}</span>
 
 <span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;star&#39;</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;user&#39;</span>
 <span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;star&#39;</span><span class="p">][</span><span class="s1">&#39;mag&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">10.0</span>              <span class="c1">#magnitude of the system</span>
 <span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;star&#39;</span><span class="p">][</span><span class="s1">&#39;ref_wave&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.25</span>
 <span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;star&#39;</span><span class="p">][</span><span class="s1">&#39;starpath&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">starflux</span>
 <span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;star&#39;</span><span class="p">][</span><span class="s1">&#39;w_unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;um&#39;</span>
-<span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;star&#39;</span><span class="p">][</span><span class="s1">&#39;f_unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;erg/cm2/s/Hz&#39;</span>
+<span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;star&#39;</span><span class="p">][</span><span class="s1">&#39;f_unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;jy&#39;</span>
 </pre></div>
 </div>
 </section>
@@ -224,14 +215,13 @@ to provide units and starpath.</p>
 </ol>
 <section id="edit-exoplanet-planet-inputs-if-using-your-own-model">
 <h5>1) Edit exoplanet planet inputs if using your own model<a class="headerlink" href="#edit-exoplanet-planet-inputs-if-using-your-own-model" title="Link to this heading"></a></h5>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span><span class="s1">&#39;user&#39;</span>                       <span class="c1">#tells pandexo you are uploading your own spectrum</span>
-<span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;exopath&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;wasp12b.txt&#39;</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;user&#39;</span>                      <span class="c1"># Upload a user spectrum.</span>
+<span class="n">wavelength</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.6</span><span class="p">,</span> <span class="mf">5.3</span><span class="p">,</span> <span class="mi">500</span><span class="p">)</span>
+<span class="n">spectrum</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">wavelength</span><span class="p">,</span> <span class="mf">0.015</span><span class="p">)</span>
+<span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;exopath&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;f&#39;</span><span class="p">:</span> <span class="n">spectrum</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">:</span> <span class="n">wavelength</span><span class="p">}</span>
 
-<span class="c1">#or as a dictionary</span>
-<span class="c1">#exo_dict[&#39;planet&#39;][&#39;exopath&#39;] = {&#39;f&#39;:spectrum, &#39;w&#39;:wavelength}</span>
-
-<span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;w_unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;cm&#39;</span>                      <span class="c1">#other options include &quot;um&quot;,&quot;nm&quot; ,&quot;Angs&quot;, &quot;sec&quot; (for phase curves)</span>
-<span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;f_unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;rp^2/r*^2&#39;</span>               <span class="c1">#other options are &#39;fp/f*&#39;</span>
+<span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;w_unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;um&#39;</span>                      <span class="c1"># Other options include nm, Angs, and sec (phase curves).</span>
+<span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;f_unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;rp^2/r*^2&#39;</span>               <span class="c1"># The other option is fp/f*.</span>
 <span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;transit_duration&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.0</span><span class="o">*</span><span class="mf">60.0</span><span class="o">*</span><span class="mf">60.0</span>   <span class="c1">#transit duration</span>
 <span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;td_unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;s&#39;</span>                      <span class="c1">#Any unit of time in accordance with astropy.units can be added</span>
 </pre></div>
@@ -255,10 +245,9 @@ to provide units and starpath.</p>
 </pre></div>
 </div>
 </section>
-<section id="select-from-grid">
-<h5>3) Select from grid<a class="headerlink" href="#select-from-grid" title="Link to this heading"></a></h5>
-<p>NOTE: Currently only the fortney grid for hot Jupiters from Fortney+2010
-is supported. Holler though, if you want another grid supported</p>
+<section id="select-from-a-grid">
+<h5>3) Select from a grid<a class="headerlink" href="#select-from-a-grid" title="Link to this heading"></a></h5>
+<p>Currently, PandExo supports the Fortney et al. (2010) hot-Jupiter grid.</p>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;grid&#39;</span>                <span class="c1">#tells pandexo you want to pull from the grid</span>
 <span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;transit_duration&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.0</span><span class="o">*</span><span class="mf">60.0</span><span class="o">*</span><span class="mf">60.0</span>
 <span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;td_unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;s&#39;</span>
@@ -292,10 +281,9 @@ NIRSpec G140M - NIRSpec G140H - MIRI LRS - NIRISS SOSS</p>
 </div>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">inst_dict</span> <span class="o">=</span> <span class="n">jdi</span><span class="o">.</span><span class="n">load_mode_dict</span><span class="p">(</span><span class="s1">&#39;NIRSpec G140H&#39;</span><span class="p">)</span>
 
-<span class="c1">#loading in instrument dictionaries allow you to personalize some of</span>
-<span class="c1">#the fields that are predefined in the templates. The templates have</span>
-<span class="c1">#the subbarays with the lowest frame times and the readmodes with 1 frame per group.</span>
-<span class="c1">#if that is not what you want. change these fields</span>
+<span class="c1"># Loading an instrument dictionary lets you personalize template fields.</span>
+<span class="c1"># Templates use subarrays with the lowest frame times and readout modes</span>
+<span class="c1"># with one frame per group; change these fields when needed.</span>
 
 <span class="c1">#Try printing this out to get a feel for how it is structured:</span>
 
@@ -362,9 +350,9 @@ the Order 2 calculation.</p>
 </section>
 <section id="running-pandexo">
 <h3>Running PandExo<a class="headerlink" href="#running-pandexo" title="Link to this heading"></a></h3>
-<p>You have <strong>four options</strong> for running PandExo. All of them are accessed
-through attribute <strong>jdi.run_pandexo</strong>. See examples below.</p>
-<p><code class="docutils literal notranslate"><span class="pre">jdi.run_pandexo(exo,</span> <span class="pre">inst,</span> <span class="pre">param_space</span> <span class="pre">=</span> <span class="pre">0,</span> <span class="pre">param_range</span> <span class="pre">=</span> <span class="pre">0,save_file</span> <span class="pre">=</span> <span class="pre">True,</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">output_path=os.getcwd(),</span> <span class="pre">output_file</span> <span class="pre">=</span> <span class="pre">'',</span> <span class="pre">verbose=True)</span></code></p>
+<p>You have <strong>four options</strong> for running PandExo. All use
+<strong>jdi.run_pandexo</strong>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">jdi.run_pandexo(exo,</span> <span class="pre">inst,</span> <span class="pre">param_space=0,</span> <span class="pre">param_range=0,</span> <span class="pre">save_file=True,</span> <span class="pre">output_path=None,</span> <span class="pre">output_file='',</span> <span class="pre">num_cores=None,</span> <span class="pre">verbose=True)</span></code></p>
 <section id="option-1-run-single-instrument-mode-single-planet">
 <h4>Option 1- Run single instrument mode, single planet<a class="headerlink" href="#option-1-run-single-instrument-mode-single-planet" title="Link to this heading"></a></h4>
 <p>If you forget which instruments are available run
@@ -384,7 +372,7 @@ through attribute <strong>jdi.run_pandexo</strong>. See examples below.</p>
 <span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;star&#39;</span><span class="p">][</span><span class="s1">&#39;r_unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;R_sun&#39;</span>
 <span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;f_unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;rp^2/r*^2&#39;</span>
 
-<span class="n">result</span> <span class="o">=</span> <span class="n">jdi</span><span class="o">.</span><span class="n">run_pandexo</span><span class="p">(</span><span class="n">exo_dict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;MIRI LRS&#39;</span><span class="p">])</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">jdi</span><span class="o">.</span><span class="n">run_pandexo</span><span class="p">(</span><span class="n">exo_dict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;MIRI LRS&#39;</span><span class="p">],</span> <span class="n">save_file</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Note, you can turn off print statements with <code class="docutils literal notranslate"><span class="pre">verbose=False</span></code></p>
@@ -400,22 +388,21 @@ precision. Here the spectrum is binned to <code class="docutils literal notransl
 </section>
 <section id="option-2-run-single-instrument-mode-with-user-dict-single-planet">
 <h4>Option 2- Run single instrument mode (with user dict), single planet<a class="headerlink" href="#option-2-run-single-instrument-mode-with-user-dict-single-planet" title="Link to this heading"></a></h4>
-<p>This is the same thing as option 1 but instead of feeding it a list of
-keys, you can feed it a instrument dictionary (this is for users who
-wanted to simulate something NOT pre defined within pandexo)</p>
+<p>This is the same as option 1, but it accepts an instrument dictionary so
+you can customize a supported configuration.</p>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">inst_dict</span> <span class="o">=</span> <span class="n">jdi</span><span class="o">.</span><span class="n">load_mode_dict</span><span class="p">(</span><span class="s1">&#39;NIRSpec G140H&#39;</span><span class="p">)</span>
-<span class="c1">#personalize subarray</span>
+<span class="c1"># Personalize the subarray.</span>
 <span class="n">inst_dict</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">][</span><span class="s2">&quot;detector&quot;</span><span class="p">][</span><span class="s2">&quot;subarray&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;sub2048&#39;</span>
-<span class="n">result</span> <span class="o">=</span> <span class="n">jdi</span><span class="o">.</span><span class="n">run_pandexo</span><span class="p">(</span><span class="n">exo_dict</span><span class="p">,</span> <span class="n">inst_dict</span><span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">jdi</span><span class="o">.</span><span class="n">run_pandexo</span><span class="p">(</span><span class="n">exo_dict</span><span class="p">,</span> <span class="n">inst_dict</span><span class="p">,</span> <span class="n">save_file</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
 <section id="option-3-run-several-modes-single-planet">
 <h4>Option 3- Run several modes, single planet<a class="headerlink" href="#option-3-run-several-modes-single-planet" title="Link to this heading"></a></h4>
 <p>Use several modes from <strong>print_instruments()</strong> options.</p>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#choose select</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Choose selected modes.</span>
 <span class="n">result</span> <span class="o">=</span> <span class="n">jdi</span><span class="o">.</span><span class="n">run_pandexo</span><span class="p">(</span><span class="n">exo_dict</span><span class="p">,[</span><span class="s1">&#39;NIRSpec G140M&#39;</span><span class="p">,</span><span class="s1">&#39;NIRSpec G235M&#39;</span><span class="p">,</span><span class="s1">&#39;NIRSpec G395M&#39;</span><span class="p">],</span>
-               <span class="n">output_file</span><span class="o">=</span><span class="s1">&#39;three_nirspec_modes.p&#39;</span><span class="p">,</span><span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+               <span class="n">save_file</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="c1">#run all</span>
 <span class="c1">#result = jdi.run_pandexo(exo_dict, [&#39;RUN ALL&#39;], save_file = False)</span>
 </pre></div>
@@ -423,15 +410,14 @@ wanted to simulate something NOT pre defined within pandexo)</p>
 </section>
 <section id="option-4-run-single-mode-several-planet-cases">
 <h4>Option 4- Run single mode, several planet cases<a class="headerlink" href="#option-4-run-single-mode-several-planet-cases" title="Link to this heading"></a></h4>
-<p>Use a single mode from <strong>print_instruments()</strong> options. But explore
-parameter space with respect to <strong>any</strong> parameter in the exo dict. The
-example below uses a few planet radii so the notebook remains runnable
-without external model files.</p>
-<p>You can loop through anything in the exoplanet dictionary. It will be
-planet, star or observation followed by whatever you want to loop
-through in that set.</p>
-<p>i.e. planet+exopath, star+temp, star+metal, star+logg,
-observation+sat_level.. etc</p>
+<p>Use a single mode from <strong>print_instruments()</strong> and explore parameter
+space for <strong>any</strong> value in the exoplanet dictionary. The example below
+uses a few planet radii so the notebook remains runnable without
+external model files.</p>
+<p>Use <code class="docutils literal notranslate"><span class="pre">planet</span></code>, <code class="docutils literal notranslate"><span class="pre">star</span></code>, or <code class="docutils literal notranslate"><span class="pre">observation</span></code> followed by the key to
+vary.</p>
+<p>For example: <code class="docutils literal notranslate"><span class="pre">planet+exopath</span></code>, <code class="docutils literal notranslate"><span class="pre">star+temp</span></code>, <code class="docutils literal notranslate"><span class="pre">star+metal</span></code>,
+<code class="docutils literal notranslate"><span class="pre">star+logg</span></code>, or <code class="docutils literal notranslate"><span class="pre">observation+sat_level</span></code>.</p>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Loop over a small, self-contained planet-radius grid.</span>
 <span class="c1"># This keeps the example runnable without requiring external model files.</span>
 <span class="n">exo_dict</span><span class="p">[</span><span class="s1">&#39;planet&#39;</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;constant&#39;</span>
@@ -454,8 +440,8 @@ observation+sat_level.. etc</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="installation_windows.html" class="btn btn-neutral float-left" title="Windows Installing Guide for PandExo" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="jwstinput.html" class="btn btn-neutral float-right" title="Possible Instrument Input Params" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="installation_windows.html" class="btn btn-neutral float-left" title="Windows Installation Guide for PandExo" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="jwstinput.html" class="btn btn-neutral float-right" title="Instrument Configuration Parameters" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

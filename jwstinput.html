@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Possible Instrument Input Params &mdash; PandExo 2026.7 documentation</title>
+  <title>Instrument Configuration Parameters &mdash; PandExo 2026.7 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
 
@@ -19,7 +19,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Py Dict Structure of JWST Output" href="jwstdict.html" />
+    <link rel="next" title="JWST Output Dictionary" href="jwstdict.html" />
     <link rel="prev" title="JWST Tutorial" href="tutorialjwst.html" /> 
 </head>
 
@@ -48,9 +48,9 @@
 <li class="toctree-l1"><a class="reference internal" href="installation.html#installation-with-pip-or-git">Installation with Pip or Git</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html#final-test-for-success">Final Test for Success</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html#the-importance-of-upgrading-pandexo">The Importance of Upgrading PandExo</a></li>
-<li class="toctree-l1"><a class="reference internal" href="installation_windows.html">Windows Installing Guide for PandExo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation_windows.html">Windows Installation Guide for PandExo</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorialjwst.html">JWST Tutorial</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Possible Instrument Input Params</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Instrument Configuration Parameters</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#nirspec">NIRSpec</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#disperser-filter-combinations">Disperser/filter combinations</a></li>
 </ul>
@@ -61,7 +61,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#groups-and-readouts">Groups and readouts</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="jwstdict.html">Py Dict Structure of JWST Output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="jwstdict.html">JWST Output Dictionary</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorialhst.html">HST Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="engine.html">API Reference</a></li>
 </ul>
@@ -80,7 +80,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Possible Instrument Input Params</li>
+      <li class="breadcrumb-item active">Instrument Configuration Parameters</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/jwstinput.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -90,13 +90,13 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="possible-instrument-input-params">
-<h1>Possible Instrument Input Params<a class="headerlink" href="#possible-instrument-input-params" title="Link to this heading"></a></h1>
+  <section id="instrument-configuration-parameters">
+<h1>Instrument Configuration Parameters<a class="headerlink" href="#instrument-configuration-parameters" title="Link to this heading"></a></h1>
 <p>Instrument dictionaries use Pandeia’s lowercase configuration values. Load a
 template with <code class="docutils literal notranslate"><span class="pre">jdi.load_mode_dict('NIRSpec</span> <span class="pre">G395H')</span></code>, then edit its
-<code class="docutils literal notranslate"><span class="pre">configuration</span></code> keys.
-The values below are the combinations exposed by PandExo’s web interface;
-confirm final timing and detector settings in the current APT.</p>
+<code class="docutils literal notranslate"><span class="pre">configuration</span></code> keys. The values below describe the 2026.7 PandExo release
+and the combinations exposed by its web interface; confirm final timing and
+detector settings in the current APT.</p>
 <section id="nirspec">
 <h2>NIRSpec<a class="headerlink" href="#nirspec" title="Link to this heading"></a></h2>
 <section id="disperser-filter-combinations">
@@ -142,7 +142,8 @@ JWST time-series observations and PandExo reports a warning.</p>
 <h2>Groups and readouts<a class="headerlink" href="#groups-and-readouts" title="Link to this heading"></a></h2>
 <p>Set <code class="docutils literal notranslate"><span class="pre">inst_dict['configuration']['detector']['ngroup']</span> <span class="pre">=</span> <span class="pre">'optimize'</span></code> to let
 PandExo select a group count, or enter an integer valid for the selected
-Pandeia detector configuration. NIRCam and DHS templates also accept
+Pandeia detector configuration. <code class="docutils literal notranslate"><span class="pre">optimize</span></code> is a PandExo convenience value,
+not a native Pandeia detector value. NIRCam and DHS templates also accept
 <code class="docutils literal notranslate"><span class="pre">readout_pattern</span> <span class="pre">=</span> <span class="pre">'optimize'</span></code> to account for saturation and estimated data
 excess when choosing a readout.</p>
 <p>Use <code class="docutils literal notranslate"><span class="pre">jdi.subarrays()</span></code>, <code class="docutils literal notranslate"><span class="pre">jdi.dispersers()</span></code>, and <code class="docutils literal notranslate"><span class="pre">jdi.filters()</span></code> to inspect
@@ -155,7 +156,7 @@ the values known to the installed PandExo release.</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="tutorialjwst.html" class="btn btn-neutral float-left" title="JWST Tutorial" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="jwstdict.html" class="btn btn-neutral float-right" title="Py Dict Structure of JWST Output" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="jwstdict.html" class="btn btn-neutral float-right" title="JWST Output Dictionary" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
