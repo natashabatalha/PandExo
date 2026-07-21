@@ -1,19 +1,21 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Possible Instrument Input Params &mdash; PandExo  documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+  <title>Possible Instrument Input Params &mdash; PandExo 2026.7 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
   
-        <script src="_static/documentation_options.js?v=5929fcd5"></script>
-        <script src="_static/doctools.js?v=888ff710"></script>
-        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=57d3cf08"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -45,24 +47,23 @@
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Pre-installation Data Download</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html#installation-with-pip-or-git">Installation with Pip or Git</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html#final-test-for-success">Final Test for Success</a></li>
-<li class="toctree-l1"><a class="reference internal" href="installation.html#troubleshooting-common-errors">Troubleshooting-Common Errors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html#the-importance-of-upgrading-pandexo">The Importance of Upgrading PandExo</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation_windows.html">Windows Installing Guide for PandExo</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorialjwst.html">JWST Tutorial</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Possible Instrument Input Params</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#nirspec">NIRSpec</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#grisms-filter-combinations">Grisms/Filter combinations</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#subarrays">Subarrays</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#disperser-filter-combinations">Disperser/filter combinations</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#niriss">NIRISS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#nircam">NIRCam</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#miri">MIRI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#groups-and-readouts">Groups and readouts</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="jwstdict.html">Py Dict Structure of JWST Output</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorialhst.html">HST Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="engine.html">The Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="engine.html">API Reference</a></li>
 </ul>
 
         </div>
@@ -90,26 +91,62 @@
            <div itemprop="articleBody">
              
   <section id="possible-instrument-input-params">
-<h1>Possible Instrument Input Params<a class="headerlink" href="#possible-instrument-input-params" title="Link to this heading">¶</a></h1>
-<p>Below are all the possible instrument input parameters, which match
-the JWST APT (downloadable here).</p>
+<h1>Possible Instrument Input Params<a class="headerlink" href="#possible-instrument-input-params" title="Link to this heading"></a></h1>
+<p>Instrument dictionaries use Pandeia’s lowercase configuration values. Load a
+template with <code class="docutils literal notranslate"><span class="pre">jdi.load_mode_dict('NIRSpec</span> <span class="pre">G395H')</span></code>, then edit its
+<code class="docutils literal notranslate"><span class="pre">configuration</span></code> keys.
+The values below are the combinations exposed by PandExo’s web interface;
+confirm final timing and detector settings in the current APT.</p>
 <section id="nirspec">
-<h2>NIRSpec<a class="headerlink" href="#nirspec" title="Link to this heading">¶</a></h2>
-<section id="grisms-filter-combinations">
-<h3>Grisms/Filter combinations<a class="headerlink" href="#grisms-filter-combinations" title="Link to this heading">¶</a></h3>
-</section>
-<section id="subarrays">
-<h3>Subarrays<a class="headerlink" href="#subarrays" title="Link to this heading">¶</a></h3>
+<h2>NIRSpec<a class="headerlink" href="#nirspec" title="Link to this heading"></a></h2>
+<section id="disperser-filter-combinations">
+<h3>Disperser/filter combinations<a class="headerlink" href="#disperser-filter-combinations" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">g140m</span></code> or <code class="docutils literal notranslate"><span class="pre">g140h</span></code> with <code class="docutils literal notranslate"><span class="pre">f070lp</span></code> or <code class="docutils literal notranslate"><span class="pre">f100lp</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">g235m</span></code> or <code class="docutils literal notranslate"><span class="pre">g235h</span></code> with <code class="docutils literal notranslate"><span class="pre">f170lp</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">g395m</span></code> or <code class="docutils literal notranslate"><span class="pre">g395h</span></code> with <code class="docutils literal notranslate"><span class="pre">f290lp</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">prism</span></code> with <code class="docutils literal notranslate"><span class="pre">clear</span></code></p></li>
+</ul>
+<p>All grating modes support <code class="docutils literal notranslate"><span class="pre">sub2048</span></code>, <code class="docutils literal notranslate"><span class="pre">sub1024a</span></code>, <code class="docutils literal notranslate"><span class="pre">sub1024b</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">sub512</span></code>. PRISM/CLEAR does not support <code class="docutils literal notranslate"><span class="pre">sub1024a</span></code>; it additionally supports
+the multistripe subarrays <code class="docutils literal notranslate"><span class="pre">s256m2_prm</span></code>, <code class="docutils literal notranslate"><span class="pre">s128m4_prm</span></code>, <code class="docutils literal notranslate"><span class="pre">s64m8_prm</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">s32m16_prm</span></code>. Multistripe subarrays are valid only with PRISM/CLEAR.</p>
 </section>
 </section>
 <section id="niriss">
-<h2>NIRISS<a class="headerlink" href="#niriss" title="Link to this heading">¶</a></h2>
+<h2>NIRISS<a class="headerlink" href="#niriss" title="Link to this heading"></a></h2>
+<p>NIRISS SOSS supports <code class="docutils literal notranslate"><span class="pre">substrip256</span></code>, <code class="docutils literal notranslate"><span class="pre">substrip96</span></code>,
+<code class="docutils literal notranslate"><span class="pre">sub17stripe_soss</span></code>, <code class="docutils literal notranslate"><span class="pre">sub60stripe_soss</span></code>, <code class="docutils literal notranslate"><span class="pre">sub204stripe_soss</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">sub680stripe_soss</span></code>. Order 1 is the default; order 2 extraction is available
+with <code class="docutils literal notranslate"><span class="pre">substrip256</span></code> by setting <code class="docutils literal notranslate"><span class="pre">inst_dict['strategy']['order']</span> <span class="pre">=</span> <span class="pre">2</span></code>.</p>
 </section>
 <section id="nircam">
-<h2>NIRCam<a class="headerlink" href="#nircam" title="Link to this heading">¶</a></h2>
+<h2>NIRCam<a class="headerlink" href="#nircam" title="Link to this heading"></a></h2>
+<p>Long-wave grism time series use <code class="docutils literal notranslate"><span class="pre">grismr</span></code> with <code class="docutils literal notranslate"><span class="pre">f322w2</span></code> or <code class="docutils literal notranslate"><span class="pre">f444w</span></code> and
+<code class="docutils literal notranslate"><span class="pre">subgrism64</span></code>, <code class="docutils literal notranslate"><span class="pre">subgrism128</span></code>, or <code class="docutils literal notranslate"><span class="pre">subgrism256</span></code>. One- and four-output
+variants are available.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">NIRCam</span> <span class="pre">DHS</span></code> template pairs one short-wave filter (<code class="docutils literal notranslate"><span class="pre">f070w</span></code>, <code class="docutils literal notranslate"><span class="pre">f090w</span></code>,
+<code class="docutils literal notranslate"><span class="pre">f115w</span></code>, <code class="docutils literal notranslate"><span class="pre">f150w2</span></code>, or <code class="docutils literal notranslate"><span class="pre">f200w</span></code>) with <code class="docutils literal notranslate"><span class="pre">f322w2</span></code> or <code class="docutils literal notranslate"><span class="pre">f444w</span></code>. Supported
+DHS subarrays are <code class="docutils literal notranslate"><span class="pre">sub41s1_2-spectra</span></code>, <code class="docutils literal notranslate"><span class="pre">sub82s2_4-spectra</span></code>,
+<code class="docutils literal notranslate"><span class="pre">sub164s4_8-spectra</span></code>, and <code class="docutils literal notranslate"><span class="pre">sub260s4_8-spectra</span></code>. Short- and long-wave
+channels are observed simultaneously but returned one channel per calculation.</p>
 </section>
 <section id="miri">
-<h2>MIRI<a class="headerlink" href="#miri" title="Link to this heading">¶</a></h2>
+<h2>MIRI<a class="headerlink" href="#miri" title="Link to this heading"></a></h2>
+<p>MIRI slitless LRS uses <code class="docutils literal notranslate"><span class="pre">p750l</span></code> and <code class="docutils literal notranslate"><span class="pre">slitlessprism</span></code>,
+<code class="docutils literal notranslate"><span class="pre">slitlessprism_ip</span></code>, or <code class="docutils literal notranslate"><span class="pre">slitlessprism_ips</span></code>. MIRI LRS slit mode can be
+simulated with <code class="docutils literal notranslate"><span class="pre">subslit</span></code> or <code class="docutils literal notranslate"><span class="pre">full</span></code>, but it is not currently offered for
+JWST time-series observations and PandExo reports a warning.</p>
+</section>
+<section id="groups-and-readouts">
+<h2>Groups and readouts<a class="headerlink" href="#groups-and-readouts" title="Link to this heading"></a></h2>
+<p>Set <code class="docutils literal notranslate"><span class="pre">inst_dict['configuration']['detector']['ngroup']</span> <span class="pre">=</span> <span class="pre">'optimize'</span></code> to let
+PandExo select a group count, or enter an integer valid for the selected
+Pandeia detector configuration. NIRCam and DHS templates also accept
+<code class="docutils literal notranslate"><span class="pre">readout_pattern</span> <span class="pre">=</span> <span class="pre">'optimize'</span></code> to account for saturation and estimated data
+excess when choosing a readout.</p>
+<p>Use <code class="docutils literal notranslate"><span class="pre">jdi.subarrays()</span></code>, <code class="docutils literal notranslate"><span class="pre">jdi.dispersers()</span></code>, and <code class="docutils literal notranslate"><span class="pre">jdi.filters()</span></code> to inspect
+the values known to the installed PandExo release.</p>
 </section>
 </section>
 
@@ -124,7 +161,7 @@ the JWST APT (downloadable here).</p>
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright Updated 2022.</p>
+    <p>&#169; Copyright 2016-2026, PandExo developers.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

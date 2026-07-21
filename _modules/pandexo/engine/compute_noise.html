@@ -1,163 +1,89 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" data-content_root="../../../">
 <head>
-  <meta charset="utf-8">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>engine.compute_noise &mdash; PandExo  documentation</title>
-  
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pandexo.engine.compute_noise &mdash; PandExo 2026.7 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
 
   
-  
-  
-  
-
-  
-  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
-  
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../_static/language_data.js"></script>
-    
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
-
-    
-
-  
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" /> 
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=57d3cf08"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
 
           
-            <a href="../../index.html" class="icon icon-home"> PandExo
           
-
-          
+          <a href="../../../index.html" class="icon icon-home">
+            PandExo
           </a>
-
-          
-            
-            
-          
-
-          
 <div role="search">
-  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../includeme.html">Getting Started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Pre-installation Data Download</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../installation.html#installation-with-pip-or-git">Installation with Pip or Git</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../installation.html#final-test-for-success">Final Test for Success</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../installation.html#troubleshooting-common-errors">Troubleshooting-Common Errors</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../installation.html#the-importance-of-upgrading-pandexo">The Importance of Upgrading PandExo</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../installation_windows.html">Windows Installing Guide for PandExo</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../tutorialjwst.html">JWST Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../jwstinput.html">Possible Instrument Input Params</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../jwstdict.html">Py Dict Structure of JWST Output</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../tutorialhst.html">HST Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../engine.html">The Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../includeme.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Pre-installation Data Download</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html#installation-with-pip-or-git">Installation with Pip or Git</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html#final-test-for-success">Final Test for Success</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html#the-importance-of-upgrading-pandexo">The Importance of Upgrading PandExo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation_windows.html">Windows Installing Guide for PandExo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorialjwst.html">JWST Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../jwstinput.html">Possible Instrument Input Params</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../jwstdict.html">Py Dict Structure of JWST Output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorialhst.html">HST Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../engine.html">API Reference</a></li>
 </ul>
 
-            
-          
         </div>
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../index.html">PandExo</a>
-        
+          <a href="../../../index.html">PandExo</a>
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="../../index.html">Docs</a> &raquo;</li>
-        
-          <li><a href="../index.html">Module code</a> &raquo;</li>
-        
-      <li>engine.compute_noise</li>
-    
-    
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pandexo.engine.compute_noise</li>
       <li class="wy-breadcrumbs-aside">
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <h1>Source code for engine.compute_noise</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+             
+  <h1>Source code for pandexo.engine.compute_noise</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<div class="viewcode-block" id="ExtractSpec"><a class="viewcode-back" href="../../engine.html#engine.compute_noise.ExtractSpec">[docs]</a><span class="k">class</span> <span class="nc">ExtractSpec</span><span class="p">():</span>
-    <span class="sd">&quot;&quot;&quot;Different methods for computing noise. </span>
+<div class="viewcode-block" id="ExtractSpec">
+<a class="viewcode-back" href="../../../engine.html#pandexo.engine.compute_noise.ExtractSpec">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExtractSpec</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Different methods for computing noise. </span>
 <span class="sd">    </span>
 <span class="sd">    PandExo has several different methods of computing noise.  </span>
 <span class="sd">    MULTIACCUM (slope method) assumses that each frame is fit for up the ramp and </span>
@@ -202,27 +128,46 @@
 <span class="sd">        computes noise using multiaccum formulation</span>
 <span class="sd">    run_f_minus_l</span>
 <span class="sd">        computs noise using first minus last</span>
-<span class="sd">    run_phase_spec</span>
-<span class="sd">        computs noise for phase curve observations     </span>
+<span class="sd">    run_phase_spec_fml</span>
+<span class="sd">        computes first-minus-last noise for legacy phase curve observations</span>
+<span class="sd">    run_phase_spec_slope</span>
+<span class="sd">        computes Pandeia slope noise for multistripe phase curve observations</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inn</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">rn</span><span class="p">,</span> <span class="n">extraction_area</span><span class="p">,</span> <span class="n">timing</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inn</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">rn</span><span class="p">,</span> <span class="n">extraction_area</span><span class="p">,</span> <span class="n">timing</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">inn</span> <span class="o">=</span> <span class="n">inn</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">out</span> <span class="o">=</span> <span class="n">out</span> 
         <span class="bp">self</span><span class="o">.</span><span class="n">ngroups_per_int</span> <span class="o">=</span> <span class="n">timing</span><span class="p">[</span><span class="s2">&quot;APT: Num Groups per Integration&quot;</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">nint_out</span> <span class="o">=</span> <span class="n">timing</span><span class="p">[</span><span class="s2">&quot;Num Integrations Out of Transit&quot;</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">nint_in</span> <span class="o">=</span> <span class="n">timing</span><span class="p">[</span><span class="s2">&quot;Num Integrations In Transit&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">real_nint_out</span> <span class="o">=</span> <span class="n">timing</span><span class="p">[</span><span class="s2">&quot;Num Integrations Out of Transit&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">real_nint_in</span> <span class="o">=</span> <span class="n">timing</span><span class="p">[</span><span class="s2">&quot;Num Integrations In Transit&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nsuperstripe</span> <span class="o">=</span> <span class="n">timing</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Num Superstripes&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nint_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">real_nint_out</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nint_in</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">real_nint_in</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tframe</span> <span class="o">=</span> <span class="n">timing</span><span class="p">[</span><span class="s2">&quot;Seconds per Frame&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">frame_zero_dead</span> <span class="o">=</span> <span class="n">timing</span><span class="p">[</span><span class="s2">&quot;Zero Frame Efficiency Loss&quot;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">rn</span> <span class="o">=</span> <span class="n">rn</span> 
         <span class="bp">self</span><span class="o">.</span><span class="n">extraction_area</span> <span class="o">=</span> <span class="n">extraction_area</span>
 
-        <span class="c1">#on source out versus in </span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">exptime_per_int</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tframe</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ngroups_per_int</span><span class="o">-</span><span class="mf">1.0</span><span class="p">)</span>
+        <span class="c1"># Pandeia is run with nint=1. In multistripe modes measurement_time</span>
+        <span class="c1"># includes every stripe in one complete cycle, while each wavelength</span>
+        <span class="c1"># receives only the per-stripe fraction of that science time. Every</span>
+        <span class="c1"># completed cycle nevertheless contributes one independent ramp at</span>
+        <span class="c1"># every wavelength.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exptime_per_int</span> <span class="o">=</span> <span class="n">timing</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s2">&quot;Measurement Time per Integration (sec)&quot;</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tframe</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ngroups_per_int</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">frame_zero_dead</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">nsuperstripe</span>
+        <span class="p">)</span>
+        <span class="n">measurement_time_in</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inn</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;scalar&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;scalar&#39;</span><span class="p">])[</span><span class="s1">&#39;measurement_time&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">on_source_in</span> <span class="o">=</span> <span class="n">measurement_time_in</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">nsuperstripe</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">nint_in</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">on_source_out</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;scalar&#39;</span><span class="p">][</span><span class="s1">&#39;measurement_time&#39;</span><span class="p">]</span>
+            <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">nsuperstripe</span>
+            <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">nint_out</span>
+        <span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">on_source_in</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tframe</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ngroups_per_int</span><span class="o">-</span><span class="mf">1.0</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">nint_in</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">on_source_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tframe</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ngroups_per_int</span><span class="o">-</span><span class="mf">1.0</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">nint_out</span>
-
-<div class="viewcode-block" id="ExtractSpec.loopingL"><a class="viewcode-back" href="../../engine.html#engine.compute_noise.ExtractSpec.loopingL">[docs]</a>    <span class="k">def</span> <span class="nf">loopingL</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cen</span><span class="p">,</span> <span class="n">signal_col</span><span class="p">,</span> <span class="n">noise_col</span><span class="p">,</span> <span class="n">bkg_col</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Finds bottom of the optimal extraction region.</span>
+<div class="viewcode-block" id="ExtractSpec.loopingL">
+<a class="viewcode-back" href="../../../engine.html#pandexo.engine.compute_noise.ExtractSpec.loopingL">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">loopingL</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cen</span><span class="p">,</span> <span class="n">signal_col</span><span class="p">,</span> <span class="n">noise_col</span><span class="p">,</span> <span class="n">bkg_col</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Finds bottom of the optimal extraction region.</span>
 <span class="sd">    </span>
 <span class="sd">        Find location where SNR is the highest and loop from highest value downward </span>
 <span class="sd">    </span>
@@ -257,8 +202,11 @@
         <span class="k">return</span> <span class="mi">0</span></div>
 
 
-<div class="viewcode-block" id="ExtractSpec.loopingU"><a class="viewcode-back" href="../../engine.html#engine.compute_noise.ExtractSpec.loopingU">[docs]</a>    <span class="k">def</span> <span class="nf">loopingU</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cen</span><span class="p">,</span> <span class="n">signal_col</span><span class="p">,</span> <span class="n">noise_col</span><span class="p">,</span> <span class="n">bkg_col</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Finds top of the optimal extraction region.</span>
+
+<div class="viewcode-block" id="ExtractSpec.loopingU">
+<a class="viewcode-back" href="../../../engine.html#pandexo.engine.compute_noise.ExtractSpec.loopingU">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">loopingU</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cen</span><span class="p">,</span> <span class="n">signal_col</span><span class="p">,</span> <span class="n">noise_col</span><span class="p">,</span> <span class="n">bkg_col</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Finds top of the optimal extraction region.</span>
 <span class="sd">    </span>
 <span class="sd">        Find location where SNR is the highest and loop from highest value upward </span>
 <span class="sd">    </span>
@@ -292,8 +240,11 @@
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">signal_col</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span> </div>
 
 
-<div class="viewcode-block" id="ExtractSpec.sum_spatial"><a class="viewcode-back" href="../../engine.html#engine.compute_noise.ExtractSpec.sum_spatial">[docs]</a>    <span class="k">def</span> <span class="nf">sum_spatial</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">extract_info</span><span class="p">):</span>    
-        <span class="sd">&quot;&quot;&quot;Sum pixel in the spatial direction </span>
+
+<div class="viewcode-block" id="ExtractSpec.sum_spatial">
+<a class="viewcode-back" href="../../../engine.html#pandexo.engine.compute_noise.ExtractSpec.sum_spatial">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sum_spatial</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">extract_info</span><span class="p">):</span>    
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sum pixel in the spatial direction </span>
 <span class="sd">        </span>
 <span class="sd">        Takes extraction info from `extract_region` and sums pixels in that region </span>
 <span class="sd">        taking into account integrations and number of transits </span>
@@ -362,10 +313,16 @@
                 <span class="s1">&#39;var_in_1d&#39;</span><span class="p">:</span><span class="n">var_in_1d</span><span class="p">,</span> <span class="s1">&#39;var_out_1d&#39;</span><span class="p">:</span><span class="n">var_out_1d</span><span class="p">,</span>
                 <span class="s1">&#39;rn[out,in]&#39;</span><span class="p">:[</span><span class="n">rn_out_1d</span><span class="p">,</span><span class="n">rn_in_1d</span><span class="p">],</span><span class="s1">&#39;bkg[out,in]&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">sky_in_1d</span><span class="p">,</span><span class="n">sky_out_1d</span><span class="p">],</span> 
                 <span class="s1">&#39;extract_info&#39;</span><span class="p">:</span><span class="n">extract_info</span><span class="p">,</span><span class="s1">&#39;on_source_in&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">on_source_in</span><span class="p">,</span> 
-                <span class="s1">&#39;on_source_out&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">on_source_out</span><span class="p">}</span></div>
+                <span class="s1">&#39;on_source_out&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">on_source_out</span><span class="p">,</span>
+                <span class="s1">&#39;nint_in&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">nint_in</span><span class="p">,</span> <span class="s1">&#39;nint_out&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">nint_out</span><span class="p">,</span>
+                <span class="s1">&#39;real_nint_in&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">real_nint_in</span><span class="p">,</span>
+                <span class="s1">&#39;real_nint_out&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">real_nint_out</span><span class="p">}</span></div>
 
-<div class="viewcode-block" id="ExtractSpec.extract_region"><a class="viewcode-back" href="../../engine.html#engine.compute_noise.ExtractSpec.extract_region">[docs]</a>    <span class="k">def</span> <span class="nf">extract_region</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="c1">#second to last </span>
-        <span class="sd">&quot;&quot;&quot;Determine extraction Region</span>
+
+<div class="viewcode-block" id="ExtractSpec.extract_region">
+<a class="viewcode-back" href="../../../engine.html#pandexo.engine.compute_noise.ExtractSpec.extract_region">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">extract_region</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="c1">#second to last </span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Determine extraction Region</span>
 <span class="sd">        </span>
 <span class="sd">        Contains functionality to determine extraction region from Pandeia 2d noise </span>
 <span class="sd">        simulations. Calls `self.loopingL` and `self.loopingU`. </span>
@@ -456,8 +413,11 @@
 
         <span class="k">return</span> <span class="n">extract_info</span></div>
 
-<div class="viewcode-block" id="ExtractSpec.run_2d_extract"><a class="viewcode-back" href="../../engine.html#engine.compute_noise.ExtractSpec.run_2d_extract">[docs]</a>    <span class="k">def</span> <span class="nf">run_2d_extract</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Extract noise from 2d detector image</span>
+
+<div class="viewcode-block" id="ExtractSpec.run_2d_extract">
+<a class="viewcode-back" href="../../../engine.html#pandexo.engine.compute_noise.ExtractSpec.run_2d_extract">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run_2d_extract</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Extract noise from 2d detector image</span>
 <span class="sd">            </span>
 <span class="sd">        Contains functionality to extract noise from 2d detector image</span>
 <span class="sd">            </span>
@@ -470,10 +430,13 @@
         <span class="n">extract</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">extract_region</span><span class="p">()</span>
         <span class="c1">#return summed up pixels </span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sum_spatial</span><span class="p">(</span><span class="n">extract</span><span class="p">)</span></div>
+
         
         
-<div class="viewcode-block" id="ExtractSpec.run_slope_method"><a class="viewcode-back" href="../../engine.html#engine.compute_noise.ExtractSpec.run_slope_method">[docs]</a>    <span class="k">def</span> <span class="nf">run_slope_method</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
-        <span class="sd">&quot;&quot;&quot;Compute noise using Pandeia 1d noise</span>
+<div class="viewcode-block" id="ExtractSpec.run_slope_method">
+<a class="viewcode-back" href="../../../engine.html#pandexo.engine.compute_noise.ExtractSpec.run_slope_method">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run_slope_method</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute noise using Pandeia 1d noise</span>
 <span class="sd">        </span>
 <span class="sd">        Contains functionality to compute noise using Pandeia 1d noise </span>
 <span class="sd">        output products (uses MULTIACCUM) noise formula</span>
@@ -497,7 +460,7 @@
         <span class="n">bkg_flux_out</span> <span class="o">=</span> <span class="n">curves_out</span><span class="p">[</span><span class="s1">&#39;extracted_bg_only&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">on_source_out</span>
 
         <span class="c1">#calculate rn </span>
-        <span class="n">rn_var</span> <span class="o">=</span> <span class="mf">2.0</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">rn</span><span class="o">**</span><span class="mf">2.0</span>
+        <span class="n">rn_var</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rn</span><span class="o">**</span><span class="mf">2.0</span>
                 
         <span class="c1">#1d rn     = rn/pix * # of integrations * #extraction area </span>
         <span class="c1">#not used for noise calcualtions here </span>
@@ -507,31 +470,59 @@
 
         <span class="c1">#In the following the SN is changed to incorporate number of occultations </span>
         <span class="c1">#i.e. multiply by sqrt(n) </span>
-        <span class="n">sn_in</span> <span class="o">=</span> <span class="n">curves_inn</span><span class="p">[</span><span class="s1">&#39;sn&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
-        <span class="n">sn_out</span> <span class="o">=</span> <span class="n">curves_out</span><span class="p">[</span><span class="s1">&#39;sn&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+        <span class="c1">#sn_in = curves_inn[&#39;sn&#39;][1]*np.sqrt(self.nint_in)</span>
+        <span class="c1">#sn_out = curves_out[&#39;sn&#39;][1]*np.sqrt(self.nint_out)</span>
 
-        <span class="n">extracted_flux_inn</span> <span class="o">=</span> <span class="n">curves_inn</span><span class="p">[</span><span class="s1">&#39;extracted_flux&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">on_source_in</span>
+        <span class="c1">#extracted_flux_inn = curves_inn[&#39;extracted_flux&#39;][1]*on_source_in</span>
         
-        <span class="n">extracted_noise_inn</span> <span class="o">=</span> <span class="n">curves_inn</span><span class="p">[</span><span class="s1">&#39;extracted_flux&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="p">(</span><span class="n">sn_in</span><span class="p">)</span>
+        <span class="c1">#extracted_noise_inn = curves_inn[&#39;extracted_flux&#39;][1]/(sn_in)</span>
 
-        <span class="n">extracted_flux_out</span> <span class="o">=</span> <span class="n">curves_out</span><span class="p">[</span><span class="s1">&#39;extracted_flux&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">on_source_out</span>
+        <span class="c1">#extracted_flux_out = curves_out[&#39;extracted_flux&#39;][1]*on_source_out</span>
         
-        <span class="n">extracted_noise_out</span> <span class="o">=</span> <span class="n">curves_out</span><span class="p">[</span><span class="s1">&#39;extracted_flux&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="p">(</span><span class="n">sn_out</span><span class="p">)</span>
+        <span class="c1">#extracted_noise_out = curves_out[&#39;extracted_flux&#39;][1]/(sn_out)</span>
+
+        <span class="n">extracted_flux_inn</span> <span class="o">=</span> <span class="n">curves_inn</span><span class="p">[</span><span class="s1">&#39;extracted_flux&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">nint_in</span>
+
+        <span class="n">extracted_flux_out</span> <span class="o">=</span> <span class="n">curves_out</span><span class="p">[</span><span class="s1">&#39;extracted_flux&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">nint_out</span>
+        <span class="n">extracted_flux_per_int_inn</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">curves_inn</span><span class="p">[</span><span class="s1">&#39;extracted_flux&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+            <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">inn</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;scalar&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;scalar&#39;</span><span class="p">])[</span><span class="s1">&#39;measurement_time&#39;</span><span class="p">]</span>
+            <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nsuperstripe</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">extracted_flux_per_int_out</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">curves_out</span><span class="p">[</span><span class="s1">&#39;extracted_flux&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+            <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;scalar&#39;</span><span class="p">][</span><span class="s1">&#39;measurement_time&#39;</span><span class="p">]</span>
+            <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nsuperstripe</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="n">extracted_noise_inn</span> <span class="o">=</span> <span class="n">curves_inn</span><span class="p">[</span><span class="s1">&#39;extracted_noise&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nint_in</span><span class="p">)</span>
+
+        <span class="n">extracted_noise_out</span> <span class="o">=</span> <span class="n">curves_out</span><span class="p">[</span><span class="s1">&#39;extracted_noise&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nint_out</span><span class="p">)</span>
 
         <span class="c1">#units of this unconventional.. sigma/s</span>
         <span class="c1">#because snr = extracted flux / extracted noise and </span>
         <span class="c1">#extracted flux in units of electrons /s</span>
-        <span class="n">varin</span> <span class="o">=</span> <span class="p">(</span><span class="n">extracted_noise_inn</span><span class="o">*</span><span class="n">on_source_in</span><span class="p">)</span><span class="o">**</span><span class="mf">2.0</span>
-        <span class="n">varout</span> <span class="o">=</span> <span class="p">(</span><span class="n">extracted_noise_out</span><span class="o">*</span><span class="n">on_source_out</span><span class="p">)</span><span class="o">**</span><span class="mf">2.0</span>
+        <span class="c1">#varin = (extracted_noise_inn*on_source_in)**2.0</span>
+        <span class="c1">#varout = (extracted_noise_out*on_source_out)**2.0</span>
+        <span class="n">varin</span> <span class="o">=</span> <span class="n">extracted_noise_inn</span><span class="o">**</span><span class="mi">2</span>
+        <span class="n">varout</span> <span class="o">=</span> <span class="n">extracted_noise_out</span><span class="o">**</span><span class="mi">2</span>
 
-        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;photon_out_1d&#39;</span><span class="p">:</span><span class="n">extracted_flux_out</span><span class="p">,</span> <span class="s1">&#39;photon_in_1d&#39;</span><span class="p">:</span><span class="n">extracted_flux_inn</span><span class="p">,</span> 
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;photon_out_1d&#39;</span><span class="p">:</span><span class="n">extracted_flux_out</span><span class="p">,</span> <span class="s1">&#39;photon_in_1d&#39;</span><span class="p">:</span><span class="n">extracted_flux_inn</span><span class="p">,</span>
+                    <span class="s1">&#39;photon_out_1d_per_int&#39;</span><span class="p">:</span><span class="n">extracted_flux_per_int_out</span><span class="p">,</span>
+                    <span class="s1">&#39;photon_in_1d_per_int&#39;</span><span class="p">:</span><span class="n">extracted_flux_per_int_inn</span><span class="p">,</span>
                     <span class="s1">&#39;var_in_1d&#39;</span><span class="p">:</span><span class="n">varin</span><span class="p">,</span> <span class="s1">&#39;var_out_1d&#39;</span><span class="p">:</span> <span class="n">varout</span><span class="p">,</span><span class="s1">&#39;on_source_in&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">on_source_in</span><span class="p">,</span> 
                 <span class="s1">&#39;on_source_out&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">on_source_out</span><span class="p">,</span><span class="s1">&#39;bkg[out,in]&#39;</span><span class="p">:[</span><span class="n">bkg_flux_out</span><span class="p">,</span><span class="n">bkg_flux_inn</span><span class="p">],</span>
-                <span class="s1">&#39;rn[out,in]&#39;</span><span class="p">:[</span><span class="n">rn_var_out</span><span class="p">,</span><span class="n">rn_var_inn</span><span class="p">]}</span></div>
+                <span class="s1">&#39;rn[out,in]&#39;</span><span class="p">:[</span><span class="n">rn_var_out</span><span class="p">,</span><span class="n">rn_var_inn</span><span class="p">],</span> 
+                <span class="s1">&#39;nint_in&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">nint_in</span><span class="p">,</span> <span class="s1">&#39;nint_out&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">nint_out</span><span class="p">,</span>
+                <span class="s1">&#39;real_nint_in&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">real_nint_in</span><span class="p">,</span>
+                <span class="s1">&#39;real_nint_out&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">real_nint_out</span><span class="p">}</span></div>
+
     
     
-<div class="viewcode-block" id="ExtractSpec.run_f_minus_l"><a class="viewcode-back" href="../../engine.html#engine.compute_noise.ExtractSpec.run_f_minus_l">[docs]</a>    <span class="k">def</span> <span class="nf">run_f_minus_l</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Compute noise using first minus last formula</span>
+<div class="viewcode-block" id="ExtractSpec.run_f_minus_l">
+<a class="viewcode-back" href="../../../engine.html#pandexo.engine.compute_noise.ExtractSpec.run_f_minus_l">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run_f_minus_l</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute noise using first minus last formula</span>
 <span class="sd">        </span>
 <span class="sd">        Uses 1d exracted products from pandeia to compute noise without </span>
 <span class="sd">        multiaccum noise formula from Rauscher 07. Includes readnoise </span>
@@ -562,6 +553,16 @@
         <span class="c1">#extract fluxs</span>
         <span class="n">extracted_flux_inn</span> <span class="o">=</span> <span class="n">curves_inn</span><span class="p">[</span><span class="s1">&#39;extracted_flux&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">on_source_in</span> 
         <span class="n">extracted_flux_out</span> <span class="o">=</span> <span class="n">curves_out</span><span class="p">[</span><span class="s1">&#39;extracted_flux&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">on_source_out</span> 
+        <span class="n">extracted_flux_per_int_inn</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">curves_inn</span><span class="p">[</span><span class="s1">&#39;extracted_flux&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+            <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">inn</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;scalar&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;scalar&#39;</span><span class="p">])[</span><span class="s1">&#39;measurement_time&#39;</span><span class="p">]</span>
+            <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nsuperstripe</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">extracted_flux_per_int_out</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">curves_out</span><span class="p">[</span><span class="s1">&#39;extracted_flux&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+            <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;scalar&#39;</span><span class="p">][</span><span class="s1">&#39;measurement_time&#39;</span><span class="p">]</span>
+            <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nsuperstripe</span><span class="p">)</span>
+        <span class="p">)</span>
                 
         <span class="c1">#background + contamination extracted </span>
         <span class="n">bkg_flux_inn</span> <span class="o">=</span> <span class="n">curves_inn</span><span class="p">[</span><span class="s1">&#39;extracted_bg_only&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">on_source_in</span> 
@@ -571,31 +572,43 @@
         <span class="n">varin</span> <span class="o">=</span> <span class="p">(</span><span class="n">extracted_flux_inn</span> <span class="o">+</span> <span class="n">bkg_flux_inn</span> <span class="o">+</span> <span class="n">rn_var_inn</span><span class="p">)</span>
         <span class="n">varout</span> <span class="o">=</span> <span class="p">(</span><span class="n">extracted_flux_out</span> <span class="o">+</span> <span class="n">bkg_flux_out</span> <span class="o">+</span> <span class="n">rn_var_out</span><span class="p">)</span>
         
-        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;photon_out_1d&#39;</span><span class="p">:</span><span class="n">extracted_flux_out</span><span class="p">,</span> <span class="s1">&#39;photon_in_1d&#39;</span><span class="p">:</span><span class="n">extracted_flux_inn</span><span class="p">,</span> 
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;photon_out_1d&#39;</span><span class="p">:</span><span class="n">extracted_flux_out</span><span class="p">,</span> <span class="s1">&#39;photon_in_1d&#39;</span><span class="p">:</span><span class="n">extracted_flux_inn</span><span class="p">,</span>
+                    <span class="s1">&#39;photon_out_1d_per_int&#39;</span><span class="p">:</span><span class="n">extracted_flux_per_int_out</span><span class="p">,</span>
+                    <span class="s1">&#39;photon_in_1d_per_int&#39;</span><span class="p">:</span><span class="n">extracted_flux_per_int_inn</span><span class="p">,</span>
                     <span class="s1">&#39;var_in_1d&#39;</span><span class="p">:</span><span class="n">varin</span><span class="p">,</span> <span class="s1">&#39;var_out_1d&#39;</span><span class="p">:</span> <span class="n">varout</span><span class="p">,</span><span class="s1">&#39;on_source_in&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">on_source_in</span><span class="p">,</span> 
                 <span class="s1">&#39;on_source_out&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">on_source_out</span><span class="p">,</span> <span class="s1">&#39;rn[out,in]&#39;</span><span class="p">:[</span><span class="n">rn_var_out</span><span class="p">,</span><span class="n">rn_var_inn</span><span class="p">],</span> 
-                <span class="s1">&#39;bkg[out,in]&#39;</span><span class="p">:[</span><span class="n">bkg_flux_out</span><span class="p">,</span><span class="n">bkg_flux_inn</span><span class="p">]}</span></div>
+                <span class="s1">&#39;bkg[out,in]&#39;</span><span class="p">:[</span><span class="n">bkg_flux_out</span><span class="p">,</span><span class="n">bkg_flux_inn</span><span class="p">],</span> 
+                <span class="s1">&#39;nint_in&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">nint_in</span><span class="p">,</span> <span class="s1">&#39;nint_out&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">nint_out</span><span class="p">,</span>
+                <span class="s1">&#39;real_nint_in&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">real_nint_in</span><span class="p">,</span>
+                <span class="s1">&#39;real_nint_out&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">real_nint_out</span><span class="p">}</span></div>
+
     
 
     
-<div class="viewcode-block" id="ExtractSpec.run_phase_spec"><a class="viewcode-back" href="../../engine.html#engine.compute_noise.ExtractSpec.run_phase_spec">[docs]</a>    <span class="k">def</span> <span class="nf">run_phase_spec</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Computes time dependent noise for phase curves.</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_phase_spec_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the resampled phase curve and one-integration cadence.&quot;&quot;&quot;</span>
+        <span class="n">time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inn</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span>
+        <span class="n">tint</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exptime_per_int</span>
+        <span class="n">new_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">time</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">time</span><span class="p">),</span> <span class="n">tint</span><span class="p">)</span>
+        <span class="n">planet_phase</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">new_t</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">inn</span><span class="p">[</span><span class="s1">&#39;planet_phase&#39;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">tint</span><span class="p">,</span> <span class="n">new_t</span><span class="p">,</span> <span class="n">planet_phase</span>
+
+
+<div class="viewcode-block" id="ExtractSpec.run_phase_spec_fml">
+<a class="viewcode-back" href="../../../engine.html#pandexo.engine.compute_noise.ExtractSpec.run_phase_spec_fml">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run_phase_spec_fml</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute time dependent first-minus-last noise for phase curves.</span>
 <span class="sd">        </span>
-<span class="sd">        Computes noise for phase curve analysis instead of spectroscopy. </span>
-<span class="sd">        Using MULTIACCUM formula here but this could be changed in the future.  Does not </span>
-<span class="sd">        return a spectra for each time element... On your own for that. </span>
+<span class="sd">        Computes white-light noise for a legacy readout instead of returning a</span>
+<span class="sd">        spectrum for each time element.</span>
 <span class="sd">        </span>
 <span class="sd">        Return</span>
 <span class="sd">        ------</span>
 <span class="sd">        dict </span>
 <span class="sd">            all optimally extracted 1d products        </span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inn</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span>
-        <span class="n">tint</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exptime_per_int</span> 
+        <span class="n">tint</span><span class="p">,</span> <span class="n">new_t</span><span class="p">,</span> <span class="n">planet_phase</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_phase_spec_inputs</span><span class="p">()</span>
         <span class="n">curves_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;1d&#39;</span><span class="p">]</span>
-        <span class="c1">#don&#39;t input a ridiculously low res phase curve</span>
-        <span class="n">new_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">time</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">time</span><span class="p">),</span> <span class="n">tint</span><span class="p">)</span> 
-        <span class="n">planet_phase</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">new_t</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">inn</span><span class="p">[</span><span class="s1">&#39;planet_phase&#39;</span><span class="p">])</span>
 
         <span class="n">rn_var</span> <span class="o">=</span> <span class="mf">2.0</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">rn</span><span class="o">**</span><span class="mf">2.0</span>
 
@@ -615,51 +628,79 @@
         <span class="n">varin</span> <span class="o">=</span> <span class="n">flux_time_in</span> <span class="o">+</span> <span class="n">bkg_flux_out</span> <span class="o">+</span> <span class="n">rn_var_out</span>
  
         
-        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;photon_out_1d&#39;</span><span class="p">:</span><span class="n">flux_time_out</span><span class="p">,</span> <span class="s1">&#39;photon_in_1d&#39;</span><span class="p">:</span><span class="n">flux_time_in</span><span class="p">,</span> 
-                    <span class="s1">&#39;var_in_1d&#39;</span><span class="p">:</span><span class="n">varin</span><span class="p">,</span> <span class="s1">&#39;var_out_1d&#39;</span><span class="p">:</span> <span class="n">varout</span><span class="p">,</span> <span class="s1">&#39;time&#39;</span><span class="p">:</span><span class="n">new_t</span><span class="p">,</span><span class="s1">&#39;on_source_in&#39;</span><span class="p">:</span><span class="s1">&#39;N/A&#39;</span><span class="p">,</span> 
-                <span class="s1">&#39;on_source_out&#39;</span><span class="p">:</span><span class="s1">&#39;N/A&#39;</span><span class="p">,</span><span class="s1">&#39;rn[out,in]&#39;</span><span class="p">:[</span><span class="n">rn_var_out</span><span class="p">,</span><span class="n">rn_var_out</span><span class="p">],</span> 
-                <span class="s1">&#39;bkg[out,in]&#39;</span><span class="p">:[</span><span class="n">bkg_flux_out</span><span class="p">,</span><span class="n">bkg_flux_out</span><span class="p">]}</span></div></div>
-        
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;photon_out_1d&#39;</span><span class="p">:</span><span class="n">flux_time_out</span><span class="p">,</span> <span class="s1">&#39;photon_in_1d&#39;</span><span class="p">:</span><span class="n">flux_time_in</span><span class="p">,</span>
+                    <span class="s1">&#39;var_in_1d&#39;</span><span class="p">:</span><span class="n">varin</span><span class="p">,</span> <span class="s1">&#39;var_out_1d&#39;</span><span class="p">:</span> <span class="n">varout</span><span class="p">,</span> <span class="s1">&#39;time&#39;</span><span class="p">:</span><span class="n">new_t</span><span class="p">,</span>
+                <span class="s1">&#39;on_source_in&#39;</span><span class="p">:</span><span class="n">tint</span><span class="p">,</span> <span class="s1">&#39;on_source_out&#39;</span><span class="p">:</span><span class="n">tint</span><span class="p">,</span>
+                <span class="s1">&#39;rn[out,in]&#39;</span><span class="p">:[</span><span class="n">rn_var_out</span><span class="p">,</span><span class="n">rn_var_out</span><span class="p">],</span>
+                <span class="s1">&#39;bkg[out,in]&#39;</span><span class="p">:[</span><span class="n">bkg_flux_out</span><span class="p">,</span><span class="n">bkg_flux_out</span><span class="p">]}</span></div>
+
+
+
+<div class="viewcode-block" id="ExtractSpec.run_phase_spec">
+<a class="viewcode-back" href="../../../engine.html#pandexo.engine.compute_noise.ExtractSpec.run_phase_spec">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run_phase_spec</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Retain the historical phase-curve method for direct callers.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_phase_spec_fml</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="ExtractSpec.run_phase_spec_slope">
+<a class="viewcode-back" href="../../../engine.html#pandexo.engine.compute_noise.ExtractSpec.run_phase_spec_slope">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run_phase_spec_slope</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute time dependent Pandeia slope noise for phase curves.</span>
+
+<span class="sd">        Pandeia is evaluated for one out-of-event integration. The extracted</span>
+<span class="sd">        MULTIACCUM noise from that integration is used at every phase sample;</span>
+<span class="sd">        the supplied phase curve changes the white-light signal only.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">tint</span><span class="p">,</span> <span class="n">new_t</span><span class="p">,</span> <span class="n">planet_phase</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_phase_spec_inputs</span><span class="p">()</span>
+        <span class="n">curves_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;1d&#39;</span><span class="p">]</span>
+
+        <span class="n">extracted_flux_out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">curves_out</span><span class="p">[</span><span class="s1">&#39;extracted_flux&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="n">tint</span>
+        <span class="n">flux_time_out</span> <span class="o">=</span> <span class="n">extracted_flux_out</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">new_t</span><span class="p">))</span>
+        <span class="n">flux_time_in</span> <span class="o">=</span> <span class="n">flux_time_out</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">planet_phase</span><span class="p">)</span>
+
+        <span class="n">extracted_noise_out</span> <span class="o">=</span> <span class="n">curves_out</span><span class="p">[</span><span class="s1">&#39;extracted_noise&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">tint</span>
+        <span class="n">varout</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">extracted_noise_out</span><span class="o">**</span><span class="mf">2.0</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">new_t</span><span class="p">))</span>
+        <span class="n">varin</span> <span class="o">=</span> <span class="n">varout</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="n">bkg_flux_out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">curves_out</span><span class="p">[</span><span class="s1">&#39;extracted_bg_only&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="n">tint</span>
+        <span class="n">rn_var_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rn</span><span class="o">**</span><span class="mf">2.0</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">extraction_area</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;photon_out_1d&#39;</span><span class="p">:</span><span class="n">flux_time_out</span><span class="p">,</span> <span class="s1">&#39;photon_in_1d&#39;</span><span class="p">:</span><span class="n">flux_time_in</span><span class="p">,</span>
+                    <span class="s1">&#39;var_in_1d&#39;</span><span class="p">:</span><span class="n">varin</span><span class="p">,</span> <span class="s1">&#39;var_out_1d&#39;</span><span class="p">:</span><span class="n">varout</span><span class="p">,</span> <span class="s1">&#39;time&#39;</span><span class="p">:</span><span class="n">new_t</span><span class="p">,</span>
+                <span class="s1">&#39;on_source_in&#39;</span><span class="p">:</span><span class="n">tint</span><span class="p">,</span> <span class="s1">&#39;on_source_out&#39;</span><span class="p">:</span><span class="n">tint</span><span class="p">,</span>
+                <span class="s1">&#39;rn[out,in]&#39;</span><span class="p">:[</span><span class="n">rn_var_out</span><span class="p">,</span><span class="n">rn_var_out</span><span class="p">],</span>
+                <span class="s1">&#39;bkg[out,in]&#39;</span><span class="p">:[</span><span class="n">bkg_flux_out</span><span class="p">,</span><span class="n">bkg_flux_out</span><span class="p">]}</span></div>
+</div>
 
 </pre></div>
 
            </div>
-           
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &copy; Copyright Updated 2022
-
-    </p>
+    <p>&#169; Copyright 2016-2026, PandExo developers.</p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
-
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

@@ -1,172 +1,116 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" data-content_root="../../../">
 <head>
-  <meta charset="utf-8">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>engine.justdoit &mdash; PandExo  documentation</title>
-  
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pandexo.engine.justdoit &mdash; PandExo 2026.7 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
 
   
-  
-  
-  
-
-  
-  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
-  
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../_static/language_data.js"></script>
-    
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
-
-    
-
-  
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" /> 
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=57d3cf08"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
 
           
-            <a href="../../index.html" class="icon icon-home"> PandExo
           
-
-          
+          <a href="../../../index.html" class="icon icon-home">
+            PandExo
           </a>
-
-          
-            
-            
-          
-
-          
 <div role="search">
-  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../includeme.html">Getting Started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Pre-installation Data Download</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../installation.html#installation-with-pip-or-git">Installation with Pip or Git</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../installation.html#final-test-for-success">Final Test for Success</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../installation.html#troubleshooting-common-errors">Troubleshooting-Common Errors</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../installation.html#the-importance-of-upgrading-pandexo">The Importance of Upgrading PandExo</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../installation_windows.html">Windows Installing Guide for PandExo</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../tutorialjwst.html">JWST Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../jwstinput.html">Possible Instrument Input Params</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../jwstdict.html">Py Dict Structure of JWST Output</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../tutorialhst.html">HST Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../engine.html">The Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../includeme.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Pre-installation Data Download</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html#installation-with-pip-or-git">Installation with Pip or Git</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html#final-test-for-success">Final Test for Success</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html#the-importance-of-upgrading-pandexo">The Importance of Upgrading PandExo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation_windows.html">Windows Installing Guide for PandExo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorialjwst.html">JWST Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../jwstinput.html">Possible Instrument Input Params</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../jwstdict.html">Py Dict Structure of JWST Output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorialhst.html">HST Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../engine.html">API Reference</a></li>
 </ul>
 
-            
-          
         </div>
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../index.html">PandExo</a>
-        
+          <a href="../../../index.html">PandExo</a>
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="../../index.html">Docs</a> &raquo;</li>
-        
-          <li><a href="../index.html">Module code</a> &raquo;</li>
-        
-      <li>engine.justdoit</li>
-    
-    
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pandexo.engine.justdoit</li>
       <li class="wy-breadcrumbs-aside">
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <h1>Source code for engine.justdoit</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">pandeia.engine.instrument_factory</span> <span class="kn">import</span> <span class="n">InstrumentFactory</span>
-<span class="kn">from</span> <span class="nn">.pandexo</span> <span class="kn">import</span> <span class="n">wrapper</span>
-<span class="kn">from</span> <span class="nn">.load_modes</span> <span class="kn">import</span> <span class="n">SetDefaultModes</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">pickle</span> <span class="k">as</span> <span class="nn">pkl</span>
-<span class="kn">from</span> <span class="nn">joblib</span> <span class="kn">import</span> <span class="n">Parallel</span><span class="p">,</span> <span class="n">delayed</span>
-<span class="kn">import</span> <span class="nn">multiprocessing</span>
-<span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">from</span> <span class="nn">.exomast</span> <span class="kn">import</span> <span class="n">get_target_data</span>
-<span class="kn">from</span> <span class="nn">astroquery.simbad</span> <span class="kn">import</span> <span class="n">Simbad</span>
-<span class="kn">import</span> <span class="nn">astropy.units</span> <span class="k">as</span> <span class="nn">u</span>
-<span class="kn">import</span> <span class="nn">copy</span>
+             
+  <h1>Source code for pandexo.engine.justdoit</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span>
+    <span class="s2">&quot;ignore&quot;</span><span class="p">,</span>
+    <span class="n">message</span><span class="o">=</span><span class="s2">&quot;pkg_resources is deprecated as an API.*&quot;</span><span class="p">,</span>
+    <span class="n">module</span><span class="o">=</span><span class="s2">&quot;pandeia.engine.config&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span>
+    <span class="s2">&quot;ignore&quot;</span><span class="p">,</span>
+    <span class="n">message</span><span class="o">=</span><span class="s1">&#39;&quot;Reader&quot; was deprecated.*&#39;</span><span class="p">,</span>
+    <span class="n">module</span><span class="o">=</span><span class="s2">&quot;pandeia.engine.extinction&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span>
+    <span class="s2">&quot;ignore&quot;</span><span class="p">,</span>
+    <span class="c1"># Pandeia&#39;s report formatter evaluates log(0) before checking for zero.</span>
+    <span class="n">message</span><span class="o">=</span><span class="s2">&quot;divide by zero encountered in log&quot;</span><span class="p">,</span>
+    <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">,</span>
+    <span class="n">module</span><span class="o">=</span><span class="s2">&quot;pandeia.engine.report&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pandeia.engine.instrument_factory</span><span class="w"> </span><span class="kn">import</span> <span class="n">InstrumentFactory</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.pandexo</span><span class="w"> </span><span class="kn">import</span> <span class="n">wrapper</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.load_modes</span><span class="w"> </span><span class="kn">import</span> <span class="n">SetDefaultModes</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pickle</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pkl</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">joblib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Parallel</span><span class="p">,</span> <span class="n">delayed</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">multiprocessing</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.exomast</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_target_data</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">astroquery.simbad</span><span class="w"> </span><span class="kn">import</span> <span class="n">Simbad</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">astropy.units</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">u</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
 
 <span class="n">user_cores</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">()</span>
 
@@ -181,17 +125,23 @@
        <span class="s2">&quot;NIRSpec G395H&quot;</span><span class="p">:</span><span class="kc">False</span><span class="p">,</span>
        <span class="s2">&quot;NIRSpec Prism&quot;</span><span class="p">:</span><span class="kc">False</span><span class="p">,</span>
        <span class="s2">&quot;NIRCam F322W2&quot;</span><span class="p">:</span><span class="kc">False</span><span class="p">,</span>
-       <span class="s2">&quot;NIRCam F444W&quot;</span><span class="p">:</span><span class="kc">False</span><span class="p">}</span>
+       <span class="s2">&quot;NIRCam F444W&quot;</span><span class="p">:</span><span class="kc">False</span><span class="p">,</span>
+       <span class="s2">&quot;NIRCam DHS&quot;</span><span class="p">:</span><span class="kc">False</span><span class="p">}</span>
 
 
-<div class="viewcode-block" id="print_instruments"><a class="viewcode-back" href="../../engine.html#engine.justdoit.print_instruments">[docs]</a><span class="k">def</span> <span class="nf">print_instruments</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Prints a list of the possible instrument templates to load</span>
+<div class="viewcode-block" id="print_instruments">
+<a class="viewcode-back" href="../../../engine.html#pandexo.engine.justdoit.print_instruments">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">print_instruments</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Prints a list of the possible instrument templates to load</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Choose from the following:&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">ALL</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="getStarName"><a class="viewcode-back" href="../../engine.html#engine.justdoit.getStarName">[docs]</a><span class="k">def</span> <span class="nf">getStarName</span><span class="p">(</span><span class="n">planet_name</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="getStarName">
+<a class="viewcode-back" href="../../../engine.html#pandexo.engine.justdoit.getStarName">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">getStarName</span><span class="p">(</span><span class="n">planet_name</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Given a string with a (supposed) planet name, this function returns the star name. For example:</span>
 
 <span class="sd">    - If `planet_name` is &#39;HATS-5b&#39; this returns &#39;HATS-5&#39;.</span>
@@ -213,8 +163,11 @@
     <span class="c1"># Return trimmed string:</span>
     <span class="k">return</span> <span class="n">star_name</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="load_exo_dict"><a class="viewcode-back" href="../../engine.html#engine.justdoit.load_exo_dict">[docs]</a><span class="k">def</span> <span class="nf">load_exo_dict</span><span class="p">(</span><span class="n">planet_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">pl_kwargs</span><span class="o">=</span><span class="p">{}):</span>
-    <span class="sd">&quot;&quot;&quot;Loads in empty exoplanet dictionary for pandexo input</span>
+
+<div class="viewcode-block" id="load_exo_dict">
+<a class="viewcode-back" href="../../../engine.html#pandexo.engine.justdoit.load_exo_dict">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">load_exo_dict</span><span class="p">(</span><span class="n">planet_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">pl_kwargs</span><span class="o">=</span><span class="p">{}):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Loads in empty exoplanet dictionary for pandexo input</span>
 
 <span class="sd">    Loads in empty exoplanet dictionary so that the user can manually edit different planet</span>
 <span class="sd">    parameters. Must be done for every bash run. User must edit each keys within the dictionary.</span>
@@ -332,8 +285,11 @@
             <span class="n">pandexo_input</span><span class="p">[</span><span class="s2">&quot;planet&quot;</span><span class="p">][</span><span class="s2">&quot;w&quot;</span><span class="p">]</span>      <span class="o">=</span> <span class="mf">90.</span>
     <span class="k">return</span> <span class="n">pandexo_input</span></div>
 
-<div class="viewcode-block" id="load_mode_dict"><a class="viewcode-back" href="../../engine.html#engine.justdoit.load_mode_dict">[docs]</a><span class="k">def</span> <span class="nf">load_mode_dict</span><span class="p">(</span><span class="n">inst</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Function to pull in correct instrument dictionary</span>
+
+<div class="viewcode-block" id="load_mode_dict">
+<a class="viewcode-back" href="../../../engine.html#pandexo.engine.justdoit.load_mode_dict">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">load_mode_dict</span><span class="p">(</span><span class="n">inst</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Function to pull in correct instrument dictionary</span>
 
 <span class="sd">    This is the instrument counterpart to load_exo_dict. It loads in a template instrument</span>
 <span class="sd">    dictionary for a specific instrument mode.</span>
@@ -354,11 +310,16 @@
 <span class="sd">    -------</span>
 <span class="sd">    &gt;&gt;&gt; inst_dict = load_mode_dict(&#39;MIRI LRS&#39;)</span>
 <span class="sd">    &gt;&gt;&gt; inst_dict[&#39;configuration&#39;][&#39;instrument&#39;][&#39;aperture&#39;] = &#39;lrsslit&#39;</span>
+<span class="sd">    &gt;&gt;&gt; inst_dict[&#39;configuration&#39;][&#39;instrument&#39;][&#39;mode&#39;] = &#39;lrsslit&#39;</span>
+<span class="sd">    &gt;&gt;&gt; inst_dict[&#39;configuration&#39;][&#39;detector&#39;][&#39;subarray&#39;] = &#39;subslit&#39;</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">SetDefaultModes</span><span class="p">(</span><span class="n">inst</span><span class="p">)</span><span class="o">.</span><span class="n">pick</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="get_thruput"><a class="viewcode-back" href="../../engine.html#engine.justdoit.get_thruput">[docs]</a><span class="k">def</span> <span class="nf">get_thruput</span><span class="p">(</span><span class="n">inst</span><span class="p">,</span> <span class="n">niriss</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">nirspec</span><span class="o">=</span><span class="s1">&#39;f100lp&#39;</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Returns complete instrument photon to electron conversion efficiency</span>
+
+<div class="viewcode-block" id="get_thruput">
+<a class="viewcode-back" href="../../../engine.html#pandexo.engine.justdoit.get_thruput">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_thruput</span><span class="p">(</span><span class="n">inst</span><span class="p">,</span> <span class="n">niriss</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">nirspec</span><span class="o">=</span><span class="s1">&#39;f100lp&#39;</span><span class="p">,</span> <span class="n">wmin</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="n">wmax</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns complete instrument photon to electron conversion efficiency</span>
 <span class="sd">    Pulls complete instrument photon to electron conversion efficiency</span>
 <span class="sd">    (PCE) based on instrument key input</span>
 
@@ -369,8 +330,14 @@
 <span class="sd">    niriss : int</span>
 <span class="sd">        (Optional) defines which niriss order you want (1 or 2)</span>
 <span class="sd">    nirspec : str</span>
-<span class="sd">        (Optional) for NIRISS G140M/H there are two available filters (f100lp and f070lp)</span>
+<span class="sd">        (Optional) for NIRSpec G140M/H there are two available filters (f100lp and f070lp)</span>
 <span class="sd">        if you are selecting G140M or G140H, this allows you to pick which one</span>
+<span class="sd">    wmin : str / float</span>
+<span class="sd">        (Optional) minimum wavlength to compute PCE across, &#39;default&#39; will use</span>
+<span class="sd">        values from Pandeia.</span>
+<span class="sd">    wmax : str / float</span>
+<span class="sd">        (Optional) maximum wavlength to compute PCE across, &#39;default&#39; will use</span>
+<span class="sd">        values from Pandeia.</span>
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    dict</span>
@@ -385,27 +352,40 @@
     <span class="n">input_dict</span> <span class="o">=</span>  <span class="n">SetDefaultModes</span><span class="p">(</span><span class="n">inst</span><span class="p">)</span><span class="o">.</span><span class="n">pick</span><span class="p">()</span>
     <span class="n">conf</span> <span class="o">=</span> <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;configuration&#39;</span><span class="p">]</span>
     <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;detector&#39;</span><span class="p">][</span><span class="s1">&#39;ngroup&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="k">if</span> <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;detector&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;readout_pattern&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;optimize&#39;</span><span class="p">:</span>
+        <span class="c1"># Readout cadence does not affect throughput, and Pandeia does not</span>
+        <span class="c1"># recognize PandExo&#39;s NIRCam optimization sentinel.</span>
+        <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;detector&#39;</span><span class="p">][</span><span class="s1">&#39;readout_pattern&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;rapid&#39;</span>
 
     <span class="k">if</span> <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;instrument&#39;</span><span class="p">][</span><span class="s1">&#39;instrument&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span><span class="s1">&#39;niriss&#39;</span><span class="p">:</span>
-        <span class="c1">#pandeia handles slit losses inside the 2d engine. So, you need to account for the</span>
-        <span class="c1">#extra .663 here</span>
         <span class="n">conf</span><span class="p">[</span><span class="s2">&quot;instrument&quot;</span><span class="p">][</span><span class="s2">&quot;disperser&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">conf</span><span class="p">[</span><span class="s2">&quot;instrument&quot;</span><span class="p">][</span><span class="s2">&quot;disperser&quot;</span><span class="p">]</span> <span class="o">+</span><span class="s1">&#39;_&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">niriss</span><span class="p">)</span>
         <span class="n">i</span> <span class="o">=</span> <span class="n">InstrumentFactory</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">conf</span><span class="p">)</span>
         <span class="n">wr</span> <span class="o">=</span> <span class="n">i</span><span class="o">.</span><span class="n">get_wave_range</span><span class="p">()</span>
-        <span class="n">wave</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">wr</span><span class="p">[</span><span class="s1">&#39;wmin&#39;</span><span class="p">],</span> <span class="n">wr</span><span class="p">[</span><span class="s1">&#39;wmax&#39;</span><span class="p">],</span> <span class="n">num</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">wmin</span> <span class="o">==</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span>
+            <span class="n">wmin</span> <span class="o">=</span> <span class="n">wr</span><span class="p">[</span><span class="s1">&#39;wmin&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">wmax</span> <span class="o">==</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span>
+            <span class="n">wmax</span> <span class="o">=</span> <span class="n">wr</span><span class="p">[</span><span class="s1">&#39;wmax&#39;</span><span class="p">]</span>
+        <span class="n">wave</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">wmin</span><span class="p">,</span> <span class="n">wmax</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
         <span class="n">pce</span> <span class="o">=</span> <span class="n">i</span><span class="o">.</span><span class="n">get_total_eff</span><span class="p">(</span><span class="n">wave</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;wave&#39;</span><span class="p">:</span><span class="n">wave</span><span class="p">,</span><span class="s1">&#39;pce&#39;</span><span class="p">:</span><span class="mf">0.663</span><span class="o">*</span><span class="n">pce</span><span class="p">}</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;wave&#39;</span><span class="p">:</span><span class="n">wave</span><span class="p">,</span><span class="s1">&#39;pce&#39;</span><span class="p">:</span><span class="n">pce</span><span class="p">}</span>
     <span class="k">elif</span> <span class="p">(</span><span class="n">conf</span><span class="p">[</span><span class="s1">&#39;instrument&#39;</span><span class="p">][</span><span class="s1">&#39;instrument&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span><span class="s1">&#39;nirspec&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;g140&#39;</span> <span class="ow">in</span> <span class="n">conf</span><span class="p">[</span><span class="s2">&quot;instrument&quot;</span><span class="p">][</span><span class="s2">&quot;disperser&quot;</span><span class="p">]):</span>
         <span class="n">conf</span><span class="p">[</span><span class="s2">&quot;instrument&quot;</span><span class="p">][</span><span class="s2">&quot;filter&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nirspec</span>
 
     <span class="n">i</span> <span class="o">=</span> <span class="n">InstrumentFactory</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">conf</span><span class="p">)</span>
     <span class="n">wr</span> <span class="o">=</span> <span class="n">i</span><span class="o">.</span><span class="n">get_wave_range</span><span class="p">()</span>
-    <span class="n">wave</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">wr</span><span class="p">[</span><span class="s1">&#39;wmin&#39;</span><span class="p">],</span> <span class="n">wr</span><span class="p">[</span><span class="s1">&#39;wmax&#39;</span><span class="p">],</span> <span class="n">num</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">wmin</span> <span class="o">==</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span>
+        <span class="n">wmin</span> <span class="o">=</span> <span class="n">wr</span><span class="p">[</span><span class="s1">&#39;wmin&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">wmax</span> <span class="o">==</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span>
+        <span class="n">wmax</span> <span class="o">=</span> <span class="n">wr</span><span class="p">[</span><span class="s1">&#39;wmax&#39;</span><span class="p">]</span>
+    <span class="n">wave</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">wmin</span><span class="p">,</span> <span class="n">wmax</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span> <span class="c1">#</span>
     <span class="n">pce</span> <span class="o">=</span> <span class="n">i</span><span class="o">.</span><span class="n">get_total_eff</span><span class="p">(</span><span class="n">wave</span><span class="p">)</span>
     <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;wave&#39;</span><span class="p">:</span><span class="n">wave</span><span class="p">,</span><span class="s1">&#39;pce&#39;</span><span class="p">:</span><span class="n">pce</span><span class="p">}</span></div>
 
-<div class="viewcode-block" id="run_param_space"><a class="viewcode-back" href="../../engine.html#engine.justdoit.run_param_space">[docs]</a><span class="k">def</span> <span class="nf">run_param_space</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">exo</span><span class="p">,</span><span class="n">inst</span><span class="p">,</span><span class="n">param_space</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Changes exo dictionary and submits run</span>
+
+<div class="viewcode-block" id="run_param_space">
+<a class="viewcode-back" href="../../../engine.html#pandexo.engine.justdoit.run_param_space">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">run_param_space</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">exo</span><span class="p">,</span><span class="n">inst</span><span class="p">,</span><span class="n">param_space</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Changes exo dictionary and submits run</span>
 
 <span class="sd">    This function is used to reset the exo dictionary based on what parameter</span>
 <span class="sd">    is being looped over and submits run to `wrapper` so that all the jobs</span>
@@ -441,10 +421,14 @@
     <span class="c1">#load in correct dict format</span>
     <span class="n">inst_dict</span> <span class="o">=</span> <span class="n">load_mode_dict</span><span class="p">(</span><span class="n">inst</span><span class="p">)</span>
     <span class="n">name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">))[</span><span class="mi">1</span><span class="p">]</span>
-    <span class="k">return</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="n">wrapper</span><span class="p">({</span><span class="s2">&quot;pandeia_input&quot;</span><span class="p">:</span> <span class="n">inst_dict</span> <span class="p">,</span> <span class="s2">&quot;pandexo_input&quot;</span><span class="p">:</span><span class="n">exo</span><span class="p">},</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)}</span></div>
+    <span class="n">run_verbose</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">=</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">param_space</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span> <span class="k">if</span> <span class="n">verbose</span> <span class="k">else</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="n">wrapper</span><span class="p">({</span><span class="s2">&quot;pandeia_input&quot;</span><span class="p">:</span> <span class="n">inst_dict</span> <span class="p">,</span> <span class="s2">&quot;pandexo_input&quot;</span><span class="p">:</span><span class="n">exo</span><span class="p">},</span> <span class="n">verbose</span><span class="o">=</span><span class="n">run_verbose</span><span class="p">)}</span></div>
 
-<div class="viewcode-block" id="run_inst_space"><a class="viewcode-back" href="../../engine.html#engine.justdoit.run_inst_space">[docs]</a><span class="k">def</span> <span class="nf">run_inst_space</span><span class="p">(</span><span class="n">inst</span><span class="p">,</span><span class="n">exo</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Changes inst dictionary and submits run</span>
+
+<div class="viewcode-block" id="run_inst_space">
+<a class="viewcode-back" href="../../../engine.html#pandexo.engine.justdoit.run_inst_space">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">run_inst_space</span><span class="p">(</span><span class="n">inst</span><span class="p">,</span><span class="n">exo</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Changes inst dictionary and submits run</span>
 
 <span class="sd">    This function is used to reset the instrument dictionary.</span>
 
@@ -466,12 +450,16 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1">#load in correct dict format</span>
     <span class="n">inst_dict</span> <span class="o">=</span> <span class="n">load_mode_dict</span><span class="p">(</span><span class="n">inst</span><span class="p">)</span>
-    <span class="k">return</span> <span class="p">{</span><span class="n">inst</span><span class="p">:</span> <span class="n">wrapper</span><span class="p">({</span><span class="s2">&quot;pandeia_input&quot;</span><span class="p">:</span> <span class="n">inst_dict</span> <span class="p">,</span> <span class="s2">&quot;pandexo_input&quot;</span><span class="p">:</span><span class="n">exo</span><span class="p">},</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)}</span></div>
+    <span class="n">run_verbose</span> <span class="o">=</span> <span class="n">inst</span> <span class="k">if</span> <span class="n">verbose</span> <span class="k">else</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="p">{</span><span class="n">inst</span><span class="p">:</span> <span class="n">wrapper</span><span class="p">({</span><span class="s2">&quot;pandeia_input&quot;</span><span class="p">:</span> <span class="n">inst_dict</span> <span class="p">,</span> <span class="s2">&quot;pandexo_input&quot;</span><span class="p">:</span><span class="n">exo</span><span class="p">},</span> <span class="n">verbose</span><span class="o">=</span><span class="n">run_verbose</span><span class="p">)}</span></div>
 
 
-<div class="viewcode-block" id="run_pandexo"><a class="viewcode-back" href="../../engine.html#engine.justdoit.run_pandexo">[docs]</a><span class="k">def</span> <span class="nf">run_pandexo</span><span class="p">(</span><span class="n">exo</span><span class="p">,</span> <span class="n">inst</span><span class="p">,</span> <span class="n">param_space</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">param_range</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span><span class="n">save_file</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+
+<div class="viewcode-block" id="run_pandexo">
+<a class="viewcode-back" href="../../../engine.html#pandexo.engine.justdoit.run_pandexo">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">run_pandexo</span><span class="p">(</span><span class="n">exo</span><span class="p">,</span> <span class="n">inst</span><span class="p">,</span> <span class="n">param_space</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">param_range</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span><span class="n">save_file</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
                             <span class="n">output_path</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="n">output_file</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span><span class="n">num_cores</span><span class="o">=</span><span class="n">user_cores</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Submits multiple runs of pandexo in parallel.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Submits multiple runs of pandexo in parallel.</span>
 
 <span class="sd">    Functionality: program contains functionality for running single or</span>
 <span class="sd">    multiple runs of PandExo</span>
@@ -508,7 +496,7 @@
 <span class="sd">    -------</span>
 <span class="sd">    dict</span>
 <span class="sd">        For single run output will just be a single PandExo output dictionary</span>
-<span class="sd">        https://github.com/natashabatalha/PandExo/wiki/PandExo-Output</span>
+<span class="sd">        as described in the JWST Output Dictionary documentation.</span>
 <span class="sd">        For multiple runs the output will be organized into a list with each</span>
 <span class="sd">        a dictionary named by whatever you are looping through</span>
 <span class="sd">        i.e. [{&#39;First temp&#39;: PandExoDict}, {&#39;Second temp&#39;: PandExoDict}, etc..]</span>
@@ -562,9 +550,12 @@
             <span class="k">return</span> <span class="n">results</span>
 
         <span class="c1">#if there are parameters to cycle through this will run</span>
-        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Running through exo parameters in parallel: &quot;</span> <span class="o">+</span> <span class="n">param_space</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Running through exo parameters in parallel: &quot;</span> <span class="o">+</span> <span class="n">param_space</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="c1">#run the above function in parallel</span>
-        <span class="n">results</span> <span class="o">=</span> <span class="n">Parallel</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="n">num_cores</span><span class="p">)(</span><span class="n">delayed</span><span class="p">(</span><span class="n">run_param_space</span><span class="p">)(</span><span class="n">i</span><span class="p">,</span><span class="n">exo</span><span class="p">,</span><span class="n">inst</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">param_space</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">param_range</span><span class="p">)</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">Parallel</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="n">num_cores</span><span class="p">)(</span>
+            <span class="n">delayed</span><span class="p">(</span><span class="n">run_param_space</span><span class="p">)(</span><span class="n">i</span><span class="p">,</span> <span class="n">exo</span><span class="p">,</span> <span class="n">inst</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">param_space</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">param_range</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Finished exo parameter grid&quot;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="c1">#Default dump all results [an array of dictionaries] into single file</span>
         <span class="c1">#and return results immediately to user</span>
@@ -575,10 +566,13 @@
         <span class="k">return</span> <span class="n">results</span>
 
     <span class="c1">#run several different instrument modes and single planet</span>
-    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Running select instruments&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">inst</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Running select instruments: &quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">inst</span><span class="p">),</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-        <span class="n">results</span> <span class="o">=</span> <span class="n">Parallel</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="n">num_cores</span><span class="p">)(</span><span class="n">delayed</span><span class="p">(</span><span class="n">run_inst_space</span><span class="p">)(</span><span class="n">i</span><span class="p">,</span> <span class="n">exo</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">inst</span><span class="p">)</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">Parallel</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="n">num_cores</span><span class="p">)(</span>
+            <span class="n">delayed</span><span class="p">(</span><span class="n">run_inst_space</span><span class="p">)(</span><span class="n">i</span><span class="p">,</span> <span class="n">exo</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">inst</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Finished select instruments&quot;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="c1">#Default dump all results [an array of dictionaries] into single file</span>
         <span class="c1">#and return results immediately to user</span>
@@ -589,8 +583,11 @@
 
     <span class="c1">#cycle through all options</span>
     <span class="k">elif</span> <span class="n">inst</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;run all&#39;</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Running through all instruments&quot;</span><span class="p">)</span>
-        <span class="n">results</span> <span class="o">=</span> <span class="n">Parallel</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="n">num_cores</span><span class="p">)(</span><span class="n">delayed</span><span class="p">(</span><span class="n">run_inst_space</span><span class="p">)(</span><span class="n">i</span><span class="p">,</span> <span class="n">exo</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">ALL</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Running through all instruments&quot;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">Parallel</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="n">num_cores</span><span class="p">)(</span>
+            <span class="n">delayed</span><span class="p">(</span><span class="n">run_inst_space</span><span class="p">)(</span><span class="n">i</span><span class="p">,</span> <span class="n">exo</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">ALL</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Finished running all instruments&quot;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="c1">#Default dump all results [an array of dictionaries] into single file</span>
         <span class="c1">#and return results immediately to user</span>
@@ -599,8 +596,11 @@
         <span class="k">if</span> <span class="n">save_file</span><span class="p">:</span> <span class="n">pkl</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span><span class="n">output_file</span><span class="p">),</span><span class="s1">&#39;wb&#39;</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">results</span></div>
 
-<div class="viewcode-block" id="subarrays"><a class="viewcode-back" href="../../engine.html#engine.justdoit.subarrays">[docs]</a><span class="k">def</span> <span class="nf">subarrays</span><span class="p">(</span><span class="n">inst</span><span class="p">):</span>
-  <span class="sd">&quot;&quot;&quot;function to show availalble subarrays and their times (in secons)</span>
+
+<div class="viewcode-block" id="subarrays">
+<a class="viewcode-back" href="../../../engine.html#pandexo.engine.justdoit.subarrays">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">subarrays</span><span class="p">(</span><span class="n">inst</span><span class="p">):</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;function to show availalble subarrays and their times (in secons)</span>
 
 <span class="sd">  Parameters</span>
 <span class="sd">  ----------</span>
@@ -615,19 +615,29 @@
   <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Subarray field stored in inst_dict[&#39;configuration&#39;][&#39;detector&#39;][&#39;subarray&#39;]&quot;</span><span class="p">)</span>
 
   <span class="k">if</span> <span class="n">inst</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;niriss&#39;</span><span class="p">:</span>
-    <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;substrip96&#39;</span><span class="p">:</span><span class="mf">2.2129</span><span class="p">,</span><span class="s1">&#39;substrip256&#39;</span><span class="p">:</span><span class="mf">5.4913</span><span class="p">}</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;substrip96&#39;</span><span class="p">:</span><span class="mf">2.2129</span><span class="p">,</span><span class="s1">&#39;substrip256&#39;</span><span class="p">:</span><span class="mf">5.4913</span><span class="p">,</span> 
+            <span class="s2">&quot;sub17stripe_soss&quot;</span><span class="p">:</span><span class="mf">0.06164</span><span class="p">,</span>
+            <span class="s2">&quot;sub60stripe_soss&quot;</span><span class="p">:</span><span class="mf">0.17688</span><span class="p">,</span>
+            <span class="s2">&quot;sub204stripe_soss&quot;</span><span class="p">:</span><span class="mf">0.5628</span><span class="p">,</span>
+            <span class="s2">&quot;sub680stripe_soss&quot;</span><span class="p">:</span> <span class="mf">1.83848</span>
+            <span class="p">}</span>
   <span class="k">elif</span> <span class="n">inst</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;nirspec&#39;</span><span class="p">:</span>
-    <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;sub1024a&#39;</span><span class="p">:</span><span class="mf">0.451</span><span class="p">,</span><span class="s1">&#39;sub1024b&#39;</span><span class="p">:</span><span class="mf">0.451</span><span class="p">,</span><span class="s1">&#39;sub2048&#39;</span><span class="p">:</span><span class="mf">0.90156</span><span class="p">,</span><span class="s1">&#39;sub512&#39;</span><span class="p">:</span><span class="mf">0.22572</span><span class="p">,</span><span class="s1">&#39;sub512s&#39;</span><span class="p">:</span><span class="mf">0.14392</span><span class="p">}</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;sub1024a&#39;</span><span class="p">:</span><span class="mf">0.451</span><span class="p">,</span><span class="s1">&#39;sub1024b&#39;</span><span class="p">:</span><span class="mf">0.451</span><span class="p">,</span><span class="s1">&#39;sub2048&#39;</span><span class="p">:</span><span class="mf">0.90156</span><span class="p">,</span><span class="s1">&#39;sub512&#39;</span><span class="p">:</span><span class="mf">0.22572</span><span class="p">,</span><span class="s1">&#39;sub512s&#39;</span><span class="p">:</span><span class="mf">0.14392</span><span class="p">,</span>
+            <span class="s1">&#39;s256m2_prm&#39;</span><span class="p">:</span><span class="mf">0.11352</span><span class="p">,</span><span class="s1">&#39;s128m4_prm&#39;</span><span class="p">:</span><span class="mf">0.0572</span><span class="p">,</span><span class="s1">&#39;s64m8_prm&#39;</span><span class="p">:</span><span class="mf">0.02904</span><span class="p">,</span><span class="s1">&#39;s32m16_prm&#39;</span><span class="p">:</span><span class="mf">0.01496</span><span class="p">}</span>
   <span class="k">elif</span> <span class="n">inst</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;miri&#39;</span><span class="p">:</span>
-    <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;slitlessprism&#39;</span><span class="p">:</span><span class="mf">0.159</span><span class="p">}</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;slitlessprism_ip&#39;</span><span class="p">:</span><span class="mf">0.15616</span><span class="p">,</span><span class="s1">&#39;slitlessprism_ips&#39;</span><span class="p">:</span><span class="mf">0.11776</span><span class="p">,</span>
+            <span class="s1">&#39;slitlessprism&#39;</span><span class="p">:</span><span class="mf">0.15904</span><span class="p">,</span><span class="s1">&#39;full&#39;</span><span class="p">:</span><span class="mf">2.77504</span><span class="p">,</span><span class="s1">&#39;subslit&#39;</span><span class="p">:</span><span class="mf">0.27904</span><span class="p">}</span>
   <span class="k">elif</span> <span class="n">inst</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>  <span class="o">==</span> <span class="s1">&#39;nircam&#39;</span><span class="p">:</span>
     <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;subgrism64&quot;</span><span class="p">:</span><span class="mf">0.34</span><span class="p">,</span> <span class="s2">&quot;subgrism128&quot;</span><span class="p">:</span><span class="mf">0.67</span><span class="p">,</span> <span class="s2">&quot;subgrism256&quot;</span><span class="p">:</span><span class="mf">1.34</span><span class="p">,</span>
       <span class="s2">&quot;subgrism64 (noutputs=1)&quot;</span><span class="p">:</span><span class="mf">1.3</span><span class="p">,</span> <span class="s2">&quot;subgrism128 (noutputs=1)&quot;</span><span class="p">:</span><span class="mf">2.6</span><span class="p">,</span> <span class="s2">&quot;subgrism256 (noutputs=1)&quot;</span><span class="p">:</span><span class="mf">5.2</span><span class="p">}</span>
   <span class="k">else</span><span class="p">:</span>
     <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Only instruments are niriss, nirspec, miri, nircam. Pick one.&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="dispersers"><a class="viewcode-back" href="../../engine.html#engine.justdoit.dispersers">[docs]</a><span class="k">def</span> <span class="nf">dispersers</span><span class="p">(</span><span class="n">inst</span><span class="p">):</span>
-  <span class="sd">&quot;&quot;&quot;function to show available dispersers</span>
+
+<div class="viewcode-block" id="dispersers">
+<a class="viewcode-back" href="../../../engine.html#pandexo.engine.justdoit.dispersers">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">dispersers</span><span class="p">(</span><span class="n">inst</span><span class="p">):</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;function to show available dispersers</span>
 
 <span class="sd">  Parameters</span>
 <span class="sd">  ----------</span>
@@ -651,8 +661,11 @@
   <span class="k">else</span><span class="p">:</span>
     <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Only instruments are niriss, nirspec, miri, nircam. Pick one.&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="filters"><a class="viewcode-back" href="../../engine.html#engine.justdoit.filters">[docs]</a><span class="k">def</span> <span class="nf">filters</span><span class="p">(</span><span class="n">inst</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Function to show availalbe filters</span>
+
+<div class="viewcode-block" id="filters">
+<a class="viewcode-back" href="../../../engine.html#pandexo.engine.justdoit.filters">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">filters</span><span class="p">(</span><span class="n">inst</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Function to show availalbe filters</span>
 
 <span class="sd">  Parameters</span>
 <span class="sd">  ----------</span>
@@ -678,8 +691,11 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Only instruments are niriss, nirspec, miri, nircam. Pick one.&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="grid_options"><a class="viewcode-back" href="../../engine.html#engine.justdoit.grid_options">[docs]</a><span class="k">def</span> <span class="nf">grid_options</span><span class="p">(</span><span class="n">grid</span> <span class="o">=</span> <span class="s1">&#39;fortney&#39;</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Function to show available grid options</span>
+
+<div class="viewcode-block" id="grid_options">
+<a class="viewcode-back" href="../../../engine.html#pandexo.engine.justdoit.grid_options">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">grid_options</span><span class="p">(</span><span class="n">grid</span> <span class="o">=</span> <span class="s1">&#39;fortney&#39;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Function to show available grid options</span>
 
 <span class="sd">    PandExo now supports various grid options. Currently, the only one that is availalbe</span>
 <span class="sd">    is the Fortney grid for giant planets. We will be implementing others, as they</span>
@@ -694,45 +710,34 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span></div>
+
 </pre></div>
 
            </div>
-           
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &copy; Copyright Updated 2022
-
-    </p>
+    <p>&#169; Copyright 2016-2026, PandExo developers.</p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
-
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

@@ -1,168 +1,94 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" data-content_root="../../../">
 <head>
-  <meta charset="utf-8">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>engine.hst &mdash; PandExo  documentation</title>
-  
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pandexo.engine.hst &mdash; PandExo 2026.7 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
 
   
-  
-  
-  
-
-  
-  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
-  
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../_static/language_data.js"></script>
-    
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
-
-    
-
-  
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" /> 
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=57d3cf08"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
 
           
-            <a href="../../index.html" class="icon icon-home"> PandExo
           
-
-          
+          <a href="../../../index.html" class="icon icon-home">
+            PandExo
           </a>
-
-          
-            
-            
-          
-
-          
 <div role="search">
-  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../includeme.html">Getting Started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Pre-installation Data Download</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../installation.html#installation-with-pip-or-git">Installation with Pip or Git</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../installation.html#final-test-for-success">Final Test for Success</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../installation.html#troubleshooting-common-errors">Troubleshooting-Common Errors</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../installation.html#the-importance-of-upgrading-pandexo">The Importance of Upgrading PandExo</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../installation_windows.html">Windows Installing Guide for PandExo</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../tutorialjwst.html">JWST Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../jwstinput.html">Possible Instrument Input Params</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../jwstdict.html">Py Dict Structure of JWST Output</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../tutorialhst.html">HST Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../engine.html">The Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../includeme.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Pre-installation Data Download</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html#installation-with-pip-or-git">Installation with Pip or Git</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html#final-test-for-success">Final Test for Success</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html#the-importance-of-upgrading-pandexo">The Importance of Upgrading PandExo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation_windows.html">Windows Installing Guide for PandExo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorialjwst.html">JWST Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../jwstinput.html">Possible Instrument Input Params</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../jwstdict.html">Py Dict Structure of JWST Output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorialhst.html">HST Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../engine.html">API Reference</a></li>
 </ul>
 
-            
-          
         </div>
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../index.html">PandExo</a>
-        
+          <a href="../../../index.html">PandExo</a>
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="../../index.html">Docs</a> &raquo;</li>
-        
-          <li><a href="../index.html">Module code</a> &raquo;</li>
-        
-      <li>engine.hst</li>
-    
-    
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pandexo.engine.hst</li>
       <li class="wy-breadcrumbs-aside">
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <h1>Source code for engine.hst</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">from</span> <span class="nn">.create_input</span> <span class="kn">import</span> <span class="n">hst_spec</span>
-<span class="kn">import</span> <span class="nn">batman</span>
-<span class="kn">from</span> <span class="nn">.RECTE</span> <span class="kn">import</span> <span class="n">RECTE</span>
-<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">optimize</span>
+             
+  <h1>Source code for pandexo.engine.hst</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.create_input</span><span class="w"> </span><span class="kn">import</span> <span class="n">hst_spec</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">batman</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.RECTE</span><span class="w"> </span><span class="kn">import</span> <span class="n">RECTE</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy</span><span class="w"> </span><span class="kn">import</span> <span class="n">optimize</span>
 
-<div class="viewcode-block" id="wfc3_GuessNOrbits"><a class="viewcode-back" href="../../engine.html#engine.hst.wfc3_GuessNOrbits">[docs]</a><span class="k">def</span> <span class="nf">wfc3_GuessNOrbits</span><span class="p">(</span><span class="n">trdur</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;Predict number of HST orbits</span>
+<div class="viewcode-block" id="wfc3_GuessNOrbits">
+<a class="viewcode-back" href="../../../engine.html#pandexo.engine.hst.wfc3_GuessNOrbits">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">wfc3_GuessNOrbits</span><span class="p">(</span><span class="n">trdur</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;Predict number of HST orbits</span>
 
 <span class="sd">    Predict number of HST orbits for transit observation when not provided by the user.</span>
 
@@ -189,8 +115,11 @@
     <span class="k">return</span> <span class="n">norbits</span></div>
 
 
-<div class="viewcode-block" id="wfc3_GuessParams"><a class="viewcode-back" href="../../engine.html#engine.hst.wfc3_GuessParams">[docs]</a><span class="k">def</span> <span class="nf">wfc3_GuessParams</span><span class="p">(</span><span class="n">jmag</span><span class="p">,</span> <span class="n">disperser</span><span class="p">,</span> <span class="n">scanDirection</span><span class="p">,</span> <span class="n">subarray</span><span class="p">,</span> <span class="n">obsTime</span><span class="p">,</span> <span class="n">maxScanHeight</span><span class="o">=</span><span class="mf">180.</span><span class="p">,</span> <span class="n">maxExptime</span><span class="o">=</span><span class="mf">150.</span><span class="p">,</span> <span class="n">targetFluence</span><span class="o">=</span><span class="mf">30000.</span><span class="p">,</span> <span class="n">hmag</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;Predict nsamp and samp_seq when values not provided by the user.</span>
+
+<div class="viewcode-block" id="wfc3_GuessParams">
+<a class="viewcode-back" href="../../../engine.html#pandexo.engine.hst.wfc3_GuessParams">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">wfc3_GuessParams</span><span class="p">(</span><span class="n">jmag</span><span class="p">,</span> <span class="n">disperser</span><span class="p">,</span> <span class="n">scanDirection</span><span class="p">,</span> <span class="n">subarray</span><span class="p">,</span> <span class="n">obsTime</span><span class="p">,</span> <span class="n">maxScanHeight</span><span class="o">=</span><span class="mf">180.</span><span class="p">,</span> <span class="n">maxExptime</span><span class="o">=</span><span class="mf">150.</span><span class="p">,</span> <span class="n">targetFluence</span><span class="o">=</span><span class="mf">30000.</span><span class="p">,</span> <span class="n">hmag</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;Predict nsamp and samp_seq when values not provided by the user.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -239,8 +168,11 @@
     <span class="k">return</span> <span class="n">bestnsamp</span><span class="p">,</span> <span class="n">bestsampseq</span></div>
 
 
-<div class="viewcode-block" id="wfc3_obs"><a class="viewcode-back" href="../../engine.html#engine.hst.wfc3_obs">[docs]</a><span class="k">def</span> <span class="nf">wfc3_obs</span><span class="p">(</span><span class="n">jmag</span><span class="p">,</span> <span class="n">disperser</span><span class="p">,</span> <span class="n">scanDirection</span><span class="p">,</span> <span class="n">subarray</span><span class="p">,</span> <span class="n">nsamp</span><span class="p">,</span> <span class="n">samp_seq</span><span class="p">,</span> <span class="n">targetFluence</span><span class="o">=</span><span class="mf">30000.</span><span class="p">,</span> <span class="n">hmag</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;Determine the recommended exposure time, scan rate, scan height, and overheads.</span>
+
+<div class="viewcode-block" id="wfc3_obs">
+<a class="viewcode-back" href="../../../engine.html#pandexo.engine.hst.wfc3_obs">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">wfc3_obs</span><span class="p">(</span><span class="n">jmag</span><span class="p">,</span> <span class="n">disperser</span><span class="p">,</span> <span class="n">scanDirection</span><span class="p">,</span> <span class="n">subarray</span><span class="p">,</span> <span class="n">nsamp</span><span class="p">,</span> <span class="n">samp_seq</span><span class="p">,</span> <span class="n">targetFluence</span><span class="o">=</span><span class="mf">30000.</span><span class="p">,</span> <span class="n">hmag</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;Determine the recommended exposure time, scan rate, scan height, and overheads.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -319,7 +251,7 @@
     <span class="c1"># Scan height in pixels</span>
     <span class="n">scanRatep</span> <span class="o">=</span> <span class="n">scanRate</span><span class="o">/</span><span class="mf">0.121</span>  <span class="c1"># pixels/s</span>
     <span class="n">scanHeight</span> <span class="o">=</span> <span class="n">scanRatep</span><span class="o">*</span><span class="n">exptime</span>  <span class="c1"># pixels</span>
-    <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    #Quadratic correlation between scanRate and read overhead</span>
 <span class="sd">    foo     = np.array([0.0,0.1,0.3,0.5,1.0,2.0,3.0,4.0])/0.121</span>
 <span class="sd">    bar     = np.array([ 40, 40, 41, 42, 45, 50, 56, 61])</span>
@@ -348,8 +280,11 @@
     <span class="k">return</span> <span class="n">exptime</span><span class="p">,</span> <span class="n">tottime</span><span class="p">,</span> <span class="n">scanRate</span><span class="p">,</span> <span class="n">scanHeight</span><span class="p">,</span> <span class="n">fluence</span></div>
 
 
-<div class="viewcode-block" id="wfc3_TExoNS"><a class="viewcode-back" href="../../engine.html#engine.hst.wfc3_TExoNS">[docs]</a><span class="k">def</span> <span class="nf">wfc3_TExoNS</span><span class="p">(</span><span class="n">dictinput</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;Compute Transit depth uncertainty</span>
+
+<div class="viewcode-block" id="wfc3_TExoNS">
+<a class="viewcode-back" href="../../../engine.html#pandexo.engine.hst.wfc3_TExoNS">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">wfc3_TExoNS</span><span class="p">(</span><span class="n">dictinput</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;Compute Transit depth uncertainty</span>
 
 <span class="sd">    Compute the transit depth uncertainty for a defined system and number of spectrophotometric channels.</span>
 <span class="sd">    Written by Kevin Stevenson      October 2016</span>
@@ -533,8 +468,11 @@
             <span class="s2">&quot;info&quot;</span><span class="p">:</span> <span class="n">info</span><span class="p">}</span></div>
 
 
-<div class="viewcode-block" id="calc_start_window"><a class="viewcode-back" href="../../engine.html#engine.hst.calc_start_window">[docs]</a><span class="k">def</span> <span class="nf">calc_start_window</span><span class="p">(</span><span class="n">eventType</span><span class="p">,</span> <span class="n">rms</span><span class="p">,</span> <span class="n">ptsOrbit</span><span class="p">,</span> <span class="n">numOrbits</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">inc</span><span class="p">,</span> <span class="n">aRs</span><span class="p">,</span> <span class="n">period</span><span class="p">,</span> <span class="n">windowSize</span><span class="p">,</span> <span class="n">ecc</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">w</span><span class="o">=</span><span class="mf">90.</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">useFirstOrbit</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;Calculate earliest and latest start times</span>
+
+<div class="viewcode-block" id="calc_start_window">
+<a class="viewcode-back" href="../../../engine.html#pandexo.engine.hst.calc_start_window">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calc_start_window</span><span class="p">(</span><span class="n">eventType</span><span class="p">,</span> <span class="n">rms</span><span class="p">,</span> <span class="n">ptsOrbit</span><span class="p">,</span> <span class="n">numOrbits</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">inc</span><span class="p">,</span> <span class="n">aRs</span><span class="p">,</span> <span class="n">period</span><span class="p">,</span> <span class="n">windowSize</span><span class="p">,</span> <span class="n">ecc</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">w</span><span class="o">=</span><span class="mf">90.</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">useFirstOrbit</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;Calculate earliest and latest start times</span>
 
 <span class="sd">    Plot earliest and latest possible spectroscopic light curves for given start window size</span>
 
@@ -654,8 +592,11 @@
             <span class="s1">&#39;phase2&#39;</span><span class="p">:</span> <span class="n">phase2</span><span class="p">,</span> <span class="s1">&#39;trmodel1&#39;</span><span class="p">:</span> <span class="n">trmodel1</span><span class="p">,</span> <span class="s1">&#39;trmodel2&#39;</span><span class="p">:</span> <span class="n">trmodel2</span><span class="p">,</span> <span class="s1">&#39;eventType&#39;</span><span class="p">:</span> <span class="n">eventType</span><span class="p">,</span> <span class="s1">&#39;planet period&#39;</span><span class="p">:</span><span class="n">period</span><span class="p">}</span></div>
 
 
-<div class="viewcode-block" id="planet_spec"><a class="viewcode-back" href="../../engine.html#engine.hst.planet_spec">[docs]</a><span class="k">def</span> <span class="nf">planet_spec</span><span class="p">(</span><span class="n">planet</span><span class="p">,</span> <span class="n">star</span><span class="p">,</span> <span class="n">w_unit</span><span class="p">,</span> <span class="n">disperser</span><span class="p">,</span> <span class="n">deptherr</span><span class="p">,</span> <span class="n">nchan</span><span class="p">,</span> <span class="n">smooth</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;Plot exoplanet transmission/emission spectrum</span>
+
+<div class="viewcode-block" id="planet_spec">
+<a class="viewcode-back" href="../../../engine.html#pandexo.engine.hst.planet_spec">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">planet_spec</span><span class="p">(</span><span class="n">planet</span><span class="p">,</span> <span class="n">star</span><span class="p">,</span> <span class="n">w_unit</span><span class="p">,</span> <span class="n">disperser</span><span class="p">,</span> <span class="n">deptherr</span><span class="p">,</span> <span class="n">nchan</span><span class="p">,</span> <span class="n">smooth</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;Plot exoplanet transmission/emission spectrum</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -693,7 +634,7 @@
 
     <span class="c1"># Smooth model spectrum (optional)</span>
     <span class="k">if</span> <span class="n">smooth</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="kn">from</span> <span class="nn">.hst_smooth</span> <span class="kn">import</span> <span class="n">smooth</span> <span class="k">as</span> <span class="n">sm</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">.hst_smooth</span><span class="w"> </span><span class="kn">import</span> <span class="n">smooth</span> <span class="k">as</span> <span class="n">sm</span>
         <span class="n">mspec</span> <span class="o">=</span> <span class="n">sm</span><span class="p">(</span><span class="n">mspec</span><span class="p">,</span> <span class="n">smooth</span><span class="p">)</span>
 
     <span class="c1"># Determine disperser wavelength boundaries</span>
@@ -724,8 +665,11 @@
             <span class="s1">&#39;error&#39;</span><span class="p">:</span> <span class="n">deptherr</span><span class="p">,</span> <span class="s1">&#39;wmin&#39;</span><span class="p">:</span> <span class="n">wmin</span><span class="p">,</span> <span class="s1">&#39;wmax&#39;</span><span class="p">:</span> <span class="n">wmax</span><span class="p">}</span></div>
 
 
-<div class="viewcode-block" id="compute_sim_lightcurve"><a class="viewcode-back" href="../../engine.html#engine.hst.compute_sim_lightcurve">[docs]</a><span class="k">def</span> <span class="nf">compute_sim_lightcurve</span><span class="p">(</span><span class="n">exposureDict</span><span class="p">,</span> <span class="n">lightCurveDict</span><span class="p">,</span> <span class="n">calRamp</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Compute simulated HST light curves</span>
+
+<div class="viewcode-block" id="compute_sim_lightcurve">
+<a class="viewcode-back" href="../../../engine.html#pandexo.engine.hst.compute_sim_lightcurve">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_sim_lightcurve</span><span class="p">(</span><span class="n">exposureDict</span><span class="p">,</span> <span class="n">lightCurveDict</span><span class="p">,</span> <span class="n">calRamp</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute simulated HST light curves</span>
 
 <span class="sd">    Function to take the fluence and error estimates from wfc3_TExoNS</span>
 <span class="sd">    and the model light curve from calc_start_window to simulate observed</span>
@@ -783,8 +727,11 @@
     <span class="k">return</span> <span class="n">resultDict</span></div>
 
 
-<div class="viewcode-block" id="compute_sim_hst"><a class="viewcode-back" href="../../engine.html#engine.hst.compute_sim_hst">[docs]</a><span class="k">def</span> <span class="nf">compute_sim_hst</span><span class="p">(</span><span class="n">dictinput</span><span class="p">,</span><span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Sets up HST simulations</span>
+
+<div class="viewcode-block" id="compute_sim_hst">
+<a class="viewcode-back" href="../../../engine.html#pandexo.engine.hst.compute_sim_hst">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_sim_hst</span><span class="p">(</span><span class="n">dictinput</span><span class="p">,</span><span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Sets up HST simulations</span>
 
 <span class="sd">    Function to set up explanet observations for HST only and</span>
 <span class="sd">    compute simulated spectrum.</span>
@@ -863,8 +810,11 @@
             <span class="s2">&quot;info_div&quot;</span><span class="p">:</span> <span class="n">info_div</span><span class="p">}</span></div>
 
 
-<div class="viewcode-block" id="create_out_div"><a class="viewcode-back" href="../../engine.html#engine.hst.create_out_div">[docs]</a><span class="k">def</span> <span class="nf">create_out_div</span><span class="p">(</span><span class="n">input_dict</span><span class="p">,</span> <span class="n">minphase</span><span class="p">,</span> <span class="n">maxphase</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Function to render input dicts in html format for web front end</span>
+
+<div class="viewcode-block" id="create_out_div">
+<a class="viewcode-back" href="../../../engine.html#pandexo.engine.hst.create_out_div">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_out_div</span><span class="p">(</span><span class="n">input_dict</span><span class="p">,</span> <span class="n">minphase</span><span class="p">,</span> <span class="n">maxphase</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Function to render input dicts in html format for web front end</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -886,8 +836,11 @@
     <span class="n">input_div</span> <span class="o">=</span> <span class="n">input_div</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">input_div</span></div>
 
-<div class="viewcode-block" id="calculate_tsec"><a class="viewcode-back" href="../../engine.html#engine.hst.calculate_tsec">[docs]</a><span class="k">def</span> <span class="nf">calculate_tsec</span><span class="p">(</span><span class="n">period</span><span class="p">,</span> <span class="n">ecc</span><span class="p">,</span> <span class="n">omega</span><span class="p">,</span> <span class="n">inc</span><span class="p">,</span> <span class="n">t0</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">tperi</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">winn_approximation</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39; Function to calculate the time of secondary eclipse.</span>
+
+<div class="viewcode-block" id="calculate_tsec">
+<a class="viewcode-back" href="../../../engine.html#pandexo.engine.hst.calculate_tsec">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calculate_tsec</span><span class="p">(</span><span class="n">period</span><span class="p">,</span> <span class="n">ecc</span><span class="p">,</span> <span class="n">omega</span><span class="p">,</span> <span class="n">inc</span><span class="p">,</span> <span class="n">t0</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">tperi</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">winn_approximation</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39; Function to calculate the time of secondary eclipse.</span>
 
 <span class="sd">        This uses Halley&#39;s method (Newton-Raphson, but using second derivatives) to first find the true anomaly (f) at which secondary eclipse occurs,</span>
 <span class="sd">        then uses this to get the eccentric anomaly (E) at secondary eclipse, which gives the mean anomaly (M) at secondary</span>
@@ -975,8 +928,11 @@
                 <span class="k">break</span>
     <span class="k">return</span> <span class="n">tsec</span></div>
 
-<div class="viewcode-block" id="drsky_2prime"><a class="viewcode-back" href="../../engine.html#engine.hst.drsky_2prime">[docs]</a><span class="k">def</span> <span class="nf">drsky_2prime</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">ecc</span><span class="p">,</span> <span class="n">omega</span><span class="p">,</span> <span class="n">inc</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39; Second derivative of function drsky. This is the second derivative with respect to f of the drsky function.</span>
+
+<div class="viewcode-block" id="drsky_2prime">
+<a class="viewcode-back" href="../../../engine.html#pandexo.engine.hst.drsky_2prime">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">drsky_2prime</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">ecc</span><span class="p">,</span> <span class="n">omega</span><span class="p">,</span> <span class="n">inc</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39; Second derivative of function drsky. This is the second derivative with respect to f of the drsky function.</span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    x : float</span>
@@ -1004,8 +960,11 @@
 
     <span class="k">return</span> <span class="n">f1</span><span class="o">+</span><span class="n">f2</span></div>
 
-<div class="viewcode-block" id="drsky_prime"><a class="viewcode-back" href="../../engine.html#engine.hst.drsky_prime">[docs]</a><span class="k">def</span> <span class="nf">drsky_prime</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">ecc</span><span class="p">,</span> <span class="n">omega</span><span class="p">,</span> <span class="n">inc</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39; Derivative of function drsky. This is the first derivative with respect to f of the drsky function.</span>
+
+<div class="viewcode-block" id="drsky_prime">
+<a class="viewcode-back" href="../../../engine.html#pandexo.engine.hst.drsky_prime">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">drsky_prime</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">ecc</span><span class="p">,</span> <span class="n">omega</span><span class="p">,</span> <span class="n">inc</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39; Derivative of function drsky. This is the first derivative with respect to f of the drsky function.</span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    x : float</span>
@@ -1034,8 +993,11 @@
 
     <span class="k">return</span> <span class="n">f1</span><span class="o">+</span><span class="n">f2</span><span class="o">+</span><span class="n">f3</span></div>
 
-<div class="viewcode-block" id="drsky"><a class="viewcode-back" href="../../engine.html#engine.hst.drsky">[docs]</a><span class="k">def</span> <span class="nf">drsky</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">ecc</span><span class="p">,</span> <span class="n">omega</span><span class="p">,</span> <span class="n">inc</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39; Function whose roots we wish to find to obtain time of secondary (and primary) eclipse(s)</span>
+
+<div class="viewcode-block" id="drsky">
+<a class="viewcode-back" href="../../../engine.html#pandexo.engine.hst.drsky">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">drsky</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">ecc</span><span class="p">,</span> <span class="n">omega</span><span class="p">,</span> <span class="n">inc</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39; Function whose roots we wish to find to obtain time of secondary (and primary) eclipse(s)</span>
 <span class="sd">    When one takes the derivative of equation (5) in Winn (2010; https://arxiv.org/abs/1001.2010v5), and equates that to zero (to find the</span>
 <span class="sd">    minimum/maximum of said function), one gets to an equation of the form g(x) = 0. This function (drsky) is g(x), where x is the true</span>
 <span class="sd">    anomaly.</span>
@@ -1063,8 +1025,11 @@
     <span class="n">f2</span> <span class="o">=</span> <span class="n">ecc</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mf">1.</span> <span class="o">-</span> <span class="n">sin_o_p_f</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">sq_sini</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">f1</span> <span class="o">-</span> <span class="n">f2</span></div>
 
-<div class="viewcode-block" id="getE"><a class="viewcode-back" href="../../engine.html#engine.hst.getE">[docs]</a><span class="k">def</span> <span class="nf">getE</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="n">ecc</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Function that returns the eccentric anomaly</span>
+
+<div class="viewcode-block" id="getE">
+<a class="viewcode-back" href="../../../engine.html#pandexo.engine.hst.getE">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">getE</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="n">ecc</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Function that returns the eccentric anomaly</span>
 <span class="sd">    Note normally this is defined in terms of cosines (see, e.g., Section 2.4 in Murray and Dermott), but numerically</span>
 <span class="sd">    this is troublesome because the arccosine doesn&#39;t handle negative numbers by definition (equation 2.43). That&#39;s why</span>
 <span class="sd">    the arctan version is better as signs are preserved (derivation is also in the same section, equation 2.46).</span>
@@ -1081,8 +1046,11 @@
 
     <span class="k">return</span> <span class="mf">2.</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="mf">1.</span><span class="o">-</span><span class="n">ecc</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mf">1.</span><span class="o">+</span><span class="n">ecc</span><span class="p">))</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">tan</span><span class="p">(</span><span class="n">f</span><span class="o">/</span><span class="mf">2.</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="getM"><a class="viewcode-back" href="../../engine.html#engine.hst.getM">[docs]</a><span class="k">def</span> <span class="nf">getM</span><span class="p">(</span><span class="n">E</span><span class="p">,</span> <span class="n">ecc</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Function that returns the mean anomaly using Kepler&#39;s equation</span>
+
+<div class="viewcode-block" id="getM">
+<a class="viewcode-back" href="../../../engine.html#pandexo.engine.hst.getM">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">getM</span><span class="p">(</span><span class="n">E</span><span class="p">,</span> <span class="n">ecc</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Function that returns the mean anomaly using Kepler&#39;s equation</span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    E : float</span>
@@ -1095,45 +1063,34 @@
 <span class="sd">      Mean anomaly &quot;&quot;&quot;</span>
 
     <span class="k">return</span> <span class="n">E</span> <span class="o">-</span> <span class="n">ecc</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">E</span><span class="p">)</span></div>
+
 </pre></div>
 
            </div>
-           
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &copy; Copyright Updated 2022
-
-    </p>
+    <p>&#169; Copyright 2016-2026, PandExo developers.</p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
-
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

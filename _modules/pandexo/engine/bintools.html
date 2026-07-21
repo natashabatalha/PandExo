@@ -1,169 +1,95 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" data-content_root="../../../">
 <head>
-  <meta charset="utf-8">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>engine.bintools &mdash; PandExo  documentation</title>
-  
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pandexo.engine.bintools &mdash; PandExo 2026.7 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
 
   
-  
-  
-  
-
-  
-  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
-  
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../_static/language_data.js"></script>
-    
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
-
-    
-
-  
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" /> 
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=57d3cf08"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
 
           
-            <a href="../../index.html" class="icon icon-home"> PandExo
           
-
-          
+          <a href="../../../index.html" class="icon icon-home">
+            PandExo
           </a>
-
-          
-            
-            
-          
-
-          
 <div role="search">
-  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../includeme.html">Getting Started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Pre-installation Data Download</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../installation.html#installation-with-pip-or-git">Installation with Pip or Git</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../installation.html#final-test-for-success">Final Test for Success</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../installation.html#troubleshooting-common-errors">Troubleshooting-Common Errors</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../installation.html#the-importance-of-upgrading-pandexo">The Importance of Upgrading PandExo</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../installation_windows.html">Windows Installing Guide for PandExo</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../tutorialjwst.html">JWST Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../jwstinput.html">Possible Instrument Input Params</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../jwstdict.html">Py Dict Structure of JWST Output</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../tutorialhst.html">HST Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../engine.html">The Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../includeme.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Pre-installation Data Download</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html#installation-with-pip-or-git">Installation with Pip or Git</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html#final-test-for-success">Final Test for Success</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html#the-importance-of-upgrading-pandexo">The Importance of Upgrading PandExo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation_windows.html">Windows Installing Guide for PandExo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorialjwst.html">JWST Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../jwstinput.html">Possible Instrument Input Params</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../jwstdict.html">Py Dict Structure of JWST Output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorialhst.html">HST Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../engine.html">API Reference</a></li>
 </ul>
 
-            
-          
         </div>
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../index.html">PandExo</a>
-        
+          <a href="../../../index.html">PandExo</a>
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="../../index.html">Docs</a> &raquo;</li>
-        
-          <li><a href="../index.html">Module code</a> &raquo;</li>
-        
-      <li>engine.bintools</li>
-    
-    
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pandexo.engine.bintools</li>
       <li class="wy-breadcrumbs-aside">
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <h1>Source code for engine.bintools</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span> 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span> 
-<span class="kn">import</span> <span class="nn">warnings</span>
-<span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
-	<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
-	<span class="kn">import</span> <span class="nn">pysynphot.binning</span> <span class="k">as</span> <span class="nn">astrobin</span> 
-<span class="kn">import</span> <span class="nn">warnings</span> <span class="k">as</span> <span class="nn">warn</span>
-<span class="kn">import</span> <span class="nn">astropy.units</span> <span class="k">as</span> <span class="nn">u</span>
-<div class="viewcode-block" id="binning"><a class="viewcode-back" href="../../engine.html#engine.bintools.binning">[docs]</a><span class="k">def</span> <span class="nf">binning</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span>  <span class="n">dy</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">binwidth</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">newx</span><span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">log</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">nan</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-	<span class="sd">&quot;&quot;&quot;</span>
+             
+  <h1>Source code for pandexo.engine.bintools</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span> 
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span> 
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">warn</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">astropy.units</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">u</span>
+<span class="k">try</span><span class="p">:</span>
+	<span class="kn">from</span><span class="w"> </span><span class="nn">.synphot_compat</span><span class="w"> </span><span class="kn">import</span> <span class="n">calculate_bin_edges</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+	<span class="kn">from</span><span class="w"> </span><span class="nn">synphot_compat</span><span class="w"> </span><span class="kn">import</span> <span class="n">calculate_bin_edges</span>
+<div class="viewcode-block" id="binning">
+<a class="viewcode-back" href="../../../engine.html#pandexo.engine.bintools.binning">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">binning</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span>  <span class="n">dy</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">binwidth</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">newx</span><span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">log</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">nan</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	This contains functionality for binning spectroscopy given an x, y and set of errors. </span>
 <span class="sd">	This is similar to IDL&#39;s regroup but in Python (obviously). Note that y is binned as the </span>
 <span class="sd">	mean(ordinates) instead of sum(ordinates), as you would want for cmputing flux in a set of </span>
@@ -245,14 +171,14 @@
 	<span class="k">if</span> <span class="n">newx</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> 
 		<span class="n">bin_x</span> <span class="o">=</span> <span class="n">newx</span>
 		<span class="n">bin_x</span><span class="p">,</span> <span class="n">bin_y</span><span class="p">,</span> <span class="n">bin_dy</span><span class="p">,</span> <span class="n">bin_n</span> <span class="o">=</span> <span class="n">uniform_tophat_mean</span><span class="p">(</span><span class="n">bin_x</span><span class="p">,</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span><span class="n">dy</span><span class="p">,</span><span class="n">nan</span><span class="o">=</span><span class="n">nan</span><span class="p">)</span>
-		<span class="n">bin_edge</span> <span class="o">=</span> <span class="n">astrobin</span><span class="o">.</span><span class="n">calculate_bin_edges</span><span class="p">(</span><span class="n">bin_x</span><span class="p">)</span>
+		<span class="n">bin_edge</span> <span class="o">=</span> <span class="n">calculate_bin_edges</span><span class="p">(</span><span class="n">bin_x</span><span class="p">)</span>
 
 		<span class="k">return</span> <span class="p">{</span><span class="s1">&#39;bin_y&#39;</span><span class="p">:</span><span class="n">bin_y</span><span class="p">,</span> <span class="s1">&#39;bin_x&#39;</span><span class="p">:</span><span class="n">bin_x</span><span class="p">,</span> <span class="s1">&#39;bin_edge&#39;</span><span class="p">:</span><span class="n">bin_edge</span><span class="p">,</span> <span class="s1">&#39;bin_dy&#39;</span><span class="p">:</span><span class="n">bin_dy</span><span class="p">,</span> <span class="s1">&#39;bin_n&#39;</span><span class="p">:</span><span class="n">bin_n</span><span class="p">}</span> 
 
 	<span class="k">elif</span> <span class="n">r</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
 		<span class="n">bin_x</span> <span class="o">=</span> <span class="n">bin_wave_to_R</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
 		<span class="n">bin_x</span><span class="p">,</span> <span class="n">bin_y</span><span class="p">,</span> <span class="n">bin_dy</span><span class="p">,</span> <span class="n">bin_n</span> <span class="o">=</span> <span class="n">uniform_tophat_mean</span><span class="p">(</span><span class="n">bin_x</span><span class="p">,</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span><span class="n">dy</span><span class="p">,</span><span class="n">nan</span><span class="o">=</span><span class="n">nan</span><span class="p">)</span>
-		<span class="n">bin_edge</span> <span class="o">=</span> <span class="n">astrobin</span><span class="o">.</span><span class="n">calculate_bin_edges</span><span class="p">(</span><span class="n">bin_x</span><span class="p">)</span>
+		<span class="n">bin_edge</span> <span class="o">=</span> <span class="n">calculate_bin_edges</span><span class="p">(</span><span class="n">bin_x</span><span class="p">)</span>
 
 		<span class="k">return</span> <span class="p">{</span><span class="s1">&#39;bin_y&#39;</span><span class="p">:</span><span class="n">bin_y</span><span class="p">,</span> <span class="s1">&#39;bin_x&#39;</span><span class="p">:</span><span class="n">bin_x</span><span class="p">,</span> <span class="s1">&#39;bin_edge&#39;</span><span class="p">:</span><span class="n">bin_edge</span><span class="p">,</span> <span class="s1">&#39;bin_dy&#39;</span><span class="p">:</span><span class="n">bin_dy</span><span class="p">,</span> <span class="s1">&#39;bin_n&#39;</span><span class="p">:</span><span class="n">bin_n</span><span class="p">}</span> 
  
@@ -267,14 +193,17 @@
 		<span class="k">elif</span> <span class="ow">not</span> <span class="n">log</span><span class="p">:</span>
 			<span class="n">bin_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">x</span><span class="p">),</span><span class="nb">max</span><span class="p">(</span><span class="n">x</span><span class="p">),</span><span class="n">binwidth</span><span class="p">)</span>
 		<span class="n">bin_x</span><span class="p">,</span> <span class="n">bin_y</span><span class="p">,</span> <span class="n">bin_dy</span><span class="p">,</span> <span class="n">bin_n</span> <span class="o">=</span> <span class="n">uniform_tophat_mean</span><span class="p">(</span><span class="n">bin_x</span><span class="p">,</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span><span class="n">dy</span><span class="p">,</span><span class="n">nan</span><span class="o">=</span><span class="n">nan</span><span class="p">)</span>
-		<span class="n">bin_edge</span> <span class="o">=</span> <span class="n">astrobin</span><span class="o">.</span><span class="n">calculate_bin_edges</span><span class="p">(</span><span class="n">bin_x</span><span class="p">)</span>
+		<span class="n">bin_edge</span> <span class="o">=</span> <span class="n">calculate_bin_edges</span><span class="p">(</span><span class="n">bin_x</span><span class="p">)</span>
 
 		<span class="k">return</span> <span class="p">{</span><span class="s1">&#39;bin_y&#39;</span><span class="p">:</span><span class="n">bin_y</span><span class="p">,</span> <span class="s1">&#39;bin_x&#39;</span><span class="p">:</span><span class="n">bin_x</span><span class="p">,</span> <span class="s1">&#39;bin_edge&#39;</span><span class="p">:</span><span class="n">bin_edge</span><span class="p">,</span> <span class="s1">&#39;bin_dy&#39;</span><span class="p">:</span><span class="n">bin_dy</span><span class="p">,</span> <span class="s1">&#39;bin_n&#39;</span><span class="p">:</span><span class="n">bin_n</span><span class="p">}</span> </div>
 
 
 
-<div class="viewcode-block" id="uniform_tophat_mean"><a class="viewcode-back" href="../../engine.html#engine.bintools.uniform_tophat_mean">[docs]</a><span class="k">def</span> <span class="nf">uniform_tophat_mean</span><span class="p">(</span><span class="n">newx</span><span class="p">,</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">nan</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-	<span class="sd">&quot;&quot;&quot;Adapted from Mike R. Line to rebin spectra</span>
+
+<div class="viewcode-block" id="uniform_tophat_mean">
+<a class="viewcode-back" href="../../../engine.html#pandexo.engine.bintools.uniform_tophat_mean">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">uniform_tophat_mean</span><span class="p">(</span><span class="n">newx</span><span class="p">,</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">nan</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">	</span><span class="sd">&quot;&quot;&quot;Adapted from Mike R. Line to rebin spectra</span>
 
 <span class="sd">	Takes mean of groups of points in certain wave bin </span>
 
@@ -348,8 +277,11 @@
 
 	<span class="k">return</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;bin_x&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;bin_y&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;bin_dy&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;bin_n&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span></div>
 
-<div class="viewcode-block" id="bin_wave_to_R"><a class="viewcode-back" href="../../engine.html#engine.bintools.bin_wave_to_R">[docs]</a><span class="k">def</span> <span class="nf">bin_wave_to_R</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">R</span><span class="p">):</span>
-	<span class="sd">&quot;&quot;&quot;Creates new wavelength axis at specified resolution</span>
+
+<div class="viewcode-block" id="bin_wave_to_R">
+<a class="viewcode-back" href="../../../engine.html#pandexo.engine.bintools.bin_wave_to_R">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">bin_wave_to_R</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">R</span><span class="p">):</span>
+<span class="w">	</span><span class="sd">&quot;&quot;&quot;Creates new wavelength axis at specified resolution</span>
 
 <span class="sd">	Parameters</span>
 <span class="sd">	----------</span>
@@ -402,42 +334,30 @@
 </pre></div>
 
            </div>
-           
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &copy; Copyright Updated 2022
-
-    </p>
+    <p>&#169; Copyright 2016-2026, PandExo developers.</p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
-
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

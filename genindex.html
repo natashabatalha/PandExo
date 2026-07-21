@@ -1,18 +1,20 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Index &mdash; PandExo  documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+  <title>Index &mdash; PandExo 2026.7 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
   
-        <script src="_static/documentation_options.js?v=5929fcd5"></script>
-        <script src="_static/doctools.js?v=888ff710"></script>
-        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=57d3cf08"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="#" />
     <link rel="search" title="Search" href="search.html" /> 
@@ -42,14 +44,13 @@
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Pre-installation Data Download</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html#installation-with-pip-or-git">Installation with Pip or Git</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html#final-test-for-success">Final Test for Success</a></li>
-<li class="toctree-l1"><a class="reference internal" href="installation.html#troubleshooting-common-errors">Troubleshooting-Common Errors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html#the-importance-of-upgrading-pandexo">The Importance of Upgrading PandExo</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation_windows.html">Windows Installing Guide for PandExo</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorialjwst.html">JWST Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="jwstinput.html">Possible Instrument Input Params</a></li>
 <li class="toctree-l1"><a class="reference internal" href="jwstdict.html">Py Dict Structure of JWST Output</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorialhst.html">HST Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="engine.html">The Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="engine.html">API Reference</a></li>
 </ul>
 
         </div>
@@ -98,23 +99,28 @@
  | <a href="#S"><strong>S</strong></a>
  | <a href="#T"><strong>T</strong></a>
  | <a href="#U"><strong>U</strong></a>
+ | <a href="#V"><strong>V</strong></a>
  | <a href="#W"><strong>W</strong></a>
  
 </div>
 <h2 id="A">A</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="engine.html#engine.run_online.AboutHandler">AboutHandler (class in engine.run_online)</a>
+      <li><a href="engine.html#pandexo.engine.run_online.AboutHandler">AboutHandler (class in pandexo.engine.run_online)</a>
 </li>
-      <li><a href="engine.html#engine.jwst.add_noise_floor">add_noise_floor() (in module engine.jwst)</a>
+      <li><a href="engine.html#pandexo.engine.jwst.add_noise_floor">add_noise_floor() (in module pandexo.engine.jwst)</a>
+</li>
+      <li><a href="engine.html#pandexo.engine.run_online.add_simbad_magnitudes">add_simbad_magnitudes() (in module pandexo.engine.run_online)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="engine.html#engine.jwst.add_warnings">add_warnings() (in module engine.jwst)</a>
+      <li><a href="engine.html#pandexo.engine.jwst.add_warnings">add_warnings() (in module pandexo.engine.jwst)</a>
 </li>
-      <li><a href="engine.html#engine.run_online.Application">Application (class in engine.run_online)</a>
+      <li><a href="engine.html#pandexo.engine.run_online.Application">Application (class in pandexo.engine.run_online)</a>
 </li>
-      <li><a href="engine.html#engine.jwst.as_dict">as_dict() (in module engine.jwst)</a>
+      <li><a href="engine.html#pandexo.engine.jwst.apt_exposure_parameters">apt_exposure_parameters() (in module pandexo.engine.jwst)</a>
+</li>
+      <li><a href="engine.html#pandexo.engine.jwst.as_dict">as_dict() (in module pandexo.engine.jwst)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -122,23 +128,25 @@
 <h2 id="B">B</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="engine.html#engine.run_online.BaseHandler">BaseHandler (class in engine.run_online)</a>
+      <li><a href="engine.html#pandexo.engine.run_online.BaseHandler">BaseHandler (class in pandexo.engine.run_online)</a>
 </li>
-      <li><a href="engine.html#engine.bintools.bin_wave_to_R">bin_wave_to_R() (in module engine.bintools)</a>
+      <li><a href="engine.html#pandexo.engine.bintools.bin_wave_to_R">bin_wave_to_R() (in module pandexo.engine.bintools)</a>
 
       <ul>
-        <li><a href="engine.html#engine.justplotit.bin_wave_to_R">(in module engine.justplotit)</a>
+        <li><a href="engine.html#pandexo.engine.justplotit.bin_wave_to_R">(in module pandexo.engine.justplotit)</a>
 </li>
-        <li><a href="engine.html#engine.jwst.bin_wave_to_R">(in module engine.jwst)</a>
+        <li><a href="engine.html#pandexo.engine.jwst.bin_wave_to_R">(in module pandexo.engine.jwst)</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="engine.html#engine.bintools.binning">binning() (in module engine.bintools)</a>
+      <li><a href="engine.html#pandexo.engine.bintools.binning">binning() (in module pandexo.engine.bintools)</a>
 </li>
-      <li><a href="engine.html#engine.create_input.bothTrans">bothTrans() (in module engine.create_input)</a>
+      <li><a href="engine.html#pandexo.engine.create_input.bothTrans">bothTrans() (in module pandexo.engine.create_input)</a>
 </li>
-      <li><a href="engine.html#engine.run_online.BaseHandler.buffer">buffer (engine.run_online.BaseHandler attribute)</a>
+      <li><a href="engine.html#pandexo.engine.run_online.BaseHandler.buffer">buffer (pandexo.engine.run_online.BaseHandler attribute)</a>
+</li>
+      <li><a href="engine.html#pandexo.engine.jwst.build_timing_display_div">build_timing_display_div() (in module pandexo.engine.jwst)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -146,45 +154,47 @@
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="engine.html#engine.hst.calc_start_window">calc_start_window() (in module engine.hst)</a>
+      <li><a href="engine.html#pandexo.engine.hst.calc_start_window">calc_start_window() (in module pandexo.engine.hst)</a>
 </li>
-      <li><a href="engine.html#engine.hst.calculate_tsec">calculate_tsec() (in module engine.hst)</a>
+      <li><a href="engine.html#pandexo.engine.hst.calculate_tsec">calculate_tsec() (in module pandexo.engine.hst)</a>
 </li>
-      <li><a href="engine.html#engine.run_online.CalculationDownloadHandler">CalculationDownloadHandler (class in engine.run_online)</a>
+      <li><a href="engine.html#pandexo.engine.run_online.CalculationDownloadHandler">CalculationDownloadHandler (class in pandexo.engine.run_online)</a>
 </li>
-      <li><a href="engine.html#engine.run_online.CalculationDownloadPandInHandler">CalculationDownloadPandInHandler (class in engine.run_online)</a>
+      <li><a href="engine.html#pandexo.engine.run_online.CalculationDownloadPandInHandler">CalculationDownloadPandInHandler (class in pandexo.engine.run_online)</a>
 </li>
-      <li><a href="engine.html#engine.run_online.CalculationNewHandler">CalculationNewHandler (class in engine.run_online)</a>
+      <li><a href="engine.html#pandexo.engine.run_online.CalculationDownloadTextHandler">CalculationDownloadTextHandler (class in pandexo.engine.run_online)</a>
 </li>
-      <li><a href="engine.html#engine.run_online.CalculationNewHSTHandler">CalculationNewHSTHandler (class in engine.run_online)</a>
+      <li><a href="engine.html#pandexo.engine.run_online.CalculationNewHandler">CalculationNewHandler (class in pandexo.engine.run_online)</a>
 </li>
-      <li><a href="engine.html#engine.run_online.CalculationStatusHandler">CalculationStatusHandler (class in engine.run_online)</a>
+      <li><a href="engine.html#pandexo.engine.run_online.CalculationNewHSTHandler">CalculationNewHSTHandler (class in pandexo.engine.run_online)</a>
 </li>
-      <li><a href="engine.html#engine.run_online.CalculationStatusHSTHandler">CalculationStatusHSTHandler (class in engine.run_online)</a>
+      <li><a href="engine.html#pandexo.engine.run_online.CalculationStatusHandler">CalculationStatusHandler (class in pandexo.engine.run_online)</a>
 </li>
-      <li><a href="engine.html#engine.run_online.CalculationTask">CalculationTask (class in engine.run_online)</a>
+      <li><a href="engine.html#pandexo.engine.run_online.CalculationStatusHSTHandler">CalculationStatusHSTHandler (class in pandexo.engine.run_online)</a>
+</li>
+      <li><a href="engine.html#pandexo.engine.run_online.CalculationTask">CalculationTask (class in pandexo.engine.run_online)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="engine.html#engine.run_online.CalculationViewHandler">CalculationViewHandler (class in engine.run_online)</a>
+      <li><a href="engine.html#pandexo.engine.run_online.CalculationViewHandler">CalculationViewHandler (class in pandexo.engine.run_online)</a>
 </li>
-      <li><a href="engine.html#engine.run_online.CalculationViewHSTHandler">CalculationViewHSTHandler (class in engine.run_online)</a>
+      <li><a href="engine.html#pandexo.engine.run_online.CalculationViewHSTHandler">CalculationViewHSTHandler (class in pandexo.engine.run_online)</a>
 </li>
-      <li><a href="engine.html#engine.jwst.compute_full_sim">compute_full_sim() (in module engine.jwst)</a>
+      <li><a href="engine.html#pandexo.engine.jwst.compute_full_sim">compute_full_sim() (in module pandexo.engine.jwst)</a>
 </li>
-      <li><a href="engine.html#engine.jwst.compute_maxexptime_per_int">compute_maxexptime_per_int() (in module engine.jwst)</a>
+      <li><a href="engine.html#pandexo.engine.jwst.compute_maxexptime_per_int">compute_maxexptime_per_int() (in module pandexo.engine.jwst)</a>
 </li>
-      <li><a href="engine.html#engine.hst.compute_sim_hst">compute_sim_hst() (in module engine.hst)</a>
+      <li><a href="engine.html#pandexo.engine.hst.compute_sim_hst">compute_sim_hst() (in module pandexo.engine.hst)</a>
 </li>
-      <li><a href="engine.html#engine.hst.compute_sim_lightcurve">compute_sim_lightcurve() (in module engine.hst)</a>
+      <li><a href="engine.html#pandexo.engine.hst.compute_sim_lightcurve">compute_sim_lightcurve() (in module pandexo.engine.hst)</a>
 </li>
-      <li><a href="engine.html#engine.jwst.compute_timing">compute_timing() (in module engine.jwst)</a>
+      <li><a href="engine.html#pandexo.engine.jwst.compute_timing">compute_timing() (in module pandexo.engine.jwst)</a>
 </li>
-      <li><a href="engine.html#engine.run_online.CalculationTask.cookie">cookie (engine.run_online.CalculationTask attribute)</a>
+      <li><a href="engine.html#pandexo.engine.run_online.CalculationTask.cookie">cookie (pandexo.engine.run_online.CalculationTask attribute)</a>
 </li>
-      <li><a href="engine.html#engine.run_online.CalculationTask.count">count (engine.run_online.CalculationTask attribute)</a>
+      <li><a href="engine.html#pandexo.engine.run_online.CalculationTask.count">count (pandexo.engine.run_online.CalculationTask attribute)</a>
 </li>
-      <li><a href="engine.html#engine.hst.create_out_div">create_out_div() (in module engine.hst)</a>
+      <li><a href="engine.html#pandexo.engine.hst.create_out_div">create_out_div() (in module pandexo.engine.hst)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -192,19 +202,21 @@
 <h2 id="D">D</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="engine.html#engine.run_online.DashboardHandler">DashboardHandler (class in engine.run_online)</a>
+      <li><a href="engine.html#pandexo.engine.run_online.DashboardHandler">DashboardHandler (class in pandexo.engine.run_online)</a>
 </li>
-      <li><a href="engine.html#engine.run_online.DashboardHSTHandler">DashboardHSTHandler (class in engine.run_online)</a>
+      <li><a href="engine.html#pandexo.engine.run_online.DashboardHSTHandler">DashboardHSTHandler (class in pandexo.engine.run_online)</a>
 </li>
-      <li><a href="engine.html#engine.justdoit.dispersers">dispersers() (in module engine.justdoit)</a>
+      <li><a href="engine.html#pandexo.engine.jwst.dhs_f150w_wavelength_mask">dhs_f150w_wavelength_mask() (in module pandexo.engine.jwst)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="engine.html#engine.hst.drsky">drsky() (in module engine.hst)</a>
+      <li><a href="engine.html#pandexo.engine.justdoit.dispersers">dispersers() (in module pandexo.engine.justdoit)</a>
 </li>
-      <li><a href="engine.html#engine.hst.drsky_2prime">drsky_2prime() (in module engine.hst)</a>
+      <li><a href="engine.html#pandexo.engine.hst.drsky">drsky() (in module pandexo.engine.hst)</a>
 </li>
-      <li><a href="engine.html#engine.hst.drsky_prime">drsky_prime() (in module engine.hst)</a>
+      <li><a href="engine.html#pandexo.engine.hst.drsky_2prime">drsky_2prime() (in module pandexo.engine.hst)</a>
+</li>
+      <li><a href="engine.html#pandexo.engine.hst.drsky_prime">drsky_prime() (in module pandexo.engine.hst)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -212,111 +224,13 @@
 <h2 id="E">E</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li>
-    engine
-
-      <ul>
-        <li><a href="engine.html#module-engine">module</a>
+      <li><a href="engine.html#pandexo.engine.jwst.estimate_dhs_data_excess">estimate_dhs_data_excess() (in module pandexo.engine.jwst)</a>
 </li>
-      </ul></li>
-      <li>
-    engine.bintools
-
-      <ul>
-        <li><a href="engine.html#module-engine.bintools">module</a>
-</li>
-      </ul></li>
-      <li>
-    engine.compute_noise
-
-      <ul>
-        <li><a href="engine.html#module-engine.compute_noise">module</a>
-</li>
-      </ul></li>
-      <li>
-    engine.create_input
-
-      <ul>
-        <li><a href="engine.html#module-engine.create_input">module</a>
-</li>
-      </ul></li>
-      <li>
-    engine.elements
-
-      <ul>
-        <li><a href="engine.html#module-engine.elements">module</a>
-</li>
-      </ul></li>
-      <li>
-    engine.hst
-
-      <ul>
-        <li><a href="engine.html#module-engine.hst">module</a>
-</li>
-      </ul></li>
-      <li>
-    engine.hst_smooth
-
-      <ul>
-        <li><a href="engine.html#module-engine.hst_smooth">module</a>
-</li>
-      </ul></li>
-      <li>
-    engine.justdoit
-
-      <ul>
-        <li><a href="engine.html#module-engine.justdoit">module</a>
-</li>
-      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li>
-    engine.justplotit
-
-      <ul>
-        <li><a href="engine.html#module-engine.justplotit">module</a>
+      <li><a href="engine.html#pandexo.engine.jwst.estimate_nircam_data_excess">estimate_nircam_data_excess() (in module pandexo.engine.jwst)</a>
 </li>
-      </ul></li>
-      <li>
-    engine.jwst
-
-      <ul>
-        <li><a href="engine.html#module-engine.jwst">module</a>
-</li>
-      </ul></li>
-      <li>
-    engine.load_modes
-
-      <ul>
-        <li><a href="engine.html#module-engine.load_modes">module</a>
-</li>
-      </ul></li>
-      <li>
-    engine.logs
-
-      <ul>
-        <li><a href="engine.html#module-engine.logs">module</a>
-</li>
-      </ul></li>
-      <li>
-    engine.pandexo
-
-      <ul>
-        <li><a href="engine.html#module-engine.pandexo">module</a>
-</li>
-      </ul></li>
-      <li>
-    engine.run_online
-
-      <ul>
-        <li><a href="engine.html#module-engine.run_online">module</a>
-</li>
-      </ul></li>
-      <li><a href="engine.html#engine.run_online.BaseHandler.executor">executor (engine.run_online.BaseHandler attribute)</a>
-</li>
-      <li><a href="engine.html#engine.compute_noise.ExtractSpec.extract_region">extract_region() (engine.compute_noise.ExtractSpec method)</a>, <a href="engine.html#id0">[1]</a>
-</li>
-      <li><a href="engine.html#engine.compute_noise.ExtractSpec">ExtractSpec (class in engine.compute_noise)</a>
+      <li><a href="engine.html#pandexo.engine.run_online.BaseHandler.executor">executor (pandexo.engine.run_online.BaseHandler attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -324,7 +238,11 @@
 <h2 id="F">F</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="engine.html#engine.justdoit.filters">filters() (in module engine.justdoit)</a>
+      <li><a href="engine.html#pandexo.engine.justdoit.filters">filters() (in module pandexo.engine.justdoit)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="engine.html#pandexo.engine.run_online.CalculationTask.form_data">form_data (pandexo.engine.run_online.CalculationTask attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -332,51 +250,61 @@
 <h2 id="G">G</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="engine.html#engine.run_online.AboutHandler.get">get() (engine.run_online.AboutHandler method)</a>
+      <li><a href="engine.html#pandexo.engine.run_online.AboutHandler.get">get() (pandexo.engine.run_online.AboutHandler method)</a>
 
       <ul>
-        <li><a href="engine.html#engine.run_online.CalculationDownloadHandler.get">(engine.run_online.CalculationDownloadHandler method)</a>
+        <li><a href="engine.html#pandexo.engine.run_online.CalculationDownloadHandler.get">(pandexo.engine.run_online.CalculationDownloadHandler method)</a>
 </li>
-        <li><a href="engine.html#engine.run_online.CalculationDownloadPandInHandler.get">(engine.run_online.CalculationDownloadPandInHandler method)</a>
+        <li><a href="engine.html#pandexo.engine.run_online.CalculationDownloadPandInHandler.get">(pandexo.engine.run_online.CalculationDownloadPandInHandler method)</a>
 </li>
-        <li><a href="engine.html#engine.run_online.CalculationNewHandler.get">(engine.run_online.CalculationNewHandler method)</a>
+        <li><a href="engine.html#pandexo.engine.run_online.CalculationDownloadTextHandler.get">(pandexo.engine.run_online.CalculationDownloadTextHandler method)</a>
 </li>
-        <li><a href="engine.html#engine.run_online.CalculationNewHSTHandler.get">(engine.run_online.CalculationNewHSTHandler method)</a>
+        <li><a href="engine.html#pandexo.engine.run_online.CalculationNewHandler.get">(pandexo.engine.run_online.CalculationNewHandler method)</a>
 </li>
-        <li><a href="engine.html#engine.run_online.CalculationStatusHandler.get">(engine.run_online.CalculationStatusHandler method)</a>
+        <li><a href="engine.html#pandexo.engine.run_online.CalculationNewHSTHandler.get">(pandexo.engine.run_online.CalculationNewHSTHandler method)</a>
 </li>
-        <li><a href="engine.html#engine.run_online.CalculationStatusHSTHandler.get">(engine.run_online.CalculationStatusHSTHandler method)</a>
+        <li><a href="engine.html#pandexo.engine.run_online.CalculationStatusHandler.get">(pandexo.engine.run_online.CalculationStatusHandler method)</a>
 </li>
-        <li><a href="engine.html#engine.run_online.CalculationViewHandler.get">(engine.run_online.CalculationViewHandler method)</a>
+        <li><a href="engine.html#pandexo.engine.run_online.CalculationStatusHSTHandler.get">(pandexo.engine.run_online.CalculationStatusHSTHandler method)</a>
 </li>
-        <li><a href="engine.html#engine.run_online.CalculationViewHSTHandler.get">(engine.run_online.CalculationViewHSTHandler method)</a>
+        <li><a href="engine.html#pandexo.engine.run_online.CalculationViewHandler.get">(pandexo.engine.run_online.CalculationViewHandler method)</a>
 </li>
-        <li><a href="engine.html#engine.run_online.DashboardHandler.get">(engine.run_online.DashboardHandler method)</a>
+        <li><a href="engine.html#pandexo.engine.run_online.CalculationViewHSTHandler.get">(pandexo.engine.run_online.CalculationViewHSTHandler method)</a>
 </li>
-        <li><a href="engine.html#engine.run_online.DashboardHSTHandler.get">(engine.run_online.DashboardHSTHandler method)</a>
+        <li><a href="engine.html#pandexo.engine.run_online.DashboardHandler.get">(pandexo.engine.run_online.DashboardHandler method)</a>
 </li>
-        <li><a href="engine.html#engine.run_online.HelpfulPlotsHandler.get">(engine.run_online.HelpfulPlotsHandler method)</a>
+        <li><a href="engine.html#pandexo.engine.run_online.DashboardHSTHandler.get">(pandexo.engine.run_online.DashboardHSTHandler method)</a>
 </li>
-        <li><a href="engine.html#engine.run_online.HomeHandler.get">(engine.run_online.HomeHandler method)</a>
+        <li><a href="engine.html#pandexo.engine.run_online.HelpfulPlotsHandler.get">(pandexo.engine.run_online.HelpfulPlotsHandler method)</a>
 </li>
-        <li><a href="engine.html#engine.run_online.TablesHandler.get">(engine.run_online.TablesHandler method)</a>
+        <li><a href="engine.html#pandexo.engine.run_online.HomeHandler.get">(pandexo.engine.run_online.HomeHandler method)</a>
+</li>
+        <li><a href="engine.html#pandexo.engine.run_online.ResolveHandler.get">(pandexo.engine.run_online.ResolveHandler method)</a>
+</li>
+        <li><a href="engine.html#pandexo.engine.run_online.TablesHandler.get">(pandexo.engine.run_online.TablesHandler method)</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="engine.html#engine.justdoit.get_thruput">get_thruput() (in module engine.justdoit)</a>
+      <li><a href="engine.html#pandexo.engine.run_online.get_cached_planet_names">get_cached_planet_names() (in module pandexo.engine.run_online)</a>
 </li>
-      <li><a href="engine.html#engine.hst.getE">getE() (in module engine.hst)</a>
+      <li><a href="engine.html#pandexo.engine.run_online.get_simbad_magnitudes">get_simbad_magnitudes() (in module pandexo.engine.run_online)</a>
 </li>
-      <li><a href="engine.html#engine.hst.getM">getM() (in module engine.hst)</a>
+      <li><a href="engine.html#pandexo.engine.run_online.BaseHandler.get_template_namespace">get_template_namespace() (pandexo.engine.run_online.BaseHandler method)</a>
 </li>
-      <li><a href="engine.html#engine.justdoit.getStarName">getStarName() (in module engine.justdoit)</a>
+      <li><a href="engine.html#pandexo.engine.justdoit.get_thruput">get_thruput() (in module pandexo.engine.justdoit)</a>
+</li>
+      <li><a href="engine.html#pandexo.engine.hst.getE">getE() (in module pandexo.engine.hst)</a>
+</li>
+      <li><a href="engine.html#pandexo.engine.hst.getM">getM() (in module pandexo.engine.hst)</a>
+</li>
+      <li><a href="engine.html#pandexo.engine.justdoit.getStarName">getStarName() (in module pandexo.engine.justdoit)</a>
 
       <ul>
-        <li><a href="engine.html#engine.run_online.getStarName">(in module engine.run_online)</a>
+        <li><a href="engine.html#pandexo.engine.run_online.getStarName">(in module pandexo.engine.run_online)</a>
 </li>
       </ul></li>
-      <li><a href="engine.html#engine.justdoit.grid_options">grid_options() (in module engine.justdoit)</a>
+      <li><a href="engine.html#pandexo.engine.justdoit.grid_options">grid_options() (in module pandexo.engine.justdoit)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -384,23 +312,23 @@
 <h2 id="H">H</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="engine.html#engine.run_online.HelpfulPlotsHandler">HelpfulPlotsHandler (class in engine.run_online)</a>
+      <li><a href="engine.html#pandexo.engine.run_online.HelpfulPlotsHandler">HelpfulPlotsHandler (class in pandexo.engine.run_online)</a>
 </li>
-      <li><a href="engine.html#engine.run_online.HomeHandler">HomeHandler (class in engine.run_online)</a>
+      <li><a href="engine.html#pandexo.engine.run_online.HomeHandler">HomeHandler (class in pandexo.engine.run_online)</a>
 </li>
-      <li><a href="engine.html#engine.logs.hst_log">hst_log() (in module engine.logs)</a>
+      <li><a href="engine.html#pandexo.engine.logs.hst_log">hst_log() (in module pandexo.engine.logs)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="engine.html#engine.justplotit.hst_simulated_lightcurve">hst_simulated_lightcurve() (in module engine.justplotit)</a>
+      <li><a href="engine.html#pandexo.engine.justplotit.hst_simulated_lightcurve">hst_simulated_lightcurve() (in module pandexo.engine.justplotit)</a>
 </li>
-      <li><a href="engine.html#engine.create_input.hst_spec">hst_spec() (in module engine.create_input)</a>
+      <li><a href="engine.html#pandexo.engine.create_input.hst_spec">hst_spec() (in module pandexo.engine.create_input)</a>
 
       <ul>
-        <li><a href="engine.html#engine.justplotit.hst_spec">(in module engine.justplotit)</a>
+        <li><a href="engine.html#pandexo.engine.justplotit.hst_spec">(in module pandexo.engine.justplotit)</a>
 </li>
       </ul></li>
-      <li><a href="engine.html#engine.justplotit.hst_time">hst_time() (in module engine.justplotit)</a>
+      <li><a href="engine.html#pandexo.engine.justplotit.hst_time">hst_time() (in module pandexo.engine.justplotit)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -408,7 +336,11 @@
 <h2 id="I">I</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="engine.html#engine.run_online.CalculationTask.id">id (engine.run_online.CalculationTask attribute)</a>
+      <li><a href="engine.html#pandexo.engine.run_online.CalculationTask.id">id (pandexo.engine.run_online.CalculationTask attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="engine.html#pandexo.engine.jwst.is_phase_spec">is_phase_spec() (in module pandexo.engine.jwst)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -416,23 +348,23 @@
 <h2 id="J">J</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="engine.html#engine.justplotit.jwst_1d_bkg">jwst_1d_bkg() (in module engine.justplotit)</a>
+      <li><a href="engine.html#pandexo.engine.justplotit.jwst_1d_bkg">jwst_1d_bkg() (in module pandexo.engine.justplotit)</a>
 </li>
-      <li><a href="engine.html#engine.justplotit.jwst_1d_flux">jwst_1d_flux() (in module engine.justplotit)</a>
+      <li><a href="engine.html#pandexo.engine.justplotit.jwst_1d_flux">jwst_1d_flux() (in module pandexo.engine.justplotit)</a>
 </li>
-      <li><a href="engine.html#engine.justplotit.jwst_1d_snr">jwst_1d_snr() (in module engine.justplotit)</a>
+      <li><a href="engine.html#pandexo.engine.justplotit.jwst_1d_snr">jwst_1d_snr() (in module pandexo.engine.justplotit)</a>
 </li>
-      <li><a href="engine.html#engine.justplotit.jwst_1d_spec">jwst_1d_spec() (in module engine.justplotit)</a>
+      <li><a href="engine.html#pandexo.engine.justplotit.jwst_1d_spec">jwst_1d_spec() (in module pandexo.engine.justplotit)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="engine.html#engine.justplotit.jwst_2d_det">jwst_2d_det() (in module engine.justplotit)</a>
+      <li><a href="engine.html#pandexo.engine.justplotit.jwst_2d_det">jwst_2d_det() (in module pandexo.engine.justplotit)</a>
 </li>
-      <li><a href="engine.html#engine.justplotit.jwst_2d_sat">jwst_2d_sat() (in module engine.justplotit)</a>
+      <li><a href="engine.html#pandexo.engine.justplotit.jwst_2d_sat">jwst_2d_sat() (in module pandexo.engine.justplotit)</a>
 </li>
-      <li><a href="engine.html#engine.logs.jwst_log">jwst_log() (in module engine.logs)</a>
+      <li><a href="engine.html#pandexo.engine.logs.jwst_log">jwst_log() (in module pandexo.engine.logs)</a>
 </li>
-      <li><a href="engine.html#engine.justplotit.jwst_noise">jwst_noise() (in module engine.justplotit)</a>
+      <li><a href="engine.html#pandexo.engine.justplotit.jwst_noise">jwst_noise() (in module pandexo.engine.justplotit)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -440,15 +372,11 @@
 <h2 id="L">L</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="engine.html#engine.justdoit.load_exo_dict">load_exo_dict() (in module engine.justdoit)</a>
-</li>
-      <li><a href="engine.html#engine.justdoit.load_mode_dict">load_mode_dict() (in module engine.justdoit)</a>
+      <li><a href="engine.html#pandexo.engine.justdoit.load_exo_dict">load_exo_dict() (in module pandexo.engine.justdoit)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="engine.html#engine.compute_noise.ExtractSpec.loopingL">loopingL() (engine.compute_noise.ExtractSpec method)</a>, <a href="engine.html#id1">[1]</a>
-</li>
-      <li><a href="engine.html#engine.compute_noise.ExtractSpec.loopingU">loopingU() (engine.compute_noise.ExtractSpec method)</a>, <a href="engine.html#id2">[1]</a>
+      <li><a href="engine.html#pandexo.engine.justdoit.load_mode_dict">load_mode_dict() (in module pandexo.engine.justdoit)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -456,43 +384,41 @@
 <h2 id="M">M</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="engine.html#engine.run_online.main">main() (in module engine.run_online)</a>
+      <li><a href="engine.html#pandexo.engine.run_online.main">main() (in module pandexo.engine.run_online)</a>
 </li>
-      <li><a href="engine.html#engine.hst_smooth.medfilt">medfilt() (in module engine.hst_smooth)</a>
+      <li><a href="engine.html#pandexo.engine.jwst.mask_fully_saturated_final_spectrum">mask_fully_saturated_final_spectrum() (in module pandexo.engine.jwst)</a>
 </li>
-      <li><a href="engine.html#engine.load_modes.SetDefaultModes.miri">miri() (engine.load_modes.SetDefaultModes method)</a>
+      <li><a href="engine.html#pandexo.engine.hst_smooth.medfilt">medfilt() (in module pandexo.engine.hst_smooth)</a>
+</li>
+      <li><a href="engine.html#pandexo.engine.load_modes.SetDefaultModes.miri">miri() (pandexo.engine.load_modes.SetDefaultModes method)</a>
+</li>
+      <li><a href="engine.html#pandexo.engine.jwst.miri_lrs_wavelength_mask">miri_lrs_wavelength_mask() (in module pandexo.engine.jwst)</a>
 </li>
       <li>
     module
 
       <ul>
-        <li><a href="engine.html#module-engine">engine</a>
+        <li><a href="engine.html#module-pandexo.engine.bintools">pandexo.engine.bintools</a>
 </li>
-        <li><a href="engine.html#module-engine.bintools">engine.bintools</a>
+        <li><a href="engine.html#module-pandexo.engine.create_input">pandexo.engine.create_input</a>
 </li>
-        <li><a href="engine.html#module-engine.compute_noise">engine.compute_noise</a>
+        <li><a href="engine.html#module-pandexo.engine.hst">pandexo.engine.hst</a>
 </li>
-        <li><a href="engine.html#module-engine.create_input">engine.create_input</a>
+        <li><a href="engine.html#module-pandexo.engine.hst_smooth">pandexo.engine.hst_smooth</a>
 </li>
-        <li><a href="engine.html#module-engine.elements">engine.elements</a>
+        <li><a href="engine.html#module-pandexo.engine.justdoit">pandexo.engine.justdoit</a>
 </li>
-        <li><a href="engine.html#module-engine.hst">engine.hst</a>
+        <li><a href="engine.html#module-pandexo.engine.justplotit">pandexo.engine.justplotit</a>
 </li>
-        <li><a href="engine.html#module-engine.hst_smooth">engine.hst_smooth</a>
+        <li><a href="engine.html#module-pandexo.engine.jwst">pandexo.engine.jwst</a>
 </li>
-        <li><a href="engine.html#module-engine.justdoit">engine.justdoit</a>
+        <li><a href="engine.html#module-pandexo.engine.load_modes">pandexo.engine.load_modes</a>
 </li>
-        <li><a href="engine.html#module-engine.justplotit">engine.justplotit</a>
+        <li><a href="engine.html#module-pandexo.engine.logs">pandexo.engine.logs</a>
 </li>
-        <li><a href="engine.html#module-engine.jwst">engine.jwst</a>
+        <li><a href="engine.html#module-pandexo.engine.pandexo">pandexo.engine.pandexo</a>
 </li>
-        <li><a href="engine.html#module-engine.load_modes">engine.load_modes</a>
-</li>
-        <li><a href="engine.html#module-engine.logs">engine.logs</a>
-</li>
-        <li><a href="engine.html#module-engine.pandexo">engine.pandexo</a>
-</li>
-        <li><a href="engine.html#module-engine.run_online">engine.run_online</a>
+        <li><a href="engine.html#module-pandexo.engine.run_online">pandexo.engine.run_online</a>
 </li>
       </ul></li>
   </ul></td>
@@ -501,15 +427,27 @@
 <h2 id="N">N</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="engine.html#engine.run_online.CalculationTask.name">name (engine.run_online.CalculationTask attribute)</a>
+      <li><a href="engine.html#pandexo.engine.run_online.CalculationTask.name">name (pandexo.engine.run_online.CalculationTask attribute)</a>
 </li>
-      <li><a href="engine.html#engine.load_modes.SetDefaultModes.nircam">nircam() (engine.load_modes.SetDefaultModes method)</a>
+      <li><a href="engine.html#pandexo.engine.load_modes.SetDefaultModes.nircam">nircam() (pandexo.engine.load_modes.SetDefaultModes method)</a>
+</li>
+      <li><a href="engine.html#pandexo.engine.jwst.nircam_dhs_no_ta_overhead">nircam_dhs_no_ta_overhead() (in module pandexo.engine.jwst)</a>
+</li>
+      <li><a href="engine.html#pandexo.engine.jwst.nircam_no_ta_overhead">nircam_no_ta_overhead() (in module pandexo.engine.jwst)</a>
+</li>
+      <li><a href="engine.html#pandexo.engine.load_modes.SetDefaultModes.niriss">niriss() (pandexo.engine.load_modes.SetDefaultModes method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="engine.html#engine.load_modes.SetDefaultModes.niriss">niriss() (engine.load_modes.SetDefaultModes method)</a>
+      <li><a href="engine.html#pandexo.engine.load_modes.SetDefaultModes.nirspec">nirspec() (pandexo.engine.load_modes.SetDefaultModes method)</a>
 </li>
-      <li><a href="engine.html#engine.load_modes.SetDefaultModes.nirspec">nirspec() (engine.load_modes.SetDefaultModes method)</a>
+      <li><a href="engine.html#pandexo.engine.jwst.nirspec_prism_apt_parameters">nirspec_prism_apt_parameters() (in module pandexo.engine.jwst)</a>
+</li>
+      <li><a href="engine.html#pandexo.engine.jwst.nirspec_prism_exposure_warning">nirspec_prism_exposure_warning() (in module pandexo.engine.jwst)</a>
+</li>
+      <li><a href="engine.html#pandexo.engine.jwst.nirspec_prism_multistripe_wavelength_mask">nirspec_prism_multistripe_wavelength_mask() (in module pandexo.engine.jwst)</a>
+</li>
+      <li><a href="engine.html#pandexo.engine.jwst.nirspec_valid_channel_mask">nirspec_valid_channel_mask() (in module pandexo.engine.jwst)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -517,7 +455,7 @@
 <h2 id="O">O</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="engine.html#engine.create_input.outTrans">outTrans() (in module engine.create_input)</a>
+      <li><a href="engine.html#pandexo.engine.create_input.outTrans">outTrans() (in module pandexo.engine.create_input)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -525,23 +463,100 @@
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="engine.html#engine.jwst.perform_in">perform_in() (in module engine.jwst)</a>
-</li>
-      <li><a href="engine.html#engine.jwst.perform_out">perform_out() (in module engine.jwst)</a>
-</li>
-      <li><a href="engine.html#engine.load_modes.SetDefaultModes.pick">pick() (engine.load_modes.SetDefaultModes method)</a>
-</li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="engine.html#engine.hst.planet_spec">planet_spec() (in module engine.hst)</a>
-</li>
-      <li><a href="engine.html#engine.run_online.CalculationNewHandler.post">post() (engine.run_online.CalculationNewHandler method)</a>
+      <li>
+    pandexo.engine.bintools
 
       <ul>
-        <li><a href="engine.html#engine.run_online.CalculationNewHSTHandler.post">(engine.run_online.CalculationNewHSTHandler method)</a>
+        <li><a href="engine.html#module-pandexo.engine.bintools">module</a>
 </li>
       </ul></li>
-      <li><a href="engine.html#engine.justdoit.print_instruments">print_instruments() (in module engine.justdoit)</a>
+      <li>
+    pandexo.engine.create_input
+
+      <ul>
+        <li><a href="engine.html#module-pandexo.engine.create_input">module</a>
+</li>
+      </ul></li>
+      <li>
+    pandexo.engine.hst
+
+      <ul>
+        <li><a href="engine.html#module-pandexo.engine.hst">module</a>
+</li>
+      </ul></li>
+      <li>
+    pandexo.engine.hst_smooth
+
+      <ul>
+        <li><a href="engine.html#module-pandexo.engine.hst_smooth">module</a>
+</li>
+      </ul></li>
+      <li>
+    pandexo.engine.justdoit
+
+      <ul>
+        <li><a href="engine.html#module-pandexo.engine.justdoit">module</a>
+</li>
+      </ul></li>
+      <li>
+    pandexo.engine.justplotit
+
+      <ul>
+        <li><a href="engine.html#module-pandexo.engine.justplotit">module</a>
+</li>
+      </ul></li>
+      <li>
+    pandexo.engine.jwst
+
+      <ul>
+        <li><a href="engine.html#module-pandexo.engine.jwst">module</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    pandexo.engine.load_modes
+
+      <ul>
+        <li><a href="engine.html#module-pandexo.engine.load_modes">module</a>
+</li>
+      </ul></li>
+      <li>
+    pandexo.engine.logs
+
+      <ul>
+        <li><a href="engine.html#module-pandexo.engine.logs">module</a>
+</li>
+      </ul></li>
+      <li>
+    pandexo.engine.pandexo
+
+      <ul>
+        <li><a href="engine.html#module-pandexo.engine.pandexo">module</a>
+</li>
+      </ul></li>
+      <li>
+    pandexo.engine.run_online
+
+      <ul>
+        <li><a href="engine.html#module-pandexo.engine.run_online">module</a>
+</li>
+      </ul></li>
+      <li><a href="engine.html#pandexo.engine.jwst.perform_in">perform_in() (in module pandexo.engine.jwst)</a>
+</li>
+      <li><a href="engine.html#pandexo.engine.jwst.perform_out">perform_out() (in module pandexo.engine.jwst)</a>
+</li>
+      <li><a href="engine.html#pandexo.engine.load_modes.SetDefaultModes.pick">pick() (pandexo.engine.load_modes.SetDefaultModes method)</a>
+</li>
+      <li><a href="engine.html#pandexo.engine.hst.planet_spec">planet_spec() (in module pandexo.engine.hst)</a>
+</li>
+      <li><a href="engine.html#pandexo.engine.run_online.CalculationNewHandler.post">post() (pandexo.engine.run_online.CalculationNewHandler method)</a>
+
+      <ul>
+        <li><a href="engine.html#pandexo.engine.run_online.CalculationNewHSTHandler.post">(pandexo.engine.run_online.CalculationNewHSTHandler method)</a>
+</li>
+      </ul></li>
+      <li><a href="engine.html#pandexo.engine.justdoit.print_instruments">print_instruments() (in module pandexo.engine.justdoit)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -549,23 +564,23 @@
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="engine.html#engine.jwst.remove_QY">remove_QY() (in module engine.jwst)</a>
+      <li><a href="engine.html#pandexo.engine.jwst.remove_QY">remove_QY() (in module pandexo.engine.jwst)</a>
 </li>
-      <li><a href="engine.html#engine.compute_noise.ExtractSpec.run_2d_extract">run_2d_extract() (engine.compute_noise.ExtractSpec method)</a>, <a href="engine.html#id3">[1]</a>
+      <li><a href="engine.html#pandexo.engine.run_online.BaseHandler.render">render() (pandexo.engine.run_online.BaseHandler method)</a>
 </li>
-      <li><a href="engine.html#engine.compute_noise.ExtractSpec.run_f_minus_l">run_f_minus_l() (engine.compute_noise.ExtractSpec method)</a>, <a href="engine.html#id4">[1]</a>
+      <li><a href="engine.html#pandexo.engine.run_online.ResolveHandler">ResolveHandler (class in pandexo.engine.run_online)</a>
 </li>
-      <li><a href="engine.html#engine.justdoit.run_inst_space">run_inst_space() (in module engine.justdoit)</a>
+      <li><a href="engine.html#pandexo.engine.run_online.retrieve_url_to_file">retrieve_url_to_file() (in module pandexo.engine.run_online)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="engine.html#engine.justdoit.run_pandexo">run_pandexo() (in module engine.justdoit)</a>
+      <li><a href="engine.html#pandexo.engine.justdoit.run_inst_space">run_inst_space() (in module pandexo.engine.justdoit)</a>
 </li>
-      <li><a href="engine.html#engine.justdoit.run_param_space">run_param_space() (in module engine.justdoit)</a>
+      <li><a href="engine.html#pandexo.engine.justdoit.run_pandexo">run_pandexo() (in module pandexo.engine.justdoit)</a>
 </li>
-      <li><a href="engine.html#engine.compute_noise.ExtractSpec.run_phase_spec">run_phase_spec() (engine.compute_noise.ExtractSpec method)</a>, <a href="engine.html#id5">[1]</a>
+      <li><a href="engine.html#pandexo.engine.justdoit.run_param_space">run_param_space() (in module pandexo.engine.justdoit)</a>
 </li>
-      <li><a href="engine.html#engine.compute_noise.ExtractSpec.run_slope_method">run_slope_method() (engine.compute_noise.ExtractSpec method)</a>, <a href="engine.html#id6">[1]</a>
+      <li><a href="engine.html#pandexo.engine.run_online.run_tornado">run_tornado() (in module pandexo.engine.run_online)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -573,15 +588,17 @@
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="engine.html#engine.load_modes.SetDefaultModes">SetDefaultModes (class in engine.load_modes)</a>
+      <li><a href="engine.html#pandexo.engine.jwst.select_calculation">select_calculation() (in module pandexo.engine.jwst)</a>
 </li>
-      <li><a href="engine.html#engine.hst_smooth.smooth">smooth() (in module engine.hst_smooth)</a>
+      <li><a href="engine.html#pandexo.engine.load_modes.SetDefaultModes">SetDefaultModes (class in pandexo.engine.load_modes)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="engine.html#engine.justdoit.subarrays">subarrays() (in module engine.justdoit)</a>
+      <li><a href="engine.html#pandexo.engine.hst_smooth.smooth">smooth() (in module pandexo.engine.hst_smooth)</a>
 </li>
-      <li><a href="engine.html#engine.compute_noise.ExtractSpec.sum_spatial">sum_spatial() (engine.compute_noise.ExtractSpec method)</a>, <a href="engine.html#id7">[1]</a>
+      <li><a href="engine.html#pandexo.engine.jwst.sort_by_wave_order">sort_by_wave_order() (in module pandexo.engine.jwst)</a>
+</li>
+      <li><a href="engine.html#pandexo.engine.justdoit.subarrays">subarrays() (in module pandexo.engine.justdoit)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -589,13 +606,13 @@
 <h2 id="T">T</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="engine.html#engine.run_online.TablesHandler">TablesHandler (class in engine.run_online)</a>
+      <li><a href="engine.html#pandexo.engine.run_online.TablesHandler">TablesHandler (class in pandexo.engine.run_online)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="engine.html#engine.jwst.target_acq">target_acq() (in module engine.jwst)</a>
+      <li><a href="engine.html#pandexo.engine.jwst.target_acq">target_acq() (in module pandexo.engine.jwst)</a>
 </li>
-      <li><a href="engine.html#engine.run_online.CalculationTask.task">task (engine.run_online.CalculationTask attribute)</a>
+      <li><a href="engine.html#pandexo.engine.run_online.CalculationTask.task">task (pandexo.engine.run_online.CalculationTask attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -603,41 +620,63 @@
 <h2 id="U">U</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="engine.html#engine.bintools.uniform_tophat_mean">uniform_tophat_mean() (in module engine.bintools)</a>
+      <li><a href="engine.html#pandexo.engine.bintools.uniform_tophat_mean">uniform_tophat_mean() (in module pandexo.engine.bintools)</a>
 
       <ul>
-        <li><a href="engine.html#engine.justplotit.uniform_tophat_mean">(in module engine.justplotit)</a>
+        <li><a href="engine.html#pandexo.engine.justplotit.uniform_tophat_mean">(in module pandexo.engine.justplotit)</a>
+</li>
+      </ul></li>
+      <li><a href="engine.html#pandexo.engine.justplotit.uniform_tophat_sum">uniform_tophat_sum() (in module pandexo.engine.justplotit)</a>
+
+      <ul>
+        <li><a href="engine.html#pandexo.engine.jwst.uniform_tophat_sum">(in module pandexo.engine.jwst)</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="engine.html#engine.justplotit.uniform_tophat_sum">uniform_tophat_sum() (in module engine.justplotit)</a>
-
-      <ul>
-        <li><a href="engine.html#engine.jwst.uniform_tophat_sum">(in module engine.jwst)</a>
+      <li><a href="engine.html#pandexo.engine.jwst.update_apt_timing">update_apt_timing() (in module pandexo.engine.jwst)</a>
 </li>
-      </ul></li>
+      <li><a href="engine.html#pandexo.engine.jwst.update_nirspec_prism_apt_timing">update_nirspec_prism_apt_timing() (in module pandexo.engine.jwst)</a>
+</li>
+      <li><a href="engine.html#pandexo.engine.jwst.update_timing_measurement_time">update_timing_measurement_time() (in module pandexo.engine.jwst)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="V">V</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="engine.html#pandexo.engine.jwst.validate_miri_lrs_subarray">validate_miri_lrs_subarray() (in module pandexo.engine.jwst)</a>
+</li>
+      <li><a href="engine.html#pandexo.engine.jwst.validate_nirspec_prism_subarray">validate_nirspec_prism_subarray() (in module pandexo.engine.jwst)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="engine.html#pandexo.engine.run_online.validate_online_instrument_configuration">validate_online_instrument_configuration() (in module pandexo.engine.run_online)</a>
+</li>
+      <li><a href="engine.html#pandexo.engine.jwst.validate_saturation_state">validate_saturation_state() (in module pandexo.engine.jwst)</a>
+</li>
   </ul></td>
 </tr></table>
 
 <h2 id="W">W</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="engine.html#engine.load_modes.SetDefaultModes.wfc3">wfc3() (engine.load_modes.SetDefaultModes method)</a>
+      <li><a href="engine.html#pandexo.engine.load_modes.SetDefaultModes.wfc3">wfc3() (pandexo.engine.load_modes.SetDefaultModes method)</a>
 </li>
-      <li><a href="engine.html#engine.hst.wfc3_GuessNOrbits">wfc3_GuessNOrbits() (in module engine.hst)</a>
+      <li><a href="engine.html#pandexo.engine.hst.wfc3_GuessNOrbits">wfc3_GuessNOrbits() (in module pandexo.engine.hst)</a>
 </li>
-      <li><a href="engine.html#engine.hst.wfc3_GuessParams">wfc3_GuessParams() (in module engine.hst)</a>
+      <li><a href="engine.html#pandexo.engine.hst.wfc3_GuessParams">wfc3_GuessParams() (in module pandexo.engine.hst)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="engine.html#engine.hst.wfc3_obs">wfc3_obs() (in module engine.hst)</a>
+      <li><a href="engine.html#pandexo.engine.hst.wfc3_obs">wfc3_obs() (in module pandexo.engine.hst)</a>
 </li>
-      <li><a href="engine.html#engine.hst.wfc3_TExoNS">wfc3_TExoNS() (in module engine.hst)</a>
+      <li><a href="engine.html#pandexo.engine.hst.wfc3_TExoNS">wfc3_TExoNS() (in module pandexo.engine.hst)</a>
 </li>
-      <li><a href="engine.html#engine.pandexo.wrapper">wrapper() (in module engine.pandexo)</a>
+      <li><a href="engine.html#pandexo.engine.pandexo.wrapper">wrapper() (in module pandexo.engine.pandexo)</a>
 </li>
-      <li><a href="engine.html#engine.run_online.BaseHandler.write_error">write_error() (engine.run_online.BaseHandler method)</a>
+      <li><a href="engine.html#pandexo.engine.run_online.BaseHandler.write_error">write_error() (pandexo.engine.run_online.BaseHandler method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -651,7 +690,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright Updated 2022.</p>
+    <p>&#169; Copyright 2016-2026, PandExo developers.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

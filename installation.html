@@ -1,19 +1,21 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pre-installation Data Download &mdash; PandExo  documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+  <title>Pre-installation Data Download &mdash; PandExo 2026.7 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
   
-        <script src="_static/documentation_options.js?v=5929fcd5"></script>
-        <script src="_static/doctools.js?v=888ff710"></script>
-        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=57d3cf08"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -46,16 +48,15 @@
 <li class="toctree-l2"><a class="reference internal" href="#jwst-reference-data">JWST Reference Data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#stellar-seds">Stellar SEDs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#normalization-files">Normalization Files</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#fortney-20210-planet-grid-optional">Fortney+ 20210  Planet Grid (Optional)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#fortney-2010-planet-grid-optional">Fortney+ 2010 Planet Grid (Optional)</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="#installation-with-pip-or-git">Installation with Pip or Git</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#final-test-for-success">Final Test for Success</a></li>
-<li class="toctree-l1"><a class="reference internal" href="#troubleshooting-common-errors">Troubleshooting-Common Errors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#the-importance-of-upgrading-pandexo">The Importance of Upgrading PandExo</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#verify-pandexo-engine-is-current">1) Verify pandexo.engine is Current</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#verify-pandeia-engine-version-compatible">2) Verify pandeia.engine version compatible</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#grab-pandeia-engine-data-2-0">3) Grab pandeia.engine data 2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#grab-pandeia-engine-data-2026-7">3) Grab pandeia.engine data 2026.7</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="installation_windows.html">Windows Installing Guide for PandExo</a></li>
@@ -63,7 +64,7 @@
 <li class="toctree-l1"><a class="reference internal" href="jwstinput.html">Possible Instrument Input Params</a></li>
 <li class="toctree-l1"><a class="reference internal" href="jwstdict.html">Py Dict Structure of JWST Output</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorialhst.html">HST Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="engine.html">The Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="engine.html">API Reference</a></li>
 </ul>
 
         </div>
@@ -92,118 +93,162 @@
              
   <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Before reading further, if you do not wish to install PandExo,there is an online version of the code here at <a class="reference external" href="https://exoctk.stsci.edu/pandexo/">STScI’s ExoCTK</a>.</p>
+<p>Before reading further, if you do not wish to install PandExo, there is an
+online version of the code here at <a class="reference external" href="https://exoctk.stsci.edu/pandexo/">STScI’s ExoCTK</a>.</p>
 </div>
 <section id="pre-installation-data-download">
-<h1>Pre-installation Data Download<a class="headerlink" href="#pre-installation-data-download" title="Link to this heading">¶</a></h1>
-<p>PandExo requires downloading <strong>three folders</strong>: 1) JWST instrument info, 2) stellar SEDs, and 3) normalization bandasses. It also requires setting up <strong>two environment variables</strong>.</p>
+<h1>Pre-installation Data Download<a class="headerlink" href="#pre-installation-data-download" title="Link to this heading"></a></h1>
+<p>PandExo requires downloading reference data for 1) JWST instrument info,
+2) JWST PSFs, 3) stellar SEDs, and 4) normalization bandpasses. It also
+requires setting up the <code class="docutils literal notranslate"><span class="pre">pandeia_refdata</span></code>, <code class="docutils literal notranslate"><span class="pre">PSF_DIR</span></code>, and <code class="docutils literal notranslate"><span class="pre">PYSYN_CDBS</span></code>
+environment variables.</p>
 <section id="jwst-reference-data">
-<h2>JWST Reference Data<a class="headerlink" href="#jwst-reference-data" title="Link to this heading">¶</a></h2>
-<p>JWST Reference data has been updated to 3.0!</p>
+<h2>JWST Reference Data<a class="headerlink" href="#jwst-reference-data" title="Link to this heading"></a></h2>
+<p>JWST reference data has been updated to 2026.7.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>Reference data must match the software version. For example Pandeia reference data 3.0 should match Pandeia verions software release 3.0, and that should match PandExo 3.0)</p>
+<p>Reference data must match the software version. For example, Pandeia
+reference data 2026.7 should match the Pandeia software release 2026.7,
+and that should match PandExo 2026.7.</p>
 </div>
-<p>The new reference data is located <a class="reference external" href="https://stsci.app.box.com/v/pandeia-refdata-v3p0-jwst">here for v3p0</a>. More information on <a class="reference external" href="https://outerspace.stsci.edu/display/PEN/Pandeia+Engine+Installation">pandeia installation can be found here</a></p>
-<p>After you have downloaded the reference data, create environment variable (<a class="reference external" href="https://natashabatalha.github.io/picaso/installation.html#create-environment-variable">more resources on how to create environment variables are located here</a>).</p>
-<p>You can verify your installation by opening up a terminal with access to the conda installation, and type</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import pandeia.engine; pandeia.engine.pandeia_version()&quot;</span>
+<p>The 2026.7 JWST reference data is available here:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://stsci.app.box.com/v/pandeia-data-v2026p7-jwst">Pandeia data v2026p7 JWST</a></p></li>
+<li><p><a class="reference external" href="https://stsci.app.box.com/v/pandeia-psfs-v2026p7-jwst">Pandeia PSFs v2026p7 JWST</a></p></li>
+</ul>
+<p>More information is available in the <a class="reference external" href="https://outerspace.stsci.edu/spaces/PEN/pages/77530136/Pandeia+Engine+Installation">Pandeia Engine installation guide</a>.</p>
+<p>After downloading the reference data, add the environment variables to your
+shell startup file so they persist across terminal sessions. For Bash, use
+<code class="docutils literal notranslate"><span class="pre">~/.bashrc</span></code> or <code class="docutils literal notranslate"><span class="pre">~/.bash_profile</span></code>; for Zsh, use <code class="docutils literal notranslate"><span class="pre">~/.zshrc</span></code>. Add these lines
+to the appropriate file, replacing the example paths:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">pandeia_refdata</span><span class="o">=</span>/path/to/pandeia_data-2026.7-jwst
+<span class="nb">export</span><span class="w"> </span><span class="nv">PSF_DIR</span><span class="o">=</span>/path/to/pandeia_psfs-2026.7-jwst
 </pre></div>
 </div>
-<p>If properly installed and configured, it should show the refdata version and synphot data directory, like this:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>Pandeia<span class="w"> </span>Engine<span class="w"> </span>version:<span class="w">  </span><span class="m">3</span>.0
-Pandeia<span class="w"> </span>RefData<span class="w"> </span>version:<span class="w">  </span><span class="m">3</span>.0
-Pysynphot<span class="w"> </span>Data:<span class="w">  </span>/your/data/directory/synphot
+<p>Source the startup file to make the changes available in your current terminal,
+for example:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span><span class="w"> </span>~/.bashrc
 </pre></div>
 </div>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;export pandeia_refdata=&quot;$USRDIR/pandeia_data&quot;&#39;</span><span class="w"> </span>&gt;&gt;~/.bash_profile
-</pre></div>
-</div>
+<p>Use the path to the file you edited, such as <code class="docutils literal notranslate"><span class="pre">source</span> <span class="pre">~/.bash_profile</span></code> or
+<code class="docutils literal notranslate"><span class="pre">source</span> <span class="pre">~/.zshrc</span></code>. Opening a new terminal will also load the saved variables.</p>
 </section>
 <section id="stellar-seds">
-<h2>Stellar SEDs<a class="headerlink" href="#stellar-seds" title="Link to this heading">¶</a></h2>
-<p>PandExo uses Pysynphot’s Phoenix stellar atlas, which can be <a class="reference external" href="https://archive.stsci.edu/hlsps/reference-atlases/hlsp_reference-atlases_hst_multi_pheonix-models_multi_v3_synphot5.tar">downloaded here</a>.</p>
+<h2>Stellar SEDs<a class="headerlink" href="#stellar-seds" title="Link to this heading"></a></h2>
+<p>PandExo uses synphot/stsynphot for stellar spectra and PHOENIX model
+interpolation. The PHOENIX reference atlas can be <a class="reference external" href="https://archive.stsci.edu/hlsps/reference-atlases/hlsp_reference-atlases_hst_multi_pheonix-models_multi_v3_synphot5.tar">downloaded here</a>.</p>
 <p>Once untarred, the files will produce a directory tree of <cite>grp/redcat/trds</cite>. The pandeia.engine uses the contents of the <cite>trds</cite> directory.</p>
 <p><strong>Environment variable: $PYSYN_CDBS must point to the trds directory (NOT grp)</strong></p>
-<p>Create your environment variable:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;export PYSYN_CDBS=&quot;$USRDIR/grp/redcat/trds&quot;&#39;</span><span class="w"> </span>&gt;&gt;~/.bash_profile
+<p>Add this environment variable to the same shell startup file and source that
+file again:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">PYSYN_CDBS</span><span class="o">=</span>/path/to/grp/redcat/trds
 </pre></div>
 </div>
 </section>
 <section id="normalization-files">
-<h2>Normalization Files<a class="headerlink" href="#normalization-files" title="Link to this heading">¶</a></h2>
-<p>New to PandExo &gt;2.0, <strong>users now have to download the master table of all pysynphot throughput tables.</strong></p>
+<h2>Normalization Files<a class="headerlink" href="#normalization-files" title="Link to this heading"></a></h2>
+<p>PandExo also needs the STScI/CDBS-style throughput files used for J/H/K
+normalization bandpasses.</p>
 <p><a class="reference external" href="https://archive.stsci.edu/hlsps/reference-atlases/hlsp_reference-atlases_hst_multi_everything_multi_v11_sed.tar">Download the file here</a></p>
-<p>Once untarred this will also produce a directory tree of <cite>grp/redcat/trds</cite> with two folders <cite>comp</cite> and <cite>mtab</cite>. Place these folders into the folder you created above <cite>$USRDIR/grp/redcat/trds</cite></p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&gt;&gt;<span class="w"> </span>ls<span class="w"> </span><span class="nv">$USRDIR</span>/grp/redcat/trds
-comp<span class="w"> </span>grid<span class="w"> </span>mtab
+<p>Once untarred, this archive also produces a <code class="docutils literal notranslate"><span class="pre">grp/redcat/trds</span></code> directory with
+<code class="docutils literal notranslate"><span class="pre">comp</span></code> and <code class="docutils literal notranslate"><span class="pre">mtab</span></code> subdirectories. Merge their contents into the existing
+<code class="docutils literal notranslate"><span class="pre">comp</span></code> and <code class="docutils literal notranslate"><span class="pre">mtab</span></code> directories under <code class="docutils literal notranslate"><span class="pre">$PYSYN_CDBS</span></code>. Do not create a second
+<code class="docutils literal notranslate"><span class="pre">grp/redcat/trds</span></code> tree inside <code class="docutils literal notranslate"><span class="pre">$PYSYN_CDBS</span></code>.</p>
+<p>For example, if <code class="docutils literal notranslate"><span class="pre">NORMALIZATION_TRDS</span></code> is the <code class="docutils literal notranslate"><span class="pre">trds</span></code> directory extracted
+from the normalization archive:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">NORMALIZATION_TRDS</span><span class="o">=</span>/path/to/extracted/grp/redcat/trds
+rsync<span class="w"> </span>-a<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$NORMALIZATION_TRDS</span><span class="s2">/comp/&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$PYSYN_CDBS</span><span class="s2">/comp/&quot;</span>
+rsync<span class="w"> </span>-a<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$NORMALIZATION_TRDS</span><span class="s2">/mtab/&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$PYSYN_CDBS</span><span class="s2">/mtab/&quot;</span>
 </pre></div>
 </div>
-<p>Now you should have three folders in your <cite>trds</cite> folder.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">$PYSYN_CDBS</span></code> directory should now contain <code class="docutils literal notranslate"><span class="pre">comp</span></code>, <code class="docutils literal notranslate"><span class="pre">grid</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">mtab</span></code> (among other synphot directories). Verify that layout and the files
+PandExo uses for J/H/K normalization and PHOENIX spectra:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ls<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$PYSYN_CDBS</span><span class="s2">&quot;</span>
+ls<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$PYSYN_CDBS</span><span class="s2">/comp/nonhst/bessell_j_003_syn.fits&quot;</span>
+ls<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$PYSYN_CDBS</span><span class="s2">/comp/nonhst/bessell_h_004_syn.fits&quot;</span>
+ls<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$PYSYN_CDBS</span><span class="s2">/comp/nonhst/bessell_k_003_syn.fits&quot;</span>
+ls<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$PYSYN_CDBS</span><span class="s2">/grid/phoenix/catalog.fits&quot;</span>
+</pre></div>
+</div>
+<p>Verify the complete reference-data setup with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import pandeia.engine; pandeia.engine.pandeia_version()&quot;</span>
+</pre></div>
+</div>
+<p>If properly installed and configured, it should show the matching versions and
+stellar reference-data directory, like this:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Pandeia Engine version:  2026.7
+Pandeia RefData version: 2026.7
+Pandeia PSFs version:    2026.7
+Synphot Data:            /path/to/grp/redcat/trds
+</pre></div>
+</div>
 </section>
-<section id="fortney-20210-planet-grid-optional">
-<h2>Fortney+ 20210  Planet Grid (Optional)<a class="headerlink" href="#fortney-20210-planet-grid-optional" title="Link to this heading">¶</a></h2>
+<section id="fortney-2010-planet-grid-optional">
+<h2>Fortney+ 2010 Planet Grid (Optional)<a class="headerlink" href="#fortney-2010-planet-grid-optional" title="Link to this heading"></a></h2>
 <p>A user may want to install a grid of atmospheric models to simulate planet atmospheres. Some of the example notebooks use an atmospheric model grid. This grid can be obtained from:</p>
-<ul class="simple">
-<li><p><a class="reference external" href="https://github.com/ExoCTK/exoctk#obtain-the-exoctk-data">The ExoCTK Website</a>.</p></li>
-</ul>
-<p>After downloading the Fortney files, create an environmental variable to point to them.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;export FORTGRID_DIR=&quot;$USRDIR/fortney_models.db&quot;&#39;</span><span class="w"> </span>&gt;&gt;~/.bash_profile
+<p>The required <code class="docutils literal notranslate"><span class="pre">fortney_models.db</span></code> database is included in the <a class="reference external" href="https://data.science.stsci.edu/redirect/JWST/ExoCTK/compressed/fortney.tar.gz">ExoCTK Fortney
+data archive</a>.
+Download and extract that archive, or install ExoCTK and run
+<code class="docutils literal notranslate"><span class="pre">exoctk.utils.download_exoctk_data('fortney')</span></code>.</p>
+<p>After downloading the Fortney files, add this optional environment variable to
+the same shell startup file and source that file again:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">FORTGRID_DIR</span><span class="o">=</span>/path/to/exoctk_data/fortney/fortney_models.db
 </pre></div>
 </div>
 </section>
 </section>
 <section id="installation-with-pip-or-git">
-<h1>Installation with Pip or Git<a class="headerlink" href="#installation-with-pip-or-git" title="Link to this heading">¶</a></h1>
+<h1>Installation with Pip or Git<a class="headerlink" href="#installation-with-pip-or-git" title="Link to this heading"></a></h1>
 <p>Install with pip:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>pandexo.engine
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>pandexo.engine
 </pre></div>
 </div>
 <p>OR Download PandExo’s repository via Github. The Github also has helpful notebooks for getting started!</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>--recursive<span class="w"> </span>https://github.com/natashabatalha/pandexo
-<span class="nb">cd</span><span class="w"> </span>pandexo
-pip<span class="w"> </span>install<span class="w"> </span>.
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/natashabatalha/PandExo.git
+<span class="nb">cd</span><span class="w"> </span>PandExo
+python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>.
 </pre></div>
 </div>
 </section>
 <section id="final-test-for-success">
-<h1>Final Test for Success<a class="headerlink" href="#final-test-for-success" title="Link to this heading">¶</a></h1>
-<p>There is a <cite>run_test.py</cite> in the <cite>github</cite>. Test that you’re code is working:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>run_test.py
-Starting<span class="w"> </span>TEST<span class="w"> </span>run
-Running<span class="w"> </span>Single<span class="w"> </span>Case<span class="w"> </span><span class="k">for</span>:<span class="w"> </span>NIRSpec<span class="w"> </span>G140H
-Optimization<span class="w"> </span>Reqested:<span class="w"> </span>Computing<span class="w"> </span>Duty<span class="w"> </span>Cycle
-Finished<span class="w"> </span>Duty<span class="w"> </span>Cycle<span class="w"> </span>Calc
-Starting<span class="w"> </span>Out<span class="w"> </span>of<span class="w"> </span>Transit<span class="w"> </span>Simulation
-End<span class="w"> </span>out<span class="w"> </span>of<span class="w"> </span>Transit
-Starting<span class="w"> </span>In<span class="w"> </span>Transit<span class="w"> </span>Simulation
-End<span class="w"> </span>In<span class="w"> </span>Transit
-SUCCESS
+<h1>Final Test for Success<a class="headerlink" href="#final-test-for-success" title="Link to this heading"></a></h1>
+<p>For a normal pip installation, run this installed-package smoke test. It loads
+PandExo’s bundled NIRSpec configuration and does not download data, start the
+web application, or run a simulation:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import pandexo.engine.justdoit as jdi; mode = jdi.load_mode_dict(&#39;NIRSpec Prism&#39;); assert mode[&#39;configuration&#39;][&#39;instrument&#39;][&#39;disperser&#39;] == &#39;prism&#39;; print(&#39;PandExo configuration smoke test passed.&#39;)&quot;</span>
+</pre></div>
+</div>
+<p>If you cloned the PandExo source repository and want to run its regression
+test, install the test dependency and run the test from the repository root:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[test]&quot;</span>
+python<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>tests/test_run.py<span class="w"> </span>-q
 </pre></div>
 </div>
 </section>
-<section id="troubleshooting-common-errors">
-<h1>Troubleshooting-Common Errors<a class="headerlink" href="#troubleshooting-common-errors" title="Link to this heading">¶</a></h1>
-</section>
 <section id="the-importance-of-upgrading-pandexo">
-<h1>The Importance of Upgrading PandExo<a class="headerlink" href="#the-importance-of-upgrading-pandexo" title="Link to this heading">¶</a></h1>
-<p>It is crucial that your verison of PandExo is up to date. There were many critical updates in the reference files after launch, and as a result of the commissioning work. Updating PandExo requires three crucial steps:</p>
+<h1>The Importance of Upgrading PandExo<a class="headerlink" href="#the-importance-of-upgrading-pandexo" title="Link to this heading"></a></h1>
+<p>It is crucial that your version of PandExo is up to date. There were many critical updates in the reference files after launch and as a result of commissioning work. Updating PandExo requires three crucial steps:</p>
 <section id="verify-pandexo-engine-is-current">
-<h2>1) Verify pandexo.engine is Current<a class="headerlink" href="#verify-pandexo-engine-is-current" title="Link to this heading">¶</a></h2>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>pandexo.engine<span class="w"> </span>--upgrade
+<h2>1) Verify pandexo.engine is Current<a class="headerlink" href="#verify-pandexo-engine-is-current" title="Link to this heading"></a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>pandexo.engine
 </pre></div>
 </div>
 </section>
 <section id="verify-pandeia-engine-version-compatible">
-<h2>2) Verify pandeia.engine version compatible<a class="headerlink" href="#verify-pandeia-engine-version-compatible" title="Link to this heading">¶</a></h2>
-<p>Currently PandExo requires pandeia.engine==2.0</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>pandeia.engine<span class="o">==</span><span class="m">2</span>.0
+<h2>2) Verify pandeia.engine version compatible<a class="headerlink" href="#verify-pandeia-engine-version-compatible" title="Link to this heading"></a></h2>
+<p>Currently PandExo requires pandeia.engine==2026.7.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>pandeia.engine<span class="o">==</span><span class="m">2026</span>.7
 </pre></div>
 </div>
 </section>
-<section id="grab-pandeia-engine-data-2-0">
-<h2>3) Grab pandeia.engine data 2.0<a class="headerlink" href="#grab-pandeia-engine-data-2-0" title="Link to this heading">¶</a></h2>
-<p>The reference data is located <a class="reference external" href="https://stsci.app.box.com/v/pandeia-refdata-v2p0-jwst">here for v2p0</a>.</p>
+<section id="grab-pandeia-engine-data-2026-7">
+<h2>3) Grab pandeia.engine data 2026.7<a class="headerlink" href="#grab-pandeia-engine-data-2026-7" title="Link to this heading"></a></h2>
+<p>The 2026.7 JWST reference data is available here:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://stsci.app.box.com/v/pandeia-data-v2026p7-jwst">Pandeia data v2026p7 JWST</a></p></li>
+<li><p><a class="reference external" href="https://stsci.app.box.com/v/pandeia-psfs-v2026p7-jwst">Pandeia PSFs v2026p7 JWST</a></p></li>
+</ul>
 </section>
 </section>
 
@@ -218,7 +263,7 @@ SUCCESS
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright Updated 2022.</p>
+    <p>&#169; Copyright 2016-2026, PandExo developers.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
