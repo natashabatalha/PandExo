@@ -44,12 +44,17 @@ files are available here:
 - `Pandeia PSFs v2026p7 JWST <https://stsci.app.box.com/v/pandeia-psfs-v2026p7-jwst>`_
 - `PHOENIX stellar reference atlas <https://archive.stsci.edu/hlsps/reference-atlases/hlsp_reference-atlases_hst_multi_pheonix-models_multi_v3_synphot5.tar>`_
 - `Normalization bandpasses <https://archive.stsci.edu/hlsps/reference-atlases/hlsp_reference-atlases_hst_multi_everything_multi_v11_sed.tar>`_
+- `Vega CALSPEC file <https://archive.stsci.edu/hlsps/reference-atlases/cdbs/calspec/alpha_lyr_stis_011.fits>`_
 
 The stellar and normalization archives both extract a ``grp/redcat/trds``
 tree. ``PYSYN_CDBS`` must name the PHOENIX archive's ``trds`` directory, not
 its parent ``grp`` directory. Copy the normalization archive's ``comp`` and
 ``mtab`` *contents* into the matching directories under that same
 ``PYSYN_CDBS`` directory. Do not nest another ``grp/redcat/trds`` tree there.
+Save the Vega file as
+``PYSYN_CDBS\calspec\alpha_lyr_stis_011.fits``. This single file is sufficient
+for PandExo; downloading the full multi-gigabyte ``synphot6`` archive is not
+required.
 
 Step 5: Set Reference-Data Variables
 `````````````````````````````````````
@@ -67,6 +72,10 @@ persistent values are loaded automatically.
     [Environment]::SetEnvironmentVariable('pandeia_refdata', $env:pandeia_refdata, 'User')
     [Environment]::SetEnvironmentVariable('PSF_DIR', $env:PSF_DIR, 'User')
     [Environment]::SetEnvironmentVariable('PYSYN_CDBS', $env:PYSYN_CDBS, 'User')
+
+These are example paths. Set each variable to the directory that was actually
+created when you extracted the archive; archives may sometimes include a
+suffix such as ``rc1`` in that directory name.
 
 Copy the normalization ``comp`` and ``mtab`` contents into ``PYSYN_CDBS``. In
 this example, ``$normalizationTrds`` is the ``trds`` directory extracted from
@@ -86,6 +95,15 @@ the normalization archive:
         "$normalizationTrds\mtab\*" `
         "$env:PYSYN_CDBS\mtab\"
 
+Create the CALSPEC directory, then copy the downloaded Vega file into it:
+
+.. code-block:: powershell
+
+    New-Item -ItemType Directory -Force "$env:PYSYN_CDBS\calspec" | Out-Null
+    Copy-Item -Force `
+        "$HOME\Downloads\alpha_lyr_stis_011.fits" `
+        "$env:PYSYN_CDBS\calspec\alpha_lyr_stis_011.fits"
+
 Verify the current terminal's variables and required files:
 
 .. code-block:: powershell
@@ -99,6 +117,7 @@ Verify the current terminal's variables and required files:
     Test-Path "$env:PYSYN_CDBS\grid"
     Test-Path "$env:PYSYN_CDBS\mtab"
     Test-Path "$env:PYSYN_CDBS\comp\nonhst\bessell_j_003_syn.fits"
+    Test-Path "$env:PYSYN_CDBS\calspec\alpha_lyr_stis_011.fits"
     Test-Path "$env:PYSYN_CDBS\grid\phoenix\catalog.fits"
     (Get-ChildItem "$env:PYSYN_CDBS\mtab" -File -Recurse | Measure-Object).Count -gt 0
 

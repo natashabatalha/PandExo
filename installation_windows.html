@@ -129,12 +129,17 @@ files are available here:</p>
 <li><p><a class="reference external" href="https://stsci.app.box.com/v/pandeia-psfs-v2026p7-jwst">Pandeia PSFs v2026p7 JWST</a></p></li>
 <li><p><a class="reference external" href="https://archive.stsci.edu/hlsps/reference-atlases/hlsp_reference-atlases_hst_multi_pheonix-models_multi_v3_synphot5.tar">PHOENIX stellar reference atlas</a></p></li>
 <li><p><a class="reference external" href="https://archive.stsci.edu/hlsps/reference-atlases/hlsp_reference-atlases_hst_multi_everything_multi_v11_sed.tar">Normalization bandpasses</a></p></li>
+<li><p><a class="reference external" href="https://archive.stsci.edu/hlsps/reference-atlases/cdbs/calspec/alpha_lyr_stis_011.fits">Vega CALSPEC file</a></p></li>
 </ul>
 <p>The stellar and normalization archives both extract a <code class="docutils literal notranslate"><span class="pre">grp/redcat/trds</span></code>
 tree. <code class="docutils literal notranslate"><span class="pre">PYSYN_CDBS</span></code> must name the PHOENIX archive’s <code class="docutils literal notranslate"><span class="pre">trds</span></code> directory, not
 its parent <code class="docutils literal notranslate"><span class="pre">grp</span></code> directory. Copy the normalization archive’s <code class="docutils literal notranslate"><span class="pre">comp</span></code> and
 <code class="docutils literal notranslate"><span class="pre">mtab</span></code> <em>contents</em> into the matching directories under that same
-<code class="docutils literal notranslate"><span class="pre">PYSYN_CDBS</span></code> directory. Do not nest another <code class="docutils literal notranslate"><span class="pre">grp/redcat/trds</span></code> tree there.</p>
+<code class="docutils literal notranslate"><span class="pre">PYSYN_CDBS</span></code> directory. Do not nest another <code class="docutils literal notranslate"><span class="pre">grp/redcat/trds</span></code> tree there.
+Save the Vega file as
+<code class="docutils literal notranslate"><span class="pre">PYSYN_CDBS\calspec\alpha_lyr_stis_011.fits</span></code>. This single file is sufficient
+for PandExo; downloading the full multi-gigabyte <code class="docutils literal notranslate"><span class="pre">synphot6</span></code> archive is not
+required.</p>
 </section>
 <section id="step-5-set-reference-data-variables">
 <h2>Step 5: Set Reference-Data Variables<a class="headerlink" href="#step-5-set-reference-data-variables" title="Link to this heading"></a></h2>
@@ -142,29 +147,39 @@ its parent <code class="docutils literal notranslate"><span class="pre">grp</spa
 and persist it for future terminals. Replace the example paths before running
 them. Start a new PowerShell or Anaconda Prompt after using this step so the
 persistent values are loaded automatically.</p>
-<div class="highlight-powershell notranslate"><div class="highlight"><pre><span></span><span class="nv">$env:pandeia_refdata</span> <span class="p">=</span> <span class="s2">&quot;$HOME\pandexo-data\pandeia_data-2026.7-jwst&quot;</span>
-<span class="nv">$env:PSF_DIR</span> <span class="p">=</span> <span class="s2">&quot;$HOME\pandexo-data\pandeia_psfs-2026.7-jwst&quot;</span>
-<span class="nv">$env:PYSYN_CDBS</span> <span class="p">=</span> <span class="s2">&quot;$HOME\pandexo-data\phoenix\grp\redcat\trds&quot;</span>
+<div class="highlight-powershell notranslate"><div class="highlight"><pre><span></span><span class="nv">$env:pandeia_refdata</span> <span class="p">=</span> <span class="s2">"$HOME\pandexo-data\pandeia_data-2026.7-jwst"</span>
+<span class="nv">$env:PSF_DIR</span> <span class="p">=</span> <span class="s2">"$HOME\pandexo-data\pandeia_psfs-2026.7-jwst"</span>
+<span class="nv">$env:PYSYN_CDBS</span> <span class="p">=</span> <span class="s2">"$HOME\pandexo-data\phoenix\grp\redcat\trds"</span>
 
-<span class="no">[Environment]</span><span class="p">::</span><span class="n">SetEnvironmentVariable</span><span class="p">(</span><span class="s1">&#39;pandeia_refdata&#39;</span><span class="p">,</span> <span class="nv">$env:pandeia_refdata</span><span class="p">,</span> <span class="s1">&#39;User&#39;</span><span class="p">)</span>
-<span class="no">[Environment]</span><span class="p">::</span><span class="n">SetEnvironmentVariable</span><span class="p">(</span><span class="s1">&#39;PSF_DIR&#39;</span><span class="p">,</span> <span class="nv">$env:PSF_DIR</span><span class="p">,</span> <span class="s1">&#39;User&#39;</span><span class="p">)</span>
-<span class="no">[Environment]</span><span class="p">::</span><span class="n">SetEnvironmentVariable</span><span class="p">(</span><span class="s1">&#39;PYSYN_CDBS&#39;</span><span class="p">,</span> <span class="nv">$env:PYSYN_CDBS</span><span class="p">,</span> <span class="s1">&#39;User&#39;</span><span class="p">)</span>
+<span class="no">[Environment]</span><span class="p">::</span><span class="n">SetEnvironmentVariable</span><span class="p">(</span><span class="s1">'pandeia_refdata'</span><span class="p">,</span> <span class="nv">$env:pandeia_refdata</span><span class="p">,</span> <span class="s1">'User'</span><span class="p">)</span>
+<span class="no">[Environment]</span><span class="p">::</span><span class="n">SetEnvironmentVariable</span><span class="p">(</span><span class="s1">'PSF_DIR'</span><span class="p">,</span> <span class="nv">$env:PSF_DIR</span><span class="p">,</span> <span class="s1">'User'</span><span class="p">)</span>
+<span class="no">[Environment]</span><span class="p">::</span><span class="n">SetEnvironmentVariable</span><span class="p">(</span><span class="s1">'PYSYN_CDBS'</span><span class="p">,</span> <span class="nv">$env:PYSYN_CDBS</span><span class="p">,</span> <span class="s1">'User'</span><span class="p">)</span>
 </pre></div>
 </div>
+<p>These are example paths. Set each variable to the directory that was actually
+created when you extracted the archive; archives may sometimes include a
+suffix such as <code class="docutils literal notranslate"><span class="pre">rc1</span></code> in that directory name.</p>
 <p>Copy the normalization <code class="docutils literal notranslate"><span class="pre">comp</span></code> and <code class="docutils literal notranslate"><span class="pre">mtab</span></code> contents into <code class="docutils literal notranslate"><span class="pre">PYSYN_CDBS</span></code>. In
 this example, <code class="docutils literal notranslate"><span class="pre">$normalizationTrds</span></code> is the <code class="docutils literal notranslate"><span class="pre">trds</span></code> directory extracted from
 the normalization archive:</p>
-<div class="highlight-powershell notranslate"><div class="highlight"><pre><span></span><span class="nv">$normalizationTrds</span> <span class="p">=</span> <span class="s2">&quot;$HOME\pandexo-data\normalization\grp\redcat\trds&quot;</span>
-<span class="nb">New-Item</span> <span class="n">-ItemType</span> <span class="n">Directory</span> <span class="n">-Force</span> <span class="s2">&quot;$env:PYSYN_CDBS\comp&quot;</span> <span class="p">|</span> <span class="nb">Out-Null</span>
-<span class="nb">New-Item</span> <span class="n">-ItemType</span> <span class="n">Directory</span> <span class="n">-Force</span> <span class="s2">&quot;$env:PYSYN_CDBS\mtab&quot;</span> <span class="p">|</span> <span class="nb">Out-Null</span>
+<div class="highlight-powershell notranslate"><div class="highlight"><pre><span></span><span class="nv">$normalizationTrds</span> <span class="p">=</span> <span class="s2">"$HOME\pandexo-data\normalization\grp\redcat\trds"</span>
+<span class="nb">New-Item</span> <span class="n">-ItemType</span> <span class="n">Directory</span> <span class="n">-Force</span> <span class="s2">"$env:PYSYN_CDBS\comp"</span> <span class="p">|</span> <span class="nb">Out-Null</span>
+<span class="nb">New-Item</span> <span class="n">-ItemType</span> <span class="n">Directory</span> <span class="n">-Force</span> <span class="s2">"$env:PYSYN_CDBS\mtab"</span> <span class="p">|</span> <span class="nb">Out-Null</span>
 
 <span class="nb">Copy-Item</span> <span class="n">-Recurse</span> <span class="n">-Force</span> <span class="p">`</span>
-    <span class="s2">&quot;$normalizationTrds\comp\*&quot;</span> <span class="p">`</span>
-    <span class="s2">&quot;$env:PYSYN_CDBS\comp\&quot;</span>
+    <span class="s2">"$normalizationTrds\comp\*"</span> <span class="p">`</span>
+    <span class="s2">"$env:PYSYN_CDBS\comp\"</span>
 
 <span class="nb">Copy-Item</span> <span class="n">-Recurse</span> <span class="n">-Force</span> <span class="p">`</span>
-    <span class="s2">&quot;$normalizationTrds\mtab\*&quot;</span> <span class="p">`</span>
-    <span class="s2">&quot;$env:PYSYN_CDBS\mtab\&quot;</span>
+    <span class="s2">"$normalizationTrds\mtab\*"</span> <span class="p">`</span>
+    <span class="s2">"$env:PYSYN_CDBS\mtab\"</span>
+</pre></div>
+</div>
+<p>Create the CALSPEC directory, then copy the downloaded Vega file into it:</p>
+<div class="highlight-powershell notranslate"><div class="highlight"><pre><span></span><span class="nb">New-Item</span> <span class="n">-ItemType</span> <span class="n">Directory</span> <span class="n">-Force</span> <span class="s2">"$env:PYSYN_CDBS\calspec"</span> <span class="p">|</span> <span class="nb">Out-Null</span>
+<span class="nb">Copy-Item</span> <span class="n">-Force</span> <span class="p">`</span>
+    <span class="s2">"$HOME\Downloads\alpha_lyr_stis_011.fits"</span> <span class="p">`</span>
+    <span class="s2">"$env:PYSYN_CDBS\calspec\alpha_lyr_stis_011.fits"</span>
 </pre></div>
 </div>
 <p>Verify the current terminal’s variables and required files:</p>
@@ -173,18 +188,19 @@ the normalization archive:</p>
 <span class="nv">$env:PYSYN_CDBS</span>
 <span class="nb">Test-Path</span> <span class="nv">$env:pandeia_refdata</span>
 <span class="nb">Test-Path</span> <span class="nv">$env:PSF_DIR</span>
-<span class="nb">Test-Path</span> <span class="s2">&quot;$env:PYSYN_CDBS\comp&quot;</span>
-<span class="nb">Test-Path</span> <span class="s2">&quot;$env:PYSYN_CDBS\grid&quot;</span>
-<span class="nb">Test-Path</span> <span class="s2">&quot;$env:PYSYN_CDBS\mtab&quot;</span>
-<span class="nb">Test-Path</span> <span class="s2">&quot;$env:PYSYN_CDBS\comp\nonhst\bessell_j_003_syn.fits&quot;</span>
-<span class="nb">Test-Path</span> <span class="s2">&quot;$env:PYSYN_CDBS\grid\phoenix\catalog.fits&quot;</span>
-<span class="p">(</span><span class="nb">Get-ChildItem</span> <span class="s2">&quot;$env:PYSYN_CDBS\mtab&quot;</span> <span class="o">-File</span> <span class="n">-Recurse</span> <span class="p">|</span> <span class="nb">Measure-Object</span><span class="p">).</span><span class="n">Count</span> <span class="o">-gt</span> <span class="n">0</span>
+<span class="nb">Test-Path</span> <span class="s2">"$env:PYSYN_CDBS\comp"</span>
+<span class="nb">Test-Path</span> <span class="s2">"$env:PYSYN_CDBS\grid"</span>
+<span class="nb">Test-Path</span> <span class="s2">"$env:PYSYN_CDBS\mtab"</span>
+<span class="nb">Test-Path</span> <span class="s2">"$env:PYSYN_CDBS\comp\nonhst\bessell_j_003_syn.fits"</span>
+<span class="nb">Test-Path</span> <span class="s2">"$env:PYSYN_CDBS\calspec\alpha_lyr_stis_011.fits"</span>
+<span class="nb">Test-Path</span> <span class="s2">"$env:PYSYN_CDBS\grid\phoenix\catalog.fits"</span>
+<span class="p">(</span><span class="nb">Get-ChildItem</span> <span class="s2">"$env:PYSYN_CDBS\mtab"</span> <span class="o">-File</span> <span class="n">-Recurse</span> <span class="p">|</span> <span class="nb">Measure-Object</span><span class="p">).</span><span class="n">Count</span> <span class="o">-gt</span> <span class="n">0</span>
 </pre></div>
 </div>
 <p>For Command Prompt instead of PowerShell, set the current terminal and its
 persistent replacement separately:</p>
-<div class="highlight-bat notranslate"><div class="highlight"><pre><span></span><span class="k">set</span> <span class="s2">&quot;pandeia_refdata=C:\Users\USERNAME\pandexo-data\pandeia_data-2026.7-jwst&quot;</span>
-setx pandeia_refdata <span class="s2">&quot;</span><span class="nv">%pandeia_refdata%</span><span class="s2">&quot;</span>
+<div class="highlight-bat notranslate"><div class="highlight"><pre><span></span><span class="k">set</span> <span class="s2">"pandeia_refdata=C:\Users\USERNAME\pandexo-data\pandeia_data-2026.7-jwst"</span>
+setx pandeia_refdata <span class="s2">"</span><span class="nv">%pandeia_refdata%</span><span class="s2">"</span>
 </pre></div>
 </div>
 <p>Repeat the pair of commands for <code class="docutils literal notranslate"><span class="pre">PSF_DIR</span></code> and <code class="docutils literal notranslate"><span class="pre">PYSYN_CDBS</span></code>. <code class="docutils literal notranslate"><span class="pre">setx</span></code> only
@@ -196,7 +212,7 @@ affects future terminals, so retain <code class="docutils literal notranslate"><
 </pre></div>
 </div>
 <p>Confirm that PandExo can see the reference data:</p>
-<div class="highlight-powershell notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">-c</span> <span class="s2">&quot;import pandeia.engine; pandeia.engine.pandeia_version()&quot;</span>
+<div class="highlight-powershell notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">-c</span> <span class="s2">"import pandeia.engine; pandeia.engine.pandeia_version()"</span>
 </pre></div>
 </div>
 </section>
@@ -204,7 +220,7 @@ affects future terminals, so retain <code class="docutils literal notranslate"><
 <h2>Step 7: Validate the Installation<a class="headerlink" href="#step-7-validate-the-installation" title="Link to this heading"></a></h2>
 <p>For a normal pip installation, run this lightweight installed-package smoke
 test. It does not start the web application or run a simulation:</p>
-<div class="highlight-powershell notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">-c</span> <span class="s2">&quot;import pandexo.engine.justdoit as jdi; mode = jdi.load_mode_dict(&#39;NIRSpec Prism&#39;); assert mode[&#39;configuration&#39;][&#39;instrument&#39;][&#39;disperser&#39;] == &#39;prism&#39;; print(&#39;PandExo configuration smoke test passed.&#39;)&quot;</span>
+<div class="highlight-powershell notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">-c</span> <span class="s2">"import pandexo.engine.justdoit as jdi; mode = jdi.load_mode_dict('NIRSpec Prism'); assert mode['configuration']['instrument']['disperser'] == 'prism'; print('PandExo configuration smoke test passed.')"</span>
 </pre></div>
 </div>
 <p>To run repository tests, first clone the source checkout and install its test
@@ -213,7 +229,7 @@ dependencies. This command applies only inside that checkout:</p>
 <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">clone</span></code>. Git is not required for a normal pip installation.</p>
 <div class="highlight-powershell notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">://</span><span class="n">github</span><span class="p">.</span><span class="n">com</span><span class="p">/</span><span class="n">natashabatalha</span><span class="p">/</span><span class="n">PandExo</span><span class="p">.</span><span class="n">git</span>
 <span class="nb">cd </span><span class="n">PandExo</span>
-<span class="n">python</span> <span class="n">-m</span> <span class="n">pip</span> <span class="n">install</span> <span class="n">-e</span> <span class="s2">&quot;.[test]&quot;</span>
+<span class="n">python</span> <span class="n">-m</span> <span class="n">pip</span> <span class="n">install</span> <span class="n">-e</span> <span class="s2">".[test]"</span>
 <span class="n">python</span> <span class="n">-m</span> <span class="n">pytest</span> <span class="n">tests</span><span class="p">/</span><span class="n">test_import</span><span class="p">.</span><span class="n">py</span> <span class="n">-q</span>
 </pre></div>
 </div>
