@@ -39,6 +39,10 @@ to the appropriate file, replacing the example paths:
     export pandeia_refdata=/path/to/pandeia_data-2026.7-jwst
     export PSF_DIR=/path/to/pandeia_psfs-2026.7-jwst
 
+These are example paths. Set each variable to the directory that was actually
+created when you extracted the archive; archives may sometimes include a
+suffix such as ``rc1`` in that directory name.
+
 Source the startup file to make the changes available in your current terminal,
 for example:
 
@@ -68,7 +72,8 @@ file again:
 Normalization Files  
 ```````````````````
 PandExo also needs the STScI/CDBS-style throughput files used for J/H/K
-normalization bandpasses.
+normalization bandpasses and the Vega calibration spectrum used to convert
+those magnitudes to fluxes.
 
 `Download the file here <https://archive.stsci.edu/hlsps/reference-atlases/hlsp_reference-atlases_hst_multi_everything_multi_v11_sed.tar>`_
 
@@ -86,9 +91,21 @@ from the normalization archive:
     rsync -a "$NORMALIZATION_TRDS/comp/" "$PYSYN_CDBS/comp/"
     rsync -a "$NORMALIZATION_TRDS/mtab/" "$PYSYN_CDBS/mtab/"
 
-The ``$PYSYN_CDBS`` directory should now contain ``comp``, ``grid``, and
-``mtab`` (among other synphot directories). Verify that layout and the files
-PandExo uses for J/H/K normalization and PHOENIX spectra:
+Also download the small `Vega CALSPEC file
+<https://archive.stsci.edu/hlsps/reference-atlases/cdbs/calspec/alpha_lyr_stis_011.fits>`_
+separately and save it at the location expected by stsynphot:
+
+.. code-block:: bash
+
+    mkdir -p "$PYSYN_CDBS/calspec"
+    curl -L https://archive.stsci.edu/hlsps/reference-atlases/cdbs/calspec/alpha_lyr_stis_011.fits -o "$PYSYN_CDBS/calspec/alpha_lyr_stis_011.fits"
+
+This single file is sufficient for PandExo; downloading the full multi-gigabyte
+``synphot6`` archive is not required for PandExo use.
+
+The ``$PYSYN_CDBS`` directory should now contain ``calspec``, ``comp``,
+``grid``, and ``mtab`` (among other synphot directories). Verify that layout
+and the files PandExo uses for J/H/K normalization and PHOENIX spectra:
 
 .. code-block:: bash
 
@@ -96,23 +113,8 @@ PandExo uses for J/H/K normalization and PHOENIX spectra:
     ls "$PYSYN_CDBS/comp/nonhst/bessell_j_003_syn.fits"
     ls "$PYSYN_CDBS/comp/nonhst/bessell_h_004_syn.fits"
     ls "$PYSYN_CDBS/comp/nonhst/bessell_k_003_syn.fits"
+    ls "$PYSYN_CDBS/calspec/alpha_lyr_stis_011.fits"
     ls "$PYSYN_CDBS/grid/phoenix/catalog.fits"
-
-Verify the complete reference-data setup with:
-
-.. code-block:: bash
-
-    python -c "import pandeia.engine; pandeia.engine.pandeia_version()"
-
-If properly installed and configured, it should show the matching versions and
-stellar reference-data directory, like this:
-
-.. code-block:: text
-
-    Pandeia Engine version:  2026.7
-    Pandeia RefData version: 2026.7
-    Pandeia PSFs version:    2026.7
-    Synphot Data:            /path/to/grp/redcat/trds
 
 Fortney+ 2010 Planet Grid (Optional)
 ````````````````````````````````````
@@ -164,6 +166,23 @@ getting started:
 
 Final Test for Success
 ======================
+
+Now that PandExo and its Pandeia dependency are installed, verify the complete
+reference-data setup:
+
+.. code-block:: bash
+
+    python -c "import pandeia.engine; pandeia.engine.pandeia_version()"
+
+If properly installed and configured, it should show the matching versions and
+stellar reference-data directory, like this:
+
+.. code-block:: text
+
+    Pandeia Engine version:  2026.7
+    Pandeia RefData version: 2026.7
+    Pandeia PSFs version:    2026.7
+    Synphot Data:            /path/to/grp/redcat/trds
 
 For a normal pip installation, run this installed-package smoke test. It loads
 PandExo's bundled NIRSpec configuration and does not download data, start the
