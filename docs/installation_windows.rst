@@ -74,7 +74,7 @@ persistent values are loaded automatically.
     [Environment]::SetEnvironmentVariable('PYSYN_CDBS', $env:PYSYN_CDBS, 'User')
 
 These are example paths. Set each variable to the directory that was actually
-created when you extracted the archive; pre-release archives may include a
+created when you extracted the archive; archives may sometimes include a
 suffix such as ``rc1`` in that directory name.
 
 Copy the normalization ``comp`` and ``mtab`` contents into ``PYSYN_CDBS``. In

@@ -40,7 +40,7 @@ to the appropriate file, replacing the example paths:
     export PSF_DIR=/path/to/pandeia_psfs-2026.7-jwst
 
 These are example paths. Set each variable to the directory that was actually
-created when you extracted the archive; pre-release archives may include a
+created when you extracted the archive; archives may sometimes include a
 suffix such as ``rc1`` in that directory name.
 
 Source the startup file to make the changes available in your current terminal,
@@ -91,7 +91,7 @@ from the normalization archive:
     rsync -a "$NORMALIZATION_TRDS/comp/" "$PYSYN_CDBS/comp/"
     rsync -a "$NORMALIZATION_TRDS/mtab/" "$PYSYN_CDBS/mtab/"
 
-Download the much smaller `Vega CALSPEC file
+Also download the small `Vega CALSPEC file
 <https://archive.stsci.edu/hlsps/reference-atlases/cdbs/calspec/alpha_lyr_stis_011.fits>`_
 separately and save it at the location expected by stsynphot:
 
@@ -101,7 +101,7 @@ separately and save it at the location expected by stsynphot:
     curl -L https://archive.stsci.edu/hlsps/reference-atlases/cdbs/calspec/alpha_lyr_stis_011.fits -o "$PYSYN_CDBS/calspec/alpha_lyr_stis_011.fits"
 
 This single file is sufficient for PandExo; downloading the full multi-gigabyte
-``synphot6`` archive is not required.
+``synphot6`` archive is not required for PandExo use.
 
 The ``$PYSYN_CDBS`` directory should now contain ``calspec``, ``comp``,
 ``grid``, and ``mtab`` (among other synphot directories). Verify that layout
