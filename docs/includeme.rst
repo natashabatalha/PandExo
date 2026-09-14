@@ -1,11 +1,11 @@
 .. include:: ../README.rst
-   :end-before: .. image:: https://zenodo.org/badge/67237418.svg
+   :end-before: .. image:: https://img.shields.io/badge/DOI-10.5281%2Fzenodo.1256954-blue.svg
 
 .. only:: html
 
-   .. image:: https://zenodo.org/badge/67237418.svg
+   .. image:: https://img.shields.io/badge/DOI-10.5281%2Fzenodo.1256954-blue.svg
       :alt: PandExo Zenodo DOI.
-      :target: https://zenodo.org/badge/latestdoi/67237418
+      :target: https://doi.org/10.5281/zenodo.1256954
 
    .. image:: https://github.com/natashabatalha/PandExo/actions/workflows/tests.yml/badge.svg?branch=master
       :alt: PandExo test workflow status.
