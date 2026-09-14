@@ -28,7 +28,7 @@ conda-env/
 # Jupyter notebooks
 .ipynb_checkpoints/
 notebooks/*.html
-*[Ll]ocal*.ipynb
+notebooks/*[Ll]ocal*.ipynb
 
 # Test and coverage output
 .coverage
