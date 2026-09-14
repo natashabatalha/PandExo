@@ -81,6 +81,22 @@ NIRISS_WEB_SUBARRAYS = (
 )
 
 
+def _configure_nircam_dhs_channel(instrument, channel, sw_filter, lw_filter):
+    """Configure the displayed channel and its simultaneous filter."""
+    if channel == "sw":
+        mode, filt, pair = "sw_tsgrism", sw_filter, lw_filter
+    elif channel == "lw":
+        mode, filt, pair = "lw_tsgrism", lw_filter, sw_filter
+    else:
+        raise ValueError("Choose the NIRCam DHS short- or long-wave channel.")
+
+    instrument.update(
+        mode=mode,
+        filter=filt,
+        pandexofilterpair=pair,
+    )
+
+
 def validate_online_instrument_configuration(conf):
     """Reject incomplete or unsupported instrument selections before queuing work."""
     instrument = conf.get("instrument", {})
@@ -700,17 +716,17 @@ class CalculationNewHandler(BaseHandler):
                 pandata = json.load(data_file)
                 # SW and LW are observed together, but PandExo displays one at a time.
                 sw_or_lw = self.get_argument("nircammode")
-                if sw_or_lw not in ("sw", "lw"):
-                    raise tornado.web.HTTPError(
-                        400, reason="Choose the NIRCam DHS short- or long-wave channel."
+                try:
+                    _configure_nircam_dhs_channel(
+                        pandata["configuration"]["instrument"],
+                        sw_or_lw,
+                        self.get_argument("nircamsw"),
+                        self.get_argument("nircamlw"),
                     )
-                filter_to_sim = f"nircam{sw_or_lw}"
-                if "sw" in filter_to_sim:
-                    pair_filter = "nircamlw"
-                else:
-                    pair_filter = "nircamsw"
-                pandata["configuration"]["instrument"]["filter"] = self.get_argument(filter_to_sim)
-                pandata["configuration"]["instrument"]["pandexofilterpair"] = self.get_argument(pair_filter)
+                except ValueError as exc:
+                    raise tornado.web.HTTPError(
+                        400, reason=str(exc)
+                    )
                 pandata["configuration"]["detector"]["subarray"] = self.get_argument("nircamsubarraydhs")
                 pandata["configuration"]["detector"]["readout_pattern"] = (
                     self.get_argument("nircamdhsreadout", "optimize")
