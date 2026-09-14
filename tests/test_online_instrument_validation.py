@@ -14,6 +14,7 @@ from pandexo.engine.run_online import (
     NIRSPEC_PRISM_MULTISTRIPE_SUBARRAYS,
     NIRSPEC_STANDARD_SUBARRAYS,
     NIRSPEC_WEB_MODES,
+    _configure_nircam_dhs_channel,
     validate_online_instrument_configuration,
 )
 
@@ -23,6 +24,34 @@ def _configuration(instrument, detector, **instrument_values):
         "instrument": {"instrument": instrument, **instrument_values},
         "detector": detector,
     }
+
+
+@pytest.mark.parametrize(
+    ("channel", "mode", "filt", "pair"),
+    [
+        ("sw", "sw_tsgrism", "f150w2", "f444w"),
+        ("lw", "lw_tsgrism", "f444w", "f150w2"),
+    ],
+)
+def test_nircam_dhs_display_channel_sets_mode_and_filter_order(
+    channel, mode, filt, pair
+):
+    conf = _configuration(
+        "nircam",
+        {"subarray": "sub41s1_2-spectra", "readout_pattern": "dhs4"},
+    )
+
+    _configure_nircam_dhs_channel(
+        conf["instrument"], channel, "f150w2", "f444w"
+    )
+
+    assert conf["instrument"] == {
+        "instrument": "nircam",
+        "mode": mode,
+        "filter": filt,
+        "pandexofilterpair": pair,
+    }
+    assert validate_online_instrument_configuration(conf) is None
 
 
 def test_all_website_instrument_configurations_are_valid():
